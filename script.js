@@ -9,13 +9,20 @@ let ALL_GAMES_DATA = [];
 // ==========================================
 async function fetchLocalOdds() {
     try {
-        const response = await fetch('data/odds.json?v=' + new Date().getTime()); 
+        console.log("Fetching odds directly from WeatherMLB server...");
+        // NEW: Reaching across to the weather site's data folder!
+        const response = await fetch('https://weathermlb.com/data/odds.json?v=' + new Date().getTime()); 
+        
         if (response.ok) {
             const fileData = await response.json();
+            console.log(`✅ Loaded ${fileData.game_count} odds from WeatherMLB (Last updated: ${new Date(fileData.last_updated).toLocaleTimeString()})`);
             return fileData.odds;
+        } else {
+            console.log("⚠️ Failed to load odds from WeatherMLB.");
+            return null;
         }
-        return null;
     } catch (e) {
+        console.log("Error fetching cross-domain odds:", e);
         return null; 
     }
 }
