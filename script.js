@@ -120,26 +120,34 @@ function createGameCard(data) {
     const handDict = data.lineupHandedness || {}; 
 
     const gameCard = document.createElement('div');
-    gameCard.className = 'col-md-6 col-lg-6 col-xl-4';
+    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
 
+    // Teams, IDs & Basic Info
     const awayName = game.teams.away.team.name;
     const homeName = game.teams.home.team.name;
+    const awayId = game.teams.away.team.id;
+    const homeId = game.teams.home.team.id;
+    const venueName = game.venue.name;
     const gameTime = new Date(game.gameDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
+    // Fetch SVGs
+    const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
+    const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
+
+    // --- PITCHER LOGIC (Formatted as: Name (Hand)) ---
     let awayPitcher = "TBD";
-    let awayPitcherHand = "";
     if (game.teams.away.probablePitcher) {
-        awayPitcher = game.teams.away.probablePitcher.fullName;
-        awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || "";
+        const hand = game.teams.away.probablePitcher.pitchHand?.code ? ` (${game.teams.away.probablePitcher.pitchHand.code})` : "";
+        awayPitcher = game.teams.away.probablePitcher.fullName + hand;
     }
 
     let homePitcher = "TBD";
-    let homePitcherHand = "";
     if (game.teams.home.probablePitcher) {
-        homePitcher = game.teams.home.probablePitcher.fullName;
-        homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || "";
+        const hand = game.teams.home.probablePitcher.pitchHand?.code ? ` (${game.teams.home.probablePitcher.pitchHand.code})` : "";
+        homePitcher = game.teams.home.probablePitcher.fullName + hand;
     }
 
+    // --- LINEUPS BUILDER ---
     const buildLineupList = (playersArray) => {
         if (!playersArray || playersArray.length === 0) {
             return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
@@ -159,8 +167,9 @@ function createGameCard(data) {
     const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers);
     const homeLineupHtml = buildLineupList(game.lineups?.homePlayers);
 
+    // --- ODDS LOGIC ---
     const oddsData = data.odds; 
-    let oddsHtml = `<div class="text-center small text-muted py-2 border-top">Odds TBD</div>`;
+    let oddsHtml = `<div class="text-center small text-muted py-2 border-top bg-white">Odds TBD</div>`;
     
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
         const bookie = oddsData.bookmakers[0];
@@ -178,43 +187,52 @@ function createGameCard(data) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) total = totalsMarket.outcomes[0].point;
         
         oddsHtml = `
-            <div class="d-flex justify-content-between align-items-center py-2 px-3 border-top bg-light" style="font-size: 0.8rem;">
+            <div class="d-flex justify-content-between align-items-center py-2 px-3 border-top bg-white" style="font-size: 0.8rem;">
                 <span class="fw-bold text-muted">Moneyline: <span class="text-dark">${mlAway} | ${mlHome}</span></span>
                 <span class="fw-bold text-muted">Total: <span class="text-dark">O/U ${total}</span></span>
             </div>`;
     }
 
+    // --- CARD RENDER ---
     gameCard.innerHTML = `
         <div class="lineup-card">
-            <div class="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
-                <span class="badge bg-dark">${gameTime}</span>
-                <span class="small fw-bold text-muted text-uppercase">${awayName} @ ${homeName}</span>
-            </div>
             
-            <div class="row g-0">
-                <div class="col-6 border-end">
-                    <div class="pitcher-block">
-                        <div class="text-uppercase text-muted" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">Starting Pitcher</div>
-                        <div class="pitcher-name mt-1">${awayPitcher}</div>
-                        ${awayPitcherHand ? `<span class="pitcher-hand mt-1 d-inline-block">Throws ${awayPitcherHand}</span>` : ''}
-                    </div>
-                    ${awayLineupHtml}
+            <div class="p-3 pb-2" style="background-color: #edf4f8;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.8rem;">${gameTime}</span>
+                    <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.75rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
                 </div>
                 
-                <div class="col-6">
-                    <div class="pitcher-block">
-                        <div class="text-uppercase text-muted" style="font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px;">Starting Pitcher</div>
-                        <div class="pitcher-name mt-1">${homePitcher}</div>
-                        ${homePitcherHand ? `<span class="pitcher-hand mt-1 d-inline-block">Throws ${homePitcherHand}</span>` : ''}
+                <div class="d-flex justify-content-between align-items-start px-1">
+                    <div class="text-center" style="width: 48%;"> 
+                        <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-2" onerror="this.style.display='none'">
+                        <div class="fw-bold lh-1 text-dark" style="font-size: 0.95rem; letter-spacing: -0.2px;">${awayName}</div>
+                        <div class="text-muted mt-1" style="font-size: 0.8rem;">${awayPitcher}</div>
                     </div>
+                    
+                    <div class="text-muted small fw-bold pt-4">@</div>
+                    
+                    <div class="text-center" style="width: 48%;"> 
+                        <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-2" onerror="this.style.display='none'">
+                        <div class="fw-bold lh-1 text-dark" style="font-size: 0.95rem; letter-spacing: -0.2px;">${homeName}</div>
+                        <div class="text-muted mt-1" style="font-size: 0.8rem;">${homePitcher}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row g-0 bg-white border-top">
+                <div class="col-6 border-end">
+                    ${awayLineupHtml}
+                </div>
+                <div class="col-6">
                     ${homeLineupHtml}
                 </div>
             </div>
             
             ${oddsHtml}
 
-            <div class="p-2 border-top text-center">
-                <a href="https://weathermlb.com" target="_blank" class="btn btn-sm btn-outline-primary w-100 promo-btn">
+            <div class="p-2 border-top text-center bg-white">
+                <a href="https://weathermlb.com" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
                     🌧️ View Weather & Wind Impact
                 </a>
             </div>
