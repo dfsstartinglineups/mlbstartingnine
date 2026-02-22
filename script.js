@@ -134,7 +134,7 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- PITCHER LOGIC (Formatted as: Name (Hand)) ---
+    // --- PITCHER LOGIC ---
     let awayPitcher = "TBD";
     if (game.teams.away.probablePitcher) {
         const hand = game.teams.away.probablePitcher.pitchHand?.code ? ` (${game.teams.away.probablePitcher.pitchHand.code})` : "";
@@ -167,30 +167,39 @@ function createGameCard(data) {
     const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers);
     const homeLineupHtml = buildLineupList(game.lineups?.homePlayers);
 
-    // --- ODDS LOGIC ---
+    // --- ODDS LOGIC (UPDATED FOR TOP SECTION) ---
     const oddsData = data.odds; 
-    let oddsHtml = `<div class="text-center small text-muted py-2 border-top bg-white">Odds TBD</div>`;
+    let mlAway = "", mlHome = "", totalHtml = `<div class="text-muted small fw-bold pt-4">@</div>`;
     
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
         const bookie = oddsData.bookmakers[0];
         const h2hMarket = bookie.markets.find(m => m.key === 'h2h');
         const totalsMarket = bookie.markets.find(m => m.key === 'totals');
         
-        let mlAway = "TBD", mlHome = "TBD", total = "TBD";
-        
+        // Generate Moneyline Badges
         if (h2hMarket) {
             const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayName);
             const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeName);
-            if (awayOutcome) mlAway = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
-            if (homeOutcome) mlHome = homeOutcome.price > 0 ? `+${homeOutcome.price}` : homeOutcome.price;
+            
+            if (awayOutcome) {
+                const price = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
+                mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
+            }
+            if (homeOutcome) {
+                const price = homeOutcome.price > 0 ? `+${homeOutcome.price}` : homeOutcome.price;
+                mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
+            }
         }
-        if (totalsMarket && totalsMarket.outcomes.length > 0) total = totalsMarket.outcomes[0].point;
         
-        oddsHtml = `
-            <div class="d-flex justify-content-between align-items-center py-2 px-3 border-top bg-white" style="font-size: 0.8rem;">
-                <span class="fw-bold text-muted">Moneyline: <span class="text-dark">${mlAway} | ${mlHome}</span></span>
-                <span class="fw-bold text-muted">Total: <span class="text-dark">O/U ${total}</span></span>
-            </div>`;
+        // Generate Centered Over/Under
+        if (totalsMarket && totalsMarket.outcomes.length > 0) {
+            const total = totalsMarket.outcomes[0].point;
+            totalHtml = `
+                <div class="d-flex flex-column justify-content-center align-items-center pt-3">
+                    <div class="text-muted small fw-bold mb-1">@</div>
+                    <div class="badge bg-secondary text-white" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${total}</div>
+                </div>`;
+        }
     }
 
     // --- CARD RENDER ---
@@ -204,17 +213,23 @@ function createGameCard(data) {
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-start px-1">
-                    <div class="text-center" style="width: 48%;"> 
+                    <div class="text-center" style="width: 42%;"> 
                         <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-2" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark" style="font-size: 0.95rem; letter-spacing: -0.2px;">${awayName}</div>
+                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.95rem; letter-spacing: -0.2px;">
+                            ${awayName} ${mlAway}
+                        </div>
                         <div class="text-muted mt-1" style="font-size: 0.8rem;">${awayPitcher}</div>
                     </div>
                     
-                    <div class="text-muted small fw-bold pt-4">@</div>
+                    <div class="text-center" style="width: 16%;">
+                        ${totalHtml}
+                    </div>
                     
-                    <div class="text-center" style="width: 48%;"> 
+                    <div class="text-center" style="width: 42%;"> 
                         <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-2" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark" style="font-size: 0.95rem; letter-spacing: -0.2px;">${homeName}</div>
+                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.95rem; letter-spacing: -0.2px;">
+                            ${homeName} ${mlHome}
+                        </div>
                         <div class="text-muted mt-1" style="font-size: 0.8rem;">${homePitcher}</div>
                     </div>
                 </div>
@@ -228,8 +243,6 @@ function createGameCard(data) {
                     ${homeLineupHtml}
                 </div>
             </div>
-            
-            ${oddsHtml}
 
             <div class="p-2 border-top text-center bg-white">
                 <a href="https://weathermlb.com" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
