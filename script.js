@@ -189,14 +189,14 @@ function createGameCard(data) {
                 let bvpClass = "text-muted"; 
                 if (bvp.ab > 0) {
                     bvpText = `${bvp.hits}-${bvp.ab}(${bvp.avg})•${bvp.hr}HR•${bvp.ops}OPS`;
-                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; 
+                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; // Keeping vP bold for emphasis (if sample size is decent)
                 }
 
                 let splitText = "No History";
                 let splitClass = "text-muted";
                 if (split.ab > 0) {
                     splitText = `${split.avg}AVG•${split.hr}HR•${split.ops}OPS`;
-                    splitClass = "text-dark fw-bold";
+                    splitClass = "text-dark"; // REMOVED fw-bold here!
                 }
 
                 // 2 & 3. Micro-labels and zero margins
