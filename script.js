@@ -10,21 +10,27 @@ let ALL_GAMES_DATA = [];
 async function fetchLocalOdds() {
     try {
         console.log("Fetching odds directly from WeatherMLB server...");
-        // NEW: Reaching across to the weather site's data folder!
         const response = await fetch('https://weathermlb.com/data/odds.json?v=' + new Date().getTime()); 
         
         if (response.ok) {
             const fileData = await response.json();
-            console.log(`✅ Loaded ${fileData.game_count} odds from WeatherMLB (Last updated: ${new Date(fileData.last_updated).toLocaleTimeString()})`);
+            console.log(`✅ Loaded ${fileData.game_count} odds from WeatherMLB`);
             return fileData.odds;
-        } else {
-            console.log("⚠️ Failed to load odds from WeatherMLB.");
-            return null;
         }
-    } catch (e) {
-        console.log("Error fetching cross-domain odds:", e);
-        return null; 
-    }
+    } catch (e) { console.log("Error fetching cross-domain odds:", e); }
+    return null; 
+}
+
+// NEW: Fetch our lightning-fast backend data
+async function fetchMatchupsData() {
+    try {
+        console.log("Fetching deep matchup stats...");
+        const response = await fetch('data/matchups.json?v=' + new Date().getTime()); 
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (e) { console.log("No matchups.json found. Backend script may not have run yet."); }
+    return null;
 }
 
 async function init(dateToFetch) {
@@ -38,7 +44,7 @@ async function init(dateToFetch) {
         container.innerHTML = `
             <div class="col-12 text-center mt-5 pt-5">
                 <div class="spinner-border text-primary" role="status"></div>
-                <p class="mt-3 text-muted fw-bold">Loading Lineups...</p>
+                <p class="mt-3 text-muted fw-bold">Loading Lineups & Matchups...</p>
             </div>`;
     }
     
@@ -59,8 +65,15 @@ async function init(dateToFetch) {
         }
 
         const rawGames = scheduleData.dates[0].games;
-        let dailyOddsData = await fetchLocalOdds();
         
+        // Fetch our static JSON files concurrently
+        const [dailyOddsData, matchupsData] = await Promise.all([
+            fetchLocalOdds(),
+            fetchMatchupsData()
+        ]);
+        
+        const cachedGames = matchupsData?.games || {};
+
         for (let i = 0; i < rawGames.length; i++) {
             const game = rawGames[i];
 
@@ -93,7 +106,8 @@ async function init(dateToFetch) {
             ALL_GAMES_DATA.push({
                 gameRaw: game,
                 odds: gameOdds,
-                lineupHandedness: lineupHandedness
+                lineupHandedness: lineupHandedness,
+                deepStats: cachedGames[game.gamePk] || {} // Injecting the backend data!
             });
         }
 
@@ -125,9 +139,10 @@ function renderGames() {
 function createGameCard(data) {
     const game = data.gameRaw;
     const handDict = data.lineupHandedness || {}; 
+    const deepStats = data.deepStats || {};
 
     const gameCard = document.createElement('div');
-    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
+    gameCard.className = 'col-md-6 col-lg-6 col-xl-6 mb-2'; // Made slightly wider (xl-6) to fit the new data table
 
     // Teams, IDs & Basic Info
     const awayName = game.teams.away.team.name;
@@ -137,25 +152,26 @@ function createGameCard(data) {
     const venueName = game.venue.name;
     const gameTime = new Date(game.gameDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
-    // Fetch SVGs
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
     // --- PITCHER LOGIC ---
     let awayPitcher = "TBD";
+    let awayPitcherHand = 'R'; // Default fallback
     if (game.teams.away.probablePitcher) {
-        const hand = game.teams.away.probablePitcher.pitchHand?.code ? ` (${game.teams.away.probablePitcher.pitchHand.code})` : "";
-        awayPitcher = game.teams.away.probablePitcher.fullName + hand;
+        awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
+        awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
     }
 
     let homePitcher = "TBD";
+    let homePitcherHand = 'R'; // Default fallback
     if (game.teams.home.probablePitcher) {
-        const hand = game.teams.home.probablePitcher.pitchHand?.code ? ` (${game.teams.home.probablePitcher.pitchHand.code})` : "";
-        homePitcher = game.teams.home.probablePitcher.fullName + hand;
+        homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
+        homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- LINEUPS BUILDER ---
-    const buildLineupList = (playersArray) => {
+    // --- LINEUPS BUILDER (WITH DEEP STATS) ---
+    const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) {
             return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         }
@@ -163,18 +179,59 @@ function createGameCard(data) {
         const listItems = playersArray.map((p, index) => {
             const batCode = handDict[p.id] || "";
             const handBadge = batCode ? `<span class="batter-hand">${batCode}</span>` : "";
-            return `<li>
-                        <div><span class="order-num">${index + 1}.</span> <span class="batter-name">${p.fullName}</span></div>
-                        ${handBadge}
+            
+            // Generate the deep stats block if we have data from Python
+            let statsHtml = '';
+            const pStats = deepStats[p.id];
+            
+            if (pStats) {
+                const bvp = pStats.bvp;
+                const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
+                
+                // Format BvP string
+                let bvpText = "No History";
+                let bvpClass = "text-muted"; // Grey out small samples
+                if (bvp.ab > 0) {
+                    bvpText = `${bvp.hits}-${bvp.ab} (${bvp.avg}) • ${bvp.hr} HR • ${bvp.ops} OPS`;
+                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; // Emphasize legit samples
+                }
+
+                // Format Split string
+                let splitText = "No History";
+                if (split.ab > 0) {
+                    splitText = `${split.avg} AVG • ${split.hr} HR • ${split.ops} OPS (${split.ab} AB)`;
+                }
+
+                statsHtml = `
+                    <div class="mt-1 p-1 rounded" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">vs Starter:</span>
+                            <span class="${bvpClass}">${bvpText}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">vs ${opposingPitcherHand}HP:</span>
+                            <span class="text-secondary fw-bold">${splitText}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `<li class="d-flex flex-column w-100">
+                        <div class="d-flex justify-content-between align-items-center w-100 mb-1">
+                            <div><span class="order-num">${index + 1}.</span> <span class="batter-name">${p.fullName}</span></div>
+                            ${handBadge}
+                        </div>
+                        ${statsHtml}
                     </li>`;
         }).join('');
-        return `<ul class="batting-order">${listItems}</ul>`;
+        return `<ul class="batting-order w-100">${listItems}</ul>`;
     };
 
-    const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers);
-    const homeLineupHtml = buildLineupList(game.lineups?.homePlayers);
+    // Away batters face Home pitcher. Home batters face Away pitcher.
+    const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers, homePitcherHand);
+    const homeLineupHtml = buildLineupList(game.lineups?.homePlayers, awayPitcherHand);
 
-    // --- ODDS LOGIC (UPDATED FOR TOP SECTION) ---
+    // --- ODDS LOGIC ---
     const oddsData = data.odds; 
     let mlAway = "", mlHome = "", totalHtml = `<div class="text-muted small fw-bold pt-4">@</div>`;
     
@@ -183,7 +240,6 @@ function createGameCard(data) {
         const h2hMarket = bookie.markets.find(m => m.key === 'h2h');
         const totalsMarket = bookie.markets.find(m => m.key === 'totals');
         
-        // Generate Moneyline Badges
         if (h2hMarket) {
             const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayName);
             const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeName);
@@ -198,7 +254,6 @@ function createGameCard(data) {
             }
         }
         
-        // Generate Centered Over/Under
         if (totalsMarket && totalsMarket.outcomes.length > 0) {
             const total = totalsMarket.outcomes[0].point;
             totalHtml = `
@@ -225,7 +280,7 @@ function createGameCard(data) {
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.95rem; letter-spacing: -0.2px;">
                             ${awayName} ${mlAway}
                         </div>
-                        <div class="text-muted mt-1" style="font-size: 0.8rem;">${awayPitcher}</div>
+                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.8rem;">${awayPitcher}</div>
                     </div>
                     
                     <div class="text-center" style="width: 16%;">
@@ -237,7 +292,7 @@ function createGameCard(data) {
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.95rem; letter-spacing: -0.2px;">
                             ${homeName} ${mlHome}
                         </div>
-                        <div class="text-muted mt-1" style="font-size: 0.8rem;">${homePitcher}</div>
+                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.8rem;">${homePitcher}</div>
                     </div>
                 </div>
             </div>
