@@ -190,27 +190,31 @@ function createGameCard(data) {
                 
                 // Format BvP string
                 let bvpText = "No History";
-                let bvpClass = "text-muted"; // Grey out small samples
+                let bvpClass = "text-muted fst-italic"; // Grey out small samples
                 if (bvp.ab > 0) {
-                    bvpText = `${bvp.hits}-${bvp.ab} (${bvp.avg}) • ${bvp.hr} HR • ${bvp.ops} OPS`;
-                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; // Emphasize legit samples
+                    bvpText = `${bvp.hits}-${bvp.ab} (${bvp.avg}) <span class="mx-1 text-muted">|</span> ${bvp.hr} HR <span class="mx-1 text-muted">|</span> ${bvp.ops} OPS`;
+                    // Emphasize legit samples, mute small samples
+                    bvpClass = bvp.ab >= 3 ? "text-dark fw-bold" : "text-secondary"; 
                 }
 
                 // Format Split string
                 let splitText = "No History";
+                let splitClass = "text-muted fst-italic";
                 if (split.ab > 0) {
-                    splitText = `${split.avg} AVG • ${split.hr} HR • ${split.ops} OPS (${split.ab} AB)`;
+                    splitText = `${split.avg} <span class="mx-1 text-muted">|</span> ${split.hr} HR <span class="mx-1 text-muted">|</span> ${split.ops} OPS <span class="text-muted fw-normal ms-1">(${split.ab} AB)</span>`;
+                    splitClass = "text-dark fw-bold";
                 }
 
+                // New Data-Table Layout
                 statsHtml = `
-                    <div class="mt-1 p-1 rounded" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span class="text-muted">vs Starter:</span>
-                            <span class="${bvpClass}">${bvpText}</span>
+                    <div class="mt-2 mb-1 rounded overflow-hidden" style="font-size: 0.65rem; border: 1px solid #dee2e6;">
+                        <div class="d-flex border-bottom bg-white align-items-stretch">
+                            <div class="text-muted fw-bold d-flex align-items-center justify-content-center border-end" style="width: 32px; font-size: 0.55rem; background-color: #f1f3f5;">BvP</div>
+                            <div class="py-1 px-2 text-center w-100 ${bvpClass}" style="letter-spacing: -0.1px;">${bvpText}</div>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted">vs ${opposingPitcherHand}HP:</span>
-                            <span class="text-secondary fw-bold">${splitText}</span>
+                        <div class="d-flex bg-white align-items-stretch">
+                            <div class="text-muted fw-bold d-flex align-items-center justify-content-center border-end" style="width: 32px; font-size: 0.55rem; background-color: #f1f3f5;">v${opposingPitcherHand}</div>
+                            <div class="py-1 px-2 text-center w-100 ${splitClass}" style="letter-spacing: -0.1px;">${splitText}</div>
                         </div>
                     </div>
                 `;
