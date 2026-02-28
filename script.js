@@ -192,8 +192,15 @@ function createGameCard(data) {
     let awayName = game.teams.away.team.teamName || awayNameFull.split(' ').pop();
     let homeName = game.teams.home.team.teamName || homeNameFull.split(' ').pop();
 
-    // Catch long names to prevent UI breaking
+    // Catch 2-word names and long names to prevent UI breaking
+    if (awayNameFull.includes('Red Sox')) awayName = 'Red Sox';
+    if (awayNameFull.includes('White Sox')) awayName = 'White Sox';
+    if (awayNameFull.includes('Blue Jays')) awayName = 'Blue Jays';
     if (awayName === 'Diamondbacks') awayName = 'Dbacks';
+
+    if (homeNameFull.includes('Red Sox')) homeName = 'Red Sox';
+    if (homeNameFull.includes('White Sox')) homeName = 'White Sox';
+    if (homeNameFull.includes('Blue Jays')) homeName = 'Blue Jays';
     if (homeName === 'Diamondbacks') homeName = 'Dbacks';
 
     const awayId = game.teams.away.team.id;
