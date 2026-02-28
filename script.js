@@ -9,27 +9,22 @@ let ALL_GAMES_DATA = [];
 // ==========================================
 async function fetchLocalOdds() {
     try {
-        console.log("Fetching odds directly from WeatherMLB server...");
         const response = await fetch('https://weathermlb.com/data/odds.json?v=' + new Date().getTime()); 
-        
         if (response.ok) {
             const fileData = await response.json();
-            console.log(`✅ Loaded ${fileData.game_count} odds from WeatherMLB`);
             return fileData.odds;
         }
     } catch (e) { console.log("Error fetching cross-domain odds:", e); }
     return null; 
 }
 
-// NEW: Fetch our lightning-fast backend data
 async function fetchMatchupsData() {
     try {
-        console.log("Fetching deep matchup stats...");
         const response = await fetch('data/matchups.json?v=' + new Date().getTime()); 
         if (response.ok) {
             return await response.json();
         }
-    } catch (e) { console.log("No matchups.json found. Backend script may not have run yet."); }
+    } catch (e) { console.log("No matchups.json found."); }
     return null;
 }
 
@@ -66,7 +61,6 @@ async function init(dateToFetch) {
 
         const rawGames = scheduleData.dates[0].games;
         
-        // Fetch our static JSON files concurrently
         const [dailyOddsData, matchupsData] = await Promise.all([
             fetchLocalOdds(),
             fetchMatchupsData()
@@ -85,7 +79,6 @@ async function init(dateToFetch) {
                 );
             }
 
-            // --- FETCH LINEUP HANDEDNESS ---
             let lineupHandedness = {};
             const awayLineup = game.lineups?.awayPlayers || [];
             const homeLineup = game.lineups?.homePlayers || [];
@@ -107,7 +100,7 @@ async function init(dateToFetch) {
                 gameRaw: game,
                 odds: gameOdds,
                 lineupHandedness: lineupHandedness,
-                deepStats: cachedGames[game.gamePk] || {} // Injecting the backend data!
+                deepStats: cachedGames[game.gamePk] || {} 
             });
         }
 
@@ -126,7 +119,6 @@ function renderGames() {
     const container = document.getElementById('games-container');
     container.innerHTML = '';
 
-    // Sort by time
     let sortedGames = [...ALL_GAMES_DATA].sort((a, b) => {
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
@@ -142,9 +134,8 @@ function createGameCard(data) {
     const deepStats = data.deepStats || {};
 
     const gameCard = document.createElement('div');
-    gameCard.className = 'col-md-6 col-lg-6 col-xl-6 mb-2'; // Made slightly wider (xl-6) to fit the new data table
+    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-3';
 
-    // Teams, IDs & Basic Info
     const awayName = game.teams.away.team.name;
     const homeName = game.teams.home.team.name;
     const awayId = game.teams.away.team.id;
@@ -155,22 +146,21 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- PITCHER LOGIC ---
     let awayPitcher = "TBD";
-    let awayPitcherHand = 'R'; // Default fallback
+    let awayPitcherHand = 'R'; 
     if (game.teams.away.probablePitcher) {
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
         awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
     }
 
     let homePitcher = "TBD";
-    let homePitcherHand = 'R'; // Default fallback
+    let homePitcherHand = 'R'; 
     if (game.teams.home.probablePitcher) {
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-   // --- LINEUPS BUILDER (COMPACT 2-LINE GRID) ---
+    // --- LINEUPS BUILDER (WITH COLLAPSIBLE STATS) ---
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) {
             return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
@@ -180,70 +170,60 @@ function createGameCard(data) {
             const batCode = handDict[p.id] || "";
             const handBadge = batCode ? `<span class="batter-hand ms-1">${batCode}</span>` : "";
             
-            // 1. Abbreviate the player's name (e.g., "Oneil Cruz" -> "O. Cruz")
-            let abbrName = p.fullName;
-            const nameParts = p.fullName.split(' ');
-            if (nameParts.length > 1) {
-                abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
-            }
-            
-            // Generate the deep stats block if we have data from Python
-            let bvpText = "", splitText = "", bvpClass = "", splitClass = "";
+            let statsHtml = '';
             const pStats = deepStats[p.id];
             
             if (pStats) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
                 
-                // Format BvP string (Ultra-compact)
-                bvpText = "No History";
-                bvpClass = "text-muted fst-italic"; 
+                let bvpText = "No History";
+                let bvpClass = "text-muted"; 
                 if (bvp.ab > 0) {
                     bvpText = `${bvp.hits}-${bvp.ab} (${bvp.avg}) • ${bvp.hr} HR • ${bvp.ops} OPS`;
-                    bvpClass = bvp.ab >= 3 ? "text-dark fw-bold" : "text-secondary"; 
+                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; 
                 }
 
-                // Format Split string (Ultra-compact)
-                splitText = "No History";
-                splitClass = "text-muted fst-italic";
+                let splitText = "No History";
+                let splitClass = "text-muted";
                 if (split.ab > 0) {
                     splitText = `${split.avg} AVG • ${split.hr} HR • ${split.ops} OPS`;
                     splitClass = "text-dark fw-bold";
                 }
+
+                statsHtml = `
+                    <div class="mt-1 p-2 rounded text-start" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef; line-height: 1.5;">
+                        <div class="mb-1">
+                            <span class="text-muted me-1">vs Starter:</span>
+                            <span class="${bvpClass}">${bvpText}</span>
+                        </div>
+                        <div>
+                            <span class="text-muted me-1">vs ${opposingPitcherHand}HP:</span>
+                            <span class="${splitClass}">${splitText}</span>
+                        </div>
+                    </div>
+                `;
             } else {
-                bvpText = "Data pending...";
-                splitText = "Data pending...";
-                bvpClass = "text-muted fst-italic";
-                splitClass = "text-muted fst-italic";
+                statsHtml = `<div class="mt-1 p-2 rounded text-start text-muted fst-italic" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
-            // 2 & 3. The "Rowspan" Flexbox Layout
-            return `<li class="d-flex align-items-center py-1 border-bottom px-2" style="min-height: 46px;">
-                        
-                        <div class="d-flex align-items-center pe-2" style="width: 40%;">
-                            <span class="order-num me-1" style="font-size: 0.65rem; width: 12px;">${index + 1}.</span> 
-                            <span class="batter-name text-truncate" style="font-size: 0.75rem; letter-spacing: -0.2px;" title="${p.fullName}">${abbrName}</span>
-                            ${handBadge}
+            // Notice the player-toggle class and d-none class for the accordion logic
+            return `<li class="d-flex flex-column w-100 px-2 py-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
+                            <div><span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;">${p.fullName}</span></div>
+                            <div>
+                                ${handBadge}
+                                <span class="badge bg-light text-secondary border ms-2 toggle-icon" style="width: 24px;">+</span>
+                            </div>
                         </div>
-                        
-                        <div class="d-flex flex-column ps-2 border-start w-100" style="width: 60%; font-size: 0.62rem; line-height: 1.35;">
-                            
-                            <div class="d-flex mb-1 align-items-center">
-                                <span class="text-muted fw-bold me-1" style="width: 20px; font-size: 0.55rem;">BvP</span>
-                                <span class="${bvpClass} text-truncate w-100">${bvpText}</span>
-                            </div>
-                            
-                            <div class="d-flex align-items-center">
-                                <span class="text-muted fw-bold me-1" style="width: 20px; font-size: 0.55rem;">v${opposingPitcherHand}</span>
-                                <span class="${splitClass} text-truncate w-100">${splitText}</span>
-                            </div>
-
+                        <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100">
+                            ${statsHtml}
                         </div>
                     </li>`;
         }).join('');
-        return `<ul class="batting-order w-100 m-0">${listItems}</ul>`;
+        return `<ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul>`;
     };
-    // Away batters face Home pitcher. Home batters face Away pitcher.
+
     const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers, homePitcherHand);
     const homeLineupHtml = buildLineupList(game.lineups?.homePlayers, awayPitcherHand);
 
@@ -282,7 +262,7 @@ function createGameCard(data) {
 
     // --- CARD RENDER ---
     gameCard.innerHTML = `
-        <div class="lineup-card">
+        <div class="lineup-card shadow-sm">
             
             <div class="p-3 pb-2" style="background-color: #edf4f8;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -312,8 +292,12 @@ function createGameCard(data) {
                     </div>
                 </div>
             </div>
+
+            <div class="bg-light border-top border-bottom text-center py-1">
+                <button class="btn btn-sm btn-link text-decoration-none card-toggle-btn fw-bold text-muted" style="font-size: 0.7rem;">[+] Expand Matchups</button>
+            </div>
             
-            <div class="row g-0 bg-white border-top">
+            <div class="row g-0 bg-white">
                 <div class="col-6 border-end">
                     ${awayLineupHtml}
                 </div>
@@ -333,7 +317,7 @@ function createGameCard(data) {
 }
 
 // ==========================================
-// 3. LISTENERS
+// 3. LISTENERS & ACCORDION LOGIC
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
@@ -348,4 +332,63 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // --- UNIVERSAL TOGGLE LISTENER ---
+    document.addEventListener('click', (e) => {
+        
+        // 1. Individual Player Clicked
+        if (e.target.closest('.player-toggle')) {
+            const toggleRow = e.target.closest('.player-toggle');
+            const targetId = toggleRow.getAttribute('data-target');
+            const statsDiv = document.getElementById(targetId);
+            const icon = toggleRow.querySelector('.toggle-icon');
+            
+            if (statsDiv.classList.contains('d-none')) {
+                statsDiv.classList.remove('d-none');
+                icon.textContent = '-';
+            } else {
+                statsDiv.classList.add('d-none');
+                icon.textContent = '+';
+            }
+        }
+        
+        // 2. Card Level "Expand Matchups" Clicked
+        if (e.target.closest('.card-toggle-btn')) {
+            const btn = e.target.closest('.card-toggle-btn');
+            const card = btn.closest('.lineup-card');
+            const statsDivs = card.querySelectorAll('.stats-collapse');
+            const icons = card.querySelectorAll('.toggle-icon');
+            
+            const isExpanding = btn.textContent.includes('+');
+            
+            statsDivs.forEach(div => {
+                if (isExpanding) div.classList.remove('d-none');
+                else div.classList.add('d-none');
+            });
+            
+            icons.forEach(icon => { icon.textContent = isExpanding ? '-' : '+'; });
+            btn.textContent = isExpanding ? '[-] Collapse Matchups' : '[+] Expand Matchups';
+        }
+        
+        // 3. Global Header "Expand All" Clicked
+        if (e.target.closest('#global-toggle-btn')) {
+            const btn = e.target.closest('#global-toggle-btn');
+            const isExpanding = btn.textContent.includes('+');
+            
+            document.querySelectorAll('.stats-collapse').forEach(div => {
+                if (isExpanding) div.classList.remove('d-none');
+                else div.classList.add('d-none');
+            });
+            
+            document.querySelectorAll('.toggle-icon').forEach(icon => { 
+                icon.textContent = isExpanding ? '-' : '+'; 
+            });
+            
+            document.querySelectorAll('.card-toggle-btn').forEach(cardBtn => {
+                cardBtn.textContent = isExpanding ? '[-] Collapse Matchups' : '[+] Expand Matchups';
+            });
+            
+            btn.textContent = isExpanding ? '[-] Collapse All' : '[+] Expand All';
+        }
+    });
 });
