@@ -170,7 +170,7 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- LINEUPS BUILDER (WITH DEEP STATS) ---
+   // --- LINEUPS BUILDER (COMPACT 2-LINE GRID) ---
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) {
             return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
@@ -178,59 +178,71 @@ function createGameCard(data) {
         
         const listItems = playersArray.map((p, index) => {
             const batCode = handDict[p.id] || "";
-            const handBadge = batCode ? `<span class="batter-hand">${batCode}</span>` : "";
+            const handBadge = batCode ? `<span class="batter-hand ms-1">${batCode}</span>` : "";
+            
+            // 1. Abbreviate the player's name (e.g., "Oneil Cruz" -> "O. Cruz")
+            let abbrName = p.fullName;
+            const nameParts = p.fullName.split(' ');
+            if (nameParts.length > 1) {
+                abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
+            }
             
             // Generate the deep stats block if we have data from Python
-            let statsHtml = '';
+            let bvpText = "", splitText = "", bvpClass = "", splitClass = "";
             const pStats = deepStats[p.id];
             
             if (pStats) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
                 
-                // Format BvP string
-                let bvpText = "No History";
-                let bvpClass = "text-muted"; // Grey out small samples
+                // Format BvP string (Ultra-compact)
+                bvpText = "No History";
+                bvpClass = "text-muted fst-italic"; 
                 if (bvp.ab > 0) {
                     bvpText = `${bvp.hits}-${bvp.ab} (${bvp.avg}) • ${bvp.hr} HR • ${bvp.ops} OPS`;
-                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; // Emphasize legit samples
+                    bvpClass = bvp.ab >= 3 ? "text-dark fw-bold" : "text-secondary"; 
                 }
 
-                // Format Split string
-                let splitText = "No History";
-                let splitClass = "text-muted";
+                // Format Split string (Ultra-compact)
+                splitText = "No History";
+                splitClass = "text-muted fst-italic";
                 if (split.ab > 0) {
                     splitText = `${split.avg} AVG • ${split.hr} HR • ${split.ops} OPS`;
                     splitClass = "text-dark fw-bold";
                 }
-
-                // Added w-100 to force the box to stretch across the whole card
-                statsHtml = `
-                    <div class="mt-1 p-2 rounded w-100 text-start" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef; line-height: 1.5;">
-                        <div class="mb-1">
-                            <span class="text-muted me-1">vs Starter:</span>
-                            <span class="${bvpClass}">${bvpText}</span>
-                        </div>
-                        <div>
-                            <span class="text-muted me-1">vs ${opposingPitcherHand}HP:</span>
-                            <span class="${splitClass}">${splitText}</span>
-                        </div>
-                    </div>
-                `;
+            } else {
+                bvpText = "Data pending...";
+                splitText = "Data pending...";
+                bvpClass = "text-muted fst-italic";
+                splitClass = "text-muted fst-italic";
             }
 
-            // Added align-items-start to override the CSS centering behavior
-            return `<li class="d-flex flex-column align-items-start w-100">
-                        <div class="d-flex justify-content-between align-items-center w-100 mb-1">
-                            <div><span class="order-num">${index + 1}.</span> <span class="batter-name">${p.fullName}</span></div>
+            // 2 & 3. The "Rowspan" Flexbox Layout
+            return `<li class="d-flex align-items-center py-1 border-bottom px-2" style="min-height: 46px;">
+                        
+                        <div class="d-flex align-items-center pe-2" style="width: 40%;">
+                            <span class="order-num me-1" style="font-size: 0.65rem; width: 12px;">${index + 1}.</span> 
+                            <span class="batter-name text-truncate" style="font-size: 0.75rem; letter-spacing: -0.2px;" title="${p.fullName}">${abbrName}</span>
                             ${handBadge}
                         </div>
-                        ${statsHtml}
+                        
+                        <div class="d-flex flex-column ps-2 border-start w-100" style="width: 60%; font-size: 0.62rem; line-height: 1.35;">
+                            
+                            <div class="d-flex mb-1 align-items-center">
+                                <span class="text-muted fw-bold me-1" style="width: 20px; font-size: 0.55rem;">BvP</span>
+                                <span class="${bvpClass} text-truncate w-100">${bvpText}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center">
+                                <span class="text-muted fw-bold me-1" style="width: 20px; font-size: 0.55rem;">v${opposingPitcherHand}</span>
+                                <span class="${splitClass} text-truncate w-100">${splitText}</span>
+                            </div>
+
+                        </div>
                     </li>`;
         }).join('');
-        return `<ul class="batting-order w-100">${listItems}</ul>`;
+        return `<ul class="batting-order w-100 m-0">${listItems}</ul>`;
     };
-
     // Away batters face Home pitcher. Home batters face Away pitcher.
     const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers, homePitcherHand);
     const homeLineupHtml = buildLineupList(game.lineups?.homePlayers, awayPitcherHand);
