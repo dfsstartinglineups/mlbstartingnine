@@ -160,15 +160,16 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- LINEUPS BUILDER (WITH COLLAPSIBLE STATS) ---
+    // --- LINEUPS BUILDER (WITH COLLAPSIBLE, COMPACT STATS) ---
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) {
             return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         }
         
         const listItems = playersArray.map((p, index) => {
+            // 1. Format Handedness to append directly to the name: e.g., "Oneil Cruz (L)"
             const batCode = handDict[p.id] || "";
-            const handBadge = batCode ? `<span class="batter-hand ms-1">${batCode}</span>` : "";
+            const handText = batCode ? ` <span class="text-muted fw-normal" style="font-size: 0.75rem;">(${batCode})</span>` : "";
             
             let statsHtml = '';
             const pStats = deepStats[p.id];
@@ -191,29 +192,31 @@ function createGameCard(data) {
                     splitClass = "text-dark fw-bold";
                 }
 
+                // 2. Compact Stats Layout (BvP and vR/vL with aligned text)
                 statsHtml = `
-                    <div class="mt-1 p-2 rounded text-start" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef; line-height: 1.5;">
-                        <div class="mb-1">
-                            <span class="text-muted me-1">vs Starter:</span>
-                            <span class="${bvpClass}">${bvpText}</span>
+                    <div class="mt-1 p-2 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.4;">
+                        <div class="d-flex mb-1 align-items-center">
+                            <span class="text-muted fw-bold me-1" style="min-width: 28px;">BvP:</span>
+                            <span class="${bvpClass} text-truncate">${bvpText}</span>
                         </div>
-                        <div>
-                            <span class="text-muted me-1">vs ${opposingPitcherHand}HP:</span>
-                            <span class="${splitClass}">${splitText}</span>
+                        <div class="d-flex align-items-center">
+                            <span class="text-muted fw-bold me-1" style="min-width: 28px;">v${opposingPitcherHand}:</span>
+                            <span class="${splitClass} text-truncate">${splitText}</span>
                         </div>
                     </div>
                 `;
             } else {
-                statsHtml = `<div class="mt-1 p-2 rounded text-start text-muted fst-italic" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
+                statsHtml = `<div class="mt-1 p-2 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
-            // Notice the player-toggle class and d-none class for the accordion logic
             return `<li class="d-flex flex-column w-100 px-2 py-2 border-bottom">
                         <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
-                            <div><span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;">${p.fullName}</span></div>
+                            <div class="text-truncate pe-2">
+                                <span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> 
+                                <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;">${p.fullName}${handText}</span>
+                            </div>
                             <div>
-                                ${handBadge}
-                                <span class="badge bg-light text-secondary border ms-2 toggle-icon" style="width: 24px;">+</span>
+                                <span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span>
                             </div>
                         </div>
                         <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100">
