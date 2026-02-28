@@ -13,22 +13,22 @@ function updateSEO(selectedDateStr) {
     const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
     // 2. Determine if we are in Spring Training (Before March 25, 2026)
-    const openingDay = new Date(2026, 2, 25); // JavaScript months are 0-indexed (2 = March)
+    const openingDay = new Date(2026, 2, 25); 
     
-    let titlePrefix = "MLB Starting Lineups";
-    let descPrefix = "Live MLB starting lineups";
+    let titlePrefix = "MLB Starting Lineups & Odds";
+    let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and over/unders";
     
     if (dateObj < openingDay) {
-        titlePrefix = "MLB Spring Training Lineups";
-        descPrefix = "Live MLB Spring Training starting lineups";
+        titlePrefix = "MLB Spring Training Lineups & Odds";
+        descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and over/unders";
     }
     
     // 3. Inject the Date and Season Type into the DOM
-    document.title = `${titlePrefix} for ${formattedDate} | BvP Matchups & Splits`;
+    document.title = `${titlePrefix} for ${formattedDate} | BvP Matchups`;
     
     const descTag = document.getElementById('dynamic-desc');
     if (descTag) {
-        descTag.setAttribute('content', `${descPrefix}, daily Batter vs. Pitcher (BvP) matchups, and career splits for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
+        descTag.setAttribute('content', `${descPrefix}. Plus daily Batter vs. Pitcher (BvP) matchups and career splits for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
     }
 }
 
