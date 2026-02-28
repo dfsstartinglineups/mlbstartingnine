@@ -16,11 +16,11 @@ function updateSEO(selectedDateStr) {
     // 2. Determine if we are in Spring Training (Before March 25, 2026)
     const openingDay = new Date(2026, 2, 25); 
     
-    let titlePrefix = "MLB Starting Lineups & Odds";
+    let titlePrefix = "Today's MLB Starting Lineups & Odds";
     let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and totals";
     
     if (dateObj < openingDay) {
-        titlePrefix = "MLB Spring Training Lineups & Odds";
+        titlePrefix = "Today's MLB Spring Training Lineups & Odds";
         descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals";
     }
     
