@@ -157,6 +157,21 @@ function renderGames() {
     sortedGames.forEach(item => {
         container.appendChild(createGameCard(item));
     });
+
+    // --- NEW: SCROLL TO LINKED GAME ---
+    setTimeout(() => {
+        if (window.location.hash) {
+            const targetCard = document.querySelector(window.location.hash);
+            if (targetCard) {
+                // Scroll to the card
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Briefly flash a blue border so they know which game they jumped to
+                const innerCard = targetCard.querySelector('.lineup-card');
+                innerCard.style.border = "2px solid #0d6efd";
+                setTimeout(() => { innerCard.style.border = "1px solid #dee2e6"; }, 2000);
+            }
+        }
+    }, 300);
 }
 
 function createGameCard(data) {
@@ -167,6 +182,7 @@ function createGameCard(data) {
     const gameCard = document.createElement('div');
     // Reduced spacing between columns from mb-3 to mb-2
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
+    gameCard.id = `game-${game.gamePk}`;
 
     // Store the full names for odds matching
     const awayNameFull = game.teams.away.team.name;
@@ -370,7 +386,7 @@ function createGameCard(data) {
             </div>
 
             <div class="p-2 border-top text-center bg-white">
-                <a href="https://weathermlb.com" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
+                <a href="https://weathermlb.com/#game-${game.gamePk}" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
                     🌧️ View Weather & Wind Impact
                 </a>
             </div>
