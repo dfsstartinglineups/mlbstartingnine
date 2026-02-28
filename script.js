@@ -165,10 +165,17 @@ function createGameCard(data) {
     const deepStats = data.deepStats || {};
 
     const gameCard = document.createElement('div');
-    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-3';
+    // Reduced spacing between columns from mb-3 to mb-2
+    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
 
-    const awayName = game.teams.away.team.name;
-    const homeName = game.teams.home.team.name;
+    // Store the full names for odds matching
+    const awayNameFull = game.teams.away.team.name;
+    const homeNameFull = game.teams.home.team.name;
+    
+    // Extract short team names (e.g., "Pirates" instead of "Pittsburgh Pirates")
+    const awayName = game.teams.away.team.teamName || awayNameFull.split(' ').pop();
+    const homeName = game.teams.home.team.teamName || homeNameFull.split(' ').pop();
+
     const awayId = game.teams.away.team.id;
     const homeId = game.teams.home.team.id;
     const venueName = game.venue.name;
@@ -279,8 +286,9 @@ function createGameCard(data) {
         const totalsMarket = bookie.markets.find(m => m.key === 'totals');
         
         if (h2hMarket) {
-            const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayName);
-            const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeName);
+            // Find odds using the full team names
+            const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
+            const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeNameFull);
             
             if (awayOutcome) {
                 const price = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
@@ -305,7 +313,7 @@ function createGameCard(data) {
 
     // --- CARD RENDER ---
     gameCard.innerHTML = `
-        <div class="lineup-card shadow-sm">
+        <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
             
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 <div class="d-flex justify-content-between align-items-center mb-1">
