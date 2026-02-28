@@ -196,7 +196,7 @@ function createGameCard(data) {
                     if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; // Emphasize legit samples
                 }
 
-                // Format Split string (Removed the ABs from the end)
+                // Format Split string
                 let splitText = "No History";
                 let splitClass = "text-muted";
                 if (split.ab > 0) {
@@ -204,9 +204,9 @@ function createGameCard(data) {
                     splitClass = "text-dark fw-bold";
                 }
 
-                // Left-justified layout so stats start immediately after the label
+                // Added w-100 to force the box to stretch across the whole card
                 statsHtml = `
-                    <div class="mt-1 p-2 rounded text-start" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef; line-height: 1.5;">
+                    <div class="mt-1 p-2 rounded w-100 text-start" style="background-color: #f8f9fa; font-size: 0.68rem; border: 1px solid #e9ecef; line-height: 1.5;">
                         <div class="mb-1">
                             <span class="text-muted me-1">vs Starter:</span>
                             <span class="${bvpClass}">${bvpText}</span>
@@ -219,7 +219,8 @@ function createGameCard(data) {
                 `;
             }
 
-            return `<li class="d-flex flex-column w-100">
+            // Added align-items-start to override the CSS centering behavior
+            return `<li class="d-flex flex-column align-items-start w-100">
                         <div class="d-flex justify-content-between align-items-center w-100 mb-1">
                             <div><span class="order-num">${index + 1}.</span> <span class="batter-name">${p.fullName}</span></div>
                             ${handBadge}
