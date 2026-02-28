@@ -160,14 +160,20 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- LINEUPS BUILDER (WITH COLLAPSIBLE, COMPACT STATS) ---
+    // --- LINEUPS BUILDER (ULTRA-COMPACT) ---
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) {
             return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         }
         
         const listItems = playersArray.map((p, index) => {
-            // 1. Format Handedness to append directly to the name: e.g., "Oneil Cruz (L)"
+            // 1. Abbreviate Name & Append Handedness (e.g., "O. Cruz (L)")
+            let abbrName = p.fullName;
+            const nameParts = p.fullName.split(' ');
+            if (nameParts.length > 1) {
+                abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
+            }
+            
             const batCode = handDict[p.id] || "";
             const handText = batCode ? ` <span class="text-muted fw-normal" style="font-size: 0.75rem;">(${batCode})</span>` : "";
             
@@ -178,29 +184,30 @@ function createGameCard(data) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
                 
+                // 4. Compact Stat Formatting (No spaces around dots or units)
                 let bvpText = "No History";
                 let bvpClass = "text-muted"; 
                 if (bvp.ab > 0) {
-                    bvpText = `${bvp.hits}-${bvp.ab} (${bvp.avg}) • ${bvp.hr} HR • ${bvp.ops} OPS`;
+                    bvpText = `${bvp.hits}-${bvp.ab}(${bvp.avg})•${bvp.hr}HR•${bvp.ops}OPS`;
                     if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; 
                 }
 
                 let splitText = "No History";
                 let splitClass = "text-muted";
                 if (split.ab > 0) {
-                    splitText = `${split.avg} AVG • ${split.hr} HR • ${split.ops} OPS`;
+                    splitText = `${split.avg}AVG•${split.hr}HR•${split.ops}OPS`;
                     splitClass = "text-dark fw-bold";
                 }
 
-                // 2. Compact Stats Layout (BvP and vR/vL with aligned text)
+                // 2 & 3. Micro-labels and zero margins
                 statsHtml = `
                     <div class="mt-1 p-2 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.4;">
                         <div class="d-flex mb-1 align-items-center">
-                            <span class="text-muted fw-bold me-1" style="min-width: 28px;">BvP:</span>
+                            <span class="text-muted fw-bold" style="min-width: 20px;">vP:</span>
                             <span class="${bvpClass} text-truncate">${bvpText}</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <span class="text-muted fw-bold me-1" style="min-width: 28px;">v${opposingPitcherHand}:</span>
+                            <span class="text-muted fw-bold" style="min-width: 20px;">v${opposingPitcherHand}:</span>
                             <span class="${splitClass} text-truncate">${splitText}</span>
                         </div>
                     </div>
@@ -211,9 +218,9 @@ function createGameCard(data) {
 
             return `<li class="d-flex flex-column w-100 px-2 py-2 border-bottom">
                         <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
-                            <div class="text-truncate pe-2">
+                            <div class="text-truncate pe-1">
                                 <span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> 
-                                <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;">${p.fullName}${handText}</span>
+                                <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}${handText}</span>
                             </div>
                             <div>
                                 <span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span>
