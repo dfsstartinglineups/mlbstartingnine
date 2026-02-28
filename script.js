@@ -3,6 +3,34 @@
 // ==========================================
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
+// ==========================================
+// DYNAMIC SEO ENGINE
+// ==========================================
+function updateSEO(selectedDateStr) {
+    // 1. Format the date (e.g., "Feb 28, 2026")
+    const [year, month, day] = selectedDateStr.split('-');
+    const dateObj = new Date(year, month - 1, day);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    // 2. Determine if we are in Spring Training (Before March 25, 2026)
+    const openingDay = new Date(2026, 2, 25); // JavaScript months are 0-indexed (2 = March)
+    
+    let titlePrefix = "MLB Starting Lineups";
+    let descPrefix = "Live MLB starting lineups";
+    
+    if (dateObj < openingDay) {
+        titlePrefix = "MLB Spring Training Lineups";
+        descPrefix = "Live MLB Spring Training starting lineups";
+    }
+    
+    // 3. Inject the Date and Season Type into the DOM
+    document.title = `${titlePrefix} for ${formattedDate} | BvP Matchups & Splits`;
+    
+    const descTag = document.getElementById('dynamic-desc');
+    if (descTag) {
+        descTag.setAttribute('content', `${descPrefix}, daily Batter vs. Pitcher (BvP) matchups, and career splits for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
+    }
+}
 
 // ==========================================
 // 1. MAIN APP LOGIC
@@ -29,6 +57,8 @@ async function fetchMatchupsData() {
 }
 
 async function init(dateToFetch) {
+    updateSEO(dateToFetch); // Instantly update Title and Meta tags!
+    
     const container = document.getElementById('games-container');
     const datePicker = document.getElementById('date-picker');
     
