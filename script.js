@@ -282,7 +282,15 @@ function createGameCard(data) {
 
     // --- ODDS LOGIC ---
     const oddsData = data.odds; 
-    let mlAway = "", mlHome = "", totalHtml = `<div class="text-muted small fw-bold pt-2">@</div>`;
+    
+    // Default to TBD badges
+    let mlAway = `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.70rem; vertical-align: middle;">TBD</span>`;
+    let mlHome = `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.70rem; vertical-align: middle;">TBD</span>`;
+    let totalHtml = `
+        <div class="d-flex flex-column justify-content-center align-items-center pt-1">
+            <div class="text-muted small fw-bold mb-0 lh-1">@</div>
+            <div class="badge bg-secondary text-white mt-1 opacity-75" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U TBD</div>
+        </div>`;
     
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
         const bookie = oddsData.bookmakers[0];
@@ -306,7 +314,7 @@ function createGameCard(data) {
         
         if (totalsMarket && totalsMarket.outcomes.length > 0) {
             const total = totalsMarket.outcomes[0].point;
-            // Compressed vertical padding & margin
+            // Overwrite TBD with actual total
             totalHtml = `
                 <div class="d-flex flex-column justify-content-center align-items-center pt-1">
                     <div class="text-muted small fw-bold mb-0 lh-1">@</div>
