@@ -55,8 +55,9 @@ def fetch_bvp(session, batter_id, pitcher_id):
 
 def fetch_split(session, batter_id, hand_code):
     """Fetches Batter lifetime splits vs LHP or RHP."""
-    # hand_code expected: 'vL' or 'vR'
-    url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=statSplits&sitCodes={hand_code}&group=hitting&gameType=R"
+    # hand_code expected: 'vl' or 'vr'
+    # Use 'careerStatSplits' instead of 'statSplits' to get lifetime data
+    url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=careerStatSplits&sitCodes={hand_code}&group=hitting&gameType=R"
     try:
         res = session.get(url, timeout=10)
         data = res.json()
@@ -64,7 +65,7 @@ def fetch_split(session, batter_id, hand_code):
         if splits:
             stat = splits[0].get('stat', {})
             return {
-                "split_type": "LHP" if hand_code == 'vL' else "RHP",
+                "split_type": "LHP" if hand_code == 'vl' else "RHP",
                 "ab": stat.get('atBats', 0),
                 "hr": stat.get('homeRuns', 0),
                 "avg": stat.get('avg', '.000'),
@@ -73,7 +74,7 @@ def fetch_split(session, batter_id, hand_code):
     except Exception as e:
         print(f"Error fetching splits for {batter_id}: {e}")
         
-    return {"split_type": "LHP" if hand_code == 'vL' else "RHP", "ab": 0, "hr": 0, "avg": "-", "ops": "-"}
+    return {"split_type": "LHP" if hand_code == 'vl' else "RHP", "ab": 0, "hr": 0, "avg": "-", "ops": "-"}
 
 def main():
     print(f"🚀 Starting Matchup Fetcher for {TODAY_STR}")
