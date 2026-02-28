@@ -136,12 +136,9 @@ def main():
                 if batter_id not in games_cache[game_pk]:
                     print(f"   [NEW] Fetching Away Batter {batter['fullName']} vs Pitcher {home_starter_id}...")
                     
-                    bvp_stats = fetch_bvp(session, batter_id, home_starter_id)
-                    # We will assume RHP fallback if hand isn't attached to probablePitcher object here
-                    # To be ultra-safe, we just fetch 'vR' and 'vL' combined, or rely on frontend. Let's fetch vR for now.
-                    # A more advanced version fetches the pitcher hand first. Let's just fetch both!
-                    split_vL = fetch_split(session, batter_id, 'vL')
-                    split_vR = fetch_split(session, batter_id, 'vR')
+                    bvp_stats = fetch_bvp(session, batter_id, away_starter_id) # (or home_starter_id)
+                    split_vL = fetch_split(session, batter_id, 'vl')
+                    split_vR = fetch_split(session, batter_id, 'vr')
                     
                     games_cache[game_pk][batter_id] = {
                         "name": batter['fullName'],
@@ -160,9 +157,9 @@ def main():
                 if batter_id not in games_cache[game_pk]:
                     print(f"   [NEW] Fetching Home Batter {batter['fullName']} vs Pitcher {away_starter_id}...")
                     
-                    bvp_stats = fetch_bvp(session, batter_id, away_starter_id)
-                    split_vL = fetch_split(session, batter_id, 'vL')
-                    split_vR = fetch_split(session, batter_id, 'vR')
+                    bvp_stats = fetch_bvp(session, batter_id, away_starter_id) # (or home_starter_id)
+                    split_vL = fetch_split(session, batter_id, 'vl')
+                    split_vR = fetch_split(session, batter_id, 'vr')
                     
                     games_cache[game_pk][batter_id] = {
                         "name": batter['fullName'],
