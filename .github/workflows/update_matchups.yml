@@ -1,0 +1,41 @@
+name: Update MLB Matchup Stats
+
+on:
+  schedule:
+    # Runs every 15 minutes from 17:00 UTC (9 AM PST) to 03:00 UTC (7 PM PST)
+    - cron: '*/15 0-3,17-23 * * *'
+  workflow_dispatch: # This allows you to click a "Run Workflow" button manually!
+
+permissions:
+  contents: write # Grants the bot permission to push the JSON file to your repo
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+
+      - name: Run Matchup Fetcher
+        run: python scripts/fetch_matchups.py
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add data/matchups.json
+          
+          # This line checks if the JSON actually changed. 
+          # If it did, it commits and pushes. If not, it quietly finishes.
+          git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Automated update: BvP and Split stats" && git push)
