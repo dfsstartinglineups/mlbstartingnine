@@ -16,11 +16,11 @@ function updateSEO(selectedDateStr) {
     const openingDay = new Date(2026, 2, 25); 
     
     let titlePrefix = "MLB Starting Lineups & Odds";
-    let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and over/unders";
+    let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and totals";
     
     if (dateObj < openingDay) {
         titlePrefix = "MLB Spring Training Lineups & Odds";
-        descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and over/unders";
+        descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals";
     }
     
     // 3. Inject the Date and Season Type into the DOM
