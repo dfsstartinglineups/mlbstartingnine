@@ -184,19 +184,23 @@ function createGameCard(data) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
                 
-                // 4. Compact Stat Formatting (No spaces around dots or units)
+                // 4. Maximum Compact Stat Formatting
                 let bvpText = "No History";
                 let bvpClass = "text-muted"; 
                 if (bvp.ab > 0) {
-                    bvpText = `${bvp.hits}-${bvp.ab}(${bvp.avg})•${bvp.hr}HR•${bvp.ops}OPS`;
-                    if (bvp.ab >= 3) bvpClass = "text-dark fw-bold"; // Keeping vP bold for emphasis (if sample size is decent)
+                    // Removed the parenthetical average: e.g., 1-3 • 0HR • .666OPS
+                    bvpText = `${bvp.hits}-${bvp.ab}•${bvp.hr}HR•${bvp.ops}OPS`;
+                    // Un-bolded the text, regardless of at-bats
+                    bvpClass = "text-dark"; 
                 }
 
                 let splitText = "No History";
                 let splitClass = "text-muted";
                 if (split.ab > 0) {
-                    splitText = `${split.avg}AVG•${split.hr}HR•${split.ops}OPS`;
-                    splitClass = "text-dark"; // REMOVED fw-bold here!
+                    // Removed the "AVG" text: e.g., .299 • 4HR • .903OPS
+                    splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`;
+                    // Un-bolded the text
+                    splitClass = "text-dark"; 
                 }
 
                 // 2 & 3. Micro-labels and zero margins
