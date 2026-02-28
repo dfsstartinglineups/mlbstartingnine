@@ -173,8 +173,12 @@ function createGameCard(data) {
     const homeNameFull = game.teams.home.team.name;
     
     // Extract short team names (e.g., "Pirates" instead of "Pittsburgh Pirates")
-    const awayName = game.teams.away.team.teamName || awayNameFull.split(' ').pop();
-    const homeName = game.teams.home.team.teamName || homeNameFull.split(' ').pop();
+    let awayName = game.teams.away.team.teamName || awayNameFull.split(' ').pop();
+    let homeName = game.teams.home.team.teamName || homeNameFull.split(' ').pop();
+
+    // Catch long names to prevent UI breaking
+    if (awayName === 'Diamondbacks') awayName = 'Dbacks';
+    if (homeName === 'Diamondbacks') homeName = 'Dbacks';
 
     const awayId = game.teams.away.team.id;
     const homeId = game.teams.home.team.id;
