@@ -3,6 +3,7 @@
 // ==========================================
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
+
 // ==========================================
 // DYNAMIC SEO ENGINE
 // ==========================================
@@ -218,24 +219,20 @@ function createGameCard(data) {
                 let bvpText = "No History";
                 let bvpClass = "text-muted"; 
                 if (bvp.ab > 0) {
-                    // Removed the parenthetical average: e.g., 1-3 • 0HR • .666OPS
                     bvpText = `${bvp.hits}-${bvp.ab}•${bvp.hr}HR•${bvp.ops}OPS`;
-                    // Un-bolded the text, regardless of at-bats
                     bvpClass = "text-dark"; 
                 }
 
                 let splitText = "No History";
                 let splitClass = "text-muted";
                 if (split.ab > 0) {
-                    // Removed the "AVG" text: e.g., .299 • 4HR • .903OPS
                     splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`;
-                    // Un-bolded the text
                     splitClass = "text-dark"; 
                 }
 
-                // 2 & 3. Micro-labels and zero margins
+                // Micro-labels and tight padding
                 statsHtml = `
-                    <div class="mt-1 p-2 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.4;">
+                    <div class="mt-1 p-1 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.3;">
                         <div class="d-flex mb-1 align-items-center">
                             <span class="text-muted fw-bold" style="min-width: 20px;">vP:</span>
                             <span class="${bvpClass} text-truncate">${bvpText}</span>
@@ -247,10 +244,11 @@ function createGameCard(data) {
                     </div>
                 `;
             } else {
-                statsHtml = `<div class="mt-1 p-2 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
+                statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
-            return `<li class="d-flex flex-column w-100 px-2 py-2 border-bottom">
+            // Compressed vertical padding (py-1)
+            return `<li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
                         <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
                             <div class="text-truncate pe-1">
                                 <span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> 
@@ -273,7 +271,7 @@ function createGameCard(data) {
 
     // --- ODDS LOGIC ---
     const oddsData = data.odds; 
-    let mlAway = "", mlHome = "", totalHtml = `<div class="text-muted small fw-bold pt-4">@</div>`;
+    let mlAway = "", mlHome = "", totalHtml = `<div class="text-muted small fw-bold pt-2">@</div>`;
     
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
         const bookie = oddsData.bookmakers[0];
@@ -296,10 +294,11 @@ function createGameCard(data) {
         
         if (totalsMarket && totalsMarket.outcomes.length > 0) {
             const total = totalsMarket.outcomes[0].point;
+            // Compressed vertical padding & margin
             totalHtml = `
-                <div class="d-flex flex-column justify-content-center align-items-center pt-3">
-                    <div class="text-muted small fw-bold mb-1">@</div>
-                    <div class="badge bg-secondary text-white" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${total}</div>
+                <div class="d-flex flex-column justify-content-center align-items-center pt-1">
+                    <div class="text-muted small fw-bold mb-0 lh-1">@</div>
+                    <div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${total}</div>
                 </div>`;
         }
     }
@@ -308,19 +307,19 @@ function createGameCard(data) {
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm">
             
-            <div class="p-3 pb-2" style="background-color: #edf4f8;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.8rem;">${gameTime}</span>
-                    <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.75rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
+            <div class="p-2 pb-1" style="background-color: #edf4f8;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
+                    <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.7rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
                 </div>
                 
-                <div class="d-flex justify-content-between align-items-start px-1">
+                <div class="d-flex justify-content-between align-items-center px-1">
                     <div class="text-center" style="width: 42%;"> 
-                        <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-2" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.95rem; letter-spacing: -0.2px;">
+                        <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
+                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">
                             ${awayName} ${mlAway}
                         </div>
-                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.8rem;">${awayPitcher}</div>
+                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${awayPitcher}</div>
                     </div>
                     
                     <div class="text-center" style="width: 16%;">
@@ -328,17 +327,17 @@ function createGameCard(data) {
                     </div>
                     
                     <div class="text-center" style="width: 42%;"> 
-                        <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-2" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.95rem; letter-spacing: -0.2px;">
+                        <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
+                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">
                             ${homeName} ${mlHome}
                         </div>
-                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.8rem;">${homePitcher}</div>
+                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${homePitcher}</div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-light border-top border-bottom text-center py-1">
-                <button class="btn btn-sm btn-link text-decoration-none card-toggle-btn fw-bold text-muted" style="font-size: 0.7rem;">[+] Expand Matchups</button>
+            <div class="bg-light border-top border-bottom text-center">
+                <button class="btn btn-sm btn-link text-decoration-none card-toggle-btn fw-bold text-muted py-1 m-0" style="font-size: 0.7rem;">[+] Expand Matchups</button>
             </div>
             
             <div class="row g-0 bg-white">
