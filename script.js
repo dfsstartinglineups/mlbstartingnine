@@ -255,19 +255,19 @@ function createGameCard(data) {
             const vL = pStats.split_vL;
             const vR = pStats.split_vR;
             
-            // Format single line with slightly wider columns now that we have 50% width
+            // Format single line: Dropped margin to 1px and tightened widths
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
                     return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
                         <span class="text-muted fw-bold" style="margin-right: 4px;">${label}:</span>
-                        <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.2px;">
-                            <span style="display: inline-block; width: 26px;">${split.avg}</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 3px;">•</span>
-                            <span style="display: inline-block; width: 26px;">${split.ops}</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 3px;">•</span>
+                        <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
+                            <span style="display: inline-block; width: 24px;">${split.avg}</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                            <span style="display: inline-block; width: 24px;">${split.ops}</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
                             <span style="display: inline-block; width: 26px;">${split.hr}HR</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 3px;">•</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
                             <span>${split.k}K</span>
                         </div>
                     </div>`;
