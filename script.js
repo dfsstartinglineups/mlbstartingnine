@@ -127,11 +127,24 @@ async function init(dateToFetch) {
                 } catch (e) { console.log("Failed to fetch lineup handedness"); }
             }
 
+            // NEW: Fetch HP Umpire from Live Feed
+            let hpUmpire = "TBD";
+            try {
+                const liveFeedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${game.gamePk}/feed/live`);
+                const liveFeedData = await liveFeedRes.json();
+                const officials = liveFeedData.liveData?.boxscore?.officials || [];
+                const hp = officials.find(o => o.officialType === "Home Plate");
+                if (hp && hp.official) {
+                    hpUmpire = hp.official.fullName;
+                }
+            } catch (e) { console.log("Failed to fetch umpire"); }
+
             ALL_GAMES_DATA.push({
                 gameRaw: game,
                 odds: gameOdds,
                 lineupHandedness: lineupHandedness,
-                deepStats: cachedGames[game.gamePk] || {} 
+                deepStats: cachedGames[game.gamePk] || {},
+                hpUmpire: hpUmpire // NEW: Store it
             });
         }
 
@@ -176,6 +189,7 @@ function createGameCard(data) {
     const game = data.gameRaw;
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
+    const hpUmpire = data.hpUmpire || "TBD"; // NEW: Extract HP Umpire
 
     const gameCard = document.createElement('div');
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
@@ -334,12 +348,9 @@ function createGameCard(data) {
         let h2hMarket = null;
         let totalsMarket = null;
 
-        // NEW: Search through ALL bookmakers to find the markets
         for (const bookie of oddsData.bookmakers) {
             if (!h2hMarket) h2hMarket = bookie.markets.find(m => m.key === 'h2h');
             if (!totalsMarket) totalsMarket = bookie.markets.find(m => m.key === 'totals');
-            
-            // If we found both, stop searching to save resources
             if (h2hMarket && totalsMarket) break; 
         }
         
@@ -365,6 +376,7 @@ function createGameCard(data) {
             rawTotal = total; 
         }
     }
+
     // --- X (TWITTER) BUTTON LOGIC ---
     const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
     
@@ -428,7 +440,11 @@ function createGameCard(data) {
                 </div>
             </div>
 
-            <div class="p-2 border-top text-center bg-white">
+            <div class="px-2 py-1 border-top border-bottom text-center" style="background-color: #f8f9fa; font-size: 0.70rem; letter-spacing: 0.5px;">
+                <span class="text-muted fw-bold text-uppercase">HP Umpire:</span> <span class="text-dark fw-bold">${hpUmpire}</span>
+            </div>
+
+            <div class="p-2 text-center bg-white">
                 <a href="https://weathermlb.com/#game-${game.gamePk}" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
                     🌧️ View Weather & Wind Impact
                 </a>
@@ -483,7 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
             textarea.setSelectionRange(0, 99999); 
 
             navigator.clipboard.writeText(textarea.value).then(() => {
-                // Modified to strictly copy, show success, and revert after 2 seconds
                 const originalText = copyBtn.innerHTML;
                 copyBtn.innerHTML = "✅ Copied to Clipboard!";
                 copyBtn.classList.remove('btn-dark');
