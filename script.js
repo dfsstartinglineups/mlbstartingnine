@@ -336,10 +336,29 @@ function createGameCard(data) {
         homeTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(homeTweetText)}">${X_ICON_SVG}</button>`;
     }
 
-    // NEW: Format the Umpire display string inline
+    // NEW: Format the Umpire display string inline with Games & Color Coding
     let umpString = `<span class="text-dark fw-bold">${hpUmpire}</span>`;
     if (umpStats) {
-        umpString += ` <span class="text-muted ms-1 fw-normal">(K: <span class="text-dark fw-bold">${umpStats.k_rate}</span> • BB: <span class="text-dark fw-bold">${umpStats.bb_rate}</span> • Runs: <span class="text-dark fw-bold">${umpStats.rpg}</span>)</span>`;
+        // Parse numbers to check thresholds
+        const kNum = parseFloat(umpStats.k_rate);
+        const bbNum = parseFloat(umpStats.bb_rate);
+        const rpgNum = parseFloat(umpStats.rpg);
+
+        // Determine colors (Bootstrap text-success for Green, text-danger for Red)
+        let kColor = "text-dark";
+        if (kNum >= 23.0) kColor = "text-danger"; // High K = Pitcher Friendly
+        else if (kNum <= 21.0) kColor = "text-success"; // Low K = Hitter Friendly
+
+        let bbColor = "text-dark";
+        if (bbNum >= 9.0) bbColor = "text-success"; // High BB = Hitter Friendly
+        else if (bbNum <= 7.5) bbColor = "text-danger"; // Low BB = Pitcher Friendly
+
+        let rpgColor = "text-dark";
+        if (rpgNum >= 9.5) rpgColor = "text-success"; // High Runs = Hitter Friendly/Over
+        else if (rpgNum <= 8.0) rpgColor = "text-danger"; // Low Runs = Pitcher Friendly/Under
+
+        // Build the final string injecting the G: value and color classes
+        umpString += ` <span class="text-muted ms-1 fw-normal">(G: <span class="text-dark fw-bold">${umpStats.games}</span> • K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span> • BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span> • Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
     gameCard.innerHTML = `
