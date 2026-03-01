@@ -51,7 +51,6 @@ async function fetchMatchupsData() {
     return null;
 }
 
-// NEW: Fetch Umpire Data
 async function fetchUmpiresData() {
     try {
         const response = await fetch('data/umpires.json?v=' + new Date().getTime()); 
@@ -90,7 +89,6 @@ async function init(dateToFetch) {
 
         const rawGames = scheduleData.dates[0].games;
         
-        // Wait for all 3 data files
         const [dailyOddsData, matchupsData, umpiresData] = await Promise.all([
             fetchLocalOdds(),
             fetchMatchupsData(),
@@ -123,7 +121,6 @@ async function init(dateToFetch) {
                 } catch (e) {}
             }
 
-            // Fetch HP Umpire and attach stats
             let hpUmpire = "TBD";
             let umpStats = null;
             try {
@@ -213,7 +210,6 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- UPDATED: PITCHER VARIABLES ---
     let awayPitcherId = null;
     let awayPitcher = "TBD";
     let awayPitcherHand = 'R'; 
@@ -232,15 +228,26 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- NEW: PITCHER SPLITS BUILDER (ULTRA-COMPACT & ALIGNED) ---
-    const buildPitcherHtml = (pId, pName) => {
+    // --- NEW: PITCHER TOGGLE (Stays in the 42% column) ---
+    const buildPitcherToggle = (pId, pName) => {
         if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
         
-        // Shorten name to save horizontal space
         let shortName = pName;
         const parts = pName.split(' ');
         if (parts.length >= 3) shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
 
+        return `
+            <div class="d-flex justify-content-center align-items-center player-toggle mt-1" style="cursor: pointer;" data-target="stats-${game.gamePk}-p-${pId}">
+                <span class="text-muted fw-bold text-truncate" style="font-size: 0.70rem; max-width: 110px;" title="${pName}">${shortName}</span>
+                <span class="badge bg-light text-secondary border toggle-icon ms-1" style="font-size: 0.55rem; padding: 0.2em 0.3em;">+</span>
+            </div>
+        `;
+    };
+
+    // --- NEW: PITCHER STATS (Moves to a 50% width row below) ---
+    const buildPitcherStats = (pId) => {
+        if (!pId) return `<div id="stats-${game.gamePk}-p-null" class="stats-collapse d-none w-100"></div>`;
+        
         let statsHtml = `<div class="mt-1 p-1 rounded text-center text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
         
         const pStats = deepStats[pId];
@@ -248,19 +255,19 @@ function createGameCard(data) {
             const vL = pStats.split_vL;
             const vR = pStats.split_vR;
             
-            // Format single line: AVG • OPS • HR • K (Tightly hugged and tabular)
+            // Format single line with slightly wider columns now that we have 50% width
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
                     return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
                         <span class="text-muted fw-bold" style="margin-right: 4px;">${label}:</span>
-                        <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
-                            <span style="display: inline-block; width: 25px;">${split.avg}</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 2px;">•</span>
-                            <span style="display: inline-block; width: 25px;">${split.ops}</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 2px;">•</span>
-                            <span style="display: inline-block; width: 25px;">${split.hr}HR</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 2px;">•</span>
+                        <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.2px;">
+                            <span style="display: inline-block; width: 26px;">${split.avg}</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 3px;">•</span>
+                            <span style="display: inline-block; width: 26px;">${split.ops}</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 3px;">•</span>
+                            <span style="display: inline-block; width: 26px;">${split.hr}HR</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 3px;">•</span>
                             <span>${split.k}K</span>
                         </div>
                     </div>`;
@@ -280,22 +287,18 @@ function createGameCard(data) {
             `;
         }
 
-        // Returns the expandable toggle block
         return `
-            <div class="d-flex flex-column align-items-center mt-1 w-100">
-                <div class="d-flex justify-content-center align-items-center player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-p-${pId}">
-                    <span class="text-muted fw-bold text-truncate" style="font-size: 0.70rem; max-width: 110px;" title="${pName}">${shortName}</span>
-                    <span class="badge bg-light text-secondary border toggle-icon ms-1" style="font-size: 0.55rem; padding: 0.2em 0.3em;">+</span>
-                </div>
-                <div id="stats-${game.gamePk}-p-${pId}" class="stats-collapse d-none w-100">
-                    ${statsHtml}
-                </div>
+            <div id="stats-${game.gamePk}-p-${pId}" class="stats-collapse d-none w-100">
+                ${statsHtml}
             </div>
         `;
     };
 
-    const awayPitcherHtml = buildPitcherHtml(awayPitcherId, awayPitcher);
-    const homePitcherHtml = buildPitcherHtml(homePitcherId, homePitcher);
+    const awayPitcherToggle = buildPitcherToggle(awayPitcherId, awayPitcher);
+    const awayPitcherStats = buildPitcherStats(awayPitcherId);
+    
+    const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher);
+    const homePitcherStats = buildPitcherStats(homePitcherId);
 
     const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
         let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
@@ -405,7 +408,6 @@ function createGameCard(data) {
         homeTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(homeTweetText)}">${X_ICON_SVG}</button>`;
     }
 
-    // --- FORMAT UMPIRE NAME (First Initial. Last Name) ---
     let displayUmpire = hpUmpire;
     if (hpUmpire !== "TBD") {
         const umpParts = hpUmpire.split(' ');
@@ -447,13 +449,22 @@ function createGameCard(data) {
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayName} ${mlAway}</div>
-                        ${awayPitcherHtml}
+                        ${awayPitcherToggle}
                     </div>
                     <div class="text-center" style="width: 16%;">${totalHtml}</div>
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeName} ${mlHome}</div>
-                        ${homePitcherHtml}
+                        ${homePitcherToggle}
+                    </div>
+                </div>
+                
+                <div class="row g-0 w-100 px-1">
+                    <div class="col-6 pe-1 d-flex justify-content-center">
+                        ${awayPitcherStats}
+                    </div>
+                    <div class="col-6 ps-1 d-flex justify-content-center">
+                        ${homePitcherStats}
                     </div>
                 </div>
             </div>
