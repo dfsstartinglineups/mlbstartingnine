@@ -24,11 +24,13 @@ function updateSEO(selectedDateStr) {
         descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals";
     }
     
-    document.title = `${titlePrefix} for ${formattedDate} | BvP Matchups`;
+    // Updates the browser tab title
+    document.title = `${titlePrefix} for ${formattedDate} | BvP, Splits & Umps`;
     
+    // Updates the meta description
     const descTag = document.getElementById('dynamic-desc');
     if (descTag) {
-        descTag.setAttribute('content', `${descPrefix}. Plus daily Batter vs. Pitcher (BvP) matchups and career splits for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
+        descTag.setAttribute('content', `${descPrefix}. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
     }
 }
 
