@@ -228,7 +228,6 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- NEW: PITCHER TOGGLE (Stays in the 42% column) ---
     const buildPitcherToggle = (pId, pName) => {
         if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
         
@@ -244,7 +243,7 @@ function createGameCard(data) {
         `;
     };
 
-    // --- NEW: PITCHER STATS (Moves to a 50% width row below) ---
+    // --- UPDATED: PITCHER STATS (Perfect Alignment & 1.000 Truncation) ---
     const buildPitcherStats = (pId) => {
         if (!pId) return `<div id="stats-${game.gamePk}-p-null" class="stats-collapse d-none w-100"></div>`;
         
@@ -255,18 +254,22 @@ function createGameCard(data) {
             const vL = pStats.split_vL;
             const vR = pStats.split_vR;
             
-            // Format single line: Dropped margin to 1px and tightened widths
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
+                    // Truncate stats like "1.000" to "1.00" (4 chars max) to prevent overflow
+                    const avgStr = split.avg.length > 4 ? split.avg.substring(0, 4) : split.avg;
+                    const opsStr = split.ops.length > 4 ? split.ops.substring(0, 4) : split.ops;
+
                     return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
-                        <span class="text-muted fw-bold" style="margin-right: 4px;">${label}:</span>
+                        <span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span>
+                        
                         <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
-                            <span style="display: inline-block; width: 24px;">${split.avg}</span>
+                            <span style="display: inline-block; width: 24px;">${avgStr}</span>
                             <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span style="display: inline-block; width: 24px;">${split.ops}</span>
+                            <span style="display: inline-block; width: 24px;">${opsStr}</span>
                             <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span style="display: inline-block; width: 26px;">${split.hr}HR</span>
+                            <span style="display: inline-block; width: 24px;">${split.hr}HR</span>
                             <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
                             <span>${split.k}K</span>
                         </div>
@@ -274,7 +277,7 @@ function createGameCard(data) {
                 }
                 return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
-                        <span class="text-muted fw-bold" style="margin-right: 4px;">${label}:</span>
+                        <span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span>
                         <span class="text-muted fst-italic">No History</span>
                     </div>`;
             };
