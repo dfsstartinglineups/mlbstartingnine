@@ -331,9 +331,17 @@ function createGameCard(data) {
     let rawTotal = "TBD";
 
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
-        const bookie = oddsData.bookmakers[0];
-        const h2hMarket = bookie.markets.find(m => m.key === 'h2h');
-        const totalsMarket = bookie.markets.find(m => m.key === 'totals');
+        let h2hMarket = null;
+        let totalsMarket = null;
+
+        // NEW: Search through ALL bookmakers to find the markets
+        for (const bookie of oddsData.bookmakers) {
+            if (!h2hMarket) h2hMarket = bookie.markets.find(m => m.key === 'h2h');
+            if (!totalsMarket) totalsMarket = bookie.markets.find(m => m.key === 'totals');
+            
+            // If we found both, stop searching to save resources
+            if (h2hMarket && totalsMarket) break; 
+        }
         
         if (h2hMarket) {
             const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
@@ -357,7 +365,6 @@ function createGameCard(data) {
             rawTotal = total; 
         }
     }
-
     // --- X (TWITTER) BUTTON LOGIC ---
     const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
     
