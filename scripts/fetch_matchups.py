@@ -18,7 +18,6 @@ def load_cache():
         try:
             with open(MATCHUPS_FILE, 'r') as f:
                 data = json.load(f)
-                # If the cache is from yesterday, wipe it clean for today
                 if data.get('date') != TODAY_STR:
                     return {"date": TODAY_STR, "games": {}}
                 return data
@@ -48,46 +47,102 @@ def fetch_bvp(session, batter_id, pitcher_id):
                 "ops": stat.get('ops', '.000')
             }
     except Exception as e:
-        print(f"Error fetching BvP for {batter_id} vs {pitcher_id}: {e}")
+        pass
     
-    # Return 0s if no history exists
     return {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
 
-def fetch_split(session, batter_id, hand_code):
-    """Fetches Batter lifetime splits vs LHP or RHP."""
-    # hand_code expected: 'vl' or 'vr'
-    # Use 'careerStatSplits' instead of 'statSplits' to get lifetime data
-    url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=careerStatSplits&sitCodes={hand_code}&group=hitting&gameType=R"
-    try:
-        res = session.get(url, timeout=10)
-        data = res.json()
-        splits = data.get('stats', [{}])[0].get('splits', [])
-        if splits:
-            stat = splits[0].get('stat', {})
-            return {
-                "split_type": "LHP" if hand_code == 'vl' else "RHP",
-                "ab": stat.get('atBats', 0),
-                "hr": stat.get('homeRuns', 0),
-                "avg": stat.get('avg', '.000'),
-                "ops": stat.get('ops', '.000')
-            }
-    except Exception as e:
-        print(f"Error fetching splits for {batter_id}: {e}")
+def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
+    """
+    Fetches splits for Last Season + Current Season, aggregates them, 
+    and manually calculates the combined AVG and OPS for maximum accuracy.
+    """
+    current_year = datetime.utcnow().year
+    years = [current_year - 1, current_year]
+    
+    totals = {
+        "ab": 0, "h": 0, "2b": 0, "3b": 0, "hr": 0, 
+        "bb": 0, "hbp": 0, "sf": 0, "k": 0
+    }
+    
+    for year in years:
+        url = f"https://statsapi.mlb.com/api/v1/people/{person_id}/stats?stats=statSplits&sitCodes={hand_code}&group={group_type}&gameType=R&season={year}"
+        try:
+            res = session.get(url, timeout=10)
+            data = res.json()
+            splits = data.get('stats', [{}])[0].get('splits', [])
+            if splits:
+                stat = splits[0].get('stat', {})
+                totals["ab"] += stat.get('atBats', 0)
+                totals["h"] += stat.get('hits', 0)
+                totals["2b"] += stat.get('doubles', 0)
+                totals["3b"] += stat.get('triples', 0)
+                totals["hr"] += stat.get('homeRuns', 0)
+                totals["bb"] += stat.get('baseOnBalls', 0)
+                totals["hbp"] += stat.get('hitByPitch', 0)
+                totals["sf"] += stat.get('sacFlies', 0)
+                totals["k"] += stat.get('strikeOuts', 0)
+        except Exception:
+            pass
         
-    return {"split_type": "LHP" if hand_code == 'vl' else "RHP", "ab": 0, "hr": 0, "avg": "-", "ops": "-"}
+        time.sleep(0.05) # Polite internal throttle
+            
+    # Calculate Official MLB Rates
+    ab = totals["ab"]
+    h = totals["h"]
+    hr = totals["hr"]
+    bb = totals["bb"]
+    hbp = totals["hbp"]
+    sf = totals["sf"]
+    k = totals["k"]
+    
+    if ab > 0:
+        avg = h / ab
+        single = h - (totals["2b"] + totals["3b"] + hr)
+        tb = single + (2 * totals["2b"]) + (3 * totals["3b"]) + (4 * hr)
+        slg = tb / ab
+    else:
+        avg = 0.0
+        slg = 0.0
+        
+    obp_denom = ab + bb + hbp + sf
+    if obp_denom > 0:
+        obp = (h + bb + hbp) / obp_denom
+    else:
+        obp = 0.0
+        
+    ops = obp + slg
+    
+    # Format strings for the frontend (e.g., 0.250 -> .250)
+    avg_str = f"{avg:.3f}".replace("0.", ".")
+    ops_str = f"{ops:.3f}".replace("0.", ".")
+    if avg_str == ".000" and ab == 0: avg_str = "-"
+    if ops_str == ".000" and ab == 0: ops_str = "-"
+    
+    split_label = ""
+    if group_type == "hitting":
+        split_label = "LHP" if hand_code == 'vl' else "RHP"
+    else:
+        split_label = "LHB" if hand_code == 'vl' else "RHB"
+        
+    return {
+        "split_type": split_label,
+        "ab": ab,
+        "hr": hr,
+        "k": k,    
+        "bb": bb,  
+        "avg": avg_str,
+        "ops": ops_str
+    }
 
 def main():
     print(f"🚀 Starting Matchup Fetcher for {TODAY_STR}")
     
-    # 1. Open a persistent connection pool (Fast & Polite)
     session = requests.Session()
     session.headers.update({"User-Agent": "MLBStartingNine-DataBot/1.0"})
     
-    # 2. Load our local saved data
     cache = load_cache()
     games_cache = cache['games']
     
-    # 3. Get today's live schedule & lineups
     schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={TODAY_STR}&hydrate=probablePitcher,lineups"
     try:
         schedule_res = session.get(schedule_url, timeout=15)
@@ -103,7 +158,6 @@ def main():
     games = schedule_data['dates'][0]['games']
     updates_made = False
 
-    # 4. Loop through the games and perform the "Diff" check
     for game in games:
         game_pk = str(game['gamePk'])
         if game_pk not in games_cache:
@@ -111,19 +165,26 @@ def main():
 
         teams = game.get('teams', {})
         
-        # Get Starters
         away_starter = teams.get('away', {}).get('probablePitcher')
         home_starter = teams.get('home', {}).get('probablePitcher')
         
-        # Determine Pitcher Handedness for Splits (vL or vR)
-        away_starter_id = away_starter.get('id') if away_starter else None
-        home_starter_id = home_starter.get('id') if home_starter else None
+        away_starter_id = str(away_starter.get('id')) if away_starter else None
+        home_starter_id = str(home_starter.get('id')) if home_starter else None
         
-        # Note: If handedness isn't in this payload, we default to RHP for the split fallback 
-        # (Though we can easily cross-reference this later, assuming RHP for safety on empty data)
-        # However, the hydrate=person payload on the frontend gives us exact hands. 
-        # For the script, we'll try to guess from the hand code if available, else standard split.
-        
+        # --- PROCESS STARTING PITCHERS ---
+        for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
+            if p_id and p_id not in games_cache[game_pk]:
+                print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
+                games_cache[game_pk][p_id] = {
+                    "name": p_data['fullName'],
+                    "is_pitcher": True,
+                    "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
+                    "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
+                }
+                updates_made = True
+                save_cache(cache)
+                time.sleep(0.2)
+
         lineups = game.get('lineups', {})
         away_lineup = lineups.get('awayPlayers', [])
         home_lineup = lineups.get('homePlayers', [])
@@ -132,13 +193,12 @@ def main():
         if home_starter_id:
             for batter in away_lineup:
                 batter_id = str(batter['id'])
-                # THE DIFF CHECK: Do we already have this batter saved for this game?
                 if batter_id not in games_cache[game_pk]:
                     print(f"   [NEW] Fetching Away Batter {batter['fullName']} vs Pitcher {home_starter_id}...")
                     
-                    bvp_stats = fetch_bvp(session, batter_id, away_starter_id) # (or home_starter_id)
-                    split_vL = fetch_split(session, batter_id, 'vl')
-                    split_vR = fetch_split(session, batter_id, 'vr')
+                    bvp_stats = fetch_bvp(session, batter_id, home_starter_id) 
+                    split_vL = fetch_combined_splits(session, batter_id, 'vl', group_type="hitting")
+                    split_vR = fetch_combined_splits(session, batter_id, 'vr', group_type="hitting")
                     
                     games_cache[game_pk][batter_id] = {
                         "name": batter['fullName'],
@@ -147,8 +207,8 @@ def main():
                         "split_vR": split_vR
                     }
                     updates_made = True
-                    save_cache(cache) # Incremental save
-                    time.sleep(0.2)   # Polite throttling
+                    save_cache(cache) 
+                    time.sleep(0.2)   
 
         # --- PROCESS HOME BATTERS (vs Away Starter) ---
         if away_starter_id:
@@ -157,9 +217,9 @@ def main():
                 if batter_id not in games_cache[game_pk]:
                     print(f"   [NEW] Fetching Home Batter {batter['fullName']} vs Pitcher {away_starter_id}...")
                     
-                    bvp_stats = fetch_bvp(session, batter_id, away_starter_id) # (or home_starter_id)
-                    split_vL = fetch_split(session, batter_id, 'vl')
-                    split_vR = fetch_split(session, batter_id, 'vr')
+                    bvp_stats = fetch_bvp(session, batter_id, away_starter_id) 
+                    split_vL = fetch_combined_splits(session, batter_id, 'vl', group_type="hitting")
+                    split_vR = fetch_combined_splits(session, batter_id, 'vr', group_type="hitting")
                     
                     games_cache[game_pk][batter_id] = {
                         "name": batter['fullName'],
@@ -168,8 +228,8 @@ def main():
                         "split_vR": split_vR
                     }
                     updates_made = True
-                    save_cache(cache) # Incremental save
-                    time.sleep(0.2)   # Polite throttling
+                    save_cache(cache) 
+                    time.sleep(0.2)   
 
     if updates_made:
         print("✅ Finished processing new lineups. Cache updated.")
