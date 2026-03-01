@@ -90,7 +90,7 @@ async function init(dateToFetch) {
 
         const rawGames = scheduleData.dates[0].games;
         
-        // NEW: Wait for all 3 data files
+        // Wait for all 3 data files
         const [dailyOddsData, matchupsData, umpiresData] = await Promise.all([
             fetchLocalOdds(),
             fetchMatchupsData(),
@@ -143,7 +143,7 @@ async function init(dateToFetch) {
                 lineupHandedness: lineupHandedness,
                 deepStats: cachedGames[game.gamePk] || {},
                 hpUmpire: hpUmpire,
-                umpStats: umpStats // NEW: Store the stats object
+                umpStats: umpStats
             });
         }
         renderGames();
@@ -180,7 +180,6 @@ function createGameCard(data) {
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
     
-    // NEW: Unpack Umpire variables
     const hpUmpire = data.hpUmpire || "TBD"; 
     const umpStats = data.umpStats;
 
@@ -214,19 +213,73 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
+    // --- UPDATED: PITCHER VARIABLES ---
+    let awayPitcherId = null;
     let awayPitcher = "TBD";
     let awayPitcherHand = 'R'; 
     if (game.teams.away.probablePitcher) {
+        awayPitcherId = game.teams.away.probablePitcher.id;
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
         awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
     }
 
+    let homePitcherId = null;
     let homePitcher = "TBD";
     let homePitcherHand = 'R'; 
     if (game.teams.home.probablePitcher) {
+        homePitcherId = game.teams.home.probablePitcher.id;
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
+
+    // --- NEW: PITCHER SPLITS BUILDER (ULTRA-COMPACT) ---
+    const buildPitcherHtml = (pId, pName) => {
+        if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
+        
+        // Shorten name to save horizontal space (e.g., "Gerrit Cole (R)" -> "G. Cole (R)")
+        let shortName = pName;
+        const parts = pName.split(' ');
+        if (parts.length >= 3) shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
+
+        let statsHtml = `<div class="mt-1 p-1 rounded text-center text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
+        
+        const pStats = deepStats[pId];
+        if (pStats && pStats.split_vL && pStats.split_vR) {
+            const vL = pStats.split_vL;
+            const vR = pStats.split_vR;
+            
+            // Format single line: AVG • OPS • K
+            const formatRow = (split, label) => {
+                if (split.ab > 0) {
+                    return `<div class="d-flex justify-content-between align-items-center"><span class="text-muted fw-bold" style="min-width: 15px;">${label}:</span><span class="text-dark text-truncate ms-1" style="letter-spacing: -0.2px;">${split.avg}•${split.ops}•${split.k}K</span></div>`;
+                }
+                return `<div class="d-flex justify-content-between align-items-center"><span class="text-muted fw-bold" style="min-width: 15px;">${label}:</span><span class="text-muted text-truncate ms-1">No History</span></div>`;
+            };
+
+            statsHtml = `
+                <div class="mt-1 p-1 rounded text-start mx-auto" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef; line-height: 1.3; width: 95%;">
+                    ${formatRow(vL, 'vL')}
+                    ${formatRow(vR, 'vR')}
+                </div>
+            `;
+        }
+
+        // Returns the expandable toggle block
+        return `
+            <div class="d-flex flex-column align-items-center mt-1 w-100">
+                <div class="d-flex justify-content-center align-items-center player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-p-${pId}">
+                    <span class="text-muted fw-bold text-truncate" style="font-size: 0.70rem; max-width: 110px;" title="${pName}">${shortName}</span>
+                    <span class="badge bg-light text-secondary border toggle-icon ms-1" style="font-size: 0.55rem; padding: 0.2em 0.3em;">+</span>
+                </div>
+                <div id="stats-${game.gamePk}-p-${pId}" class="stats-collapse d-none w-100">
+                    ${statsHtml}
+                </div>
+            </div>
+        `;
+    };
+
+    const awayPitcherHtml = buildPitcherHtml(awayPitcherId, awayPitcher);
+    const homePitcherHtml = buildPitcherHtml(homePitcherId, homePitcher);
 
     const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
         let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
@@ -253,7 +306,7 @@ function createGameCard(data) {
             
             let statsHtml = '';
             const pStats = deepStats[p.id];
-            if (pStats) {
+            if (pStats && pStats.bvp) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
                 
@@ -261,7 +314,7 @@ function createGameCard(data) {
                 if (bvp.ab > 0) { bvpText = `${bvp.hits}-${bvp.ab}•${bvp.hr}HR•${bvp.ops}OPS`; bvpClass = "text-dark"; }
 
                 let splitText = "No History", splitClass = "text-muted";
-                if (split.ab > 0) { splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`; splitClass = "text-dark"; }
+                if (split && split.ab > 0) { splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`; splitClass = "text-dark"; }
 
                 statsHtml = `
                     <div class="mt-1 p-1 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.3;">
@@ -345,28 +398,24 @@ function createGameCard(data) {
         }
     }
 
-    // NEW: Format the Umpire display string inline with Games & Color Coding
     let umpString = `<span class="text-dark fw-bold">${displayUmpire}</span>`;
     if (umpStats) {
-        // Parse numbers to check thresholds
         const kNum = parseFloat(umpStats.k_rate);
         const bbNum = parseFloat(umpStats.bb_rate);
         const rpgNum = parseFloat(umpStats.rpg);
 
-        // Determine colors (Bootstrap text-success for Green, text-danger for Red)
         let kColor = "text-dark";
-        if (kNum >= 23.0) kColor = "text-danger"; // High K = Pitcher Friendly
-        else if (kNum <= 21.0) kColor = "text-success"; // Low K = Hitter Friendly
+        if (kNum >= 23.0) kColor = "text-danger"; 
+        else if (kNum <= 21.0) kColor = "text-success"; 
 
         let bbColor = "text-dark";
-        if (bbNum >= 9.0) bbColor = "text-success"; // High BB = Hitter Friendly
-        else if (bbNum <= 7.5) bbColor = "text-danger"; // Low BB = Pitcher Friendly
+        if (bbNum >= 9.0) bbColor = "text-success"; 
+        else if (bbNum <= 7.5) bbColor = "text-danger"; 
 
         let rpgColor = "text-dark";
-        if (rpgNum >= 9.5) rpgColor = "text-success"; // High Runs = Hitter Friendly/Over
-        else if (rpgNum <= 8.0) rpgColor = "text-danger"; // Low Runs = Pitcher Friendly/Under
+        if (rpgNum >= 9.5) rpgColor = "text-success"; 
+        else if (rpgNum <= 8.0) rpgColor = "text-danger"; 
 
-        // Build the final string injecting the G: value and color classes
         umpString += ` <span class="text-muted ms-1 fw-normal">(G: <span class="text-dark fw-bold">${umpStats.games}</span> • K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span> • BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span> • Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
@@ -377,17 +426,18 @@ function createGameCard(data) {
                     <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
                     <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.7rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
                 </div>
-                <div class="d-flex justify-content-between align-items-center px-1">
+                
+                <div class="d-flex justify-content-between align-items-start px-1 pt-1">
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayName} ${mlAway}</div>
-                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${awayPitcher}</div>
+                        ${awayPitcherHtml}
                     </div>
                     <div class="text-center" style="width: 16%;">${totalHtml}</div>
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeName} ${mlHome}</div>
-                        <div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${homePitcher}</div>
+                        ${homePitcherHtml}
                     </div>
                 </div>
             </div>
