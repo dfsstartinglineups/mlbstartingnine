@@ -4,16 +4,17 @@
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
 
+// The X icon SVG path
+const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
+
 // ==========================================
 // DYNAMIC SEO ENGINE
 // ==========================================
 function updateSEO(selectedDateStr) {
-    // 1. Format the date (e.g., "Feb 28, 2026")
     const [year, month, day] = selectedDateStr.split('-');
     const dateObj = new Date(year, month - 1, day);
     const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     
-    // 2. Determine if we are in Spring Training (Before March 25, 2026)
     const openingDay = new Date(2026, 2, 25); 
     
     let titlePrefix = "Today's MLB Starting Lineups & Odds";
@@ -24,7 +25,6 @@ function updateSEO(selectedDateStr) {
         descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals";
     }
     
-    // 3. Inject the Date and Season Type into the DOM
     document.title = `${titlePrefix} for ${formattedDate} | BvP Matchups`;
     
     const descTag = document.getElementById('dynamic-desc');
@@ -58,7 +58,7 @@ async function fetchMatchupsData() {
 }
 
 async function init(dateToFetch) {
-    updateSEO(dateToFetch); // Instantly update Title and Meta tags!
+    updateSEO(dateToFetch); 
     
     const container = document.getElementById('games-container');
     const datePicker = document.getElementById('date-picker');
@@ -158,14 +158,12 @@ function renderGames() {
         container.appendChild(createGameCard(item));
     });
 
-    // --- NEW: SCROLL TO LINKED GAME ---
+    // --- SCROLL TO LINKED GAME ---
     setTimeout(() => {
         if (window.location.hash) {
             const targetCard = document.querySelector(window.location.hash);
             if (targetCard) {
-                // Scroll to the card
                 targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                // Briefly flash a blue border so they know which game they jumped to
                 const innerCard = targetCard.querySelector('.lineup-card');
                 innerCard.style.border = "2px solid #0d6efd";
                 setTimeout(() => { innerCard.style.border = "1px solid #dee2e6"; }, 2000);
@@ -180,19 +178,15 @@ function createGameCard(data) {
     const deepStats = data.deepStats || {};
 
     const gameCard = document.createElement('div');
-    // Reduced spacing between columns from mb-3 to mb-2
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
     gameCard.id = `game-${game.gamePk}`;
 
-    // Store the full names for odds matching
     const awayNameFull = game.teams.away.team.name;
     const homeNameFull = game.teams.home.team.name;
     
-    // Extract short team names (e.g., "Pirates" instead of "Pittsburgh Pirates")
     let awayName = game.teams.away.team.teamName || awayNameFull.split(' ').pop();
     let homeName = game.teams.home.team.teamName || homeNameFull.split(' ').pop();
 
-    // Catch 2-word names and long names to prevent UI breaking
     if (awayNameFull.includes('Red Sox')) awayName = 'Red Sox';
     if (awayNameFull.includes('White Sox')) awayName = 'White Sox';
     if (awayNameFull.includes('Blue Jays')) awayName = 'Blue Jays';
@@ -206,7 +200,9 @@ function createGameCard(data) {
     const awayId = game.teams.away.team.id;
     const homeId = game.teams.home.team.id;
     const venueName = game.venue.name;
-    const gameTime = new Date(game.gameDate).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const gameDateObj = new Date(game.gameDate);
+    const gameTime = gameDateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const gameDateShort = gameDateObj.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' });
 
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
@@ -225,6 +221,26 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
+    // --- HELPER: GENERATE TWEET TEXT ---
+    const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
+        let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
+        
+        let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\n`;
+        text += `SP: ${teamPitcher} [${teamOdds}]\n`;
+        text += `vs ${oppPitcher} [${oppOdds}]\n\n`;
+        
+        // Push all players to an array, then join them with a single newline
+        const playerStrings = players.map((p, i) => {
+             const hand = handDict[p.id] ? `(${handDict[p.id]})` : '';
+             return `${i+1}. ${p.fullName} ${hand}`;
+        });
+        
+        text += playerStrings.join('\n'); // Perfect single-spaced list
+        text += `\n\nCheck splits & BvP at https://mlbstartingnine.com #MLB #DFS`;
+        
+        return text;
+    };
+
     // --- LINEUPS BUILDER (ULTRA-COMPACT) ---
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) {
@@ -232,7 +248,6 @@ function createGameCard(data) {
         }
         
         const listItems = playersArray.map((p, index) => {
-            // 1. Abbreviate Name & Append Handedness (e.g., "O. Cruz (L)")
             let abbrName = p.fullName;
             const nameParts = p.fullName.split(' ');
             if (nameParts.length > 1) {
@@ -249,7 +264,6 @@ function createGameCard(data) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
                 
-                // 4. Maximum Compact Stat Formatting
                 let bvpText = "No History";
                 let bvpClass = "text-muted"; 
                 if (bvp.ab > 0) {
@@ -264,7 +278,6 @@ function createGameCard(data) {
                     splitClass = "text-dark"; 
                 }
 
-                // Micro-labels and tight padding
                 statsHtml = `
                     <div class="mt-1 p-1 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.3;">
                         <div class="d-flex mb-1 align-items-center">
@@ -281,7 +294,6 @@ function createGameCard(data) {
                 statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
-            // Compressed vertical padding (py-1)
             return `<li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
                         <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
                             <div class="text-truncate pe-1">
@@ -305,45 +317,55 @@ function createGameCard(data) {
 
     // --- ODDS LOGIC ---
     const oddsData = data.odds; 
-    
-    // Default to TBD badges
     let mlAway = `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.70rem; vertical-align: middle;">TBD</span>`;
     let mlHome = `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.70rem; vertical-align: middle;">TBD</span>`;
-    let totalHtml = `
-        <div class="d-flex flex-column justify-content-center align-items-center pt-1">
-            <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-            <div class="badge bg-secondary text-white mt-1 opacity-75" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U TBD</div>
-        </div>`;
+    let totalHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1"><div class="text-muted small fw-bold mb-0 lh-1">@</div><div class="badge bg-secondary text-white mt-1 opacity-75" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U TBD</div></div>`;
     
+    let rawAwayOdds = "TBD";
+    let rawHomeOdds = "TBD";
+    let rawTotal = "TBD";
+
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
         const bookie = oddsData.bookmakers[0];
         const h2hMarket = bookie.markets.find(m => m.key === 'h2h');
         const totalsMarket = bookie.markets.find(m => m.key === 'totals');
         
         if (h2hMarket) {
-            // Find odds using the full team names
             const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
             const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeNameFull);
             
             if (awayOutcome) {
                 const price = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
                 mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
+                rawAwayOdds = price; 
             }
             if (homeOutcome) {
                 const price = homeOutcome.price > 0 ? `+${homeOutcome.price}` : homeOutcome.price;
                 mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
+                rawHomeOdds = price; 
             }
         }
         
         if (totalsMarket && totalsMarket.outcomes.length > 0) {
             const total = totalsMarket.outcomes[0].point;
-            // Overwrite TBD with actual total
-            totalHtml = `
-                <div class="d-flex flex-column justify-content-center align-items-center pt-1">
-                    <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-                    <div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${total}</div>
-                </div>`;
+            totalHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1"><div class="text-muted small fw-bold mb-0 lh-1">@</div><div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${total}</div></div>`;
+            rawTotal = total; 
         }
+    }
+
+    // --- X (TWITTER) BUTTON LOGIC ---
+    const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
+    
+    let awayTweetBtn = '';
+    if (game.lineups?.awayPlayers?.length > 0) {
+        const awayTweetText = generateTweetText(awayName, awayPitcher, rawAwayOdds, homePitcher, rawHomeOdds, rawTotal, game.lineups.awayPlayers);
+        awayTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(awayTweetText)}">${X_ICON_SVG}</button>`;
+    }
+
+    let homeTweetBtn = '';
+    if (game.lineups?.homePlayers?.length > 0) {
+        const homeTweetText = generateTweetText(homeName, homePitcher, rawHomeOdds, awayPitcher, rawAwayOdds, rawTotal, game.lineups.homePlayers);
+        homeTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(homeTweetText)}">${X_ICON_SVG}</button>`;
     }
 
     // --- CARD RENDER ---
@@ -379,8 +401,10 @@ function createGameCard(data) {
                 </div>
             </div>
 
-            <div class="bg-light border-top border-bottom text-center">
-                <button class="btn btn-sm btn-link text-decoration-none card-toggle-btn fw-bold text-muted py-1 m-0" style="font-size: 0.7rem;">[+] Expand Matchups</button>
+            <div class="bg-light border-top border-bottom d-flex justify-content-between align-items-center px-2 py-1">
+                <div>${awayTweetBtn}</div>
+                <div><button class="btn btn-sm btn-link text-decoration-none card-toggle-btn fw-bold text-muted py-0 m-0" style="font-size: 0.7rem;">[+] Expand Matchups</button></div>
+                <div>${homeTweetBtn}</div>
             </div>
             
             <div class="row g-0 bg-white">
@@ -399,7 +423,26 @@ function createGameCard(data) {
             </div>
         </div>`;
     
+    // Add event listeners to the newly created tweet buttons
+    gameCard.querySelectorAll('.tweet-trigger').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            const tweetText = decodeURIComponent(btn.getAttribute('data-tweet'));
+            openTweetModal(tweetText);
+        });
+    });
+
     return gameCard;
+}
+
+function openTweetModal(text) {
+    const modalEl = document.getElementById('tweetModal');
+    const textarea = document.getElementById('tweet-textarea');
+    if(modalEl && textarea) {
+        textarea.value = text;
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
 }
 
 // ==========================================
@@ -419,10 +462,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- MODAL COPY BUTTON LISTENER ---
+    const copyBtn = document.getElementById('copy-tweet-btn');
+    if(copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const textarea = document.getElementById('tweet-textarea');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); 
+
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = "✅ Copied! Opening X...";
+                copyBtn.classList.remove('btn-dark');
+                copyBtn.classList.add('btn-success');
+
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('btn-success');
+                    copyBtn.classList.add('btn-dark');
+                    window.open('https://twitter.com/intent/tweet', '_blank');
+                }, 1500);
+            }).catch(err => {
+                 console.error('Failed to copy text: ', err);
+                 alert("Failed to copy to clipboard. Please copy manually.");
+            });
+        });
+    }
+
     // --- UNIVERSAL TOGGLE LISTENER ---
     document.addEventListener('click', (e) => {
         
-        // 1. Individual Player Clicked
         if (e.target.closest('.player-toggle')) {
             const toggleRow = e.target.closest('.player-toggle');
             const targetId = toggleRow.getAttribute('data-target');
@@ -438,7 +507,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // 2. Card Level "Expand Matchups" Clicked
         if (e.target.closest('.card-toggle-btn')) {
             const btn = e.target.closest('.card-toggle-btn');
             const card = btn.closest('.lineup-card');
@@ -456,7 +524,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = isExpanding ? '[-] Collapse Matchups' : '[+] Expand Matchups';
         }
         
-        // 3. Global Header "Expand All" Clicked
         if (e.target.closest('#global-toggle-btn')) {
             const btn = e.target.closest('#global-toggle-btn');
             const isExpanding = btn.textContent.includes('+');
