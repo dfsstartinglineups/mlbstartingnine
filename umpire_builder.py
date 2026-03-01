@@ -5,20 +5,12 @@ import json
 from datetime import datetime, timedelta
 
 def build_umpire_json():
-    # 1. Smart Date Logic (Offseason vs Regular Season)
+    # 1. Rolling 365-Day Window (Maximum Sample Size)
     today = datetime.today()
+    start_dt = (today - timedelta(days=365)).strftime('%Y-%m-%d')
+    end_dt = today.strftime('%Y-%m-%d')
     
-    # If we are in Jan, Feb, or March, pull the entire previous season for a baseline.
-    if today.month < 4:
-        start_dt = f"{today.year - 1}-03-25" 
-        end_dt = f"{today.year - 1}-11-05"   
-        print(f"Offseason detected. Pulling previous season data: {start_dt} to {end_dt}...")
-    else:
-        # If it's April or later, pull the last 90 calendar days
-        start_dt = (today - timedelta(days=90)).strftime('%Y-%m-%d')
-        end_dt = today.strftime('%Y-%m-%d')
-        print(f"Mid-season detected. Pulling rolling 90-day data: {start_dt} to {end_dt}...")
-        
+    print(f"Pulling rolling 365-day Statcast data: {start_dt} to {end_dt}...")
     df = pyb.statcast(start_dt, end_dt)
     
     # 2. Filter to only the final pitch of each at-bat
