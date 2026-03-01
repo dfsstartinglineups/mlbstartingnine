@@ -336,8 +336,17 @@ function createGameCard(data) {
         homeTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(homeTweetText)}">${X_ICON_SVG}</button>`;
     }
 
+    // --- FORMAT UMPIRE NAME (First Initial. Last Name) ---
+    let displayUmpire = hpUmpire;
+    if (hpUmpire !== "TBD") {
+        const umpParts = hpUmpire.split(' ');
+        if (umpParts.length > 1) {
+            displayUmpire = `${umpParts[0].charAt(0)}. ${umpParts.slice(1).join(' ')}`;
+        }
+    }
+
     // NEW: Format the Umpire display string inline with Games & Color Coding
-    let umpString = `<span class="text-dark fw-bold">${hpUmpire}</span>`;
+    let umpString = `<span class="text-dark fw-bold">${displayUmpire}</span>`;
     if (umpStats) {
         // Parse numbers to check thresholds
         const kNum = parseFloat(umpStats.k_rate);
