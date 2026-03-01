@@ -248,29 +248,32 @@ function createGameCard(data) {
             const vL = pStats.split_vL;
             const vR = pStats.split_vR;
             
-            // Format single line: AVG • OPS • HR • K (Left-anchored with tabular columns)
+            // Format single line: AVG • OPS • HR • K (Tightly hugged and tabular)
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
                     return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
-                        <span class="text-muted fw-bold" style="width: 20px;">${label}:</span>
-                        <div class="d-flex align-items-center text-dark ms-1" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.3px;">
-                            <span style="display: inline-block; width: 28px;">${split.avg}</span><span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
-                            <span style="display: inline-block; width: 28px;">${split.ops}</span><span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
-                            <span style="display: inline-block; width: 26px;">${split.hr}HR</span><span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
+                        <span class="text-muted fw-bold" style="margin-right: 4px;">${label}:</span>
+                        <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
+                            <span style="display: inline-block; width: 25px;">${split.avg}</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 2px;">•</span>
+                            <span style="display: inline-block; width: 25px;">${split.ops}</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 2px;">•</span>
+                            <span style="display: inline-block; width: 25px;">${split.hr}HR</span>
+                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 2px;">•</span>
                             <span>${split.k}K</span>
                         </div>
                     </div>`;
                 }
                 return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
-                        <span class="text-muted fw-bold" style="width: 20px;">${label}:</span>
-                        <span class="text-muted ms-1 fst-italic">No History</span>
+                        <span class="text-muted fw-bold" style="margin-right: 4px;">${label}:</span>
+                        <span class="text-muted fst-italic">No History</span>
                     </div>`;
             };
 
             statsHtml = `
-                <div class="mt-1 p-1 rounded w-100" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                <div class="mt-1 p-1 rounded w-100 mx-auto" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
                     ${formatRow(vL, 'vL')}
                     ${formatRow(vR, 'vR')}
                 </div>
