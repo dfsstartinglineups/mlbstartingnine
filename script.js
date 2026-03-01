@@ -232,11 +232,11 @@ function createGameCard(data) {
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     }
 
-    // --- NEW: PITCHER SPLITS BUILDER (ULTRA-COMPACT) ---
+    // --- NEW: PITCHER SPLITS BUILDER (ULTRA-COMPACT & ALIGNED) ---
     const buildPitcherHtml = (pId, pName) => {
         if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
         
-        // Shorten name to save horizontal space (e.g., "Gerrit Cole (R)" -> "G. Cole (R)")
+        // Shorten name to save horizontal space
         let shortName = pName;
         const parts = pName.split(' ');
         if (parts.length >= 3) shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
@@ -248,16 +248,29 @@ function createGameCard(data) {
             const vL = pStats.split_vL;
             const vR = pStats.split_vR;
             
-            // Format single line: AVG • OPS • K
+            // Format single line: AVG • OPS • HR • K (Left-anchored with tabular columns)
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
-                    return `<div class="d-flex justify-content-between align-items-center"><span class="text-muted fw-bold" style="min-width: 15px;">${label}:</span><span class="text-dark text-truncate ms-1" style="letter-spacing: -0.2px;">${split.avg}•${split.ops}•${split.k}K</span></div>`;
+                    return `
+                    <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
+                        <span class="text-muted fw-bold" style="width: 20px;">${label}:</span>
+                        <div class="d-flex align-items-center text-dark ms-1" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.3px;">
+                            <span style="display: inline-block; width: 28px;">${split.avg}</span><span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
+                            <span style="display: inline-block; width: 28px;">${split.ops}</span><span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
+                            <span style="display: inline-block; width: 26px;">${split.hr}HR</span><span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
+                            <span>${split.k}K</span>
+                        </div>
+                    </div>`;
                 }
-                return `<div class="d-flex justify-content-between align-items-center"><span class="text-muted fw-bold" style="min-width: 15px;">${label}:</span><span class="text-muted text-truncate ms-1">No History</span></div>`;
+                return `
+                    <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
+                        <span class="text-muted fw-bold" style="width: 20px;">${label}:</span>
+                        <span class="text-muted ms-1 fst-italic">No History</span>
+                    </div>`;
             };
 
             statsHtml = `
-                <div class="mt-1 p-1 rounded text-start mx-auto" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef; line-height: 1.3; width: 95%;">
+                <div class="mt-1 p-1 rounded w-100" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
                     ${formatRow(vL, 'vL')}
                     ${formatRow(vR, 'vR')}
                 </div>
