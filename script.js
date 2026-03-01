@@ -236,7 +236,12 @@ function createGameCard(data) {
         });
         
         text += playerStrings.join('\n'); // Perfect single-spaced list
-        text += `\n\nCheck splits & BvP at https://mlbstartingnine.com #MLB #DFS`;
+        
+        // Strip spaces from team name for valid hashtags (e.g. "Red Sox" -> "RedSox")
+        const teamHash = teamName.replace(/\s+/g, '');
+        
+        text += `\n\nCheck splits & BvP at https://mlbstartingnine.com\n`;
+        text += `#${teamHash} #${teamHash}Lineup #MLB #DFS #MLBOdds #StartingPitchers #SpringLineups`;
         
         return text;
     };
@@ -471,8 +476,9 @@ document.addEventListener('DOMContentLoaded', () => {
             textarea.setSelectionRange(0, 99999); 
 
             navigator.clipboard.writeText(textarea.value).then(() => {
+                // Modified to strictly copy, show success, and revert after 2 seconds
                 const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = "✅ Copied! Opening X...";
+                copyBtn.innerHTML = "✅ Copied to Clipboard!";
                 copyBtn.classList.remove('btn-dark');
                 copyBtn.classList.add('btn-success');
 
@@ -480,8 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     copyBtn.innerHTML = originalText;
                     copyBtn.classList.remove('btn-success');
                     copyBtn.classList.add('btn-dark');
-                    window.open('https://twitter.com/intent/tweet', '_blank');
-                }, 1500);
+                }, 2000);
             }).catch(err => {
                  console.error('Failed to copy text: ', err);
                  alert("Failed to copy to clipboard. Please copy manually.");
