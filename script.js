@@ -224,34 +224,42 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- PARK FACTORS: COMPACT GRID (NO DEAD SPACE) ---
+    // --- PARK FACTORS: PERFECT ALIGNMENT & ZERO DEAD SPACE ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            const style = `font-size:0.75rem; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
+            // Using inline-flex and baseline to prevent the "dropped" look
+            const style = `display:inline-flex; align-items:baseline; font-size:0.75rem; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
             if (diff > 0) return `<span class="text-success" style="${style}">↑${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">↓${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
         const sBlock = (val, lbl) => `
-            <div class="d-flex align-items-center" style="min-width:38px; margin-left:2px;">
+            <div class="d-flex align-items-baseline">
                 ${val}<span style="font-size:0.55rem; font-family:sans-serif; font-weight:bold; opacity:0.7; margin-left:1px;">${lbl}</span>
             </div>`;
 
         parkString = `
             <div class="d-flex flex-column align-items-end" style="margin-top:1px; font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.5px; line-height:1.1;">
-                <div class="d-flex align-items-center justify-content-end">
-                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem;">RUNS:</span>
-                    <span style="margin-left:2px; min-width:32px;">${getParkBadge(parkStats.runs)}</span>
-                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-left:4px;">HR:</span>
-                    ${sBlock(getParkBadge(parkStats.hr_l), 'L')}<span class="text-muted" style="width:6px; text-align:center;">/</span>${sBlock(getParkBadge(parkStats.hr_r), 'R')}
+                
+                <div class="d-flex align-items-baseline justify-content-end">
+                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-right:2px;">RUNS:</span>
+                    ${getParkBadge(parkStats.runs)}
+                    
+                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-left:6px; margin-right:2px;">HR:</span>
+                    ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
+                    <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.7rem;">/</span>
+                    ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
                 </div>
-                <div class="d-flex align-items-center justify-content-end">
-                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem;">wOBA:</span>
-                    ${sBlock(getParkBadge(parkStats.woba_l), 'L')}<span class="text-muted" style="width:6px; text-align:center;">/</span>${sBlock(getParkBadge(parkStats.woba_r), 'R')}
+
+                <div class="d-flex align-items-baseline justify-content-end">
+                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-right:2px;">wOBA:</span>
+                    ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
+                    <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.7rem;">/</span>
+                    ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
                 </div>
             </div>`;
     }
