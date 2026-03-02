@@ -439,7 +439,11 @@ function createGameCard(data) {
         if (rpgNum >= 9.5) rpgColor = "text-success"; 
         else if (rpgNum <= 8.0) rpgColor = "text-danger"; 
 
-        umpString += ` <span class="text-muted ms-1 fw-normal">(G: <span class="text-dark fw-bold">${umpStats.games}</span> • K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span> • BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span> • Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
+        // Tightly styled dot separator
+        const umpDot = `<span class="text-muted" style="margin: 0 3px;">•</span>`;
+
+        // Removed the 'ms-1' and literal leading space, replacing with a 4px margin and tight letter spacing
+        umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span>${umpDot}K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span>${umpDot}BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span>${umpDot}Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
     gameCard.innerHTML = `
