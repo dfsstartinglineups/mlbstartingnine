@@ -224,39 +224,42 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- UPDATED: PARK FACTOR STAT LINE (GRID ALIGNED) ---
+    // --- UPDATED: PARK FACTOR STAT LINE (ROBUST ALIGNMENT) ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            if (diff > 0) return `<span class="text-success fw-bold">↑${absDiff}%</span>`;
-            if (diff < 0) return `<span class="text-danger fw-bold">↓${absDiff}%</span>`;
-            return `<span class="text-muted fw-bold">0%</span>`;
+            // Increased font size and added shadow for readability
+            const style = `font-size: 0.75rem; font-weight: 800; text-shadow: 0px 0px 1px rgba(0,0,0,0.1);`;
+            if (diff > 0) return `<span class="text-success" style="${style}">↑${absDiff}%</span>`;
+            if (diff < 0) return `<span class="text-danger" style="${style}">↓${absDiff}%</span>`;
+            return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        // Helper to create a fixed-width stat block for L/R alignment
+        // Standardized data block with min-width to prevent shifting
         const statBlock = (val, label) => `
-            <div class="d-flex align-items-center" style="width: 34px;">
-                ${val}<span style="font-size: 0.5rem; font-family: sans-serif; opacity: 0.7; margin-left: 2px;">${label}</span>
+            <div class="d-flex align-items-center justify-content-start" style="min-width: 42px;">
+                ${val}<span style="font-size: 0.55rem; font-family: sans-serif; font-weight: bold; opacity: 0.7; margin-left: 1px;">${label}</span>
             </div>`;
 
         parkString = `
-            <div class="d-flex flex-column align-items-end" style="font-size: 0.60rem; margin-top: 1px; font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px; line-height: 1.2;">
-                <div class="d-flex align-items-center">
-                    <span class="text-muted fw-bold" style="font-family: sans-serif; width: 28px;">Runs:</span>
-                    <span style="width: 32px; text-align: left;">${getParkBadge(parkStats.runs)}</span>
-                    <span class="text-muted" style="font-size: 0.5rem; margin: 0 2px;">•</span>
-                    <span class="text-muted fw-bold" style="font-family: sans-serif; width: 18px;">HR:</span>
+            <div class="d-flex flex-column align-items-end" style="margin-top: 2px; font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.3px; line-height: 1.3;">
+                
+                <div class="d-flex align-items-center justify-content-end w-100">
+                    <span class="text-muted fw-bold pe-1" style="font-family: sans-serif; font-size: 0.65rem; min-width: 35px; text-align: right;">RUNS:</span>
+                    <span style="min-width: 38px; text-align: left;">${getParkBadge(parkStats.runs)}</span>
+                    
+                    <span class="text-muted fw-bold px-1" style="font-family: sans-serif; font-size: 0.65rem; min-width: 25px; text-align: right;">HR:</span>
                     ${statBlock(getParkBadge(parkStats.hr_l), 'L')}
-                    <span class="text-muted" style="width: 6px; text-align: center;">/</span>
+                    <span class="text-muted fw-bold" style="width: 8px; text-align: center; font-size: 0.7rem;">/</span>
                     ${statBlock(getParkBadge(parkStats.hr_r), 'R')}
                 </div>
-                <div class="d-flex align-items-center">
-                    <span class="text-muted fw-bold" style="font-family: sans-serif; width: 28px;">wOBA:</span>
-                    <div style="width: 32px;"></div> <span class="text-muted" style="font-size: 0.5rem; margin: 0 2px; visibility: hidden;">•</span>
-                    <div style="width: 18px;"></div> ${statBlock(getParkBadge(parkStats.woba_l), 'L')}
-                    <span class="text-muted" style="width: 6px; text-align: center;">/</span>
+
+                <div class="d-flex align-items-center justify-content-end w-100">
+                    <span class="text-muted fw-bold pe-1" style="font-family: sans-serif; font-size: 0.65rem; min-width: 35px; text-align: right;">wOBA:</span>
+                    <span style="min-width: 38px;"></span> <span style="min-width: 25px;"></span> ${statBlock(getParkBadge(parkStats.woba_l), 'L')}
+                    <span class="text-muted fw-bold" style="width: 8px; text-align: center; font-size: 0.7rem;">/</span>
                     ${statBlock(getParkBadge(parkStats.woba_r), 'R')}
                 </div>
             </div>
