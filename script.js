@@ -224,12 +224,13 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- UPDATED: PARK FACTOR STAT LINE (ZERO-SPACE WITH HANDEDNESS PADDING) ---
+    // --- UPDATED: PARK FACTOR STAT LINE (UNIFORM BOLD NUMBERS) ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
+            // Number, arrow, and % are now all inside the same bold span
             if (diff > 0) return `<span class="text-success fw-bold">↑${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger fw-bold">↓${absDiff}%</span>`;
             return `<span class="text-muted fw-bold">0%</span>`;
@@ -239,10 +240,10 @@ function createGameCard(data) {
 
         parkString = `
             <div class="d-flex align-items-center justify-content-end" style="font-size: 0.60rem; margin-top: 1px; font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
-                <span class="text-muted fw-bold" style="font-family: sans-serif;">Runs:</span>${getParkBadge(parkStats.runs)}
+                <span class="text-muted fw-bold" style="font-family: sans-serif; margin-right: 1px;">Runs:</span>${getParkBadge(parkStats.runs)}
                 ${parkDot}
-                <span class="text-muted fw-bold" style="font-family: sans-serif;">HR:</span>${getParkBadge(parkStats.hr_l)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7; margin-left: 2px;">L</span>
-                <span class="text-muted">/</span>${getParkBadge(parkStats.hr_r)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7; margin-left: 2px;">R</span>
+                <span class="text-muted fw-bold" style="font-family: sans-serif; margin-right: 1px;">HR:</span>${getParkBadge(parkStats.hr_l)}<span style="font-size: 0.55rem; font-family: sans-serif; opacity: 0.8; margin-left: 2px;">L</span>
+                <span class="text-muted" style="margin: 0 1px;">/</span>${getParkBadge(parkStats.hr_r)}<span style="font-size: 0.55rem; font-family: sans-serif; opacity: 0.8; margin-left: 2px;">R</span>
             </div>
         `;
     }
