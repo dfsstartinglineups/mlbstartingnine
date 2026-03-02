@@ -224,22 +224,23 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: LARGER NUMBERS & PERFECT BASELINE ---
+   // --- PARK FACTORS: ODDS-STYLE (+/-) & PERFECT BASELINE ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            // Increased font size to 0.85rem and kept baseline alignment
             const style = `display:inline-flex; align-items:baseline; font-size:0.85rem; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
-            if (diff > 0) return `<span class="text-success" style="${style}">↑${absDiff}%</span>`;
-            if (diff < 0) return `<span class="text-danger" style="${style}">↓${absDiff}%</span>`;
+            
+            // Replaced arrows with + and - symbols
+            if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
+            if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
-                ${val}<span style="font-size:0.55rem; font-family:sans-serif; font-weight:bold; opacity:0.7; margin-left:1px;">${lbl}</span>
+                ${val}<span style="font-size:0.55rem; font-family:sans-serif; font-weight:bold; opacity:0.7; margin-left:2px;">${lbl}</span>
             </div>`;
 
         parkString = `
