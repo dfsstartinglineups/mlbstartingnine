@@ -24,10 +24,8 @@ function updateSEO(selectedDateStr) {
         descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals";
     }
     
-    // Updates the browser tab title
     document.title = `${titlePrefix} for ${formattedDate} | BvP, Splits & Umps`;
     
-    // Updates the meta description
     const descTag = document.getElementById('dynamic-desc');
     if (descTag) {
         descTag.setAttribute('content', `${descPrefix}. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
@@ -56,6 +54,15 @@ async function fetchMatchupsData() {
 async function fetchUmpiresData() {
     try {
         const response = await fetch('data/umpires.json?v=' + new Date().getTime()); 
+        if (response.ok) return await response.json();
+    } catch (e) {}
+    return null;
+}
+
+// NEW: Fetch Parks Data
+async function fetchParksData() {
+    try {
+        const response = await fetch('data/parks.json?v=' + new Date().getTime()); 
         if (response.ok) return await response.json();
     } catch (e) {}
     return null;
@@ -91,14 +98,17 @@ async function init(dateToFetch) {
 
         const rawGames = scheduleData.dates[0].games;
         
-        const [dailyOddsData, matchupsData, umpiresData] = await Promise.all([
+        // NEW: Load the 4th Parks file simultaneously
+        const [dailyOddsData, matchupsData, umpiresData, parksData] = await Promise.all([
             fetchLocalOdds(),
             fetchMatchupsData(),
-            fetchUmpiresData() 
+            fetchUmpiresData(),
+            fetchParksData()
         ]);
         
         const cachedGames = matchupsData?.games || {};
         const umpCache = umpiresData?.umpires || {};
+        const parksCache = parksData?.parks || {};
 
         for (let i = 0; i < rawGames.length; i++) {
             const game = rawGames[i];
@@ -142,7 +152,8 @@ async function init(dateToFetch) {
                 lineupHandedness: lineupHandedness,
                 deepStats: cachedGames[game.gamePk] || {},
                 hpUmpire: hpUmpire,
-                umpStats: umpStats
+                umpStats: umpStats,
+                parkStats: parksCache[game.venue.name] || null // NEW: Attach the park data
             });
         }
         renderGames();
@@ -178,6 +189,7 @@ function createGameCard(data) {
     const game = data.gameRaw;
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
+    const parkStats = data.parkStats; // NEW: Unpack the park stats
     
     const hpUmpire = data.hpUmpire || "TBD"; 
     const umpStats = data.umpStats;
@@ -212,6 +224,25 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
+    // --- NEW: PARK FACTOR BADGE FORMATTER ---
+    let parkString = '';
+    if (parkStats) {
+        const getParkBadge = (factor) => {
+            const diff = factor - 100;
+            if (diff > 0) return `<span class="text-success fw-bold" style="letter-spacing: -0.5px;">↑${diff}%</span>`;
+            if (diff < 0) return `<span class="text-danger fw-bold" style="letter-spacing: -0.5px;">↓${Math.abs(diff)}%</span>`;
+            return `<span class="text-muted fw-bold">-</span>`;
+        };
+
+        // Builds the tight sub-text below the venue name
+        parkString = `
+            <div class="text-end" style="font-size: 0.60rem; letter-spacing: 0.2px; margin-top: 2px;">
+                <span class="text-muted fw-bold">Runs:</span> ${getParkBadge(parkStats.runs)} <span class="text-muted mx-1">•</span> 
+                <span class="text-muted fw-bold">HR:</span> ${getParkBadge(parkStats.hr_l)} <span class="text-muted" style="font-size: 0.5rem;">(L)</span> / ${getParkBadge(parkStats.hr_r)} <span class="text-muted" style="font-size: 0.5rem;">(R)</span>
+            </div>
+        `;
+    }
+
     let awayPitcherId = null;
     let awayPitcher = "TBD";
     let awayPitcherHand = 'R'; 
@@ -245,7 +276,6 @@ function createGameCard(data) {
         `;
     };
 
-    // --- UPDATED: PITCHER STATS (Perfect Alignment & 1.000 Truncation) ---
     const buildPitcherStats = (pId) => {
         if (!pId) return `<div id="stats-${game.gamePk}-p-null" class="stats-collapse d-none w-100"></div>`;
         
@@ -258,7 +288,6 @@ function createGameCard(data) {
             
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
-                    // Truncate stats like "1.000" to "1.00" (4 chars max) to prevent overflow
                     const avgStr = split.avg.length > 4 ? split.avg.substring(0, 4) : split.avg;
                     const opsStr = split.ops.length > 4 ? split.ops.substring(0, 4) : split.ops;
 
@@ -439,19 +468,20 @@ function createGameCard(data) {
         if (rpgNum >= 9.5) rpgColor = "text-success"; 
         else if (rpgNum <= 8.0) rpgColor = "text-danger"; 
 
-        // Tightly styled dot separator
         const umpDot = `<span class="text-muted" style="margin: 0 3px;">•</span>`;
-
-        // Removed the 'ms-1' and literal leading space, replacing with a 4px margin and tight letter spacing
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span>${umpDot}K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span>${umpDot}BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span>${umpDot}Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
+    // UPDATED: The header HTML to cleanly fit the new park factor string below the venue
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
-                <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
-                    <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.7rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <span class="badge bg-white text-dark shadow-sm border px-2 py-1 mt-1" style="font-size: 0.75rem;">${gameTime}</span>
+                    <div class="d-flex flex-column align-items-end">
+                        <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.7rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
+                        ${parkString}
+                    </div>
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-start px-1 pt-1">
