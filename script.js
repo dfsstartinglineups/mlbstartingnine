@@ -224,7 +224,7 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: HIGH-DENSITY SINGLE-LINE ---
+   // --- PARK FACTORS: ZERO-GAP SINGLE-LINE ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
@@ -236,28 +236,31 @@ function createGameCard(data) {
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        const labelStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:700; opacity:0.8;`;
+        // Darkened label and separator styles
+        const labelStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:700; color:#495057;`;
+        const sepStyle = `font-weight:bold; color:#212529; opacity:0.8;`; // Darker & Bolder
+        
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
                 ${val}<span style="font-size:0.6rem; font-family:sans-serif; font-weight:700; opacity:0.7; margin-left:1px;">${lbl}</span>
             </div>`;
         
-        // Compressed dot with minimal horizontal margin
-        const dot = `<span class="text-muted" style="font-size: 0.5rem; opacity: 0.3; margin: 0 3px;">•</span>`;
+        // Zero-margin bullet
+        const dot = `<span style="${sepStyle} font-size:0.55rem; margin:0 1px;">•</span>`;
 
         parkString = `
-            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.5px; line-height:1;">
-                <span class="text-muted" style="${labelStyle} margin-right:1px;">R:</span>
+            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.6px; line-height:1;">
+                <span style="${labelStyle} margin-right:1px;">R:</span>
                 ${getParkBadge(parkStats.runs)}
                 ${dot}
-                <span class="text-muted" style="${labelStyle} margin-right:1px;">HR:</span>
+                <span style="${labelStyle} margin-right:1px;">HR:</span>
                 ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
-                <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.7rem; opacity:0.4;">/</span>
+                <span style="${sepStyle} margin:0 1px; font-size:0.7rem;">/</span>
                 ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
                 ${dot}
-                <span class="text-muted" style="${labelStyle} margin-right:1px;">wOBA:</span>
+                <span style="${labelStyle} margin-right:1px;">wOBA:</span>
                 ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
-                <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.7rem; opacity:0.4;">/</span>
+                <span style="${sepStyle} margin:0 1px; font-size:0.7rem;">/</span>
                 ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
             </div>`;
     }
