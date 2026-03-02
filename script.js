@@ -501,22 +501,18 @@ function createGameCard(data) {
     }
 
     // --- UPDATED: RESTRUCTURED HEADER WITH CENTERED STADIUM & LEFT-JUSTIFIED STATS ---
-    gameCard.innerHTML = `
+   gameCard.innerHTML = `
         <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
-                <div class="d-flex align-items-center mb-1 w-100">
-                    <div style="flex: 0 0 auto;">
-                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1 mt-1" style="font-size: 0.75rem;">${gameTime}</span>
+                <div class="d-flex align-items-start mb-1 w-100">
+                    <div style="flex: 0 0 auto;" class="pt-1 pe-1">
+                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
                     </div>
 
-                    <div class="d-flex flex-column ps-3" style="flex: 1; min-width: 0;">
-                        <div class="text-center w-100">
-                            <span class="text-muted fw-bold text-uppercase text-truncate d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">${venueName}</span>
-                        </div>
-                        <div class="w-100">
-                            ${parkString}
-                        </div>
+                    <div class="d-flex flex-column align-items-center justify-content-center" style="flex: 1; min-width: 0;">
+                        <span class="text-muted fw-bold text-uppercase text-truncate text-center w-100" style="font-size: 0.70rem; letter-spacing: 0.5px;">${venueName}</span>
+                        ${parkString}
                     </div>
                 </div>
                 
