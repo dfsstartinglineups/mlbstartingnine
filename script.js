@@ -224,7 +224,7 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: UNIFIED FONT-FAMILY & SIZING ---
+   // --- PARK FACTORS: CENTERED & STANDARD WEIGHT ---
     let parkString = '';
     if (parkStats) {
         const uSize = "0.75rem"; 
@@ -232,27 +232,30 @@ function createGameCard(data) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            // ADDED: font-family: sans-serif so numbers match the tags exactly
-            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
+            // Reduced from 800 to 500 (medium) to save horizontal space
+            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:500; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
             if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:700; color:#495057;`;
+        // Removed bold (now normal)
+        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057;`;
         
-        // ADDED: font-family: sans-serif to separators
-        const sepStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:900; color:#212529; opacity:0.85;`; 
+        // Removed bold (now normal)
+        const sepStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#212529; opacity:0.85;`; 
         
+        // Removed bold on L/R tags (now normal)
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
-                ${val}<span style="font-size:${uSize}; font-family:sans-serif; font-weight:700; color:#495057; margin-left:1px;">${lbl}</span>
+                ${val}<span style="font-size:${uSize}; font-family:sans-serif; font-weight:normal; color:#495057; margin-left:1px;">${lbl}</span>
             </div>`;
         
         const dot = `<span style="${sepStyle} font-size:0.65rem; margin:0 3px;">•</span>`;
 
+        // CHANGED: justify-content-start is now justify-content-center
         parkString = `
-            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:sans-serif; letter-spacing:-0.4px; line-height:1.2; -webkit-text-size-adjust:100%;">
+            <div class="d-flex align-items-baseline justify-content-center flex-wrap w-100" style="font-family:sans-serif; letter-spacing:-0.4px; line-height:1.2; -webkit-text-size-adjust:100%;">
                 <span style="${labelStyle} margin-right:1px;">R:</span>
                 ${getParkBadge(parkStats.runs)}
                 ${dot}
