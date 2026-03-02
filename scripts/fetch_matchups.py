@@ -13,16 +13,35 @@ TODAY_STR = datetime.utcnow().strftime('%Y-%m-%d') # MLB API uses UTC dates nati
 os.makedirs(DATA_DIR, exist_ok=True)
 
 def load_cache():
-    """Loads the existing matchups to use as a diff baseline."""
+    """Loads existing matchups and keeps only today and yesterday's data."""
+    # Define our two-day retention window
+    today_obj = datetime.utcnow()
+    yesterday_obj = today_obj - timedelta(days=1)
+    
+    valid_dates = [
+        today_obj.strftime('%Y-%m-%d'),
+        yesterday_obj.strftime('%Y-%m-%d')
+    ]
+    
     if os.path.exists(MATCHUPS_FILE):
         try:
             with open(MATCHUPS_FILE, 'r') as f:
                 data = json.load(f)
-                if data.get('date') != TODAY_STR:
+                
+                # If the file structure is old or missing 'games', reset
+                if 'games' not in data:
                     return {"date": TODAY_STR, "games": {}}
-                return data
-        except json.JSONDecodeError:
+
+                # Filter: Keep only games where the cached date is Today or Yesterday
+                # (Note: This assumes you might want to store the date per game 
+                # or just keep the whole dict if the top-level date matches)
+                if data.get('date') in valid_dates:
+                    print(f"♻️ Retaining data for {data.get('date')}")
+                    return data
+                
+        except (json.JSONDecodeError, KeyError):
             pass
+            
     return {"date": TODAY_STR, "games": {}}
 
 def save_cache(data):
