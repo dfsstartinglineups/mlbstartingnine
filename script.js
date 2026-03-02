@@ -224,21 +224,27 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- NEW: PARK FACTOR BADGE FORMATTER ---
+    // --- UPDATED: PARK FACTOR STAT LINE (ULTRA-TIGHT) ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
-            if (diff > 0) return `<span class="text-success fw-bold" style="letter-spacing: -0.5px;">↑${diff}%</span>`;
-            if (diff < 0) return `<span class="text-danger fw-bold" style="letter-spacing: -0.5px;">↓${Math.abs(diff)}%</span>`;
-            return `<span class="text-muted fw-bold">-</span>`;
+            const absDiff = Math.abs(diff);
+            if (diff > 0) return `<span class="text-success fw-bold">↑${absDiff}%</span>`;
+            if (diff < 0) return `<span class="text-danger fw-bold">↓${absDiff}%</span>`;
+            return `<span class="text-muted fw-bold">0%</span>`;
         };
 
-        // Builds the tight sub-text below the venue name
+        // Removed nearly all horizontal margins and reduced font further
         parkString = `
-            <div class="text-end" style="font-size: 0.60rem; letter-spacing: 0.2px; margin-top: 2px;">
-                <span class="text-muted fw-bold">Runs:</span> ${getParkBadge(parkStats.runs)} <span class="text-muted mx-1">•</span> 
-                <span class="text-muted fw-bold">HR:</span> ${getParkBadge(parkStats.hr_l)} <span class="text-muted" style="font-size: 0.5rem;">(L)</span> / ${getParkBadge(parkStats.hr_r)} <span class="text-muted" style="font-size: 0.5rem;">(R)</span>
+            <div class="d-flex align-items-center justify-content-end" style="font-size: 0.60rem; margin-top: 1px; font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.4px;">
+                <span class="text-muted fw-bold" style="font-family: sans-serif; margin-right: 2px;">RUNS:</span>
+                ${getParkBadge(parkStats.runs)}
+                <span class="text-muted mx-1" style="font-size: 0.5rem;">•</span>
+                <span class="text-muted fw-bold" style="font-family: sans-serif; margin-right: 2px;">HR:</span>
+                ${getParkBadge(parkStats.hr_l)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7; margin-left: 1px;">L</span>
+                <span class="text-muted" style="margin: 0 1px;">/</span>
+                ${getParkBadge(parkStats.hr_r)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7; margin-left: 1px;">R</span>
             </div>
         `;
     }
