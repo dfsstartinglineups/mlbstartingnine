@@ -491,15 +491,23 @@ function createGameCard(data) {
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span>${umpDot}K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span>${umpDot}BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span>${umpDot}Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
-    // UPDATED: The header HTML to cleanly fit the new park factor string below the venue
+    // --- UPDATED: RESTRUCTURED HEADER WITH CENTERED STADIUM & LEFT-JUSTIFIED STATS ---
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
-                <div class="d-flex justify-content-between align-items-start mb-1">
-                    <span class="badge bg-white text-dark shadow-sm border px-2 py-1 mt-1" style="font-size: 0.75rem;">${gameTime}</span>
-                    <div class="d-flex flex-column align-items-end">
-                        <span class="text-muted fw-bold text-uppercase text-truncate" style="font-size: 0.7rem; max-width: 180px; letter-spacing: 0.5px;">${venueName}</span>
-                        ${parkString}
+                
+                <div class="d-flex align-items-center mb-1 w-100">
+                    <div style="flex: 0 0 auto;">
+                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1 mt-1" style="font-size: 0.75rem;">${gameTime}</span>
+                    </div>
+
+                    <div class="d-flex flex-column ps-3" style="flex: 1; min-width: 0;">
+                        <div class="text-center w-100">
+                            <span class="text-muted fw-bold text-uppercase text-truncate d-block" style="font-size: 0.7rem; letter-spacing: 0.5px;">${venueName}</span>
+                        </div>
+                        <div class="w-100">
+                            ${parkString}
+                        </div>
                     </div>
                 </div>
                 
