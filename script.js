@@ -224,17 +224,16 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: TRUE UNIFORMITY & DARK SEPARATORS ---
+   // --- PARK FACTORS: UNIFIED FONT-FAMILY & SIZING ---
     let parkString = '';
     if (parkStats) {
-        // One absolute size for everything to force Desktop and Mobile to match
         const uSize = "0.75rem"; 
 
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            // Removed inline-flex to stop Desktop from shrinking the numbers
-            const style = `font-size:${uSize}; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
+            // ADDED: font-family: sans-serif so numbers match the tags exactly
+            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
             if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
@@ -242,30 +241,29 @@ function createGameCard(data) {
 
         const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:700; color:#495057;`;
         
-        // Restored the very dark, heavy separators
-        const sepStyle = `font-size:${uSize}; font-weight:900; color:#212529; opacity:0.85;`; 
+        // ADDED: font-family: sans-serif to separators
+        const sepStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:900; color:#212529; opacity:0.85;`; 
         
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
                 ${val}<span style="font-size:${uSize}; font-family:sans-serif; font-weight:700; color:#495057; margin-left:1px;">${lbl}</span>
             </div>`;
         
-        // Dark bullet with nearly zero margin
-        const dot = `<span style="${sepStyle} font-size:0.65rem; margin:0 2px;">•</span>`;
+        const dot = `<span style="${sepStyle} font-size:0.65rem; margin:0 3px;">•</span>`;
 
         parkString = `
-            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.5px; line-height:1.2; -webkit-text-size-adjust:100%;">
+            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:sans-serif; letter-spacing:-0.4px; line-height:1.2; -webkit-text-size-adjust:100%;">
                 <span style="${labelStyle} margin-right:1px;">R:</span>
                 ${getParkBadge(parkStats.runs)}
                 ${dot}
                 <span style="${labelStyle} margin-right:1px;">HR:</span>
                 ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
-                <span style="${sepStyle} margin:0 1px;">/</span>
+                <span style="${sepStyle} margin:0 2px;">/</span>
                 ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
                 ${dot}
                 <span style="${labelStyle} margin-right:1px;">wOBA:</span>
                 ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
-                <span style="${sepStyle} margin:0 1px;">/</span>
+                <span style="${sepStyle} margin:0 2px;">/</span>
                 ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
             </div>`;
     }
