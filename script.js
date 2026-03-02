@@ -224,42 +224,45 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: ODDS-STYLE (+/-) & PERFECT BASELINE ---
+   // --- PARK FACTORS: UNIFIED MOBILE & DESKTOP SCALING ---
     let parkString = '';
     if (parkStats) {
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
+            // Explicitly locking font-size and using 800 weight for high-contrast mobile readability
             const style = `display:inline-flex; align-items:baseline; font-size:0.85rem; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
             
-            // Replaced arrows with + and - symbols
             if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
+        // Standardized label style to prevent mobile 'shrinking'
+        const labelStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:700; opacity:0.8;`;
+
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
-                ${val}<span style="font-size:0.55rem; font-family:sans-serif; font-weight:bold; opacity:0.7; margin-left:2px;">${lbl}</span>
+                ${val}<span style="font-size:0.6rem; font-family:sans-serif; font-weight:700; opacity:0.7; margin-left:1.5px;">${lbl}</span>
             </div>`;
 
         parkString = `
-            <div class="d-flex flex-column align-items-end" style="margin-top:1px; font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.5px; line-height:1.0;">
+            <div class="d-flex flex-column align-items-end" style="margin-top:1px; font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.3px; line-height:1.2;">
                 
                 <div class="d-flex align-items-baseline justify-content-end">
-                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-right:3px;">RUNS:</span>
+                    <span class="text-muted" style="${labelStyle} margin-right:3px;">RUNS:</span>
                     ${getParkBadge(parkStats.runs)}
                     
-                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-left:8px; margin-right:3px;">HR:</span>
+                    <span class="text-muted" style="${labelStyle} margin-left:8px; margin-right:3px;">HR:</span>
                     ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
-                    <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.75rem;">/</span>
+                    <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.75rem; opacity:0.5;">/</span>
                     ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
                 </div>
 
-                <div class="d-flex align-items-baseline justify-content-end" style="margin-top: -1px;">
-                    <span class="text-muted fw-bold" style="font-family:sans-serif; font-size:0.6rem; margin-right:3px;">wOBA:</span>
+                <div class="d-flex align-items-baseline justify-content-end" style="margin-top: 1px;">
+                    <span class="text-muted" style="${labelStyle} margin-right:3px;">wOBA:</span>
                     ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
-                    <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.75rem;">/</span>
+                    <span class="text-muted fw-bold" style="margin:0 1px; font-size:0.75rem; opacity:0.5;">/</span>
                     ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
                 </div>
             </div>`;
