@@ -224,48 +224,48 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: UNIFORM SIZING (COLOR/WEIGHT HIERARCHY) ---
+   // --- PARK FACTORS: TRUE UNIFORMITY & DARK SEPARATORS ---
     let parkString = '';
     if (parkStats) {
-        // We set ONE universal size for the entire line
-        const uniSize = "0.70rem"; 
+        // One absolute size for everything to force Desktop and Mobile to match
+        const uSize = "0.75rem"; 
 
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            // Numbers get maximum thickness (900) and full color
-            const style = `display:inline-flex; align-items:baseline; font-size:${uniSize}; font-weight:900; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
+            // Removed inline-flex to stop Desktop from shrinking the numbers
+            const style = `font-size:${uSize}; font-weight:800; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
             if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        // Labels get medium thickness (600) and a softer gray color
-        const labelStyle = `font-family:sans-serif; font-size:${uniSize}; font-weight:600; color:#6c757d;`;
+        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:700; color:#495057;`;
         
-        // Separators get a very light gray so they fade into the background
-        const sepStyle = `font-weight:600; color:#adb5bd; opacity:0.6;`; 
+        // Restored the very dark, heavy separators
+        const sepStyle = `font-size:${uSize}; font-weight:900; color:#212529; opacity:0.85;`; 
         
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
-                ${val}<span style="font-size:${uniSize}; font-family:sans-serif; font-weight:600; color:#6c757d; margin-left:1px;">${lbl}</span>
+                ${val}<span style="font-size:${uSize}; font-family:sans-serif; font-weight:700; color:#495057; margin-left:1px;">${lbl}</span>
             </div>`;
         
-        const dot = `<span style="${sepStyle} font-size:${uniSize}; margin:0 2px;">•</span>`;
+        // Dark bullet with nearly zero margin
+        const dot = `<span style="${sepStyle} font-size:0.65rem; margin:0 2px;">•</span>`;
 
         parkString = `
-            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.5px; line-height:1.1; -webkit-text-size-adjust:100%;">
+            <div class="d-flex align-items-baseline justify-content-start flex-wrap w-100" style="font-family:SFMono-Regular,Consolas,monospace; letter-spacing:-0.5px; line-height:1.2; -webkit-text-size-adjust:100%;">
                 <span style="${labelStyle} margin-right:1px;">R:</span>
                 ${getParkBadge(parkStats.runs)}
                 ${dot}
                 <span style="${labelStyle} margin-right:1px;">HR:</span>
                 ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
-                <span style="${sepStyle} margin:0 1px; font-size:${uniSize};">/</span>
+                <span style="${sepStyle} margin:0 1px;">/</span>
                 ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
                 ${dot}
                 <span style="${labelStyle} margin-right:1px;">wOBA:</span>
                 ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
-                <span style="${sepStyle} margin:0 1px; font-size:${uniSize};">/</span>
+                <span style="${sepStyle} margin:0 1px;">/</span>
                 ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
             </div>`;
     }
