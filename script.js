@@ -224,26 +224,28 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- UPDATED: PARK FACTOR STAT LINE (ULTRA-TIGHT) ---
+    // --- UPDATED: PARK FACTOR STAT LINE (ZERO-SPACE WITH HANDEDNESS PADDING) ---
     let parkString = '';
     if (parkStats) {
-    const getParkBadge = (factor) => {
-        const diff = factor - 100;
-        const absDiff = Math.abs(diff);
-        if (diff > 0) return `<span class="text-success fw-bold">↑${absDiff}%</span>`;
-        if (diff < 0) return `<span class="text-danger fw-bold">↓${absDiff}%</span>`;
-        return `<span class="text-muted fw-bold">0%</span>`;
-    };
+        const getParkBadge = (factor) => {
+            const diff = factor - 100;
+            const absDiff = Math.abs(diff);
+            if (diff > 0) return `<span class="text-success fw-bold">↑${absDiff}%</span>`;
+            if (diff < 0) return `<span class="text-danger fw-bold">↓${absDiff}%</span>`;
+            return `<span class="text-muted fw-bold">0%</span>`;
+        };
 
-    parkString = `
-        <div class="d-flex align-items-center justify-content-end" style="font-size: 0.60rem; margin-top: 1px; font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
-            <span class="text-muted fw-bold" style="font-family: sans-serif;">Runs:</span>${getParkBadge(parkStats.runs)}
-            <span class="text-muted" style="font-size: 0.5rem; margin: 0 1px;">•</span>
-            <span class="text-muted fw-bold" style="font-family: sans-serif;">HR:</span>${getParkBadge(parkStats.hr_l)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7;">L</span>
-            <span class="text-muted">/</span>${getParkBadge(parkStats.hr_r)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7;">R</span>
-        </div>
-    `;
-}
+        const parkDot = `<span class="text-muted" style="font-size: 0.5rem; margin: 0 1px;">•</span>`;
+
+        parkString = `
+            <div class="d-flex align-items-center justify-content-end" style="font-size: 0.60rem; margin-top: 1px; font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
+                <span class="text-muted fw-bold" style="font-family: sans-serif;">Runs:</span>${getParkBadge(parkStats.runs)}
+                ${parkDot}
+                <span class="text-muted fw-bold" style="font-family: sans-serif;">HR:</span>${getParkBadge(parkStats.hr_l)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7; margin-left: 2px;">L</span>
+                <span class="text-muted">/</span>${getParkBadge(parkStats.hr_r)}<span style="font-size: 0.45rem; font-family: sans-serif; opacity: 0.7; margin-left: 2px;">R</span>
+            </div>
+        `;
+    }
 
     let awayPitcherId = null;
     let awayPitcher = "TBD";
