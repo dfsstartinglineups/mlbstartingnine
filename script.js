@@ -108,7 +108,7 @@ async function init(dateToFetch) {
 
         const rawGames = scheduleData.dates[0].games;
         
-        // NEW: Load the 4th Parks file simultaneously
+        // Load all data simultaneously
         const [dailyOddsData, matchupsData, umpiresData, parksData] = await Promise.all([
             fetchLocalOdds(),
             fetchMatchupsData(),
@@ -163,7 +163,7 @@ async function init(dateToFetch) {
                 deepStats: cachedGames[game.gamePk] || {},
                 hpUmpire: hpUmpire,
                 umpStats: umpStats,
-                parkStats: parksCache[game.venue.name] || null // NEW: Attach the park data
+                parkStats: parksCache[game.venue.name] || null 
             });
         }
         renderGames();
@@ -179,13 +179,12 @@ function renderGames() {
     const container = document.getElementById('games-container');
     container.innerHTML = '';
 
-    // --- NEW: Search Filter Logic ---
+    // Search Filter Logic
     const searchInput = document.getElementById('team-search');
     const searchText = searchInput ? searchInput.value.toLowerCase() : '';
 
     let filteredGames = ALL_GAMES_DATA.filter(item => {
         const g = item.gameRaw;
-        // Combine both team names to search against
         const matchString = (g.teams.away.team.name + " " + g.teams.home.team.name).toLowerCase();
         return matchString.includes(searchText);
     });
@@ -195,7 +194,7 @@ function renderGames() {
         return;
     }
 
-    // Sort and Render the filtered list
+    // Sort and Render
     let sortedGames = [...filteredGames].sort((a, b) => new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate));
     sortedGames.forEach(item => container.appendChild(createGameCard(item)));
 
@@ -216,7 +215,7 @@ function createGameCard(data) {
     const game = data.gameRaw;
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
-    const parkStats = data.parkStats; // NEW: Unpack the park stats
+    const parkStats = data.parkStats; 
     
     const hpUmpire = data.hpUmpire || "TBD"; 
     const umpStats = data.umpStats;
@@ -264,50 +263,60 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-   // --- PARK FACTORS: CENTERED & STANDARD WEIGHT ---
+    // --- VENUE NAME SHORTENER ---
+    const venueShortNames = {
+        "Oriole Park at Camden Yards": "Oriole Park",
+        "Guaranteed Rate Field": "Guaranteed Rate",
+        "American Family Field": "AmFam Field",
+        "Great American Ball Park": "Great American",
+        "Chase Field": "Chase Field",
+        "Citizens Bank Park": "Citizens Bank",
+        "Globe Life Field": "Globe Life Field",
+        "Minute Maid Park": "Minute Maid Park",
+        "loanDepot park": "loanDepot Park"
+    };
+    const displayVenueName = venueShortNames[venueName] || venueName;
+
+    // --- PARK FACTORS: 3-ROW GRID LAYOUT ---
     let parkString = '';
     if (parkStats) {
-        const uSize = "0.75rem"; 
+        const uSize = "0.70rem"; 
 
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            // Reduced from 800 to 500 (medium) to save horizontal space
-            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:500; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
+            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:600; text-shadow:0px 0px 1px rgba(0,0,0,0.1); display: inline-block; min-width: 28px; text-align: left;`;
             if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        // Removed bold (now normal)
-        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057;`;
+        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057; display: inline-block; width: 35px; text-align: right; padding-right: 4px;`;
+        const sepStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:normal; color:#adb5bd; margin:0 3px;`; 
         
-        // Removed bold (now normal)
-        const sepStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#212529; opacity:0.85;`; 
-        
-        // Removed bold on L/R tags (now normal)
         const sBlock = (val, lbl) => `
             <div class="d-flex align-items-baseline">
-                ${val}<span style="font-size:${uSize}; font-family:sans-serif; font-weight:normal; color:#495057; margin-left:1px;">${lbl}</span>
+                ${val}<span style="font-size:0.65rem; font-family:sans-serif; font-weight:normal; color:#6c757d; margin-left:1px;">${lbl}</span>
             </div>`;
-        
-        const dot = `<span style="${sepStyle} font-size:0.65rem; margin:0 3px;">•</span>`;
 
-        // CHANGED: justify-content-start is now justify-content-center
         parkString = `
-            <div class="d-flex align-items-baseline justify-content-center flex-wrap w-100" style="font-family:sans-serif; letter-spacing:-0.4px; line-height:1.2; -webkit-text-size-adjust:100%;">
-                <span style="${labelStyle} margin-right:1px;">R:</span>
-                ${getParkBadge(parkStats.runs)}
-                ${dot}
-                <span style="${labelStyle} margin-right:1px;">HR:</span>
-                ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
-                <span style="${sepStyle} margin:0 2px;">/</span>
-                ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
-                ${dot}
-                <span style="${labelStyle} margin-right:1px;">wOBA:</span>
-                ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
-                <span style="${sepStyle} margin:0 2px;">/</span>
-                ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
+            <div class="d-flex flex-column justify-content-center border-start ps-2 ms-2 w-100" style="font-family:sans-serif; line-height:1.2;">
+                <div class="d-flex align-items-baseline w-100 mb-1">
+                    <span style="${labelStyle}">R:</span>
+                    ${getParkBadge(parkStats.runs)}
+                </div>
+                <div class="d-flex align-items-baseline w-100 mb-1">
+                    <span style="${labelStyle}">HR:</span>
+                    ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
+                    <span style="${sepStyle}">/</span>
+                    ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
+                </div>
+                <div class="d-flex align-items-baseline w-100">
+                    <span style="${labelStyle}">wOBA:</span>
+                    ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
+                    <span style="${sepStyle}">/</span>
+                    ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
+                </div>
             </div>`;
     }
 
@@ -540,18 +549,20 @@ function createGameCard(data) {
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span>${umpDot}K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span>${umpDot}BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span>${umpDot}Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
-    // --- UPDATED: RESTRUCTURED HEADER WITH CENTERED STADIUM & LEFT-JUSTIFIED STATS ---
-   gameCard.innerHTML = `
+    // --- RESTRUCTURED HEADER ---
+    gameCard.innerHTML = `
         <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
-                <div class="d-flex align-items-start mb-1 w-100">
-                    <div style="flex: 0 0 auto;" class="pt-1 pe-1">
+                <div class="d-flex align-items-center mb-2 w-100 pb-1 border-bottom border-white">
+                    <div style="flex: 0 0 auto;" class="pe-2">
                         <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
                     </div>
 
-                    <div class="d-flex flex-column align-items-center justify-content-center" style="flex: 1; min-width: 0;">
-                        <span class="text-muted fw-bold text-uppercase text-truncate text-center w-100" style="font-size: 0.70rem; letter-spacing: 0.5px;">${venueName}</span>
+                    <div class="d-flex align-items-center justify-content-center" style="flex: 1; min-width: 0;">
+                        <div class="text-muted fw-bold text-uppercase text-end" style="font-size: 0.70rem; letter-spacing: 0.5px; max-width: 80px; white-space: normal; line-height: 1.1;">
+                            ${displayVenueName}
+                        </div>
                         ${parkString}
                     </div>
                 </div>
@@ -627,7 +638,7 @@ function openTweetModal(text) {
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
 
-    // --- NEW: Search Bar Listener ---
+    // Search Bar Listener
     const searchInput = document.getElementById('team-search');
     if (searchInput) {
         searchInput.addEventListener('input', renderGames);
