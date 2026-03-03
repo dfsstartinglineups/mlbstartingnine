@@ -12,6 +12,21 @@ TODAY_STR = datetime.utcnow().strftime('%Y-%m-%d') # MLB API uses UTC dates nati
 # Ensure data directory exists
 os.makedirs(DATA_DIR, exist_ok=True)
 
+def get_active_sport_ids():
+    """
+    Dynamically determines which sportIds to fetch based on the current date.
+    1 = MLB (Spring Training & Regular Season)
+    51 = World Baseball Classic
+    """
+    current_date = datetime.utcnow().date()
+    wbc_start = datetime(2026, 3, 4).date()
+    wbc_end = datetime(2026, 3, 17).date()
+    
+    # If we are in the WBC window, pull both. Otherwise, just MLB.
+    if wbc_start <= current_date <= wbc_end:
+        return "1,51"
+    return "1"
+
 def load_cache():
     """Loads existing matchups and keeps only today and yesterday's data."""
     # Define our two-day retention window
@@ -33,8 +48,6 @@ def load_cache():
                     return {"date": TODAY_STR, "games": {}}
 
                 # Filter: Keep only games where the cached date is Today or Yesterday
-                # (Note: This assumes you might want to store the date per game 
-                # or just keep the whole dict if the top-level date matches)
                 if data.get('date') in valid_dates:
                     print(f"♻️ Retaining data for {data.get('date')}")
                     return data
@@ -162,7 +175,10 @@ def main():
     cache = load_cache()
     games_cache = cache['games']
     
-    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={TODAY_STR}&hydrate=probablePitcher,lineups"
+    # DYNAMIC SPORT ID INJECTION
+    sport_ids = get_active_sport_ids()
+    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&date={TODAY_STR}&hydrate=probablePitcher,lineups"
+    
     try:
         schedule_res = session.get(schedule_url, timeout=15)
         schedule_data = schedule_res.json()
