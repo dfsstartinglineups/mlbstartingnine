@@ -245,7 +245,7 @@ function createGameCard(data) {
         'Dominican Republic': 'Dom Rep', 'United States': 'USA', 
         'Puerto Rico': 'Puerto Rico', 'South Korea': 'South Korea', 
         'Great Britain': 'Gr Britain', 'Chinese Taipei': 'Chinese Taipei', 
-        'Czech Republic': 'Czechia'
+        'Czech Republic': 'Czechia', 'Netherlands': 'Netherlands', 'Venezuela': 'Venezuela', 'Mexico': 'Mexico'
     };
 
     Object.keys(wbcOverrides).forEach(country => {
@@ -277,21 +277,23 @@ function createGameCard(data) {
     };
     const displayVenueName = venueShortNames[venueName] || venueName;
 
-    // --- PARK FACTORS: 3-ROW GRID LAYOUT ---
-    let parkString = '';
+    // --- NEW: RIGHT-ALIGNED HEADER HTML ---
+    let rightSideHtml = '';
+    
     if (parkStats) {
         const uSize = "0.70rem"; 
 
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
-            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:600; text-shadow:0px 0px 1px rgba(0,0,0,0.1); display: inline-block; min-width: 28px; text-align: left;`;
+            const style = `font-family:sans-serif; font-size:${uSize}; font-weight:600; text-shadow:0px 0px 1px rgba(0,0,0,0.1);`;
             if (diff > 0) return `<span class="text-success" style="${style}">+${absDiff}%</span>`;
             if (diff < 0) return `<span class="text-danger" style="${style}">-${absDiff}%</span>`;
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057; display: inline-block; width: 35px; text-align: right; padding-right: 4px;`;
+        // Added strict width and right alignment so the colons stack perfectly
+        const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057; display: inline-block; width: 42px; text-align: right; padding-right: 4px;`;
         const sepStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:normal; color:#adb5bd; margin:0 3px;`; 
         
         const sBlock = (val, lbl) => `
@@ -299,8 +301,8 @@ function createGameCard(data) {
                 ${val}<span style="font-size:0.65rem; font-family:sans-serif; font-weight:normal; color:#6c757d; margin-left:1px;">${lbl}</span>
             </div>`;
 
-        parkString = `
-            <div class="d-flex flex-column justify-content-center border-start ps-2 ms-2 w-100" style="font-family:sans-serif; line-height:1.2;">
+        let parkString = `
+            <div class="d-flex flex-column justify-content-center border-start ps-2 ms-2" style="font-family:sans-serif; line-height:1.2;">
                 <div class="d-flex align-items-baseline w-100 mb-1">
                     <span style="${labelStyle}">R:</span>
                     ${getParkBadge(parkStats.runs)}
@@ -318,6 +320,23 @@ function createGameCard(data) {
                     ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
                 </div>
             </div>`;
+            
+        // Uses ms-auto to push the entire group to the right
+        rightSideHtml = `
+            <div class="d-flex align-items-center ms-auto">
+                <div class="text-muted fw-bold text-uppercase text-end" style="font-size: 0.70rem; letter-spacing: 0.5px; max-width: 85px; white-space: normal; line-height: 1.1;">
+                    ${displayVenueName}
+                </div>
+                ${parkString}
+            </div>
+        `;
+    } else {
+        // If no stats, just push the venue name entirely to the right
+        rightSideHtml = `
+            <div class="text-muted fw-bold text-uppercase text-end ms-auto" style="font-size: 0.70rem; letter-spacing: 0.5px; line-height: 1.1;">
+                ${displayVenueName}
+            </div>
+        `;
     }
 
     let awayPitcherId = null;
@@ -559,12 +578,7 @@ function createGameCard(data) {
                         <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
                     </div>
 
-                    <div class="d-flex align-items-center justify-content-center" style="flex: 1; min-width: 0;">
-                        <div class="text-muted fw-bold text-uppercase text-end" style="font-size: 0.70rem; letter-spacing: 0.5px; max-width: 80px; white-space: normal; line-height: 1.1;">
-                            ${displayVenueName}
-                        </div>
-                        ${parkString}
-                    </div>
+                    ${rightSideHtml}
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-start px-1 pt-1">
