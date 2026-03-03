@@ -214,6 +214,19 @@ function createGameCard(data) {
     if (homeNameFull.includes('Blue Jays')) homeName = 'Blue Jays';
     if (homeName === 'Diamondbacks') homeName = 'Dbacks';
 
+    // --- WBC Exceptions ---
+    const wbcOverrides = {
+        'Dominican Republic': 'Dom Rep', 'United States': 'USA', 
+        'Puerto Rico': 'Puerto Rico', 'South Korea': 'Korea', 
+        'Great Britain': 'Gr Britain', 'Chinese Taipei': 'Taipei', 
+        'Czech Republic': 'Czechia'
+    };
+
+    Object.keys(wbcOverrides).forEach(country => {
+        if (awayNameFull.includes(country)) awayName = wbcOverrides[country];
+        if (homeNameFull.includes(country)) homeName = wbcOverrides[country];
+    });
+
     const awayId = game.teams.away.team.id;
     const homeId = game.teams.home.team.id;
     const venueName = game.venue.name;
