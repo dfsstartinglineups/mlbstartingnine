@@ -14,22 +14,22 @@
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="favicon.svg">
     
-    <title id="dynamic-title">Today's MLB Starting Lineups & Odds | BvP, Splits & Umpires</title>
+    <title id="dynamic-title">Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors</title>
     
-    <meta name="description" id="dynamic-desc" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies for DFS and sports bettors.">
-    <meta name="keywords" content="MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders">
+    <meta name="description" id="dynamic-desc" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), umpire tendencies, and park factors for DFS and sports bettors.">
+    <meta name="keywords" content="MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mlbstartingnine.com/">
-    <meta property="og:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits & Umpires">
-    <meta property="og:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies.">
+    <meta property="og:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors">
+    <meta property="og:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="mlbstartingnine.com">
     <meta property="twitter:url" content="https://mlbstartingnine.com/">
-    <meta name="twitter:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits & Umpires">
-    <meta name="twitter:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, and umpire tendencies.">
+    <meta name="twitter:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors">
+    <meta name="twitter:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
     <meta name="twitter:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -41,27 +41,20 @@
         .header-brand { 
             font-weight: 900; 
             letter-spacing: -1px; 
-            font-size: 2rem; /* Slightly larger */
+            font-size: 2rem; 
             color: #fff; 
-            font-style: italic; /* Adds the slant from the image */
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); /* Dropshadow for depth */
+            font-style: italic; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
         }
         .header-brand a {
             color: inherit;
         }
         .header-brand span { 
-            /* 1. KILL the black shadow bleeding through from the main header */
             text-shadow: none !important;
-            
-            /* 2. The bright, pure sky-blue gradient from your target image */
             background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
-            
-            /* 3. Clip the gradient to the text shape */
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            
-            /* 4. The vibrant blue outer glow */
             filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
         }
         
@@ -121,9 +114,71 @@
             width: 14px;
             height: 14px;
         }
+
+        /* --- SEO Visually Hidden Class --- */
+        .visually-hidden-seo {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const todayDate = new Date();
+            const todayFormatted = todayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            // Set your exact Opening Day cutoff here
+            const openingDay = new Date('2026-03-25T00:00:00'); 
+            const isSpringTraining = todayDate < openingDay;
+            
+            // Default Evergreen Tags (Now including Park Factors & Umps)
+            let titleText = `Today's MLB Starting Lineups & Odds for ${todayFormatted} | BvP, Splits, Umps & Parks`;
+            let descText = `Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), umpire tendencies, and stadium park factors for ${todayFormatted}. Built for DFS, fantasy baseball, and sports bettors.`;
+            let h1Text = `Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds for ${todayFormatted}`;
+            
+            if (isSpringTraining) {
+                // Spring Training Override
+                titleText = `Today's MLB Spring Training Lineups & Odds for ${todayFormatted} | BvP, Splits, Umps & Parks`;
+                descText = `Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), umpire tendencies, and stadium park factors for ${todayFormatted}. Built for DFS, fantasy baseball, and sports bettors.`;
+                h1Text = `Daily MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds for ${todayFormatted}`;
+            }
+            
+            // 1. Update the Main Title
+            document.title = titleText;
+            
+            // 2. Update the Meta Description
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.content = descText;
+
+            // 3. Update Social & OpenGraph Tags
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.content = titleText;
+            
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.content = descText;
+            
+            const twTitle = document.querySelector('meta[name="twitter:title"]');
+            if (twTitle) twTitle.content = titleText;
+            
+            const twDesc = document.querySelector('meta[name="twitter:description"]');
+            if (twDesc) twDesc.content = descText;
+
+            // 4. Update the Hidden SEO H1
+            const h1 = document.getElementById('seo-h1');
+            if (h1) h1.innerText = h1Text;
+        });
+    </script>
 </head>
 <body>
+
+<h1 id="seo-h1" class="visually-hidden-seo">Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds</h1>
 
 <nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
