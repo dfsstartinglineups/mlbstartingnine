@@ -227,7 +227,7 @@ function createGameCard(data) {
     // --- WBC Exceptions ---
     const wbcOverrides = {
         'Dominican Republic': 'Dom Rep', 'United States': 'USA', 
-        'Puerto Rico': 'Puerto Rico', 'South Korea': 'S. Korea', 
+        'Puerto Rico': 'Puerto Rico', 'South Korea': 'South Korea', 
         'Great Britain': 'Gr Britain', 'Chinese Taipei': 'Chinese Taipei', 
         'Czech Republic': 'Czechia'
     };
