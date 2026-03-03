@@ -179,7 +179,24 @@ function renderGames() {
     const container = document.getElementById('games-container');
     container.innerHTML = '';
 
-    let sortedGames = [...ALL_GAMES_DATA].sort((a, b) => new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate));
+    // --- NEW: Search Filter Logic ---
+    const searchInput = document.getElementById('team-search');
+    const searchText = searchInput ? searchInput.value.toLowerCase() : '';
+
+    let filteredGames = ALL_GAMES_DATA.filter(item => {
+        const g = item.gameRaw;
+        // Combine both team names to search against
+        const matchString = (g.teams.away.team.name + " " + g.teams.home.team.name).toLowerCase();
+        return matchString.includes(searchText);
+    });
+
+    if (filteredGames.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center py-5 text-muted fw-bold">No games match your search.</div>`;
+        return;
+    }
+
+    // Sort and Render the filtered list
+    let sortedGames = [...filteredGames].sort((a, b) => new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate));
     sortedGames.forEach(item => container.appendChild(createGameCard(item)));
 
     setTimeout(() => {
@@ -609,6 +626,12 @@ function openTweetModal(text) {
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
+
+    // --- NEW: Search Bar Listener ---
+    const searchInput = document.getElementById('team-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', renderGames);
+    }
 
     const datePicker = document.getElementById('date-picker');
     if (datePicker) {
