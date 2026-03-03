@@ -85,7 +85,17 @@ async function init(dateToFetch) {
             </div>`;
     }
     
-    const MLB_API_URL = `https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${dateToFetch}&hydrate=linescore,probablePitcher,lineups,person`;
+    // --- DYNAMIC WBC DATE CHECKER ---
+    const fetchDateObj = new Date(dateToFetch + 'T00:00:00'); 
+    const wbcStart = new Date('2026-03-04T00:00:00');
+    const wbcEnd = new Date('2026-03-17T23:59:59'); 
+
+    let sportIds = "1"; // Default to MLB only
+    if (fetchDateObj >= wbcStart && fetchDateObj <= wbcEnd) {
+        sportIds = "1,51"; // 1 = MLB, 51 = World Baseball Classic
+    }
+    
+    const MLB_API_URL = `https://statsapi.mlb.com/api/v1/schedule?sportId=${sportIds}&date=${dateToFetch}&hydrate=linescore,probablePitcher,lineups,person`;
     
     try {
         const scheduleResponse = await fetch(MLB_API_URL);
