@@ -476,9 +476,9 @@ function createGameCard(data) {
             const batCode = handDict[p.id] || "";
             const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.70rem; margin-left: 2px;">(${batCode})</span>` : "";
             
-            // Extract True Game Position
+            // Extract True Game Position or Fallback
             const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
-            const posText = gamePos ? `<span class="text-muted fw-bold" style="font-size: 0.70rem; margin-left: 3px;">(${gamePos})</span>` : "";
+            const prefixText = gamePos ? gamePos : `${index + 1}.`;
             
             let statsHtml = '';
             const pStats = deepStats[p.id];
@@ -505,7 +505,7 @@ function createGameCard(data) {
                 <li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
                     <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
                         <div class="text-truncate pe-1">
-                            <span class="order-num text-muted fw-bold" style="font-size: 0.7rem;">${index + 1}.</span><span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}</span>${posText}${handText}
+                            <span class="text-muted fw-bold d-inline-block text-start" style="font-size: 0.7rem; width: 20px;">${prefixText}</span><span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}</span>${handText}
                         </div>
                         <div><span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span></div>
                     </div>
