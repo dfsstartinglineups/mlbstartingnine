@@ -59,7 +59,6 @@ async function fetchUmpiresData() {
     return null;
 }
 
-// NEW: Fetch Parks Data
 async function fetchParksData() {
     try {
         const response = await fetch('data/parks.json?v=' + new Date().getTime()); 
@@ -145,14 +144,36 @@ async function init(dateToFetch) {
 
             let hpUmpire = "TBD";
             let umpStats = null;
+            let gamePositions = {}; // Store true boxscore positions
+
             try {
                 const liveFeedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${game.gamePk}/feed/live`);
                 const liveFeedData = await liveFeedRes.json();
+                
+                // 1. Umpire Extraction
                 const officials = liveFeedData.liveData?.boxscore?.officials || [];
                 const hp = officials.find(o => o.officialType === "Home Plate");
                 if (hp && hp.official) {
                     hpUmpire = hp.official.fullName;
                     if (umpCache[hpUmpire]) umpStats = umpCache[hpUmpire];
+                }
+
+                // 2. Position Extraction
+                const boxscore = liveFeedData.liveData?.boxscore;
+                if (boxscore) {
+                    const awayPlayers = boxscore.teams?.away?.players || {};
+                    const homePlayers = boxscore.teams?.home?.players || {};
+
+                    Object.values(awayPlayers).forEach(p => {
+                        if (p.position && p.position.abbreviation) {
+                            gamePositions[p.person.id] = p.position.abbreviation;
+                        }
+                    });
+                    Object.values(homePlayers).forEach(p => {
+                        if (p.position && p.position.abbreviation) {
+                            gamePositions[p.person.id] = p.position.abbreviation;
+                        }
+                    });
                 }
             } catch (e) {}
 
@@ -160,6 +181,7 @@ async function init(dateToFetch) {
                 gameRaw: game,
                 odds: gameOdds,
                 lineupHandedness: lineupHandedness,
+                gamePositions: gamePositions, // Attach to payload
                 deepStats: cachedGames[game.gamePk] || {},
                 hpUmpire: hpUmpire,
                 umpStats: umpStats,
@@ -275,10 +297,9 @@ function createGameCard(data) {
         "Minute Maid Park": "Minute Maid Park",
         "loanDepot park": "loanDepot Park"
     };
-    //const displayVenueName = venueShortNames[venueName] || venueName;
     const displayVenueName = venueName;
 
-    // --- NEW: RIGHT-ALIGNED HEADER HTML ---
+    // --- RIGHT-ALIGNED HEADER HTML ---
     let rightSideHtml = '';
     
     if (parkStats) {
@@ -293,7 +314,6 @@ function createGameCard(data) {
             return `<span class="text-muted" style="${style}">0%</span>`;
         };
 
-        // Added strict width and right alignment so the colons stack perfectly
         const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057; display: inline-block; width: 42px; text-align: right; padding-right: 4px;`;
         const sepStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:normal; color:#adb5bd; margin:0 3px;`; 
         
@@ -322,7 +342,6 @@ function createGameCard(data) {
                 </div>
             </div>`;
             
-        // Uses ms-auto to push the entire group to the right
         rightSideHtml = `
             <div class="d-flex align-items-center ms-auto">
                 <div class="text-muted fw-bold text-uppercase text-end" style="font-size: 0.70rem; letter-spacing: 0.5px; max-width: 85px; white-space: normal; line-height: 1.1;">
@@ -332,7 +351,6 @@ function createGameCard(data) {
             </div>
         `;
     } else {
-        // If no stats, just push the venue name entirely to the right
         rightSideHtml = `
             <div class="text-muted fw-bold text-uppercase text-end ms-auto" style="font-size: 0.70rem; letter-spacing: 0.5px; line-height: 1.1;">
                 ${displayVenueName}
@@ -431,12 +449,15 @@ function createGameCard(data) {
     const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher);
     const homePitcherStats = buildPitcherStats(homePitcherId);
 
+    // --- UPDATED TWITTER EXPORT WITH POSITIONS ---
     const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
         let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
         let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\nSP: ${teamPitcher} [${teamOdds}]\nvs ${oppPitcher} [${oppOdds}]\n\n`;
         const playerStrings = players.map((p, i) => {
              const hand = handDict[p.id] ? `(${handDict[p.id]})` : '';
-             return `${i+1}. ${p.fullName} ${hand}`;
+             const pos = (data.gamePositions && data.gamePositions[p.id]) ? `(${data.gamePositions[p.id]})` : '';
+             // Format smoothly, avoiding double spaces if data is missing
+             return `${i+1}. ${p.fullName} ${pos} ${hand}`.replace(/  +/g, ' ').trim();
         });
         text += playerStrings.join('\n'); 
         const teamHash = teamName.replace(/\s+/g, '');
@@ -451,8 +472,13 @@ function createGameCard(data) {
             const nameParts = p.fullName.split(' ');
             if (nameParts.length > 1) abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
             
+            // Extract Handedness
             const batCode = handDict[p.id] || "";
-            const handText = batCode ? ` <span class="text-muted fw-normal" style="font-size: 0.75rem;">(${batCode})</span>` : "";
+            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.70rem; margin-left: 2px;">(${batCode})</span>` : "";
+            
+            // Extract True Game Position
+            const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
+            const posText = gamePos ? `<span class="text-muted fw-bold" style="font-size: 0.70rem; margin-left: 3px;">(${gamePos})</span>` : "";
             
             let statsHtml = '';
             const pStats = deepStats[p.id];
@@ -478,7 +504,10 @@ function createGameCard(data) {
             return `
                 <li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
                     <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
-                        <div class="text-truncate pe-1"><span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}${handText}</span></div>
+                        <div class="text-truncate pe-1">
+                            <span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> 
+                            <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}</span>${posText}${handText}
+                        </div>
                         <div><span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span></div>
                     </div>
                     <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100">${statsHtml}</div>
