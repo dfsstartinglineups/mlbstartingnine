@@ -505,8 +505,7 @@ function createGameCard(data) {
                 <li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
                     <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
                         <div class="text-truncate pe-1">
-                            <span class="order-num text-muted fw-bold me-1" style="font-size: 0.7rem;">${index + 1}.</span> 
-                            <span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}</span>${posText}${handText}
+                            <span class="order-num text-muted fw-bold" style="font-size: 0.7rem;">${index + 1}.</span><span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}</span>${posText}${handText}
                         </div>
                         <div><span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span></div>
                     </div>
