@@ -265,7 +265,7 @@ function createGameCard(data) {
 
     // --- VENUE NAME SHORTENER ---
     const venueShortNames = {
-        "Oriole Park at Camden Yards": "Oriole Park",
+        "Oriole Park at Camden Yards": "Oriole Park at Camden Yards",
         "Guaranteed Rate Field": "Guaranteed Rate",
         "American Family Field": "AmFam Field",
         "Great American Ball Park": "Great American",
