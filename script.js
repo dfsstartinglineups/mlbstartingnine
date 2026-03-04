@@ -124,7 +124,28 @@ async function init(dateToFetch) {
 
             let gameOdds = null;
             if (dailyOddsData) {
-                gameOdds = dailyOddsData.find(o => o.home_team === game.teams.home.team.name && o.away_team === game.teams.away.team.name);
+                const gameDateString = new Date(game.gameDate).toDateString();
+                const gameTimeMs = new Date(game.gameDate).getTime(); // Grab precise milliseconds
+                
+                // 1. Find ALL odds for this matchup on this calendar day
+                const potentialOdds = dailyOddsData.filter(o => {
+                    const oddsDateString = new Date(o.commence_time).toDateString();
+                    return o.home_team === game.teams.home.team.name && 
+                           o.away_team === game.teams.away.team.name &&
+                           gameDateString === oddsDateString;
+                });
+
+                // 2. Assign the correct odds
+                if (potentialOdds.length === 1) {
+                    gameOdds = potentialOdds[0]; // Normal game
+                } else if (potentialOdds.length > 1) {
+                    // Doubleheader! Find the odds with the closest start time to this specific game
+                    gameOdds = potentialOdds.reduce((closest, current) => {
+                        const closestDiff = Math.abs(new Date(closest.commence_time).getTime() - gameTimeMs);
+                        const currentDiff = Math.abs(new Date(current.commence_time).getTime() - gameTimeMs);
+                        return currentDiff < closestDiff ? current : closest;
+                    });
+                }
             }
 
             let lineupHandedness = {};
