@@ -158,22 +158,25 @@ async function init(dateToFetch) {
                     if (umpCache[hpUmpire]) umpStats = umpCache[hpUmpire];
                 }
 
-                // 2. Position Extraction
+                // 2. Position Extraction (Locked to Starting Position)
                 const boxscore = liveFeedData.liveData?.boxscore;
                 if (boxscore) {
                     const awayPlayers = boxscore.teams?.away?.players || {};
                     const homePlayers = boxscore.teams?.home?.players || {};
 
-                    Object.values(awayPlayers).forEach(p => {
-                        if (p.position && p.position.abbreviation) {
+                    const extractStartingPosition = (p) => {
+                        // Look at the chronological history first
+                        if (p.allPositions && p.allPositions.length > 0) {
+                            gamePositions[p.person.id] = p.allPositions[0].abbreviation;
+                        } 
+                        // Fallback to current position just in case
+                        else if (p.position && p.position.abbreviation) {
                             gamePositions[p.person.id] = p.position.abbreviation;
                         }
-                    });
-                    Object.values(homePlayers).forEach(p => {
-                        if (p.position && p.position.abbreviation) {
-                            gamePositions[p.person.id] = p.position.abbreviation;
-                        }
-                    });
+                    };
+
+                    Object.values(awayPlayers).forEach(extractStartingPosition);
+                    Object.values(homePlayers).forEach(extractStartingPosition);
                 }
             } catch (e) {}
 
