@@ -275,7 +275,8 @@ function createGameCard(data) {
         "Minute Maid Park": "Minute Maid Park",
         "loanDepot park": "loanDepot Park"
     };
-    const displayVenueName = venueShortNames[venueName] || venueName;
+    //const displayVenueName = venueShortNames[venueName] || venueName;
+    const displayVenueName = venueName;
 
     // --- NEW: RIGHT-ALIGNED HEADER HTML ---
     let rightSideHtml = '';
