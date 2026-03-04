@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 # --- CONFIGURATION ---
 DATA_DIR = 'data'
 MATCHUPS_FILE = os.path.join(DATA_DIR, 'matchups.json')
-TODAY_STR = datetime.utcnow().strftime('%Y-%m-%d') # MLB API uses UTC dates natively
 
 # Ensure data directory exists
 os.makedirs(DATA_DIR, exist_ok=True)
@@ -28,34 +27,17 @@ def get_active_sport_ids():
     return "1"
 
 def load_cache():
-    """Loads existing matchups and keeps only today and yesterday's data."""
-    # Define our two-day retention window
-    today_obj = datetime.utcnow()
-    yesterday_obj = today_obj - timedelta(days=1)
-    
-    valid_dates = [
-        today_obj.strftime('%Y-%m-%d'),
-        yesterday_obj.strftime('%Y-%m-%d')
-    ]
-    
+    """Loads existing matchups."""
     if os.path.exists(MATCHUPS_FILE):
         try:
             with open(MATCHUPS_FILE, 'r') as f:
                 data = json.load(f)
-                
-                # If the file structure is old or missing 'games', reset
                 if 'games' not in data:
-                    return {"date": TODAY_STR, "games": {}}
-
-                # Filter: Keep only games where the cached date is Today or Yesterday
-                if data.get('date') in valid_dates:
-                    print(f"♻️ Retaining data for {data.get('date')}")
-                    return data
-                
+                    return {"games": {}}
+                return data
         except (json.JSONDecodeError, KeyError):
             pass
-            
-    return {"date": TODAY_STR, "games": {}}
+    return {"games": {}}
 
 def save_cache(data):
     """Saves the incremental progress to disk."""
@@ -167,17 +149,22 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
     }
 
 def main():
-    print(f"🚀 Starting Matchup Fetcher for {TODAY_STR}")
+    # --- 1. SET ROLLING 3-DAY WINDOW ---
+    today_obj = datetime.utcnow()
+    start_date = (today_obj - timedelta(days=1)).strftime('%Y-%m-%d')
+    end_date = (today_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+    
+    print(f"🚀 Starting Matchup Fetcher for window: {start_date} to {end_date}")
     
     session = requests.Session()
     session.headers.update({"User-Agent": "MLBStartingNine-DataBot/1.0"})
     
     cache = load_cache()
-    games_cache = cache['games']
+    games_cache = cache.get('games', {})
     
-    # DYNAMIC SPORT ID INJECTION
+    # --- 2. FETCH 3-DAY SCHEDULE ---
     sport_ids = get_active_sport_ids()
-    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&date={TODAY_STR}&hydrate=probablePitcher,lineups"
+    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=probablePitcher,lineups"
     
     try:
         schedule_res = session.get(schedule_url, timeout=15)
@@ -187,16 +174,36 @@ def main():
         return
 
     if schedule_data.get('totalGames', 0) == 0:
-        print("No games today. Exiting.")
+        print("No games scheduled in this window. Exiting.")
         return
 
-    games = schedule_data['dates'][0]['games']
+    # --- 3. PURGE STALE GAMES ---
+    valid_game_pks = set()
+    all_games = []
+    
+    for date_item in schedule_data.get('dates', []):
+        for game in date_item.get('games', []):
+            valid_game_pks.add(str(game['gamePk']))
+            all_games.append(game)
+            
+    # If a game in the cache is no longer in our 3-day window, delete it!
+    stale_pks = [pk for pk in games_cache.keys() if pk not in valid_game_pks]
+    for pk in stale_pks:
+        print(f"🧹 Purging stale game PK {pk} from cache.")
+        del games_cache[pk]
+        
+    cache['games'] = games_cache
+    cache['last_updated'] = today_obj.strftime('%Y-%m-%d %H:%M:%S UTC')
+    save_cache(cache)
+
+    # --- 4. PROCESS ALL GAMES IN WINDOW ---
     updates_made = False
 
-    for game in games:
+    for game in all_games:
         game_pk = str(game['gamePk'])
         if game_pk not in games_cache:
             games_cache[game_pk] = {}
+            updates_made = True
 
         teams = game.get('teams', {})
         
