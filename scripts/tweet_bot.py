@@ -97,10 +97,11 @@ for game in games:
     if not away_needs_tweet and not home_needs_tweet:
         continue
 
-    # --- FETCH LIVE FEED FOR HANDEDNESS & POSITIONS ---
+    # --- FETCH LIVE FEED FOR POSITIONS ---
     positions = {}
     hands = {}
     try:
+        # 1. Get Positions from the live feed
         feed_data = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live").json()
         box_teams = feed_data.get('liveData', {}).get('boxscore', {}).get('teams', {})
         
@@ -109,9 +110,16 @@ for game in games:
             person_id = p_data.get('person', {}).get('id')
             if p_data.get('allPositions'): positions[person_id] = p_data['allPositions'][0].get('abbreviation', '')
             elif p_data.get('position'): positions[person_id] = p_data['position'].get('abbreviation', '')
-            hands[person_id] = p_data.get('person', {}).get('batSide', {}).get('code', '')
-    except:
-        pass
+
+        # 2. Get Handedness from the people endpoint (Just like the JS script!)
+        player_ids = [str(p['id']) for p in game.get('lineups', {}).get('awayPlayers', []) + game.get('lineups', {}).get('homePlayers', [])]
+        if player_ids:
+            people_data = requests.get(f"https://statsapi.mlb.com/api/v1/people?personIds={','.join(player_ids)}").json()
+            for person in people_data.get('people', []):
+                hands[person['id']] = person.get('batSide', {}).get('code', '')
+                
+    except Exception as e:
+        print(f"Error fetching positions/hands: {e}")
 
     # --- EXTRACT TEAM DATA & PITCHERS ---
     away_full = game['teams']['away']['team']['name']
