@@ -473,7 +473,7 @@ function createGameCard(data) {
     const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher);
     const homePitcherStats = buildPitcherStats(homePitcherId);
 
-    // --- UPDATED TWITTER EXPORT WITH POSITIONS ---
+    // --- UPDATED TWITTER EXPORT WITH POSITIONS & DEEP LINKS ---
     const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
         let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
         let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\nSP: ${teamPitcher} [${teamOdds}]\nvs ${oppPitcher} [${oppOdds}]\n\n`;
@@ -485,7 +485,9 @@ function createGameCard(data) {
         });
         text += playerStrings.join('\n'); 
         const teamHash = teamName.replace(/\s+/g, '');
-        text += `\n\nCheck splits & BvP at https://mlbstartingnine.com\n#${teamHash} #${teamHash}Lineup #MLB #DFS #MLBOdds #StartingPitchers`;
+        
+        // THE FIX: Appended /#game-${game.gamePk} to the URL
+        text += `\n\nCheck splits, BvP, umpires, etc at https://mlbstartingnine.com/#game-${game.gamePk}\n#${teamHash} #${teamHash}Lineup #MLB #DFS #MLBOdds #StartingPitchers`;
         return text;
     };
 
