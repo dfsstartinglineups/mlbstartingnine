@@ -487,7 +487,7 @@ function createGameCard(data) {
         const teamHash = teamName.replace(/\s+/g, '');
         
         // THE FIX: Appended /#game-${game.gamePk} to the URL
-        text += `\n\nCheck splits, BvP, umpires, etc at https://mlbstartingnine.com/#game-${game.gamePk}\n#${teamHash} #${teamHash}Lineup #MLB #DFS #MLBOdds #StartingPitchers`;
+        text += `\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-${game.gamePk}\n\n#${teamHash} #${teamHash}Lineup #MLB #DFS #MLBOdds #StartingPitchers`;
         return text;
     };
 
