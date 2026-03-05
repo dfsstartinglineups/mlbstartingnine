@@ -30,17 +30,28 @@ LOG_FILE = 'data/tweet_log.json'
 MLB_API_URL = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&date={date_str}&hydrate=probablePitcher,lineups,person"
 ODDS_URL = "https://weathermlb.com/data/odds.json"
 
-# 3. LOAD MEMORY
+# 3. LOAD & CLEAN MEMORY
 try:
     with open(LOG_FILE, 'r') as f:
         memory = json.load(f)
 except FileNotFoundError:
     memory = {}
 
+# Keep only today and yesterday to prevent infinite file growth
+yesterday_str = (today_est - timedelta(days=1)).strftime('%Y-%m-%d')
+dates_to_keep = [date_str, yesterday_str]
+memory = {k: v for k, v in memory.items() if k in dates_to_keep}
+
 if date_str not in memory:
     memory[date_str] = []
 
 log_today = memory[date_str]
+
+# Create a master list of EVERY game in memory (today + yesterday)
+tweeted_recently = []
+for date_list in memory.values():
+    tweeted_recently.extend(date_list)
+
 new_tweets_sent = False
 
 # 4. FETCH BASE DATA (MLB SCHEDULE & ODDS)
@@ -57,8 +68,9 @@ try:
 except:
     pass
 
-# Helper to format team names exactly like the JS script (Includes WBC logic)
+# Helper to format team names exactly like the JS script
 def get_short_name(full_name, team_name):
+    # The API usually provides the clean team/country name here
     name = team_name if team_name else full_name.split(' ')[-1]
     
     # MLB Exceptions
@@ -68,17 +80,8 @@ def get_short_name(full_name, team_name):
     if name == 'Diamondbacks': name = 'Dbacks'
 
     # WBC Exceptions
-    wbc_overrides = {
-        'Dominican Republic': 'Dom Rep', 'United States': 'USA', 
-        'Puerto Rico': 'Puerto Rico', 'South Korea': 'South Korea', 
-        'Great Britain': 'Gr Britain', 'Chinese Taipei': 'Chinese Taipei', 
-        'Czech Republic': 'Czechia', 'Netherlands': 'Netherlands', 
-        'Venezuela': 'Venezuela', 'Mexico': 'Mexico'
-    }
-    
-    for country, short_name in wbc_overrides.items():
-        if country in full_name:
-            name = short_name
+    if 'Korea' in full_name or name == 'Korea':
+        name = 'South Korea'
 
     return name
 
@@ -91,8 +94,9 @@ def format_odds(price):
 for game in games:
     game_pk = game['gamePk']
     
-    away_needs_tweet = 'lineups' in game and 'awayPlayers' in game['lineups'] and len(game['lineups']['awayPlayers']) > 0 and f"{game_pk}_away" not in log_today
-    home_needs_tweet = 'lineups' in game and 'homePlayers' in game['lineups'] and len(game['lineups']['homePlayers']) > 0 and f"{game_pk}_home" not in log_today
+    # Check the master `tweeted_recently` list so we don't double tweet at midnight
+    away_needs_tweet = 'lineups' in game and 'awayPlayers' in game['lineups'] and len(game['lineups']['awayPlayers']) > 0 and f"{game_pk}_away" not in tweeted_recently
+    home_needs_tweet = 'lineups' in game and 'homePlayers' in game['lineups'] and len(game['lineups']['homePlayers']) > 0 and f"{game_pk}_home" not in tweeted_recently
 
     if not away_needs_tweet and not home_needs_tweet:
         continue
@@ -111,7 +115,7 @@ for game in games:
             if p_data.get('allPositions'): positions[person_id] = p_data['allPositions'][0].get('abbreviation', '')
             elif p_data.get('position'): positions[person_id] = p_data['position'].get('abbreviation', '')
 
-        # 2. Get Handedness from the people endpoint (Just like the JS script!)
+        # 2. Get Handedness from the people endpoint
         player_ids = [str(p['id']) for p in game.get('lineups', {}).get('awayPlayers', []) + game.get('lineups', {}).get('homePlayers', [])]
         if player_ids:
             people_data = requests.get(f"https://statsapi.mlb.com/api/v1/people?personIds={','.join(player_ids)}").json()
@@ -178,7 +182,9 @@ for game in games:
         try:
             client.create_tweet(text=tweet_text)
             print(f"✅ Successfully tweeted {team_short} lineup!")
+            # Add to both the save log and the active check list
             log_today.append(f"{game_pk}_{side}")
+            tweeted_recently.append(f"{game_pk}_{side}")
             return True
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
