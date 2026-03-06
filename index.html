@@ -146,17 +146,27 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const todayDate = new Date();
-            const formattedDate = todayDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        // GLOBALLY ACCESSIBLE SEO FUNCTION
+        window.updateSEO = function(dateStr) {
+            let dateObj;
             
-            // Set Date Boundaries
-            const wbcStart = new Date('2026-03-04T00:00:00');
-            const wbcEnd = new Date('2026-03-17T23:59:59');
-            const openingDay = new Date('2026-03-25T00:00:00'); 
+            // If the calendar passes a date, use it. Otherwise, default to exactly right now.
+            if (dateStr) {
+                const [year, month, day] = dateStr.split('-');
+                dateObj = new Date(year, month - 1, day);
+            } else {
+                dateObj = new Date();
+            }
+
+            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             
-            const isWBC = todayDate >= wbcStart && todayDate <= wbcEnd;
-            const isSpringTraining = todayDate < openingDay;
+            // Set Date Boundaries (Using correct zero-indexed months: 2 = March)
+            const wbcStart = new Date(2026, 2, 4);   
+            const wbcEnd = new Date(2026, 2, 17);    
+            const openingDay = new Date(2026, 2, 25);
+            
+            const isWBC = dateObj >= wbcStart && dateObj <= wbcEnd;
+            const isSpringTraining = dateObj < openingDay;
             
             // Default Evergreen Tags (Regular Season)
             let titlePrefix = "Today's MLB Starting Lineups & Odds";
@@ -204,6 +214,11 @@
 
             const h1 = document.getElementById('seo-h1');
             if (h1) h1.innerText = h1Text;
+        };
+
+        // Fire instantly on load so Google sees it!
+        document.addEventListener('DOMContentLoaded', () => {
+            window.updateSEO();
         });
     </script>
 </head>
