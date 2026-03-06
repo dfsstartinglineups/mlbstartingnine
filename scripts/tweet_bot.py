@@ -79,7 +79,17 @@ def get_short_name(full_name, team_name):
     if 'Blue Jays' in full_name: name = 'Blue Jays'
     if name == 'Diamondbacks': name = 'Dbacks'
 
-    # WBC Exceptions
+    # WBC Exceptions - Protect multi-word countries from being split
+    wbc_full_names = [
+        'Dominican Republic', 'United States', 'Puerto Rico', 
+        'Great Britain', 'Chinese Taipei'
+    ]
+    
+    for country in wbc_full_names:
+        if country in full_name:
+            name = country
+            
+    # Fix Korea specifically
     if 'Korea' in full_name or name == 'Korea':
         name = 'South Korea'
 
