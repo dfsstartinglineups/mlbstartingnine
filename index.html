@@ -169,23 +169,23 @@
             const isSpringTraining = dateObj < openingDay;
             
             // Default Evergreen Tags (Regular Season)
-            let titlePrefix = "Today's MLB Starting Lineups & Odds";
-            let ogTitleText = "Today's MLB Starting Lineups & Odds";
+            let titlePrefix = "Today's MLB Starting Lineups";
+            let ogTitleText = "Today's MLB Starting Lineups";
             let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and totals.";
             let h1Text = "Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds";
             let keywordsText = "MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders";
             
             if (isWBC) {
                 // WBC + Spring Training Overrides
-                titlePrefix = "Today's WBC & MLB Spring Training Lineups & Odds";
-                ogTitleText = "Today's WBC & MLB Spring Training Lineups & Live Odds";
+                titlePrefix = "Today's World Baseball Classic(WBC) & MLB Spring Training Lineups";
+                ogTitleText = "Today's World Baseball Classic(WBC) & MLB Spring Training Lineups";
                 descPrefix = "Live World Baseball Classic and MLB Spring Training starting lineups, probable pitchers, live odds, and totals.";
                 h1Text = "Daily World Baseball Classic & MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, and Betting Odds";
                 keywordsText = "WBC lineups, World Baseball Classic odds, World Baseball Classic lineups, WBC betting, MLB Spring Training lineups, MLB Spring Training odds, DFS lineups, BvP matchups, pitcher splits";
             } else if (isSpringTraining) {
                 // Spring Training Only Overrides
-                titlePrefix = "Today's MLB Spring Training Lineups & Odds";
-                ogTitleText = "Today's MLB Spring Training Lineups & Odds";
+                titlePrefix = "Today's MLB Spring Training Lineups";
+                ogTitleText = "Today's MLB Spring Training Lineups";
                 descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals.";
                 h1Text = "Daily MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds";
             }
