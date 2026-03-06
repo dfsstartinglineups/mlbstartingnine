@@ -6,31 +6,8 @@ let ALL_GAMES_DATA = [];
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
-// ==========================================
-// DYNAMIC SEO ENGINE 
-// ==========================================
-function updateSEO(selectedDateStr) {
-    const [year, month, day] = selectedDateStr.split('-');
-    const dateObj = new Date(year, month - 1, day);
-    const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    
-    const openingDay = new Date(2026, 2, 25); 
-    
-    let titlePrefix = "Today's MLB Starting Lineups & Odds";
-    let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and totals";
-    
-    if (dateObj < openingDay) {
-        titlePrefix = "Today's MLB Spring Training Lineups & Odds";
-        descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals";
-    }
-    
-    document.title = `${titlePrefix} for ${formattedDate} | BvP, Splits & Umps`;
-    
-    const descTag = document.getElementById('dynamic-desc');
-    if (descTag) {
-        descTag.setAttribute('content', `${descPrefix}. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`);
-    }
-}
+
+
 
 // ==========================================
 // 1. MAIN APP LOGIC
