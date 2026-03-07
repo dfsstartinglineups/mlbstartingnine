@@ -174,7 +174,7 @@ for game in nba_data:
             team_name = NBA_TEAM_NAMES.get(team, team)
             opp_name = NBA_TEAM_NAMES.get(opp, opp)
             
-            tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}{odds_str}\n\n"
+            tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\n{odds_str}\n\n"
             
             for index, p in enumerate(players):
                 if index < 5:
