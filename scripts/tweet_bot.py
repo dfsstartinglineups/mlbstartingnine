@@ -54,6 +54,7 @@ try:
 except FileNotFoundError:
     memory = {}
 
+# Keep only today and yesterday to prevent infinite file growth
 yesterday_str = (today_est - timedelta(days=1)).strftime('%Y-%m-%d')
 dates_to_keep = [date_str, yesterday_str]
 memory = {k: v for k, v in memory.items() if k in dates_to_keep}
@@ -63,6 +64,7 @@ if date_str not in memory:
 
 log_today = memory[date_str]
 
+# Create a master list of EVERY game in memory (today + yesterday)
 tweeted_recently = []
 for date_list in memory.values():
     tweeted_recently.extend(date_list)
@@ -102,6 +104,18 @@ except Exception as e:
 
 # Hardcoded traditional lineup order
 NBA_POS_ORDER = ["PG", "SG", "SF", "PF", "C"]
+
+# --- TEAM NAME TRANSLATION MAP ---
+NBA_TEAM_NAMES = {
+    "ATL": "Hawks", "BOS": "Celtics", "BKN": "Nets", "CHA": "Hornets",
+    "CHI": "Bulls", "CLE": "Cavaliers", "DAL": "Mavericks", "DEN": "Nuggets",
+    "DET": "Pistons", "GSW": "Warriors", "HOU": "Rockets", "IND": "Pacers",
+    "LAC": "Clippers", "LAL": "Lakers", "MEM": "Grizzlies", "MIA": "Heat",
+    "MIL": "Bucks", "MIN": "Timberwolves", "NOP": "Pelicans", "NYK": "Knicks",
+    "OKC": "Thunder", "ORL": "Magic", "PHI": "76ers", "PHX": "Suns",
+    "POR": "Trail Blazers", "SAC": "Kings", "SAS": "Spurs", "TOR": "Raptors",
+    "UTA": "Jazz", "WAS": "Wizards"
+}
 
 for game in nba_data:
     game_id = game.get('id', '')
@@ -156,7 +170,11 @@ for game in nba_data:
         if is_official:
             opp = matchup.replace(team, '').replace(' vs ', '').strip()
             
-            tweet_text = f"🏀 {game_date_short} {team} Starting Lineup vs {opp}{odds_str}\n\n"
+            # --- APPLY TEAM NAME TRANSLATIONS ---
+            team_name = NBA_TEAM_NAMES.get(team, team)
+            opp_name = NBA_TEAM_NAMES.get(opp, opp)
+            
+            tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}{odds_str}\n\n"
             
             for index, p in enumerate(players):
                 if index < 5:
@@ -164,17 +182,19 @@ for game in nba_data:
                     name = p.get('name', 'Unknown')
                     tweet_text += f"{final_pos} {name}\n"
                 
-            team_hash = team.replace(" ", "")
+            # Create a hashtag-friendly version (e.g., "Trail Blazers" -> "TrailBlazers")
+            team_hash = team_name.replace(" ", "")
+            
             tweet_text += f"\n\nFull matchups & odds: https://nbastartingfive.com/#game-{game_id}\n\n#{team_hash} #{team_hash}Lineup #NBA #DFS #StartingFive"
             
             try:
                 nba_client.create_tweet(text=tweet_text)
-                print(f"✅ Successfully tweeted {team} NBA lineup!")
+                print(f"✅ Successfully tweeted {team_name} NBA lineup!")
                 log_today.append(team_key)
                 tweeted_recently.append(team_key)
                 new_tweets_sent = True
             except Exception as e:
-                print(f"❌ Failed to tweet {team} NBA lineup: {e}")
+                print(f"❌ Failed to tweet {team_name} NBA lineup: {e}")
 
 # ==========================================
 # 5. MLB ENGINE
