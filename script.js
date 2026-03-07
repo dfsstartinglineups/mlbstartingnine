@@ -6,9 +6,6 @@ let ALL_GAMES_DATA = [];
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
-
-
-
 // ==========================================
 // 1. MAIN APP LOGIC
 // ==========================================
@@ -45,7 +42,7 @@ async function fetchParksData() {
 }
 
 async function init(dateToFetch) {
-    updateSEO(dateToFetch); 
+    if (window.updateSEO) window.updateSEO(dateToFetch); 
     
     const container = document.getElementById('games-container');
     const datePicker = document.getElementById('date-picker');
@@ -102,9 +99,8 @@ async function init(dateToFetch) {
             let gameOdds = null;
             if (dailyOddsData) {
                 const gameDateString = new Date(game.gameDate).toDateString();
-                const gameTimeMs = new Date(game.gameDate).getTime(); // Grab precise milliseconds
+                const gameTimeMs = new Date(game.gameDate).getTime(); 
                 
-                // 1. Find ALL odds for this matchup on this calendar day
                 const potentialOdds = dailyOddsData.filter(o => {
                     const oddsDateString = new Date(o.commence_time).toDateString();
                     return o.home_team === game.teams.home.team.name && 
@@ -112,11 +108,9 @@ async function init(dateToFetch) {
                            gameDateString === oddsDateString;
                 });
 
-                // 2. Assign the correct odds
                 if (potentialOdds.length === 1) {
-                    gameOdds = potentialOdds[0]; // Normal game
+                    gameOdds = potentialOdds[0]; 
                 } else if (potentialOdds.length > 1) {
-                    // Doubleheader! Find the odds with the closest start time to this specific game
                     gameOdds = potentialOdds.reduce((closest, current) => {
                         const closestDiff = Math.abs(new Date(closest.commence_time).getTime() - gameTimeMs);
                         const currentDiff = Math.abs(new Date(current.commence_time).getTime() - gameTimeMs);
@@ -142,13 +136,12 @@ async function init(dateToFetch) {
 
             let hpUmpire = "TBD";
             let umpStats = null;
-            let gamePositions = {}; // Store true boxscore positions
+            let gamePositions = {}; 
 
             try {
                 const liveFeedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${game.gamePk}/feed/live`);
                 const liveFeedData = await liveFeedRes.json();
                 
-                // 1. Umpire Extraction
                 const officials = liveFeedData.liveData?.boxscore?.officials || [];
                 const hp = officials.find(o => o.officialType === "Home Plate");
                 if (hp && hp.official) {
@@ -156,19 +149,15 @@ async function init(dateToFetch) {
                     if (umpCache[hpUmpire]) umpStats = umpCache[hpUmpire];
                 }
 
-                // 2. Position Extraction (Locked to Starting Position)
                 const boxscore = liveFeedData.liveData?.boxscore;
                 if (boxscore) {
                     const awayPlayers = boxscore.teams?.away?.players || {};
                     const homePlayers = boxscore.teams?.home?.players || {};
 
                     const extractStartingPosition = (p) => {
-                        // Look at the chronological history first
                         if (p.allPositions && p.allPositions.length > 0) {
                             gamePositions[p.person.id] = p.allPositions[0].abbreviation;
-                        } 
-                        // Fallback to current position just in case
-                        else if (p.position && p.position.abbreviation) {
+                        } else if (p.position && p.position.abbreviation) {
                             gamePositions[p.person.id] = p.position.abbreviation;
                         }
                     };
@@ -182,7 +171,7 @@ async function init(dateToFetch) {
                 gameRaw: game,
                 odds: gameOdds,
                 lineupHandedness: lineupHandedness,
-                gamePositions: gamePositions, // Attach to payload
+                gamePositions: gamePositions, 
                 deepStats: cachedGames[game.gamePk] || {},
                 hpUmpire: hpUmpire,
                 umpStats: umpStats,
@@ -202,7 +191,6 @@ function renderGames() {
     const container = document.getElementById('games-container');
     container.innerHTML = '';
 
-    // Search Filter Logic
     const searchInput = document.getElementById('team-search');
     const searchText = searchInput ? searchInput.value.toLowerCase() : '';
 
@@ -217,8 +205,18 @@ function renderGames() {
         return;
     }
 
-    // Sort and Render
-    let sortedGames = [...filteredGames].sort((a, b) => new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate));
+    // --- SORTING ENGINE: Final Games at the bottom, others sorted by time ---
+    let sortedGames = [...filteredGames].sort((a, b) => {
+        const isFinalA = a.gameRaw.status.abstractGameState === 'Final';
+        const isFinalB = b.gameRaw.status.abstractGameState === 'Final';
+
+        if (isFinalA && !isFinalB) return 1; // A goes to bottom
+        if (!isFinalA && isFinalB) return -1; // B goes to bottom
+        
+        // If both have the same status (both Final, or both not Final), sort by time
+        return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
+    });
+
     sortedGames.forEach(item => container.appendChild(createGameCard(item)));
 
     setTimeout(() => {
@@ -263,7 +261,6 @@ function createGameCard(data) {
     if (homeNameFull.includes('Blue Jays')) homeName = 'Blue Jays';
     if (homeName === 'Diamondbacks') homeName = 'Dbacks';
 
-    // --- WBC Exceptions ---
     const wbcOverrides = {
         'Dominican Republic': 'Dom Rep', 'United States': 'USA', 
         'Puerto Rico': 'Puerto Rico', 'South Korea': 'South Korea', 
@@ -286,7 +283,6 @@ function createGameCard(data) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    // --- VENUE NAME SHORTENER ---
     const venueShortNames = {
         "Oriole Park at Camden Yards": "Oriole Park at Camden Yards",
         "Guaranteed Rate Field": "Guaranteed Rate",
@@ -298,9 +294,8 @@ function createGameCard(data) {
         "Minute Maid Park": "Minute Maid Park",
         "loanDepot park": "loanDepot Park"
     };
-    const displayVenueName = venueName;
+    const displayVenueName = venueShortNames[venueName] || venueName;
 
-    // --- RIGHT-ALIGNED HEADER HTML ---
     let rightSideHtml = '';
     
     if (parkStats) {
@@ -450,21 +445,100 @@ function createGameCard(data) {
     const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher);
     const homePitcherStats = buildPitcherStats(homePitcherId);
 
-    // --- UPDATED TWITTER EXPORT WITH POSITIONS & DEEP LINKS ---
+    // --- ODDS & LIVE SCOREBOARD ENGINE ---
+    const oddsData = data.odds; 
+    let mlAway = '';
+    let mlHome = '';
+    let rawAwayOdds = "TBD", rawHomeOdds = "TBD", rawTotal = "TBD";
+
+    if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
+        let h2hMarket = null, totalsMarket = null;
+        for (const bookie of oddsData.bookmakers) {
+            if (!h2hMarket) h2hMarket = bookie.markets.find(m => m.key === 'h2h');
+            if (!totalsMarket) totalsMarket = bookie.markets.find(m => m.key === 'totals');
+            if (h2hMarket && totalsMarket) break; 
+        }
+        
+        if (h2hMarket) {
+            const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
+            const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeNameFull);
+            if (awayOutcome && awayOutcome.price) {
+                const price = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
+                mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
+                rawAwayOdds = price; 
+            }
+            if (homeOutcome && homeOutcome.price) {
+                const price = homeOutcome.price > 0 ? `+${homeOutcome.price}` : homeOutcome.price;
+                mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
+                rawHomeOdds = price; 
+            }
+        }
+        
+        if (totalsMarket && totalsMarket.outcomes.length > 0) {
+            rawTotal = totalsMarket.outcomes[0].point; 
+        }
+    }
+
+    let middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1"><div class="text-muted small fw-bold mb-0 lh-1">@</div></div>`;
+
+    const gameState = game.status.abstractGameState; // "Preview", "Live", "Final"
+    const detailedState = game.status.detailedState; 
+
+    if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
+        middleSectionHtml = `
+            <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100">
+                <div class="badge bg-danger text-white mt-1 text-wrap w-100" style="font-size: 0.65rem;">${detailedState}</div>
+            </div>`;
+    } else if (gameState === 'Live' || gameState === 'Final') {
+        const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
+        const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
+        
+        // Changed to text-primary and bg-primary for active live status
+        const scoreColor = gameState === 'Live' ? 'text-primary' : 'text-dark';
+        const badgeClass = gameState === 'Live' ? 'bg-primary text-white' : 'bg-dark text-white';
+        
+        let statusBadgeText = 'Final';
+        if (gameState === 'Live') {
+            const inning = game.linescore?.currentInning || '';
+            let half = game.linescore?.inningHalf || ''; 
+            if (half === 'Bottom') half = 'Bot';
+            statusBadgeText = (half && inning) ? `${half} ${inning}` : (detailedState || 'Live');
+        }
+
+        middleSectionHtml = `
+            <div class="fw-bold fs-5 ${scoreColor} d-flex justify-content-center align-items-center w-100" style="letter-spacing: -1px; line-height: 1;">
+                <span class="text-end" style="width: 45%;">${awayScore}</span>
+                <span class="text-center text-muted" style="width: 10%; font-size: 0.9rem;">-</span>
+                <span class="text-start" style="width: 45%;">${homeScore}</span>
+            </div>
+            <div class="badge ${badgeClass} w-100 mt-1 text-truncate px-0" style="font-size: 0.65rem;" title="${statusBadgeText}">${statusBadgeText}</div>
+        `;
+    } else {
+        if (rawTotal !== "TBD") {
+            middleSectionHtml = `
+                <div class="d-flex flex-column justify-content-center align-items-center pt-1">
+                    <div class="text-muted small fw-bold mb-0 lh-1">@</div>
+                    <div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>
+                </div>`;
+        }
+    }
+
+
+    // --- TWITTER EXPORT ---
     const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
         let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
-        let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\nSP: ${teamPitcher} [${teamOdds}]\nvs ${oppPitcher} [${oppOdds}]\n\n`;
+        let teamOddsStr = teamOdds !== 'TBD' ? ` [${teamOdds}]` : '';
+        let oppOddsStr = oppOdds !== 'TBD' ? ` [${oppOdds}]` : '';
+        
+        let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\nSP: ${teamPitcher}${teamOddsStr}\nvs ${oppPitcher}${oppOddsStr}\n\n`;
         const playerStrings = players.map((p, i) => {
              const hand = handDict[p.id] ? `(${handDict[p.id]})` : '';
              const pos = (data.gamePositions && data.gamePositions[p.id]) ? `(${data.gamePositions[p.id]})` : '';
-             // Format smoothly, avoiding double spaces if data is missing
              return `${i+1}. ${p.fullName} ${pos} ${hand}`.replace(/  +/g, ' ').trim();
         });
         text += playerStrings.join('\n'); 
         const teamHash = teamName.replace(/\s+/g, '');
-        
-        // THE FIX: Appended /#game-${game.gamePk} to the URL
-        text += `\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-${game.gamePk}\n\n#${teamHash} #${teamHash}Lineup #MLB #DFS #MLBOdds #StartingPitchers`;
+        text += `\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-${game.gamePk}\n\n#${teamHash} #${teamHash}Lineup #MLB #DFS #StartingPitchers`;
         return text;
     };
 
@@ -475,11 +549,9 @@ function createGameCard(data) {
             const nameParts = p.fullName.split(' ');
             if (nameParts.length > 1) abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
             
-            // Extract Handedness
             const batCode = handDict[p.id] || "";
             const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.70rem; margin-left: 2px;">(${batCode})</span>` : "";
             
-            // Extract True Game Position or Fallback
             const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
             const prefixText = gamePos ? gamePos : `${index + 1}.`;
             
@@ -520,43 +592,6 @@ function createGameCard(data) {
 
     const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers, homePitcherHand);
     const homeLineupHtml = buildLineupList(game.lineups?.homePlayers, awayPitcherHand);
-
-    const oddsData = data.odds; 
-    let mlAway = `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.70rem; vertical-align: middle;">TBD</span>`;
-    let mlHome = `<span class="badge bg-light text-muted border ms-1" style="font-size: 0.70rem; vertical-align: middle;">TBD</span>`;
-    let totalHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1"><div class="text-muted small fw-bold mb-0 lh-1">@</div><div class="badge bg-secondary text-white mt-1 opacity-75" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U TBD</div></div>`;
-    
-    let rawAwayOdds = "TBD", rawHomeOdds = "TBD", rawTotal = "TBD";
-
-    if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
-        let h2hMarket = null, totalsMarket = null;
-        for (const bookie of oddsData.bookmakers) {
-            if (!h2hMarket) h2hMarket = bookie.markets.find(m => m.key === 'h2h');
-            if (!totalsMarket) totalsMarket = bookie.markets.find(m => m.key === 'totals');
-            if (h2hMarket && totalsMarket) break; 
-        }
-        
-        if (h2hMarket) {
-            const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
-            const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeNameFull);
-            if (awayOutcome) {
-                const price = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
-                mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
-                rawAwayOdds = price; 
-            }
-            if (homeOutcome) {
-                const price = homeOutcome.price > 0 ? `+${homeOutcome.price}` : homeOutcome.price;
-                mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
-                rawHomeOdds = price; 
-            }
-        }
-        
-        if (totalsMarket && totalsMarket.outcomes.length > 0) {
-            const total = totalsMarket.outcomes[0].point;
-            totalHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1"><div class="text-muted small fw-bold mb-0 lh-1">@</div><div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${total}</div></div>`;
-            rawTotal = total; 
-        }
-    }
 
     const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
     let awayTweetBtn = '';
@@ -619,7 +654,7 @@ function createGameCard(data) {
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayName} ${mlAway}</div>
                         ${awayPitcherToggle}
                     </div>
-                    <div class="text-center" style="width: 16%;">${totalHtml}</div>
+                    <div class="text-center" style="width: 16%;">${middleSectionHtml}</div>
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeName} ${mlHome}</div>
