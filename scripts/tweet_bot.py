@@ -150,9 +150,14 @@ for game in nba_data:
         if str(local_ou) not in ["TBD", "nan", "+nan", "None", ""]:
             final_ou = local_ou
             
-    odds_str = ""
-    if final_spread != "TBD" and final_ou != "TBD":
-         odds_str = f" [{final_spread} | O/U {final_ou}]"
+    # UPDATED: Cleanly strip TBD odds from NBA string
+    odds_parts = []
+    if final_spread != "TBD":
+        odds_parts.append(final_spread)
+    if final_ou != "TBD":
+        odds_parts.append(f"O/U {final_ou}")
+        
+    odds_str = f" [{' | '.join(odds_parts)}]" if odds_parts else ""
 
     rosters = game.get('rosters', {})
     
@@ -288,15 +293,22 @@ for game in games:
     home_odds_str = format_odds(raw_home_odds)
 
     def send_mlb_tweet(team_short, team_pitcher, team_odds, opp_pitcher, opp_odds, players, side):
-        tweet_text = f"⚾ {game_date_short} {team_short} Lineup{total_string}\nSP: {team_pitcher} [{team_odds}]\nvs {opp_pitcher} [{opp_odds}]\n\n"
+        # UPDATED: Only inject the brackets if the odds are actually available
+        team_odds_display = f" [{team_odds}]" if team_odds != "TBD" else ""
+        opp_odds_display = f" [{opp_odds}]" if opp_odds != "TBD" else ""
+        
+        tweet_text = f"⚾ {game_date_short} {team_short} Lineup{total_string}\nSP: {team_pitcher}{team_odds_display}\nvs {opp_pitcher}{opp_odds_display}\n\n"
+        
         for i, p in enumerate(players):
             pid = p['id']
             hand = f"({hands.get(pid)})" if hands.get(pid) else ""
             pos = f"({positions.get(pid)})" if positions.get(pid) else ""
             line = f"{i+1}. {p['fullName']} {pos} {hand}"
             tweet_text += " ".join(line.split()) + "\n"
+            
         team_hash = team_short.replace(" ", "")
         tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-{game_pk}\n\n#{team_hash} #{team_hash}Lineup #MLB #DFS #MLBOdds #StartingPitchers"
+        
         try:
             mlb_client.create_tweet(text=tweet_text)
             print(f"✅ Successfully tweeted {team_short} MLB lineup!")
