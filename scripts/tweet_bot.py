@@ -132,12 +132,17 @@ NBA_TEAM_NAMES = {
 }
 
 for game in nba_data:
-    game_id = game.get('id', '')
     if not game.get('teams') or len(game['teams']) < 2: continue
     
     away_team = game['teams'][0]
     home_team = game['teams'][1]
     matchup = f"{away_team} vs {home_team}"
+    
+    # Bulletproof fallback to match the website JS logic if ID is missing
+    game_id = game.get('id')
+    if not game_id:
+        game_id = f"{away_team}-{home_team}-{date_str}"
+        
     meta = game.get('meta', {})
     
     # --- SMART ODDS RESOLVER ---
@@ -172,9 +177,13 @@ for game in nba_data:
     rosters = game.get('rosters', {})
     
     for team, data in rosters.items():
-        team_key = f"NBA_{team}" 
+        # Injecting the date completely prevents back-to-back bugs!
+        team_key = f"NBA_{team}_{date_str}" 
+        old_team_key = f"NBA_{team}"
         
-        if team_key in tweeted_recently:
+        # Check new key against all recent memory. 
+        # Check old key ONLY against today's memory to prevent yesterday from blocking today.
+        if team_key in tweeted_recently or old_team_key in log_today:
             continue
             
         players = data.get('players', [])
