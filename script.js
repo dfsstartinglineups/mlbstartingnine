@@ -4,6 +4,10 @@
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
 
+// Check local storage for the user's saved preference
+let savedLineupState = localStorage.getItem('futbolLineupsExpanded');
+let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'true' : true; 
+
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
 // ==========================================
@@ -484,10 +488,10 @@ function createGameCard(data) {
     const detailedState = game.status.detailedState; 
 
     if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
-        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>` : '';
+        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
         middleSectionHtml = `
             <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-1">
-                <div class="badge bg-danger text-white mt-1 text-wrap w-100" style="font-size: 0.65rem;">${detailedState}</div>
+                <div class="badge bg-danger text-white mt-1 d-inline-block text-wrap" style="font-size: 0.65rem; padding: 0.35em 0.6em;">${detailedState}</div>
                 ${ouHtml}
             </div>`;
     } else if (gameState === 'Live' || gameState === 'Final') {
@@ -496,7 +500,7 @@ function createGameCard(data) {
         
         let topBadgeHtml = '';
         let extraLiveInfo = '';
-        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>` : '';
+        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
 
         if (gameState === 'Live') {
             const inning = game.linescore?.currentInning || '';
@@ -506,11 +510,11 @@ function createGameCard(data) {
             if (half === 'Bottom') halfLetter = 'B';
             let inningStr = (halfLetter && inning) ? `${halfLetter}${inning}` : (detailedState || 'Live');
 
-            // Top Badge (Inning & Score)
+            // Top Badge (Inning & Score) - Responsive fit
             topBadgeHtml = `
-                <div class="badge bg-primary text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm px-1" style="font-size: 0.75rem; padding: 0.3em 0;">
+                <div class="badge bg-primary text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
                     <span style="white-space: nowrap;">${inningStr}</span>
-                    <span style="margin: 0 4px; color:#ffffff99;">|</span>
+                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
                     <span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
 
@@ -543,7 +547,7 @@ function createGameCard(data) {
                 </div>
             `;
 
-            // 4. Build the Count Output (Nowrap applied to prevent breaking)
+            // 4. Build the Count Output
             extraLiveInfo = `
                 ${baseSvg}
                 <div class="d-flex justify-content-center align-items-center w-100" style="margin-top: 2px; margin-bottom: 2px;">
@@ -552,17 +556,17 @@ function createGameCard(data) {
                 </div>
             `;
         } else {
-            // Final Status Badge
+            // Final Status Badge - Responsive fit
             topBadgeHtml = `
-                <div class="badge bg-dark text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm px-1" style="font-size: 0.75rem; padding: 0.3em 0;">
+                <div class="badge bg-dark text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
                     <span style="white-space: nowrap;">Final</span>
-                    <span style="margin: 0 4px; color:#ffffff99;">|</span>
+                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
                     <span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
         }
 
         middleSectionHtml = `
-            <div class="d-flex flex-column justify-content-center align-items-center w-100 px-1 pt-1">
+            <div class="d-flex flex-column justify-content-center align-items-center w-100 px-0 pt-1">
                 ${topBadgeHtml}
                 ${extraLiveInfo}
                 ${ouHtml}
@@ -572,9 +576,9 @@ function createGameCard(data) {
         // Preview State
         if (rawTotal !== "TBD") {
             middleSectionHtml = `
-                <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-1">
+                <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-0">
                     <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-                    <div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px; white-space: nowrap;">O/U ${rawTotal}</div>
+                    <div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>
                 </div>`;
         }
     }
