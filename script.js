@@ -4,6 +4,10 @@
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
 
+// Check local storage for the user's saved preference
+let savedLineupState = localStorage.getItem('futbolLineupsExpanded');
+let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'true' : true; 
+
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
 // ==========================================
@@ -484,25 +488,35 @@ function createGameCard(data) {
     const detailedState = game.status.detailedState; 
 
     if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
+        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>` : '';
         middleSectionHtml = `
-            <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100">
+            <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-1">
                 <div class="badge bg-danger text-white mt-1 text-wrap w-100" style="font-size: 0.65rem;">${detailedState}</div>
+                ${ouHtml}
             </div>`;
     } else if (gameState === 'Live' || gameState === 'Final') {
         const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
         const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
         
-        const scoreColor = gameState === 'Live' ? 'text-primary' : 'text-dark';
-        const badgeClass = gameState === 'Live' ? 'bg-primary text-white' : 'bg-dark text-white';
-        
-        let statusBadgeText = 'Final';
+        let topBadgeHtml = '';
         let extraLiveInfo = '';
+        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>` : '';
 
         if (gameState === 'Live') {
             const inning = game.linescore?.currentInning || '';
             let half = game.linescore?.inningHalf || ''; 
-            if (half === 'Bottom') half = 'Bot';
-            statusBadgeText = (half && inning) ? `${half} ${inning}` : (detailedState || 'Live');
+            let halfLetter = '';
+            if (half === 'Top') halfLetter = 'T';
+            if (half === 'Bottom') halfLetter = 'B';
+            let inningStr = (halfLetter && inning) ? `${halfLetter}${inning}` : (detailedState || 'Live');
+
+            // Top Badge (Inning & Score) - Using matching Blue (#0d6efd)
+            topBadgeHtml = `
+                <div class="badge bg-primary text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.80rem; padding: 0.3em 0;">
+                    <span style="width:30%; text-align:right;">${inningStr}</span>
+                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
+                    <span style="width:30%; text-align:left; letter-spacing:-0.5px;">${awayScore} - ${homeScore}</span>
+                </div>`;
 
             // 1. Extract Live Count & Bases
             const balls = game.linescore?.balls || 0;
@@ -516,39 +530,55 @@ function createGameCard(data) {
 
             // 2. Build the Diamond SVG
             const baseSvg = `
-                <svg width="24" height="24" viewBox="0 0 100 100" class="mx-auto" style="display: block; margin-top: 2px;">
-                   <polygon points="50,15 65,30 50,45 35,30" fill="${onSecond ? '#0d6efd' : '#e9ecef'}" stroke="#adb5bd" stroke-width="4"/>
-                   <polygon points="75,40 90,55 75,70 60,55" fill="${onFirst ? '#0d6efd' : '#e9ecef'}" stroke="#adb5bd" stroke-width="4"/>
-                   <polygon points="25,40 40,55 25,70 10,55" fill="${onThird ? '#0d6efd' : '#e9ecef'}" stroke="#adb5bd" stroke-width="4"/>
+                <svg width="24" height="24" viewBox="0 0 100 100" class="mx-auto mt-1" style="display: block;">
+                   <polygon points="50,15 65,30 50,45 35,30" fill="${onSecond ? '#0d6efd' : 'transparent'}" stroke="${onSecond ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
+                   <polygon points="75,40 90,55 75,70 60,55" fill="${onFirst ? '#0d6efd' : 'transparent'}" stroke="${onFirst ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
+                   <polygon points="25,40 40,55 25,70 10,55" fill="${onThird ? '#0d6efd' : 'transparent'}" stroke="${onThird ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
                 </svg>
             `;
 
-            // 3. Build the Count Output
-            const countText = `${balls}-${strikes} <span style="margin: 0 2px;">•</span> ${outs} OUT`;
+            // 3. Build Outs Circles
+            const getCircle = (isFilled) => `<circle cx="5" cy="5" r="4.5" fill="${isFilled ? '#0d6efd' : 'transparent'}" stroke="${isFilled ? '#0d6efd' : '#adb5bd'}" stroke-width="1.5"/>`;
+            const outsHtml = `
+                <div class="d-flex align-items-center ms-1 pb-1">
+                    <svg width="10" height="10" viewBox="0 0 10 10" style="margin: 0 1.5px;">${getCircle(outs >= 1)}</svg>
+                    <svg width="10" height="10" viewBox="0 0 10 10" style="margin: 0 1.5px;">${getCircle(outs >= 2)}</svg>
+                    <svg width="10" height="10" viewBox="0 0 10 10" style="margin: 0 1.5px;">${getCircle(outs >= 3)}</svg>
+                </div>
+            `;
 
+            // 4. Build the Count Output
             extraLiveInfo = `
                 ${baseSvg}
-                <div class="text-muted fw-bold" style="font-size: 0.60rem; letter-spacing: 0.3px; line-height: 1; margin-top: 2px; margin-bottom: 3px;">${countText}</div>
+                <div class="d-flex justify-content-center align-items-center w-100" style="margin-top: 2px; margin-bottom: 2px;">
+                    <span class="text-dark fw-bold" style="font-size: 0.65rem; font-family: monospace; letter-spacing: -0.5px;">${balls}-${strikes}</span>
+                    ${outsHtml}
+                </div>
             `;
+        } else {
+            // Final Status Badge
+            topBadgeHtml = `
+                <div class="badge bg-dark text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.80rem; padding: 0.3em 0;">
+                    <span style="width:30%; text-align:right;">Final</span>
+                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
+                    <span style="width:30%; text-align:left; letter-spacing:-0.5px;">${awayScore} - ${homeScore}</span>
+                </div>`;
         }
 
         middleSectionHtml = `
-            <div class="d-flex flex-column justify-content-center align-items-center w-100">
-                <div class="fw-bold fs-5 ${scoreColor} d-flex justify-content-center align-items-center w-100" style="letter-spacing: -1px; line-height: 1;">
-                    <span class="text-end" style="width: 45%;">${awayScore}</span>
-                    <span class="text-center text-muted" style="width: 10%; font-size: 0.9rem;">-</span>
-                    <span class="text-start" style="width: 45%;">${homeScore}</span>
-                </div>
+            <div class="d-flex flex-column justify-content-center align-items-center w-100 px-1 pt-1">
+                ${topBadgeHtml}
                 ${extraLiveInfo}
-                <div class="badge ${badgeClass} w-100 text-truncate px-0" style="font-size: 0.65rem;" title="${statusBadgeText}">${statusBadgeText}</div>
+                ${ouHtml}
             </div>
         `;
     } else {
+        // Preview State
         if (rawTotal !== "TBD") {
             middleSectionHtml = `
-                <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100">
+                <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-1">
                     <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-                    <div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>
+                    <div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>
                 </div>`;
         }
     }
@@ -686,7 +716,7 @@ function createGameCard(data) {
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayRank}${awayName} ${mlAway}</div>
                         ${awayPitcherToggle}
                     </div>
-                    <div class="text-center d-flex align-items-center justify-content-center" style="width: 16%;">
+                    <div class="text-center d-flex align-items-start justify-content-center" style="width: 16%;">
                         ${middleSectionHtml}
                     </div>
                     <div class="text-center" style="width: 42%;"> 
