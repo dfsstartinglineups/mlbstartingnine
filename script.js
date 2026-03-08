@@ -210,10 +210,9 @@ function renderGames() {
         const isFinalA = a.gameRaw.status.abstractGameState === 'Final';
         const isFinalB = b.gameRaw.status.abstractGameState === 'Final';
 
-        if (isFinalA && !isFinalB) return 1; // A goes to bottom
-        if (!isFinalA && isFinalB) return -1; // B goes to bottom
+        if (isFinalA && !isFinalB) return 1; 
+        if (!isFinalA && isFinalB) return -1; 
         
-        // If both have the same status (both Final, or both not Final), sort by time
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
@@ -479,9 +478,9 @@ function createGameCard(data) {
         }
     }
 
-    let middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1"><div class="text-muted small fw-bold mb-0 lh-1">@</div></div>`;
+    let middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100"><div class="text-muted small fw-bold mb-0 lh-1">@</div></div>`;
 
-    const gameState = game.status.abstractGameState; // "Preview", "Live", "Final"
+    const gameState = game.status.abstractGameState; 
     const detailedState = game.status.detailedState; 
 
     if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
@@ -493,30 +492,61 @@ function createGameCard(data) {
         const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
         const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
         
-        // Changed to text-primary and bg-primary for active live status
         const scoreColor = gameState === 'Live' ? 'text-primary' : 'text-dark';
         const badgeClass = gameState === 'Live' ? 'bg-primary text-white' : 'bg-dark text-white';
         
         let statusBadgeText = 'Final';
+        let extraLiveInfo = '';
+
         if (gameState === 'Live') {
             const inning = game.linescore?.currentInning || '';
             let half = game.linescore?.inningHalf || ''; 
             if (half === 'Bottom') half = 'Bot';
             statusBadgeText = (half && inning) ? `${half} ${inning}` : (detailedState || 'Live');
+
+            // 1. Extract Live Count & Bases
+            const balls = game.linescore?.balls || 0;
+            const strikes = game.linescore?.strikes || 0;
+            const outs = game.linescore?.outs || 0;
+            
+            const offense = game.linescore?.offense || {};
+            const onFirst = !!offense.first;
+            const onSecond = !!offense.second;
+            const onThird = !!offense.third;
+
+            // 2. Build the Diamond SVG
+            const baseSvg = `
+                <svg width="24" height="24" viewBox="0 0 100 100" class="mx-auto" style="display: block; margin-top: 2px;">
+                   <polygon points="50,15 65,30 50,45 35,30" fill="${onSecond ? '#0d6efd' : '#e9ecef'}" stroke="#adb5bd" stroke-width="4"/>
+                   <polygon points="75,40 90,55 75,70 60,55" fill="${onFirst ? '#0d6efd' : '#e9ecef'}" stroke="#adb5bd" stroke-width="4"/>
+                   <polygon points="25,40 40,55 25,70 10,55" fill="${onThird ? '#0d6efd' : '#e9ecef'}" stroke="#adb5bd" stroke-width="4"/>
+                </svg>
+            `;
+
+            // 3. Build the Count Output
+            const countText = `${balls}-${strikes} <span style="margin: 0 2px;">•</span> ${outs} OUT`;
+
+            extraLiveInfo = `
+                ${baseSvg}
+                <div class="text-muted fw-bold" style="font-size: 0.60rem; letter-spacing: 0.3px; line-height: 1; margin-top: 2px; margin-bottom: 3px;">${countText}</div>
+            `;
         }
 
         middleSectionHtml = `
-            <div class="fw-bold fs-5 ${scoreColor} d-flex justify-content-center align-items-center w-100" style="letter-spacing: -1px; line-height: 1;">
-                <span class="text-end" style="width: 45%;">${awayScore}</span>
-                <span class="text-center text-muted" style="width: 10%; font-size: 0.9rem;">-</span>
-                <span class="text-start" style="width: 45%;">${homeScore}</span>
+            <div class="d-flex flex-column justify-content-center align-items-center w-100">
+                <div class="fw-bold fs-5 ${scoreColor} d-flex justify-content-center align-items-center w-100" style="letter-spacing: -1px; line-height: 1;">
+                    <span class="text-end" style="width: 45%;">${awayScore}</span>
+                    <span class="text-center text-muted" style="width: 10%; font-size: 0.9rem;">-</span>
+                    <span class="text-start" style="width: 45%;">${homeScore}</span>
+                </div>
+                ${extraLiveInfo}
+                <div class="badge ${badgeClass} w-100 text-truncate px-0" style="font-size: 0.65rem;" title="${statusBadgeText}">${statusBadgeText}</div>
             </div>
-            <div class="badge ${badgeClass} w-100 mt-1 text-truncate px-0" style="font-size: 0.65rem;" title="${statusBadgeText}">${statusBadgeText}</div>
         `;
     } else {
         if (rawTotal !== "TBD") {
             middleSectionHtml = `
-                <div class="d-flex flex-column justify-content-center align-items-center pt-1">
+                <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100">
                     <div class="text-muted small fw-bold mb-0 lh-1">@</div>
                     <div class="badge bg-secondary text-white mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>
                 </div>`;
@@ -635,7 +665,9 @@ function createGameCard(data) {
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span>${umpDot}K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span>${umpDot}BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span>${umpDot}Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
-    // --- RESTRUCTURED HEADER ---
+    const homeRank = game.teams.home.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.home.team.rank}]</span> ` : '';
+    const awayRank = game.teams.away.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.away.team.rank}]</span> ` : '';
+
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
@@ -651,13 +683,15 @@ function createGameCard(data) {
                 <div class="d-flex justify-content-between align-items-start px-1 pt-1">
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayName} ${mlAway}</div>
+                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayRank}${awayName} ${mlAway}</div>
                         ${awayPitcherToggle}
                     </div>
-                    <div class="text-center" style="width: 16%;">${middleSectionHtml}</div>
+                    <div class="text-center d-flex align-items-center justify-content-center" style="width: 16%;">
+                        ${middleSectionHtml}
+                    </div>
                     <div class="text-center" style="width: 42%;"> 
                         <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeName} ${mlHome}</div>
+                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeRank}${homeName} ${mlHome}</div>
                         ${homePitcherToggle}
                     </div>
                 </div>
