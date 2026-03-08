@@ -35,6 +35,11 @@ jobs:
           NBA_X_API_SECRET: ${{ secrets.NBA_X_API_SECRET }}
           NBA_X_ACCESS_TOKEN: ${{ secrets.NBA_X_ACCESS_TOKEN }}
           NBA_X_ACCESS_TOKEN_SECRET: ${{ secrets.NBA_X_ACCESS_TOKEN_SECRET }}
+          # SERIEA keys
+          SERIEA_X_API_KEY: ${{ secrets.SERIEA_X_API_KEY }}
+          SERIEA_X_API_SECRET: ${{ secrets.SERIEA_X_API_SECRET }}
+          SERIEA_X_ACCESS_TOKEN: ${{ secrets.SERIEA_X_ACCESS_TOKEN }}
+          SERIEA_X_ACCESS_TOKEN_SECRET: ${{ secrets.SERIEA_X_ACCESS_TOKEN_SECRET }}
         run: python scripts/tweet_bot.py
 
       - name: Commit Log Silently
