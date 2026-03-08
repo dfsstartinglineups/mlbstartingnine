@@ -25,8 +25,8 @@ nba_client = tweepy.Client(
     access_token_secret=os.environ.get("NBA_X_ACCESS_TOKEN_SECRET")
 )
 
-# Serie A Client (@FutbolStarting11)
-seriea_client = tweepy.Client(
+# Futbol Client (@FutbolStarting11 - Using existing SerieA Env Vars)
+futbol_client = tweepy.Client(
     consumer_key=os.environ.get("SERIEA_X_API_KEY"),
     consumer_secret=os.environ.get("SERIEA_X_API_SECRET"),
     access_token=os.environ.get("SERIEA_X_ACCESS_TOKEN"),
@@ -36,7 +36,6 @@ seriea_client = tweepy.Client(
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
-
 
 # Automatically handles EST/EDT shifts
 today_est = datetime.now(zoneinfo.ZoneInfo("America/New_York"))
@@ -336,9 +335,23 @@ for game in games:
 
 
 # ==========================================
-# 6. SERIE A / FUTBOL ENGINE
+# 6. MULTI-LEAGUE FUTBOL ENGINE
 # ==========================================
-print("\n--- STARTING SERIE A ENGINE ---")
+print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
+
+# Whitelist of approved leagues and their specific Twitter parameters
+FUTBOL_LEAGUES = {
+    39:  {"name": "PREMIER LEAGUE 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "tag": "#EPL", "url_slug": "epl"},
+    140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
+    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea"},
+    2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
+    45:  {"name": "FA CUP 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "tag": "#FACup", "url_slug": "facup"},
+    40:  {"name": "CHAMPIONSHIP 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "tag": "#Championship", "url_slug": "championship"},
+    78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga"},
+    61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
+    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"}
+}
+
 try:
     futbol_response = requests.get(FUTBOL_API_URL)
     if futbol_response.status_code == 200:
@@ -349,24 +362,25 @@ except Exception as e:
     print(f"Error fetching Futbol data: {e}")
     futbol_data = []
 
-# Helper function to group players by position
 def parse_futbol_lineup(startXI):
     pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
     for player_item in startXI:
         p = player_item.get('player', {})
         pos = p.get('pos', 'M')
         if pos not in pos_dict:
-            pos = 'M' # Fallback
+            pos = 'M' 
         pos_dict[pos].append(p.get('name', 'Unknown'))
     return pos_dict
 
 for match in futbol_data:
-    # 1. Filter for Serie A Only (League ID 135)
-    if match.get('league', {}).get('id') != 135:
+    # 1. Filter out unapproved leagues
+    league_id = match.get('league', {}).get('id')
+    if league_id not in FUTBOL_LEAGUES:
         continue
         
+    league_info = FUTBOL_LEAGUES[league_id]
     fixture_id = match.get('fixture', {}).get('id')
-    team_key = f"SERIEA_{fixture_id}"
+    team_key = f"FUTBOL_{fixture_id}"
     
     # 2. Check if we already tweeted this game
     if team_key in tweeted_recently:
@@ -385,8 +399,6 @@ for match in futbol_data:
     if not home_startXI or not away_startXI:
         continue
 
-    print(f"[{fixture_id}] Both lineups found for Serie A! Building tweet...")
-
     # Extract Teams Data
     home_t = match['teams']['home']
     away_t = match['teams']['away']
@@ -399,8 +411,10 @@ for match in futbol_data:
     a_rec = f"({away_t['record']})" if away_t.get('record') else ""
     a_name = away_t['name']
     
-    # Build Header
-    header = f"🚨 OFFICIAL STARTING XI SERIE A 🇮🇹\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
+    print(f"[{fixture_id}] Both lineups found for {h_name} vs {a_name} ({league_info['tag']}). Building tweet...")
+
+    # Build Header dynamically based on league mapping
+    header = f"🚨 OFFICIAL STARTING XI: {league_info['name']}\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
     
     # Parse Lineups
     h_pos = parse_futbol_lineup(home_startXI)
@@ -422,20 +436,24 @@ for match in futbol_data:
     a_inj = ", ".join(inj.get('away', [])) if inj.get('away') else "None"
     inj_str = f"🤕 Key Absences:\n{h_name}: {h_inj}\n{a_name}: {a_inj}"
     
-    # Footer & Deep Link
-    footer = f"📱 Live stats and scores: https://futbolstartingeleven.com/?league=seriea&date={date_str}#card-{fixture_id}\n#SerieA #{h_name.replace(' ', '')} #{a_name.replace(' ', '')}"
+    # Clean Team Names for Hashtags (Strips spaces, hyphens, periods)
+    h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
+    a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+    
+    # Footer & Deep Link (Dynamic URL Slug and Smart Hashtags)
+    footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={date_str}#card-{fixture_id}\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
     
     # Combine Tweet
     tweet_text = f"{header}\n\n{home_str}\n\n{away_str}\n\n{odds_str}\n\n{inj_str}\n\n{footer}"
     
     try:
-        seriea_client.create_tweet(text=tweet_text)
-        print(f"✅ Successfully tweeted Serie A matchup: {h_name} vs {a_name}!")
+        futbol_client.create_tweet(text=tweet_text)
+        print(f"✅ Successfully tweeted Futbol matchup: {h_name} vs {a_name}!")
         log_today.append(team_key)
         tweeted_recently.append(team_key)
         new_tweets_sent = True
     except Exception as e:
-        print(f"❌ Failed to tweet Serie A matchup ({h_name} vs {a_name}): {e}")
+        print(f"❌ Failed to tweet Futbol matchup ({h_name} vs {a_name}): {e}")
 
 # ==========================================
 # 7. SAVE MEMORY
@@ -446,4 +464,4 @@ if new_tweets_sent:
         json.dump(memory, f, indent=4)
     print("\n💾 Memory updated.")
 else:
-    print("\nNo new lineups to tweet for NBA, MLB, or Serie A.")
+    print("\nNo new lineups to tweet for NBA, MLB, or Futbol.")
