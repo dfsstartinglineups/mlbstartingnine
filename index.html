@@ -57,6 +57,8 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
+            padding-right: 2px; /* Fix for italic 'e' getting cut off */
+            display: inline-block; /* Required for padding to push the bounding box */
         }
         
         /* Lineup Card */
