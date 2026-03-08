@@ -4,10 +4,6 @@
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
 
-// Check local storage for the user's saved preference
-let savedLineupState = localStorage.getItem('futbolLineupsExpanded');
-let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'true' : true; 
-
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
 // ==========================================
@@ -510,12 +506,12 @@ function createGameCard(data) {
             if (half === 'Bottom') halfLetter = 'B';
             let inningStr = (halfLetter && inning) ? `${halfLetter}${inning}` : (detailedState || 'Live');
 
-            // Top Badge (Inning & Score) - Using matching Blue (#0d6efd)
+            // Top Badge (Inning & Score)
             topBadgeHtml = `
-                <div class="badge bg-primary text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.80rem; padding: 0.3em 0;">
-                    <span style="width:30%; text-align:right;">${inningStr}</span>
-                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
-                    <span style="width:30%; text-align:left; letter-spacing:-0.5px;">${awayScore} - ${homeScore}</span>
+                <div class="badge bg-primary text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm px-1" style="font-size: 0.75rem; padding: 0.3em 0;">
+                    <span style="white-space: nowrap;">${inningStr}</span>
+                    <span style="margin: 0 4px; color:#ffffff99;">|</span>
+                    <span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
 
             // 1. Extract Live Count & Bases
@@ -530,7 +526,7 @@ function createGameCard(data) {
 
             // 2. Build the Diamond SVG
             const baseSvg = `
-                <svg width="24" height="24" viewBox="0 0 100 100" class="mx-auto mt-1" style="display: block;">
+                <svg width="22" height="22" viewBox="0 0 100 100" class="mx-auto mt-1" style="display: block;">
                    <polygon points="50,15 65,30 50,45 35,30" fill="${onSecond ? '#0d6efd' : 'transparent'}" stroke="${onSecond ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
                    <polygon points="75,40 90,55 75,70 60,55" fill="${onFirst ? '#0d6efd' : 'transparent'}" stroke="${onFirst ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
                    <polygon points="25,40 40,55 25,70 10,55" fill="${onThird ? '#0d6efd' : 'transparent'}" stroke="${onThird ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
@@ -540,28 +536,28 @@ function createGameCard(data) {
             // 3. Build Outs Circles
             const getCircle = (isFilled) => `<circle cx="5" cy="5" r="4.5" fill="${isFilled ? '#0d6efd' : 'transparent'}" stroke="${isFilled ? '#0d6efd' : '#adb5bd'}" stroke-width="1.5"/>`;
             const outsHtml = `
-                <div class="d-flex align-items-center ms-1 pb-1">
-                    <svg width="10" height="10" viewBox="0 0 10 10" style="margin: 0 1.5px;">${getCircle(outs >= 1)}</svg>
-                    <svg width="10" height="10" viewBox="0 0 10 10" style="margin: 0 1.5px;">${getCircle(outs >= 2)}</svg>
-                    <svg width="10" height="10" viewBox="0 0 10 10" style="margin: 0 1.5px;">${getCircle(outs >= 3)}</svg>
+                <div class="d-flex align-items-center ms-1 pb-0">
+                    <svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs >= 1)}</svg>
+                    <svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs >= 2)}</svg>
+                    <svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs >= 3)}</svg>
                 </div>
             `;
 
-            // 4. Build the Count Output
+            // 4. Build the Count Output (Nowrap applied to prevent breaking)
             extraLiveInfo = `
                 ${baseSvg}
                 <div class="d-flex justify-content-center align-items-center w-100" style="margin-top: 2px; margin-bottom: 2px;">
-                    <span class="text-dark fw-bold" style="font-size: 0.65rem; font-family: monospace; letter-spacing: -0.5px;">${balls}-${strikes}</span>
+                    <span class="text-dark fw-bold" style="font-size: 0.70rem; font-family: monospace; letter-spacing: -0.5px; white-space: nowrap;">${balls}-${strikes}</span>
                     ${outsHtml}
                 </div>
             `;
         } else {
             // Final Status Badge
             topBadgeHtml = `
-                <div class="badge bg-dark text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.80rem; padding: 0.3em 0;">
-                    <span style="width:30%; text-align:right;">Final</span>
-                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
-                    <span style="width:30%; text-align:left; letter-spacing:-0.5px;">${awayScore} - ${homeScore}</span>
+                <div class="badge bg-dark text-white w-100 mb-1 d-flex justify-content-center align-items-center shadow-sm px-1" style="font-size: 0.75rem; padding: 0.3em 0;">
+                    <span style="white-space: nowrap;">Final</span>
+                    <span style="margin: 0 4px; color:#ffffff99;">|</span>
+                    <span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
         }
 
@@ -578,7 +574,7 @@ function createGameCard(data) {
             middleSectionHtml = `
                 <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-1">
                     <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-                    <div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px;">O/U ${rawTotal}</div>
+                    <div class="badge bg-secondary text-white mt-1 w-100" style="font-size: 0.65rem; letter-spacing: 0.5px; white-space: nowrap;">O/U ${rawTotal}</div>
                 </div>`;
         }
     }
@@ -711,15 +707,15 @@ function createGameCard(data) {
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-start px-1 pt-1">
-                    <div class="text-center" style="width: 42%;"> 
+                    <div class="text-center" style="width: 40%;"> 
                         <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayRank}${awayName} ${mlAway}</div>
                         ${awayPitcherToggle}
                     </div>
-                    <div class="text-center d-flex align-items-start justify-content-center" style="width: 16%;">
+                    <div class="text-center d-flex align-items-start justify-content-center px-1" style="width: 20%;">
                         ${middleSectionHtml}
                     </div>
-                    <div class="text-center" style="width: 42%;"> 
+                    <div class="text-center" style="width: 40%;"> 
                         <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
                         <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeRank}${homeName} ${mlHome}</div>
                         ${homePitcherToggle}
