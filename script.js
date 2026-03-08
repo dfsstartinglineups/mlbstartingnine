@@ -45,6 +45,55 @@ async function fetchParksData() {
     return null;
 }
 
+// ==========================================
+// 2. DEEP LINK SCROLLING (MLB BLUE THEME)
+// ==========================================
+function handleHashNavigation() {
+    if (window.location.hash) {
+        setTimeout(() => {
+            // Remove the '#' to get the pure ID
+            const targetId = window.location.hash.substring(1);
+            const targetCard = document.getElementById(targetId);
+            
+            if (targetCard) {
+                // Scroll the card into the center of the view
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                const innerHeader = targetCard.querySelector('.p-2.pb-1'); // Grab the top header row
+                
+                // Apply the bold BLUE highlight and slight zoom directly to the card
+                targetCard.style.transition = 'all 0.4s ease-out';
+                targetCard.style.transform = 'scale(1.02)';
+                
+                // Force overrides on Bootstrap's utility classes
+                targetCard.style.setProperty('border', '3px solid #0d6efd', 'important');
+                targetCard.style.setProperty('box-shadow', '0 0 25px rgba(13, 110, 253, 0.8)', 'important');
+                
+                targetCard.style.position = 'relative'; // Ensure z-index stacks properly
+                targetCard.style.zIndex = '10';
+                
+                // Temporarily turn the header slightly blue to make it pop
+                if (innerHeader) {
+                    innerHeader.style.transition = 'background-color 0.4s ease-out';
+                    innerHeader.style.backgroundColor = '#cfe2ff'; // Bootstrap primary light blue
+                }
+                
+                // Hold the blue highlight for 4 seconds, then fade it back to normal
+                setTimeout(() => {
+                    targetCard.style.transform = 'scale(1)';
+                    targetCard.style.removeProperty('border'); // Reverts to bootstrap border class
+                    targetCard.style.setProperty('box-shadow', '0 2px 4px rgba(0,0,0,0.05)', 'important');
+                    targetCard.style.zIndex = '1';
+                    
+                    if (innerHeader) {
+                        innerHeader.style.backgroundColor = '#edf4f8'; // Back to original MLB gray-blue
+                    }
+                }, 4000); // 4000ms = 4 seconds
+            }
+        }, 600); // Slight delay to ensure DOM is fully rendered first
+    }
+}
+
 async function init(dateToFetch) {
     if (window.updateSEO) window.updateSEO(dateToFetch); 
     
@@ -182,14 +231,17 @@ async function init(dateToFetch) {
                 parkStats: parksCache[game.venue.name] || null 
             });
         }
+        
         renderGames();
+        handleHashNavigation(); // Fire Deep Link scrolling!
+        
     } catch (error) {
         container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-danger">Failed to load schedule.</div></div>`;
     }
 }
 
 // ==========================================
-// 2. RENDERING ENGINE
+// 3. RENDERING ENGINE
 // ==========================================
 function renderGames() {
     const container = document.getElementById('games-container');
@@ -221,18 +273,6 @@ function renderGames() {
     });
 
     sortedGames.forEach(item => container.appendChild(createGameCard(item)));
-
-    setTimeout(() => {
-        if (window.location.hash) {
-            const targetCard = document.querySelector(window.location.hash);
-            if (targetCard) {
-                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                const innerCard = targetCard.querySelector('.lineup-card');
-                innerCard.style.border = "2px solid #0d6efd";
-                setTimeout(() => { innerCard.style.border = "1px solid #dee2e6"; }, 2000);
-            }
-        }
-    }, 300);
 }
 
 function createGameCard(data) {
@@ -246,7 +286,6 @@ function createGameCard(data) {
 
     const gameCard = document.createElement('div');
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
-    gameCard.id = `game-${game.gamePk}`;
 
     const awayNameFull = game.teams.away.team.name;
     const homeNameFull = game.teams.home.team.name;
@@ -698,8 +737,9 @@ function createGameCard(data) {
     const homeRank = game.teams.home.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.home.team.rank}]</span> ` : '';
     const awayRank = game.teams.away.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.away.team.rank}]</span> ` : '';
 
+    // The ID is now attached directly to the .lineup-card div so the highlight effect targets the physical box properly
     gameCard.innerHTML = `
-        <div class="lineup-card shadow-sm" style="margin-bottom: 8px;">
+        <div class="lineup-card shadow-sm" style="margin-bottom: 8px;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
                 <div class="d-flex align-items-center mb-2 w-100 pb-1 border-bottom border-white">
