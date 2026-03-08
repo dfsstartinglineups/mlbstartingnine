@@ -358,7 +358,8 @@ FUTBOL_LEAGUES = {
     40:  {"name": "CHAMPIONSHIP 🇬🇧", "tag": "#Championship", "url_slug": "championship"},
     78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga"},
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
-    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"}
+    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"},
+    3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"}
 }
 
 try:
