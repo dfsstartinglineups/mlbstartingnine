@@ -2,6 +2,7 @@ import os
 import json
 import requests
 import tweepy
+import zoneinfo
 from datetime import datetime, timezone, timedelta
 
 # ==========================================
@@ -35,7 +36,10 @@ seriea_client = tweepy.Client(
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
-today_est = datetime.now(timezone.utc) - timedelta(hours=4)
+
+
+# Automatically handles EST/EDT shifts
+today_est = datetime.now(zoneinfo.ZoneInfo("America/New_York"))
 date_str = today_est.strftime('%Y-%m-%d')
 game_date_short = f"{today_est.month}/{today_est.day}"
 
