@@ -339,14 +339,14 @@ for game in games:
 # ==========================================
 print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 
-# Whitelist of approved leagues and their specific Twitter parameters
+# Whitelist of approved leagues and their specific Twitter parameters (UK Flags fixed for GitHub)
 FUTBOL_LEAGUES = {
-    39:  {"name": "PREMIER LEAGUE 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "tag": "#EPL", "url_slug": "epl"},
+    39:  {"name": "PREMIER LEAGUE 🇬🇧", "tag": "#EPL", "url_slug": "epl"},
     140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea"},
     2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
-    45:  {"name": "FA CUP 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "tag": "#FACup", "url_slug": "facup"},
-    40:  {"name": "CHAMPIONSHIP 🏴󠁧󠁢󠁥󠁮󠁧󠁿", "tag": "#Championship", "url_slug": "championship"},
+    45:  {"name": "FA CUP 🇬🇧", "tag": "#FACup", "url_slug": "facup"},
+    40:  {"name": "CHAMPIONSHIP 🇬🇧", "tag": "#Championship", "url_slug": "championship"},
     78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga"},
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
     253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"}
