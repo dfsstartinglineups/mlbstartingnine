@@ -24,6 +24,14 @@ nba_client = tweepy.Client(
     access_token_secret=os.environ.get("NBA_X_ACCESS_TOKEN_SECRET")
 )
 
+# Serie A Client (@FutbolStarting11)
+seriea_client = tweepy.Client(
+    consumer_key=os.environ.get("SERIEA_X_API_KEY"),
+    consumer_secret=os.environ.get("SERIEA_X_API_SECRET"),
+    access_token=os.environ.get("SERIEA_X_ACCESS_TOKEN"),
+    access_token_secret=os.environ.get("SERIEA_X_ACCESS_TOKEN_SECRET")
+)
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -44,6 +52,9 @@ MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
 
 # --- NBA URL ---
 NBA_DATA_URL = f"https://nbastartingfive.com/nba_data.json?v={today_est.timestamp()}"
+
+# --- FUTBOL URL ---
+FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp()}"
 
 # ==========================================
 # 3. LOAD & CLEAN MEMORY
@@ -130,17 +141,14 @@ for game in nba_data:
     final_spread = "TBD"
     final_ou = "TBD"
     
-    # 1. Try ESPN Live Odds First
     if away_team in nba_odds_map and nba_odds_map[away_team]['spread'] != "TBD":
         final_spread = nba_odds_map[away_team]['spread']
         final_ou = nba_odds_map[away_team]['ou']
     else:
-        # 2. Fallback to local JSON memory
         local_spread = meta.get('spread', 'TBD')
         local_ou = meta.get('total', 'TBD')
         
         if str(local_spread) not in ["TBD", "nan", "+nan", "None", ""]:
-            # If away team's spread has a minus, they are favored. If plus, home is favored.
             if "-" in str(local_spread):
                 final_spread = f"{away_team} {local_spread}"
             else:
@@ -150,7 +158,6 @@ for game in nba_data:
         if str(local_ou) not in ["TBD", "nan", "+nan", "None", ""]:
             final_ou = local_ou
             
-    # UPDATED: Cleanly strip TBD odds from NBA string
     odds_parts = []
     if final_spread != "TBD":
         odds_parts.append(final_spread)
@@ -169,13 +176,11 @@ for game in nba_data:
             
         players = data.get('players', [])
         
-        # Check if we have 5 players and ALL are verified
         is_official = len(players) >= 5 and all(p.get('verified') == True for p in players)
         
         if is_official:
             opp = matchup.replace(team, '').replace(' vs ', '').strip()
             
-            # --- APPLY TEAM NAME TRANSLATIONS ---
             team_name = NBA_TEAM_NAMES.get(team, team)
             opp_name = NBA_TEAM_NAMES.get(opp, opp)
             
@@ -187,7 +192,6 @@ for game in nba_data:
                     name = p.get('name', 'Unknown')
                     tweet_text += f"{final_pos} {name}\n"
                 
-            # Create a hashtag-friendly version (e.g., "Trail Blazers" -> "TrailBlazers")
             team_hash = team_name.replace(" ", "")
             
             tweet_text += f"\n\nFull matchups & odds: https://nbastartingfive.com/#game-{game_id}\n\n#{team_hash} #{team_hash}Lineup #NBA #DFS #StartingFive"
@@ -293,7 +297,6 @@ for game in games:
     home_odds_str = format_odds(raw_home_odds)
 
     def send_mlb_tweet(team_short, team_pitcher, team_odds, opp_pitcher, opp_odds, players, side):
-        # UPDATED: Only inject the brackets if the odds are actually available
         team_odds_display = f" [{team_odds}]" if team_odds != "TBD" else ""
         opp_odds_display = f" [{opp_odds}]" if opp_odds != "TBD" else ""
         
@@ -327,8 +330,111 @@ for game in games:
         if send_mlb_tweet(home_short, home_pitcher_str, home_odds_str, away_pitcher_str, away_odds_str, game['lineups']['homePlayers'], 'home'):
             new_tweets_sent = True
 
+
 # ==========================================
-# 6. SAVE MEMORY
+# 6. SERIE A / FUTBOL ENGINE
+# ==========================================
+print("\n--- STARTING SERIE A ENGINE ---")
+try:
+    futbol_response = requests.get(FUTBOL_API_URL)
+    if futbol_response.status_code == 200:
+        futbol_data = futbol_response.json()
+    else:
+        futbol_data = []
+except Exception as e:
+    print(f"Error fetching Futbol data: {e}")
+    futbol_data = []
+
+# Helper function to group players by position
+def parse_futbol_lineup(startXI):
+    pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
+    for player_item in startXI:
+        p = player_item.get('player', {})
+        pos = p.get('pos', 'M')
+        if pos not in pos_dict:
+            pos = 'M' # Fallback
+        pos_dict[pos].append(p.get('name', 'Unknown'))
+    return pos_dict
+
+for match in futbol_data:
+    # 1. Filter for Serie A Only (League ID 135)
+    if match.get('league', {}).get('id') != 135:
+        continue
+        
+    fixture_id = match.get('fixture', {}).get('id')
+    team_key = f"SERIEA_{fixture_id}"
+    
+    # 2. Check if we already tweeted this game
+    if team_key in tweeted_recently:
+        continue
+        
+    home_lineup = match.get('homeLineup')
+    away_lineup = match.get('awayLineup')
+    
+    # 3. Require BOTH lineups to be released before tweeting
+    if not home_lineup or not away_lineup:
+        continue
+        
+    home_startXI = home_lineup.get('startXI', [])
+    away_startXI = away_lineup.get('startXI', [])
+    
+    if not home_startXI or not away_startXI:
+        continue
+
+    print(f"[{fixture_id}] Both lineups found for Serie A! Building tweet...")
+
+    # Extract Teams Data
+    home_t = match['teams']['home']
+    away_t = match['teams']['away']
+    
+    h_rank = f"[{home_t['rank']}] " if home_t.get('rank') else ""
+    h_rec = f"({home_t['record']})" if home_t.get('record') else ""
+    h_name = home_t['name']
+    
+    a_rank = f"[{away_t['rank']}] " if away_t.get('rank') else ""
+    a_rec = f"({away_t['record']})" if away_t.get('record') else ""
+    a_name = away_t['name']
+    
+    # Build Header
+    header = f"🚨 OFFICIAL STARTING XI SERIE A 🇮🇹\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
+    
+    # Parse Lineups
+    h_pos = parse_futbol_lineup(home_startXI)
+    a_pos = parse_futbol_lineup(away_startXI)
+    
+    h_form = home_lineup.get('formation', 'TBD')
+    a_form = away_lineup.get('formation', 'TBD')
+    
+    home_str = f"🟢 {h_name} ({h_form})\nG: {', '.join(h_pos['G'])}\nD: {', '.join(h_pos['D'])}\nM: {', '.join(h_pos['M'])}\nF: {', '.join(h_pos['F'])}"
+    away_str = f"🔴 {a_name} ({a_form})\nG: {', '.join(a_pos['G'])}\nD: {', '.join(a_pos['D'])}\nM: {', '.join(a_pos['M'])}\nF: {', '.join(a_pos['F'])}"
+    
+    # Parse Odds
+    odds = match.get('odds', {})
+    odds_str = f"📊 Live Match Odds\n{h_name}: {odds.get('home', 'TBD')} | Draw: {odds.get('draw', 'TBD')} | {a_name}: {odds.get('away', 'TBD')}\nOver {odds.get('total', '2.5')}: {odds.get('over', 'TBD')} | Under {odds.get('total', '2.5')}: {odds.get('under', 'TBD')}"
+    
+    # Parse Injuries
+    inj = match.get('injuries', {})
+    h_inj = ", ".join(inj.get('home', [])) if inj.get('home') else "None"
+    a_inj = ", ".join(inj.get('away', [])) if inj.get('away') else "None"
+    inj_str = f"🤕 Key Absences:\n{h_name}: {h_inj}\n{a_name}: {a_inj}"
+    
+    # Footer & Deep Link
+    footer = f"📱 Live stats and scores: https://futbolstartingeleven.com/?league=seriea&date={date_str}#card-{fixture_id}\n#SerieA #{h_name.replace(' ', '')} #{a_name.replace(' ', '')}"
+    
+    # Combine Tweet
+    tweet_text = f"{header}\n\n{home_str}\n\n{away_str}\n\n{odds_str}\n\n{inj_str}\n\n{footer}"
+    
+    try:
+        seriea_client.create_tweet(text=tweet_text)
+        print(f"✅ Successfully tweeted Serie A matchup: {h_name} vs {a_name}!")
+        log_today.append(team_key)
+        tweeted_recently.append(team_key)
+        new_tweets_sent = True
+    except Exception as e:
+        print(f"❌ Failed to tweet Serie A matchup ({h_name} vs {a_name}): {e}")
+
+# ==========================================
+# 7. SAVE MEMORY
 # ==========================================
 if new_tweets_sent:
     memory[date_str] = log_today
@@ -336,4 +442,4 @@ if new_tweets_sent:
         json.dump(memory, f, indent=4)
     print("\n💾 Memory updated.")
 else:
-    print("\nNo new lineups to tweet for NBA or MLB.")
+    print("\nNo new lineups to tweet for NBA, MLB, or Serie A.")
