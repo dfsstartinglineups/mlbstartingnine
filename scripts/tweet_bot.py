@@ -97,7 +97,7 @@ except Exception as e:
     print(f"Error fetching NBA data: {e}")
     nba_data = []
 
-# --- FETCH ESPN ODDS & GAME IDs ---
+# --- FETCH ESPN ODDS, IDs, & REAL-TIME STATUS ---
 ESPN_TO_STD = {"NY": "NYK", "NO": "NOP", "SA": "SAS", "GS": "GSW", "WSH": "WAS", "UTAH": "UTA"}
 nba_odds_map = {}
 try:
@@ -105,8 +105,10 @@ try:
     espn_url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={espn_date}"
     espn_data = requests.get(espn_url).json()
     for event in espn_data.get('events', []):
-        # Grab the unique ESPN Event ID!
         espn_game_id = str(event.get('id', ''))
+        
+        # Grab ESPN's highly accurate game status ('pre', 'in', or 'post')
+        espn_state = event.get('status', {}).get('type', {}).get('state', 'pre')
         
         comp = event['competitions'][0]
         spread, ou = "TBD", "TBD"
@@ -117,7 +119,12 @@ try:
         for c in comp['competitors']:
             espn_abbr = c['team']['abbreviation'].upper()
             std_abbr = ESPN_TO_STD.get(espn_abbr, espn_abbr)
-            nba_odds_map[std_abbr] = {"spread": spread, "ou": ou, "id": espn_game_id}
+            nba_odds_map[std_abbr] = {
+                "spread": spread, 
+                "ou": ou, 
+                "id": espn_game_id,
+                "state": espn_state  # Save the state!
+            }
 except Exception as e:
     print(f"Error fetching ESPN odds/IDs: {e}")
 
@@ -143,26 +150,23 @@ for game in nba_data:
     home_team = game['teams'][1]
     matchup = f"{away_team} vs {home_team}"
     
-    meta = game.get('meta', {})
-    
     # ----------------------------------------------------
-    # FIX 1: TIME CHECK (Skip games that have already started)
+    # FIX 1: THE DATE CHECK (Kills the midnight bug)
     # ----------------------------------------------------
     game_date_str = game.get('date') 
-    game_time_str = meta.get('time', 'TBD')
-    
-    if game_date_str and game_time_str != "TBD":
-        try:
-            datetime_str = f"{game_date_str} {game_time_str}"
-            game_start_dt = datetime.strptime(datetime_str, "%Y-%m-%d %I:%M %p")
-            game_start_dt = game_start_dt.replace(tzinfo=zoneinfo.ZoneInfo("America/New_York"))
-            
-            # If current time is past tipoff, ignore it completely to prevent midnight bugs
-            if today_est >= game_start_dt:
-                print(f"Skipping {matchup} - Game already started ({game_date_str} at {game_time_str}).")
-                continue
-        except Exception as e:
-            pass
+    if game_date_str and game_date_str != date_str:
+        print(f"Skipping {matchup} - Stale data from {game_date_str} (Today is {date_str}).")
+        continue
+
+    # ----------------------------------------------------
+    # FIX 2: THE ESPN STATUS CHECK (Stop tweeting after tipoff)
+    # ----------------------------------------------------
+    espn_game_data = nba_odds_map.get(away_team, {})
+    if espn_game_data.get('state') in ['in', 'post']:
+        print(f"Skipping {matchup} - Game has already started or finished according to ESPN.")
+        continue
+
+    meta = game.get('meta', {})
             
     # Bulletproof fallback for the website URL hash link if ID is missing
     url_game_id = game.get('id')
@@ -170,7 +174,7 @@ for game in nba_data:
         url_game_id = f"{away_team}-{home_team}-{date_str}"
         
     # Get the ESPN ID for the log (or fallback to URL ID if ESPN fails)
-    espn_game_id = nba_odds_map.get(away_team, {}).get('id', url_game_id)
+    espn_game_id = espn_game_data.get('id', url_game_id)
         
     # --- SMART ODDS RESOLVER ---
     final_spread = "TBD"
@@ -205,15 +209,13 @@ for game in nba_data:
     
     for team, data in rosters.items():
         # ----------------------------------------------------
-        # FIX 2: UNIQUE ESPN KEY FOR THE TWEET LOG
+        # FIX 3: UNIQUE ESPN KEY FOR THE TWEET LOG
         # ----------------------------------------------------
         espn_team_key = f"NBA_{team}_{espn_game_id}" 
         
-        # Legacy keys to ensure it doesn't double-tweet things already logged today
         legacy_date_key = f"NBA_{team}_{date_str}"
         legacy_base_key = f"NBA_{team}"
         
-        # Skip if any of these keys are in the memory bank
         if espn_team_key in tweeted_recently or legacy_date_key in log_today or legacy_base_key in log_today:
             continue
             
@@ -242,7 +244,6 @@ for game in nba_data:
             try:
                 nba_client.create_tweet(text=tweet_text)
                 print(f"✅ Successfully tweeted {team_name} NBA lineup!")
-                # Log the brand new ESPN ID so it skips it next loop!
                 log_today.append(espn_team_key)
                 tweeted_recently.append(espn_team_key)
                 new_tweets_sent = True
