@@ -173,7 +173,7 @@ for game in nba_data:
     if not url_game_id:
         url_game_id = f"{away_team}-{home_team}-{date_str}"
         
-    # Get the ESPN ID for the log (or fallback to URL ID if ESPN fails)
+    # Get the ESPN ID for fallback/safety
     espn_game_id = espn_game_data.get('id', url_game_id)
         
     # --- SMART ODDS RESOLVER ---
@@ -209,14 +209,15 @@ for game in nba_data:
     
     for team, data in rosters.items():
         # ----------------------------------------------------
-        # FIX 3: UNIQUE ESPN KEY FOR THE TWEET LOG
+        # FIX 3: REVERT TO TEAM/DATE KEY FOR THE TWEET LOG
         # ----------------------------------------------------
-        espn_team_key = f"NBA_{team}_{espn_game_id}" 
+        team_date_key = f"NBA_{team}_{date_str}"
         
-        legacy_date_key = f"NBA_{team}_{date_str}"
+        # Keep legacy checks to prevent duplicates during today's transition
+        espn_team_key = f"NBA_{team}_{espn_game_id}" 
         legacy_base_key = f"NBA_{team}"
         
-        if espn_team_key in tweeted_recently or legacy_date_key in log_today or legacy_base_key in log_today:
+        if team_date_key in tweeted_recently or espn_team_key in tweeted_recently or legacy_base_key in log_today:
             continue
             
         players = data.get('players', [])
@@ -244,8 +245,8 @@ for game in nba_data:
             try:
                 nba_client.create_tweet(text=tweet_text)
                 print(f"✅ Successfully tweeted {team_name} NBA lineup!")
-                log_today.append(espn_team_key)
-                tweeted_recently.append(espn_team_key)
+                log_today.append(team_date_key)
+                tweeted_recently.append(team_date_key)
                 new_tweets_sent = True
             except Exception as e:
                 print(f"❌ Failed to tweet {team_name} NBA lineup: {e}")
