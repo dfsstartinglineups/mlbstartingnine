@@ -40,7 +40,19 @@ jobs:
 
       - name: Commit and Push Changes
         run: |
-          git config --global user.name "GitHub Action Bot"
-          git config --global user.email "action@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data/umpires.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated update: Umpire stats" && git push)
+          
+          # Check if there are staged changes ready to be committed
+          if ! git diff --quiet --staged; then
+            git commit -m "Automated update: Umpire stats [skip ci]"
+            
+            # Pull latest changes and rebase BEFORE pushing
+            git pull --rebase origin main || echo "Nothing to pull"
+            
+            # Try pushing. If rejected, pull again and immediately push.
+            git push origin main || (git pull --rebase origin main && git push origin main)
+          else
+            echo "No new umpire stats. Skipping commit."
+          fi
