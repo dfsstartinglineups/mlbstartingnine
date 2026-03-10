@@ -47,4 +47,16 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add data/tweet_log.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "📝 Update tweet log [skip ci]" && git push)
+          
+          # Check if there are staged changes ready to be committed
+          if ! git diff --quiet --staged; then
+            git commit -m "📝 Update tweet log [skip ci]"
+            
+            # The Magic Fix: Pull latest changes and rebase BEFORE pushing
+            git pull --rebase origin main || echo "Nothing to pull"
+            
+            # Try pushing. If rejected, pull again and immediately push.
+            git push origin main || (git pull --rebase origin main && git push origin main)
+          else
+            echo "No new tweets to log. Skipping commit."
+          fi
