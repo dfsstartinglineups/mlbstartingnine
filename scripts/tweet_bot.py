@@ -488,7 +488,7 @@ for match in futbol_data:
     a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
     
     # Footer & Deep Link (Dynamic URL Slug and Smart Hashtags)
-    footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={date_str}#card-{fixture_id}\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
+    footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={date_str}#card-{fixture_id}\n\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
     
     # Combine Tweet
     tweet_text = f"{header}\n\n{home_str}\n\n{away_str}\n\n{odds_str}\n\n{inj_str}\n\n{footer}"
