@@ -394,7 +394,8 @@ FUTBOL_LEAGUES = {
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
     253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"},
     3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
-    13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"}
+    13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
+    16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"}
 }
 
 try:
