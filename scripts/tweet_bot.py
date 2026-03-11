@@ -67,7 +67,7 @@ MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
 NBA_DATA_URL = f"https://nbastartingfive.com/nba_data.json?v={today_est.timestamp()}"
 
 # --- FUTBOL URL ---
-FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp
+FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp()}"
 
                                                                                 
 
