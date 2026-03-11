@@ -4,7 +4,7 @@ import requests
 import tweepy
 import zoneinfo
 from datetime import datetime, timezone, timedelta
-
+import time
 import os  # Make sure this is imported at the top!
 
 def save_memory_safely(memory_data):
@@ -263,6 +263,7 @@ for game in nba_data:
                 # --- IMMEDIATE SAFE LOG SAVE ---
                 memory[date_str] = log_today
                 save_memory_safely(memory)
+                time.sleep(5)
             except Exception as e:
                 print(f"❌ Failed to tweet {team_name} NBA lineup: {e}")
 
@@ -382,6 +383,7 @@ for game in games:
             # --- IMMEDIATE SAFE LOG SAVE ---
             memory[date_str] = log_today
             save_memory_safely(memory)
+            time.sleep(5)
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
             return False
@@ -521,6 +523,7 @@ for match in futbol_data:
         # --- IMMEDIATE SAFE LOG SAVE ---
         memory[date_str] = log_today
         save_memory_safely(memory)
+        time.sleep(5)
     except Exception as e:
         print(f"❌ Failed to tweet Futbol matchup ({h_name} vs {a_name}): {e}")
 
