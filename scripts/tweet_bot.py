@@ -5,6 +5,16 @@ import tweepy
 import zoneinfo
 from datetime import datetime, timezone, timedelta
 
+import os  # Make sure this is imported at the top!
+
+def save_memory_safely(memory_data):
+    """Safely writes to the log file using a temporary file to prevent corruption."""
+    temp_file = f"{LOG_FILE}.tmp"
+    with open(temp_file, 'w') as f:
+        json.dump(memory_data, f, indent=4)
+    os.replace(temp_file, LOG_FILE) # This atomic swap is instant and crash-proof
+
+
 # ==========================================
 # 1. AUTHENTICATE WITH X (TWITTER)
 # ==========================================
@@ -57,7 +67,9 @@ MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
 NBA_DATA_URL = f"https://nbastartingfive.com/nba_data.json?v={today_est.timestamp()}"
 
 # --- FUTBOL URL ---
-FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp()}"
+FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp
+
+                                                                                
 
 # ==========================================
 # 3. LOAD & CLEAN MEMORY
@@ -248,6 +260,9 @@ for game in nba_data:
                 log_today.append(team_date_key)
                 tweeted_recently.append(team_date_key)
                 new_tweets_sent = True
+                # --- IMMEDIATE SAFE LOG SAVE ---
+                memory[date_str] = log_today
+                save_memory_safely(memory)
             except Exception as e:
                 print(f"❌ Failed to tweet {team_name} NBA lineup: {e}")
 
@@ -364,6 +379,9 @@ for game in games:
             log_today.append(f"{game_pk}_{side}")
             tweeted_recently.append(f"{game_pk}_{side}")
             return True
+            # --- IMMEDIATE SAFE LOG SAVE ---
+            memory[date_str] = log_today
+            save_memory_safely(memory)
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
             return False
@@ -499,6 +517,9 @@ for match in futbol_data:
         log_today.append(team_key)
         tweeted_recently.append(team_key)
         new_tweets_sent = True
+        # --- IMMEDIATE SAFE LOG SAVE ---
+        memory[date_str] = log_today
+        save_memory_safely(memory)
     except Exception as e:
         print(f"❌ Failed to tweet Futbol matchup ({h_name} vs {a_name}): {e}")
 
@@ -507,8 +528,7 @@ for match in futbol_data:
 # ==========================================
 if new_tweets_sent:
     memory[date_str] = log_today
-    with open(LOG_FILE, 'w') as f:
-        json.dump(memory, f, indent=4)
+    save_memory_safely(memory)
     print("\n💾 Memory updated.")
 else:
     print("\nNo new lineups to tweet for NBA, MLB, or Futbol.")
