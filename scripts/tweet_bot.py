@@ -497,8 +497,8 @@ for match in futbol_data:
     
     # Parse Injuries
     inj = match.get('injuries', {})
-    h_inj = ", ".join(inj.get('home', [])) if inj.get('home') else "None"
-    a_inj = ", ".join(inj.get('away', [])) if inj.get('away') else "None"
+    h_inj = ", ".join(str(p) for p in inj.get('home', []) if p) if inj.get('home') else "None"
+    a_inj = ", ".join(str(p) for p in inj.get('away', []) if p) if inj.get('away') else "None"
     inj_str = f"🤕 Key Absences:\n{h_name}: {h_inj}\n{a_name}: {a_inj}"
     
     # Clean Team Names for Hashtags (Strips spaces, hyphens, periods)
