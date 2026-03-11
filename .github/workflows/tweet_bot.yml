@@ -43,6 +43,7 @@ jobs:
         run: python scripts/tweet_bot.py
 
       - name: Commit Log Silently
+        if: always()
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
