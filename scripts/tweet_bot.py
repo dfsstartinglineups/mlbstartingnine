@@ -500,9 +500,16 @@ for match in futbol_data:
     
     # Parse Injuries
     inj = match.get('injuries', {})
-    h_inj = ", ".join(str(p) for p in inj.get('home', []) if p) if inj.get('home') else "None"
-    a_inj = ", ".join(str(p) for p in inj.get('away', []) if p) if inj.get('away') else "None"
-    inj_str = f"🤕 Key Absences:\n{h_name}: {h_inj}\n{a_name}: {a_inj}"
+    h_inj = ", ".join(str(p) for p in inj.get('home', []) if p) if inj.get('home') else ""
+    a_inj = ", ".join(str(p) for p in inj.get('away', []) if p) if inj.get('away') else ""
+    
+    inj_lines = []
+    if h_inj:
+        inj_lines.append(f"{h_name}: {h_inj}")
+    if a_inj:
+        inj_lines.append(f"{a_name}: {a_inj}")
+        
+    inj_str = f"🤕 Key Absences:\n" + "\n".join(inj_lines) if inj_lines else ""
     
     # Clean Team Names for Hashtags (Strips spaces, hyphens, periods)
     h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
@@ -511,8 +518,13 @@ for match in futbol_data:
     # Footer & Deep Link (Dynamic URL Slug and Smart Hashtags)
     footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={date_str}#card-{fixture_id}\n\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
     
-    # Combine Tweet
-    tweet_text = f"{header}\n\n{home_str}\n\n{away_str}\n\n{odds_str}\n\n{inj_str}\n\n{footer}"
+    # Combine Tweet dynamically so there are no empty gaps
+    tweet_parts = [header, home_str, away_str, odds_str]
+    if inj_str:
+        tweet_parts.append(inj_str)
+    tweet_parts.append(footer)
+    
+    tweet_text = "\n\n".join(tweet_parts)
     
     try:
         futbol_client.create_tweet(text=tweet_text)
