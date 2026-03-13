@@ -543,6 +543,128 @@ for match in futbol_data:
         print(f"❌ Failed to tweet Futbol matchup ({h_name} vs {a_name}): {e}")
 
 # ==========================================
+# 6. FUTBOL LIVE ALERTS ENGINE (LATE DRAMA & UPSETS)
+# ==========================================
+print("--- EVALUATING FUTBOL LIVE ALERTS ---")
+
+for match in futbol_data:
+    # 1. Filter out unapproved leagues
+    league_id = match.get('league', {}).get('id')
+    if league_id not in FUTBOL_LEAGUES:
+        continue
+        
+    league_info = FUTBOL_LEAGUES[league_id]
+    fixture_id = match.get('fixture', {}).get('id')
+    fixture_status = match.get('fixture', {}).get('status', {}).get('short', '')
+    
+    events = match.get('events', [])
+    if not events:
+        continue
+        
+    h_id = match['teams']['home']['id']
+    a_id = match['teams']['away']['id']
+    h_name = match['teams']['home']['name']
+    a_name = match['teams']['away']['name']
+    
+    # Calculate true score dynamically strictly from the events array
+    calc_home_score = 0
+    calc_away_score = 0
+    
+    # Safely parse pre-match Match Winner odds
+    home_odds_str = match.get('odds', {}).get('home', 'TBD')
+    away_odds_str = match.get('odds', {}).get('away', 'TBD')
+    try: home_odds = float(home_odds_str) if home_odds_str != 'TBD' else 0.0
+    except ValueError: home_odds = 0.0
+    try: away_odds = float(away_odds_str) if away_odds_str != 'TBD' else 0.0
+    except ValueError: away_odds = 0.0
+
+    for event in events:
+        # Only look at valid goals (Ignore Own Goals to prevent API attribution bugs)
+        if event.get('type') == 'Goal' and event.get('detail') in ['Normal Goal', 'Penalty']:
+            team_id = event.get('team_id')
+            
+            # Update the True Score chronologically
+            if team_id == h_id: calc_home_score += 1
+            elif team_id == a_id: calc_away_score += 1
+                
+            event_time_str = str(event.get('time', '0'))
+            try: event_time = int(event_time_str)
+            except ValueError: event_time = 0
+                
+            # The Synthesized Unique Key
+            event_key = f"ALERT_{fixture_id}_{event_time_str}_{team_id}_Goal"
+            
+            # Master failsafe check
+            if event_key in tweeted_recently:
+                continue
+                
+            # --- THE BRAINS: EVALUATE TRIGGERS ---
+            is_late_drama = False
+            is_upset = False
+            
+            # Trigger 1: Late Drama (>= 75 min, tied or took a 1-goal lead)
+            if event_time >= 75:
+                if calc_home_score == calc_away_score or abs(calc_home_score - calc_away_score) == 1:
+                    is_late_drama = True
+                    
+            # Trigger 2: Upset Alert (Scorer odds >= 4.00 AND took the lead)
+            if team_id == h_id and home_odds >= 4.00 and calc_home_score > calc_away_score:
+                is_upset = True
+            elif team_id == a_id and away_odds >= 4.00 and calc_away_score > calc_home_score:
+                is_upset = True
+                
+            # If neither trigger hit, move to the next event
+            if not (is_late_drama or is_upset):
+                continue
+                
+            # --- THE DEAD FUNNEL KILL SWITCH ---
+            if fixture_status in ['FT', 'AET', 'PEN']:
+                log_today.append(event_key)
+                tweeted_recently.append(event_key)
+                memory[date_str] = log_today
+                save_memory_safely(memory)
+                continue
+                
+            # --- FORMAT AND SEND TWEET ---
+            scoring_team_name = h_name if team_id == h_id else a_name
+            scorer = event.get('player')
+            
+            # Smart Fallback for missing player name
+            scorer_str = f"{scorer} ({scoring_team_name})" if scorer and scorer != "null" else f"{scoring_team_name}"
+                
+            # Convert Decimal Odds to American (+300) formatting
+            scorer_odds = home_odds if team_id == h_id else away_odds
+            american_odds = f"+{int((scorer_odds - 1) * 100)}"
+            
+            h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
+            a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+            link = f"https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={date_str}#card-{fixture_id}"
+            
+            # Template Routing
+            if is_late_drama and is_upset:
+                tweet_text = f"🚨🔥 SHOCKER IN THE MAKING!\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {calc_home_score} - {calc_away_score} {a_name}\n\n📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\nWe are minutes away from a massive upset. Watch the final frantic moments live:\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+            elif is_late_drama:
+                tweet_text = f"🚨 LATE DRAMA ALERT!\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {calc_home_score} - {calc_away_score} {a_name}\n\nA massive goal in the dying minutes! Track the final push and live stats here:\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+            elif is_upset:
+                tweet_text = f"⚠️ UPSET IN PROGRESS!\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {calc_home_score} - {calc_away_score} {a_name}\n\nThe heavy underdogs take the lead!\n📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\nCan they pull off the unthinkable? Follow the live action here:\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+
+            # Fire Tweet & Save Memory
+            try:
+                futbol_client.create_tweet(text=tweet_text)
+                print(f"✅ Successfully tweeted ALERTS for {scoring_team_name}!")
+                
+                # Immediate atomic save to prevent double-tweets
+                log_today.append(event_key)
+                tweeted_recently.append(event_key)
+                new_tweets_sent = True
+                memory[date_str] = log_today
+                save_memory_safely(memory)
+                time.sleep(5)
+                
+            except Exception as e:
+                print(f"❌ Failed to tweet ALERT: {e}")
+
+# ==========================================
 # 7. SAVE MEMORY
 # ==========================================
 if new_tweets_sent:
