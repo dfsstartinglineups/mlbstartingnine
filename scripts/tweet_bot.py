@@ -566,9 +566,13 @@ for match in futbol_data:
     h_name = match['teams']['home']['name']
     a_name = match['teams']['away']['name']
     
-    # Calculate true score dynamically strictly from the events array
-    calc_home_score = 0
-    calc_away_score = 0
+    # --- BUG FIX: GRAB OFFICIAL SCOREBOARD FIRST ---
+    # We use 0 as a fallback if the score is somehow null
+    official_home_score = match.get('goals', {}).get('home')
+    official_away_score = match.get('goals', {}).get('away')
+    
+    official_home_score = int(official_home_score) if official_home_score is not None else 0
+    official_away_score = int(official_away_score) if official_away_score is not None else 0
     
     # Safely parse pre-match Match Winner odds
     home_odds_str = match.get('odds', {}).get('home', 'TBD')
@@ -582,10 +586,6 @@ for match in futbol_data:
         # Only look at valid goals (Ignore Own Goals to prevent API attribution bugs)
         if event.get('type') == 'Goal' and event.get('detail') in ['Normal Goal', 'Penalty']:
             team_id = event.get('team_id')
-            
-            # Update the True Score chronologically
-            if team_id == h_id: calc_home_score += 1
-            elif team_id == a_id: calc_away_score += 1
                 
             event_time_str = str(event.get('time', '0'))
             try: event_time = int(event_time_str)
@@ -597,6 +597,22 @@ for match in futbol_data:
             # Master failsafe check
             if event_key in tweeted_recently:
                 continue
+                
+            # --- BUG FIX: THE "TRUE SCORE" SYNC ---
+            # We assume the official scoreboard is right. 
+            # But if this is a brand new event, we simulate the +1 to see what the score *should* be.
+            calc_home_score = official_home_score
+            calc_away_score = official_away_score
+            
+            # To ensure we don't double-count a goal that is ALREADY on the scoreboard, 
+            # we count all goals by this team in the events array, and if that count is GREATER than 
+            # the official scoreboard, it means the scoreboard is lagging, and we need to manually add 1.
+            team_events_count = sum(1 for e in events if e.get('team_id') == team_id and e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty'])
+            
+            if team_id == h_id and team_events_count > official_home_score:
+                calc_home_score += 1
+            elif team_id == a_id and team_events_count > official_away_score:
+                calc_away_score += 1
                 
             # --- THE BRAINS: EVALUATE TRIGGERS ---
             is_late_drama = False
