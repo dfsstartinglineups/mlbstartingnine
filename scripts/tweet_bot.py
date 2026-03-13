@@ -419,7 +419,8 @@ FUTBOL_LEAGUES = {
     71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
     128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
     848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
-    307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" }
+    307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
+    88:  { "name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" }
 }
 
 try:
