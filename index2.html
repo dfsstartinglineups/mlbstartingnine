@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <title id="dynamic-title">Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors</title>
+    
+    <meta name="description" id="dynamic-desc" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), umpire tendencies, and park factors for DFS and sports bettors.">
+    <meta name="keywords" content="MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mlbstartingnine.com/">
+    <meta property="og:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors">
+    <meta property="og:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
+    <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="mlbstartingnine.com">
+    <meta property="twitter:url" content="https://mlbstartingnine.com/">
+    <meta name="twitter:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors">
+    <meta name="twitter:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
+    <meta name="twitter:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body { background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        /* Sleek Header - Upgraded to match image */
+        .header-brand { 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            font-size: 2rem; 
+            color: #fff; 
+            font-style: italic; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+        .header-brand a {
+            color: inherit;
+        }
+        .header-brand span { 
+            text-shadow: none !important;
+            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
+            padding-right: 2px; /* Fix for italic 'e' getting cut off */
+            display: inline-block; /* Required for padding to push the bounding box */
+        }
+        
+        /* Lineup Card */
+        .lineup-card { 
+            background: #fff; 
+            border: 1px solid #dee2e6; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        /* Logos */
+        .team-logo {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
+        }
+        
+        /* Batting Order List */
+        .batting-order { padding-left: 0; list-style-type: none; margin-bottom: 0; }
+        .batting-order li {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f1f3f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .batting-order li:last-child { border-bottom: none; }
+        .order-num { color: #adb5bd; font-weight: 700; font-size: 0.7rem; width: 15px; display: inline-block; }
+        .batter-name { font-weight: 600; color: #495057; }
+        
+        /* Cross-Promo Link */
+        .promo-btn { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* --- X (Twitter) Share Button Styles --- */
+        .x-btn {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .x-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        .x-icon {
+            fill: currentColor;
+            width: 14px;
+            height: 14px;
+        }
+
+        .sr-only {
+          position: absolute !important;
+          width: 1px !important;
+          height: 1px !important;
+          padding: 0 !important;
+          margin: -1px !important;
+          overflow: hidden !important;
+          clip: rect(0, 0, 0, 0) !important;
+          white-space: nowrap !important;
+          border: 0 !important;
+        }
+
+        /* EXPANDING SEARCH BOX (MLB THEME) */
+        #team-search { 
+            color: #ffffff !important; 
+            color-scheme: dark; 
+            width: 45px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #343a40;
+            border: 1px solid #495057;
+            cursor: pointer;
+        }
+        #team-search::placeholder { 
+            color: #adb5bd !important; 
+            opacity: 1; 
+        }
+        #team-search:focus { 
+            width: 150px;
+            background-color: #495057 !important; 
+            color: #ffffff !important; 
+            border-color: #0d6efd !important; /* MLB Blue */
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+            cursor: text;
+        }
+    </style>
+
+    <script>
+        // GLOBALLY ACCESSIBLE SEO FUNCTION
+        window.updateSEO = function(dateStr) {
+            let dateObj;
+            
+            // If the calendar passes a date, use it. Otherwise, default to exactly right now.
+            if (dateStr) {
+                const [year, month, day] = dateStr.split('-');
+                dateObj = new Date(year, month - 1, day);
+            } else {
+                dateObj = new Date();
+            }
+
+            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            // Set Date Boundaries (Using correct zero-indexed months: 2 = March)
+            const wbcStart = new Date(2026, 2, 4);   
+            const wbcEnd = new Date(2026, 2, 17);    
+            const openingDay = new Date(2026, 2, 25);
+            
+            const isWBC = dateObj >= wbcStart && dateObj <= wbcEnd;
+            const isSpringTraining = dateObj < openingDay;
+            
+            // Default Evergreen Tags (Regular Season)
+            let titlePrefix = "Today's MLB Starting Lineups";
+            let ogTitleText = "Today's MLB Starting Lineups";
+            let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and totals.";
+            let h1Text = "Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds";
+            let keywordsText = "MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders";
+            
+            if (isWBC) {
+                // WBC + Spring Training Overrides
+                titlePrefix = "Today's World Baseball Classic(WBC) & MLB Spring Training Lineups";
+                ogTitleText = "Today's World Baseball Classic(WBC) & MLB Spring Training Lineups";
+                descPrefix = "Live World Baseball Classic and MLB Spring Training starting lineups, probable pitchers, live odds, and totals.";
+                h1Text = "Daily World Baseball Classic & MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, and Betting Odds";
+                keywordsText = "WBC lineups, World Baseball Classic odds, World Baseball Classic lineups, WBC betting, MLB Spring Training lineups, MLB Spring Training odds, DFS lineups, BvP matchups, pitcher splits";
+            } else if (isSpringTraining) {
+                // Spring Training Only Overrides
+                titlePrefix = "Today's MLB Spring Training Lineups";
+                ogTitleText = "Today's MLB Spring Training Lineups";
+                descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals.";
+                h1Text = "Daily MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds";
+            }
+            
+            const fullTitle = `${titlePrefix} for ${formattedDate} | BvP, Splits & Umps`;
+            const fullDesc = `${descPrefix} Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`;
+
+            // Update the DOM
+            document.title = fullTitle;
+            
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.content = fullDesc;
+            
+            const metaKeywords = document.querySelector('meta[name="keywords"]');
+            if (metaKeywords) metaKeywords.content = keywordsText;
+
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.content = ogTitleText;
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.content = fullDesc;
+            
+            const twTitle = document.querySelector('meta[name="twitter:title"]');
+            if (twTitle) twTitle.content = ogTitleText;
+            const twDesc = document.querySelector('meta[name="twitter:description"]');
+            if (twDesc) twDesc.content = fullDesc;
+
+            const h1 = document.getElementById('main-header');
+            if (h1) h1.innerText = h1Text;
+        };
+
+        // Fire instantly on load so Google sees it!
+        document.addEventListener('DOMContentLoaded', () => {
+            window.updateSEO();
+        });
+    </script>
+</head>
+    
+<body>
+
+<h1 id="main-header" class="sr-only">Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds</h1>
+
+<nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        
+        <div class="header-brand mb-2 mb-md-0">
+            <a href="/" class="text-decoration-none">MLBStarting<span>Nine</span></a>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 gap-md-3">
+            <input type="text" id="team-search" class="form-control form-control-sm" placeholder="🔍">
+            <button id="global-toggle-btn" class="btn btn-sm fw-bold" style="background-color: #343a40; color: #adb5bd; border: 1px solid #495057;">[+] Expand All</button>
+            <input type="date" id="date-picker" class="form-control form-control-sm text-center fw-bold w-auto" style="background-color: #343a40; color: #fff; border: none; color-scheme: dark;">
+        </div>
+    </div>
+</nav>
+
+<div class="container mb-3">
+    <div class="text-center text-muted px-2" style="font-size: 0.70rem; letter-spacing: 0.2px;">
+        📊 <strong>Data Note:</strong> To ensure relevant sample sizes, all player splits (vL/vR) combine data from the current and last season. Batter vs. Pitcher (vP) history is lifetime. Umpire data is a 365 day window.
+    </div>
+</div>
+
+<div class="container">
+    <div id="games-container" class="row justify-content-center">
+    </div>
+</div>
+
+<div class="modal fade" id="tweetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-dark text-white py-2">
+          <h6 class="modal-title fw-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-twitter-x me-2" viewBox="0 0 16 16">
+                <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/>
+            </svg>
+            Share Lineup
+          </h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-2">Edit post below, then copy to clipboard.</p>
+          <textarea id="tweet-textarea" class="form-control" rows="12" style="font-size: 0.85rem; font-family: monospace;"></textarea>
+        </div>
+        <div class="modal-footer py-1">
+          <button type="button" class="btn btn-sm btn-dark w-100 fw-bold" id="copy-tweet-btn">
+              📋 Copy to Clipboard
+          </button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+    <footer class="mt-5 py-4 bg-light border-top">
+    <div class="container text-center">
+        <p class="text-muted mb-1" style="font-size: 0.85rem; font-weight: 600;">
+            © 2026 MLB Starting Nine
+        </p>
+        <p class="text-muted mb-0" style="font-size: 0.70rem; max-width: 600px; margin: 0 auto; line-height: 1.4;">
+            This site is for informational and entertainment purposes only. <strong>Disclaimer:</strong> MLB Starting Nine is not affiliated with, endorsed by, authorized by, or sponsored by Major League Baseball (MLB) or any of its respective teams. All team names, logos, and brands are property of their respective owners.
+        </p>
+    </div>
+</footer>
+</body>
+</html>
