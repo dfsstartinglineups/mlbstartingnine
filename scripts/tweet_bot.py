@@ -442,6 +442,8 @@ def parse_futbol_lineup(startXI):
 futbol_dates_to_check = [date_str]
 if today_est.hour >= 20: # If it's 8 PM EST or later, check tomorrow's file too
     futbol_dates_to_check.append(tomorrow_str)
+if today_est.hour <= 2: # If it's 2 AM EST or earlier, check yesterday's file too
+    futbol_dates_to_check.append(yesterday_str)    
 
 for target_date_str in futbol_dates_to_check:
     print(f"\n>> Fetching Futbol file for: {target_date_str}")
