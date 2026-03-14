@@ -563,8 +563,33 @@ for target_date_str in futbol_dates_to_check:
         official_home_score = int(match.get('goals', {}).get('home') or 0)
         official_away_score = int(match.get('goals', {}).get('away') or 0)
         
-        home_events_total = sum(1 for e in events if e.get('team_id') == h_id and e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty'])
-        away_events_total = sum(1 for e in events if e.get('team_id') == a_id and e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty'])
+        # --- 🛡️ SHOOTOUT PRE-FILTER ---
+        # API-Sports sends shootout penalties as regular "Penalty" events, which causes massive spam.
+        valid_goal_events = []
+        is_shootout = fixture_status in ['P', 'PEN']
+        
+        # Fallback Check: If status is lagging but multiple late penalties appear, it's a shootout
+        late_penalties = sum(1 for e in events if e.get('type') == 'Goal' and e.get('detail') == 'Penalty' and int(str(e.get('time', '0')) if str(e.get('time', '0')).isdigit() else 0) >= 90)
+        if late_penalties > 1:
+            is_shootout = True
+            
+        for e in events:
+            if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty']:
+                e_time = int(str(e.get('time', '0'))) if str(e.get('time', '0')).isdigit() else 0
+                
+                # Nuke shootout penalties so they don't corrupt the live score or trigger tweets
+                if e.get('detail') == 'Penalty' and e_time >= 90 and is_shootout:
+                    continue
+                
+                valid_goal_events.append(e)
+
+        # If all events were scrubbed, skip to the next game
+        if not valid_goal_events: 
+            continue
+            
+        # Recalculate totals using ONLY the valid regular-play goals
+        home_events_total = sum(1 for e in valid_goal_events if e.get('team_id') == h_id)
+        away_events_total = sum(1 for e in valid_goal_events if e.get('team_id') == a_id)
         
         current_home_score = max(0, official_home_score - home_events_total)
         current_away_score = max(0, official_away_score - away_events_total)
@@ -576,20 +601,19 @@ for target_date_str in futbol_dates_to_check:
         try: away_odds = float(away_odds_str) if away_odds_str != 'TBD' else 0.0
         except ValueError: away_odds = 0.0
 
-        for event in events:
-            if event.get('type') == 'Goal' and event.get('detail') in ['Normal Goal', 'Penalty']:
-                team_id = event.get('team_id')
+        for event in valid_goal_events: # <--- Make sure this line is looping the valid events!
+            team_id = event.get('team_id')
+            
+            if team_id == h_id:
+                current_home_score += 1
+                team_goal_count = current_home_score
+            else:
+                current_away_score += 1
+                team_goal_count = current_away_score
                 
-                if team_id == h_id:
-                    current_home_score += 1
-                    team_goal_count = current_home_score
-                else:
-                    current_away_score += 1
-                    team_goal_count = current_away_score
-                    
-                event_time_str = str(event.get('time', '0'))
-                try: event_time = int(event_time_str)
-                except ValueError: event_time = 0
+            event_time_str = str(event.get('time', '0'))
+            try: event_time = int(event_time_str)
+            except ValueError: event_time = 0
                     
                 event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{team_goal_count}"
                 
