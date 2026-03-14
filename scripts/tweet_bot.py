@@ -568,13 +568,19 @@ for match in futbol_data:
     h_name = match['teams']['home']['name']
     a_name = match['teams']['away']['name']
     
-    # --- BUG FIX: GRAB OFFICIAL SCOREBOARD FIRST ---
-    # We use 0 as a fallback if the score is somehow null
-    official_home_score = match.get('goals', {}).get('home')
-    official_away_score = match.get('goals', {}).get('away')
+    # --- BULLETPROOF SCORE & KEY GENERATOR ---
+    official_home_score = int(match.get('goals', {}).get('home') or 0)
+    official_away_score = int(match.get('goals', {}).get('away') or 0)
     
-    official_home_score = int(official_home_score) if official_home_score is not None else 0
-    official_away_score = int(official_away_score) if official_away_score is not None else 0
+    # 1. Count all valid goals currently sitting in the events array
+    home_events_total = sum(1 for e in events if e.get('team_id') == h_id and e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty'])
+    away_events_total = sum(1 for e in events if e.get('team_id') == a_id and e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty'])
+    
+    # 2. Establish the "Base Score"
+    # If the API purged early 1st-half goals from the events array, the scoreboard will be higher. We add the difference.
+    # If a live goal just happened and the scoreboard is lagging, this safely zeroes out so we trust the events.
+    current_home_score = max(0, official_home_score - home_events_total)
+    current_away_score = max(0, official_away_score - away_events_total)
     
     # Safely parse pre-match Match Winner odds
     home_odds_str = match.get('odds', {}).get('home', 'TBD')
@@ -588,33 +594,30 @@ for match in futbol_data:
         # Only look at valid goals (Ignore Own Goals to prevent API attribution bugs)
         if event.get('type') == 'Goal' and event.get('detail') in ['Normal Goal', 'Penalty']:
             team_id = event.get('team_id')
+            
+            # 3. Increment the chronological score
+            if team_id == h_id:
+                current_home_score += 1
+                team_goal_count = current_home_score
+            else:
+                current_away_score += 1
+                team_goal_count = current_away_score
                 
             event_time_str = str(event.get('time', '0'))
             try: event_time = int(event_time_str)
             except ValueError: event_time = 0
                 
-            # The Synthesized Unique Key
-            event_key = f"ALERT_{fixture_id}_{event_time_str}_{team_id}_Goal"
+            # --- THE BUG FIX: THE SEQUENTIAL UNIQUE KEY ---
+            # By using 'team_goal_count' instead of time, two goals in the 90th minute will have different keys!
+            event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{team_goal_count}"
             
             # Master failsafe check
             if event_key in tweeted_recently:
                 continue
-                
-            # --- BUG FIX: THE "TRUE SCORE" SYNC ---
-            # We assume the official scoreboard is right. 
-            # But if this is a brand new event, we simulate the +1 to see what the score *should* be.
-            calc_home_score = official_home_score
-            calc_away_score = official_away_score
-            
-            # To ensure we don't double-count a goal that is ALREADY on the scoreboard, 
-            # we count all goals by this team in the events array, and if that count is GREATER than 
-            # the official scoreboard, it means the scoreboard is lagging, and we need to manually add 1.
-            team_events_count = sum(1 for e in events if e.get('team_id') == team_id and e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty'])
-            
-            if team_id == h_id and team_events_count > official_home_score:
-                calc_home_score += 1
-            elif team_id == a_id and team_events_count > official_away_score:
-                calc_away_score += 1
+
+            # To keep the variables matching the rest of the script below:
+            calc_home_score = current_home_score
+            calc_away_score = current_away_score
                 
             
             # --- DYNAMIC PHRASE DICTIONARY ---
