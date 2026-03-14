@@ -737,11 +737,25 @@ for target_date_str in futbol_dates_to_check:
                 if not scenario_key: continue
 
                 if fixture_status in ['FT', 'AET', 'PEN']:
-                    log_target_date.append(event_key)
-                    tweeted_recently.append(event_key)
-                    memory[target_date_str] = log_target_date
-                    save_memory_safely(memory)
-                    continue
+                    # Only silence the tweet if the game has been over for more than 20 minutes
+                    is_stale = True
+                    match_ended_str = match.get("match_ended_at")
+                    
+                    if match_ended_str:
+                        try:
+                            ended_time = datetime.fromisoformat(match_ended_str)
+                            mins_since_end = (datetime.now(timezone.utc) - ended_time).total_seconds() / 60
+                            if mins_since_end < 20:
+                                is_stale = False # The game just finished! Let the late tweet through!
+                        except Exception:
+                            pass
+                            
+                    if is_stale:
+                        log_target_date.append(event_key)
+                        tweeted_recently.append(event_key)
+                        memory[target_date_str] = log_target_date
+                        save_memory_safely(memory)
+                        continue
                     
                 scoring_team_name = h_name if team_id == h_id else a_name
                 conceding_team_name = a_name if team_id == h_id else h_name
