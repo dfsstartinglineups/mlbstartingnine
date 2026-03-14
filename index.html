@@ -118,7 +118,7 @@
             height: 14px;
         }
 
-        .visually-hidden-seo {
+        .sr-only {
           position: absolute !important;
           width: 1px !important;
           height: 1px !important;
@@ -221,7 +221,7 @@
             const twDesc = document.querySelector('meta[name="twitter:description"]');
             if (twDesc) twDesc.content = fullDesc;
 
-            const h1 = document.getElementById('seo-h1');
+            const h1 = document.getElementById('main-header');
             if (h1) h1.innerText = h1Text;
         };
 
@@ -233,7 +233,7 @@
 </head>
 <body>
 
-<h1 id="seo-h1" class="visually-hidden-seo">Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds</h1>
+<h1 id="main-header" class="sr-only">Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds</h1>
 
 <nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
