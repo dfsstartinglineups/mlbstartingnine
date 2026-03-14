@@ -68,7 +68,7 @@ async function init(dateToFetch) {
     
     try {
         // Look at how fast this is now! One single file load.
-        const response = await fetch(`data/games_${dateToFetch}.json?v=` + new Date().getTime());
+        const response = await fetch('data/daily_files/games_${dateToFetch}.json?v=' + new Date().getTime());
         if (!response.ok) throw new Error("No Data");
         
         ALL_GAMES_DATA = await response.json();
