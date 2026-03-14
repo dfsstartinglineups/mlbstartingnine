@@ -584,9 +584,7 @@ for target_date_str in futbol_dates_to_check:
                 
                 valid_goal_events.append(e)
 
-        # If all events were scrubbed, skip to the next game
-        if not valid_goal_events: 
-            continue
+        # --- REMOVED 'if not valid_goal_events: continue' so 1-0 reversals work! ---
             
         # Recalculate totals using ONLY the valid regular-play goals
         home_events_total = sum(1 for e in valid_goal_events if e.get('team_id') == h_id)
@@ -794,6 +792,58 @@ for target_date_str in futbol_dates_to_check:
                 
             except Exception as e:
                 print(f"❌ Failed to tweet ALERT: {e}")
+
+        # ==========================================
+        # 🛑 DISALLOWED GOAL DETECTOR
+        # ==========================================
+        for side, c_score, t_id, t_name in [
+            ("home", current_home_score, h_id, h_name), 
+            ("away", current_away_score, a_id, a_name)
+        ]:
+            # The key for the goal that *would* be next if it wasn't reversed
+            ghost_goal_key = f"ALERT_{fixture_id}_{t_id}_Goal_{c_score + 1}"
+            
+            # If the ghost goal is in our memory, but the current score is lower... it was disallowed!
+            if ghost_goal_key in tweeted_recently:
+                print(f"🛑 DISALLOWED GOAL DETECTED FOR {t_name}! They dropped from {c_score + 1} back to {c_score}.")
+                
+                # 1. Purge the fake goal from memory so if they score a REAL goal later, it tweets normally
+                if ghost_goal_key in tweeted_recently: tweeted_recently.remove(ghost_goal_key)
+                if ghost_goal_key in log_target_date: log_target_date.remove(ghost_goal_key)
+                
+                # 2. Build the Disallowed Goal Tweet
+                disallowed_phrases = [
+                    f"❌ HOLD EVERYTHING! The goal for {t_name} has been DISALLOWED. The score remains {current_home_score}-{current_away_score}.",
+                    f"🛑 GOAL CHALKED OFF! {t_name} has their goal wiped off the board. We are back to {current_home_score}-{current_away_score}!",
+                    f"💔 Heartbreak for {t_name}! The officials wave off the goal. It stays {current_home_score}-{current_away_score}.",
+                    f"⚠️ SCRATCH THAT! The recent goal for {t_name} is ruled out. Scoreline remains {current_home_score}-{current_away_score}."
+                ]
+                
+                disallowed_tweet = random.choice(disallowed_phrases)
+                h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
+                a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+                
+                link = f"https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={target_date_str}#card-{fixture_id}"
+                
+                disallowed_tweet += f"\n\nLive match center:\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+                
+                # 3. Send the Tweet
+                try:
+                    futbol_client.create_tweet(text=disallowed_tweet)
+                    print(f"✅ Successfully tweeted Disallowed Goal for {t_name}!")
+                    
+                    # Log that we did the reversal so we don't spam it
+                    reversal_key = f"DISALLOWED_{fixture_id}_{t_id}_Reversed_{c_score + 1}"
+                    log_target_date.append(reversal_key)
+                    tweeted_recently.append(reversal_key)
+                    
+                    new_tweets_sent = True
+                    memory[target_date_str] = log_target_date
+                    save_memory_safely(memory)
+                    time.sleep(5)
+                except Exception as e:
+                    print(f"❌ Failed to tweet Disallowed Goal: {e}")
+        # ==========================================
 
 # ==========================================
 # 7. SAVE MEMORY
