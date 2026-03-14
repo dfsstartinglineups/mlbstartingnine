@@ -422,7 +422,8 @@ FUTBOL_LEAGUES = {
     848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
     307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
     88:  { "name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
-    262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"}
+    262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
+    98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"}
 }
 
 try:
