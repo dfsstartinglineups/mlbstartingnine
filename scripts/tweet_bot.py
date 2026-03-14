@@ -614,185 +614,185 @@ for target_date_str in futbol_dates_to_check:
             event_time_str = str(event.get('time', '0'))
             try: event_time = int(event_time_str)
             except ValueError: event_time = 0
-                    
-                event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{team_goal_count}"
-                
-                if event_key in tweeted_recently: continue
+            
+            event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{team_goal_count}"
+            
+            if event_key in tweeted_recently: continue
 
-                calc_home_score = current_home_score
-                calc_away_score = current_away_score
-                    
-                PHRASES = {
-                    "late_equalizer": {
-                        "titles": ["🚨 LATE EQUALIZER!", "🚨 DRAMATIC EQUALIZER!", "🚨 TIED UP LATE!", "🚨 CLOSING STAGES CHAOS!", "🚨 ALL SQUARE LATE!"],
-                        "blurbs": [
-                            "A massive goal from {scoring_team_name} to level the score, leaving {conceding_team_name} scrambling as time winds down!",
-                            "{scoring_team_name} claws their way back to tie the match, ripping the momentum right out of {conceding_team_name}'s hands.",
-                            "{scoring_team_name} refuses to go away quietly! We are all square as {conceding_team_name} tries to regain control.",
-                            "A crucial tying goal for {scoring_team_name} stuns {conceding_team_name} and sets up a frantic finish!",
-                            "{scoring_team_name} finds a late lifeline against {conceding_team_name}! A massive momentum swing erases the deficit."
-                        ],
-                        "ctas": ["Track the final push for a game-winner here:", "See the live momentum shift and pitch data:", "Can someone find a late winner? Follow live:", "Watch the closing minutes unfold live:"]
-                    },
-                    "late_go_ahead": {
-                        "titles": ["🚨 LATE GO-AHEAD GOAL!", "🚨 THE DEADLOCK IS BROKEN!", "🚨 CLUTCH MOMENT!", "🚨 HUGE LATE GOAL!", "🚨 TENSION IN THE FINAL 15!"],
-                        "blurbs": [
-                            "A game-changing strike from {scoring_team_name} forces {conceding_team_name} to chase the game late!",
-                            "{scoring_team_name} snatches the advantage right when they needed it, leaving {conceding_team_name} stunned.",
-                            "A massive momentum swing puts {scoring_team_name} in front, and now {conceding_team_name} is running out of time!",
-                            "The defense finally cracks! {scoring_team_name} takes a crucial late lead over {conceding_team_name}.",
-                            "Heartbreak for {conceding_team_name} as they concede the lead to {scoring_team_name} late in the half!"
-                        ],
-                        "ctas": ["Can they hold on? Follow the final minutes live:", "Track the closing stages and live stats here:", "See if the defense can shut the door:", "Follow the live pitch data as time winds down:"]
-                    },
-                    "stoppage_equalizer": {
-                        "titles": ["🚨 STOPPAGE TIME EQUALIZER!", "🚨 SAVED AT THE DEATH!", "🚨 LAST MINUTE LIFELINE!", "🚨 90TH MINUTE MADNESS!", "🚨 SCENES IN STOPPAGE TIME!"],
-                        "blurbs": [
-                            "Absolute scenes! A miraculous stoppage-time equalizer for {scoring_team_name} throws {conceding_team_name} into chaos!",
-                            "{scoring_team_name} climbs out of the grave to level the match. Is there still time for {conceding_team_name} to respond?!",
-                            "You can't write a better script! {scoring_team_name} stuns {conceding_team_name} with a tying goal deep in stoppage time.",
-                            "A devastating blown lead for {conceding_team_name}! {scoring_team_name} forces a dramatic tie in the dying moments.",
-                            "An unbelievable momentum shift! {scoring_team_name} breaks {conceding_team_name}'s hearts to level the score right at the end."
-                        ],
-                        "ctas": ["Watch the frantic final moments unfold live:", "Track the live pitch data before the referee blows the whistle:", "See the post-goal chaos and live match center here:", "Don't miss the ending. See live stats and match data here:"]
-                    },
-                    "stoppage_go_ahead": {
-                        "titles": ["🚨 STOPPAGE TIME THRILLER!", "🚨 AT THE DEATH!", "🚨 LATE HEARTBREAK!", "🚨 STOPPAGE TIME DAGGER!", "🚨 90TH MINUTE MADNESS!"],
-                        "blurbs": [
-                            "Heartbreak for {conceding_team_name}! {scoring_team_name} pulls a rabbit out of the hat to take the lead in stoppage time.",
-                            "A staggering late dagger! {scoring_team_name} snatches a crucial lead, leaving {conceding_team_name} with virtually no time to respond.",
-                            "Absolute madness! {scoring_team_name} takes the lead at the death, forcing {conceding_team_name} into pure panic mode.",
-                            "A devastating stoppage-time strike puts {scoring_team_name} in front, leaving {conceding_team_name} desperate for a last-second miracle.",
-                            "Have they just won it at the death?! {scoring_team_name} stuns {conceding_team_name} with a massive go-ahead goal in the dying moments."
-                        ],
-                        "ctas": ["Can they survive the final whistle? Follow live:", "Don't miss the frantic ending. See live stats and pitch data here:", "Will there be one last twist? Track the closing seconds here:", "Watch the desperate final push unfold live:"]
-                    },
-                    "standard_upset": {
-                        "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
-                        "blurbs": [
-                            "The underdogs have taken the lead! {scoring_team_name} strikes against {conceding_team_name}.",
-                            "A surprising turn of events puts {scoring_team_name} ahead of heavy favorites {conceding_team_name}.",
-                            "The heavy favorites find themselves trailing as {scoring_team_name} takes the game right to {conceding_team_name}!",
-                            "Vegas might be sweating a bit as {scoring_team_name} snatches the lead from {conceding_team_name}.",
-                            "The script is flipped! {scoring_team_name} grabs the advantage over {conceding_team_name}."
-                        ],
-                        "ctas": ["Can they hold on for the upset? Track live here:", "Follow the live match center and pitch data here:", "See the live odds and full stats here:"]
-                    },
-                    "massive_upset": {
-                        "titles": ["🚨🔥 MAJOR UPSET ALERT!", "🚨🔥 SHOCKER IN PROGRESS!", "🚨🔥 MASSIVE UPSET BREWING!", "🚨🔥 DAVID VS GOLIATH!"],
-                        "blurbs": [
-                            "A massive shocker is unfolding! {scoring_team_name} takes a stunning lead over {conceding_team_name}.",
-                            "Nobody saw this coming! Massive underdogs {scoring_team_name} are out in front of {conceding_team_name}.",
-                            "Stunning scenes! The heavy favorites are on the ropes as {scoring_team_name} goes up on {conceding_team_name}.",
-                            "A potential shocker of the weekend is happening right now, with {scoring_team_name} leading {conceding_team_name}.",
-                            "Parlays are in serious danger! {scoring_team_name} just flipped the script on {conceding_team_name}."
-                        ],
-                        "ctas": ["Witness the upset attempt live:", "Don't miss this potential shocker. Live stats and odds:", "Will the favorites respond? Follow the live action here:"]
-                    },
-                    "late_upset": {
-                        "titles": ["🚨⚠️ LATE UPSET BREWING!", "🚨⚠️ LATE UNDERDOG ALERT!", "🚨⚠️ UPSET WATCH: CLOSING STAGES!", "🚨⚠️ VEGAS IS SWEATING!"],
-                        "blurbs": [
-                            "{scoring_team_name} snatches a crucial late lead, putting {conceding_team_name} in serious danger of a huge upset!",
-                            "A massive late goal puts heavy favorites {conceding_team_name} on the brink of defeat against {scoring_team_name}.",
-                            "With time running out, {scoring_team_name} takes a shocking late lead over {conceding_team_name}!",
-                            "Live bettors take note: {scoring_team_name} just struck late to put {conceding_team_name} on the ropes!"
-                        ],
-                        "ctas": ["Watch the frantic final push live here:", "Can the underdogs hold the line? Live stats:", "Will Goliath respond? Follow the live action here:"]
-                    },
-                    "stoppage_upset": {
-                        "titles": ["🚨🔥 STUNNER IN STOPPAGE TIME!", "🚨🔥 LATE UPSET THRILLER!", "🚨🔥 MADNESS AT THE DEATH!", "🚨🔥 THE ULTIMATE SHOCKER!"],
-                        "blurbs": [
-                            "A staggering stoppage-time strike! {scoring_team_name} takes a shocking lead, forcing {conceding_team_name} into a desperate final push.",
-                            "Parlays are in critical danger! {scoring_team_name} strikes in stoppage time to go ahead of {conceding_team_name}. Will there be one last twist?",
-                            "You cannot write a better script! {scoring_team_name} takes a massive late lead, leaving {conceding_team_name} stunned with the clock ticking down.",
-                            "Absolute pandemonium! {scoring_team_name} scores deep in stoppage time, putting heavy favorites {conceding_team_name} on the brink of an epic collapse.",
-                            "A potential miracle in the making! {scoring_team_name} snatches a shock lead, leaving {conceding_team_name} desperate for a last-gasp response."
-                        ],
-                        "ctas": ["Witness the final frantic moments live:", "Don't miss the final whistle of this shocker. Live stats:", "See the post-goal chaos and live match center here:"]
-                    }
+            calc_home_score = current_home_score
+            calc_away_score = current_away_score
+                
+            PHRASES = {
+                "late_equalizer": {
+                    "titles": ["🚨 LATE EQUALIZER!", "🚨 DRAMATIC EQUALIZER!", "🚨 TIED UP LATE!", "🚨 CLOSING STAGES CHAOS!", "🚨 ALL SQUARE LATE!"],
+                    "blurbs": [
+                        "A massive goal from {scoring_team_name} to level the score, leaving {conceding_team_name} scrambling as time winds down!",
+                        "{scoring_team_name} claws their way back to tie the match, ripping the momentum right out of {conceding_team_name}'s hands.",
+                        "{scoring_team_name} refuses to go away quietly! We are all square as {conceding_team_name} tries to regain control.",
+                        "A crucial tying goal for {scoring_team_name} stuns {conceding_team_name} and sets up a frantic finish!",
+                        "{scoring_team_name} finds a late lifeline against {conceding_team_name}! A massive momentum swing erases the deficit."
+                    ],
+                    "ctas": ["Track the final push for a game-winner here:", "See the live momentum shift and pitch data:", "Can someone find a late winner? Follow live:", "Watch the closing minutes unfold live:"]
+                },
+                "late_go_ahead": {
+                    "titles": ["🚨 LATE GO-AHEAD GOAL!", "🚨 THE DEADLOCK IS BROKEN!", "🚨 CLUTCH MOMENT!", "🚨 HUGE LATE GOAL!", "🚨 TENSION IN THE FINAL 15!"],
+                    "blurbs": [
+                        "A game-changing strike from {scoring_team_name} forces {conceding_team_name} to chase the game late!",
+                        "{scoring_team_name} snatches the advantage right when they needed it, leaving {conceding_team_name} stunned.",
+                        "A massive momentum swing puts {scoring_team_name} in front, and now {conceding_team_name} is running out of time!",
+                        "The defense finally cracks! {scoring_team_name} takes a crucial late lead over {conceding_team_name}.",
+                        "Heartbreak for {conceding_team_name} as they concede the lead to {scoring_team_name} late in the half!"
+                    ],
+                    "ctas": ["Can they hold on? Follow the final minutes live:", "Track the closing stages and live stats here:", "See if the defense can shut the door:", "Follow the live pitch data as time winds down:"]
+                },
+                "stoppage_equalizer": {
+                    "titles": ["🚨 STOPPAGE TIME EQUALIZER!", "🚨 SAVED AT THE DEATH!", "🚨 LAST MINUTE LIFELINE!", "🚨 90TH MINUTE MADNESS!", "🚨 SCENES IN STOPPAGE TIME!"],
+                    "blurbs": [
+                        "Absolute scenes! A miraculous stoppage-time equalizer for {scoring_team_name} throws {conceding_team_name} into chaos!",
+                        "{scoring_team_name} climbs out of the grave to level the match. Is there still time for {conceding_team_name} to respond?!",
+                        "You can't write a better script! {scoring_team_name} stuns {conceding_team_name} with a tying goal deep in stoppage time.",
+                        "A devastating blown lead for {conceding_team_name}! {scoring_team_name} forces a dramatic tie in the dying moments.",
+                        "An unbelievable momentum shift! {scoring_team_name} breaks {conceding_team_name}'s hearts to level the score right at the end."
+                    ],
+                    "ctas": ["Watch the frantic final moments unfold live:", "Track the live pitch data before the referee blows the whistle:", "See the post-goal chaos and live match center here:", "Don't miss the ending. See live stats and match data here:"]
+                },
+                "stoppage_go_ahead": {
+                    "titles": ["🚨 STOPPAGE TIME THRILLER!", "🚨 AT THE DEATH!", "🚨 LATE HEARTBREAK!", "🚨 STOPPAGE TIME DAGGER!", "🚨 90TH MINUTE MADNESS!"],
+                    "blurbs": [
+                        "Heartbreak for {conceding_team_name}! {scoring_team_name} pulls a rabbit out of the hat to take the lead in stoppage time.",
+                        "A staggering late dagger! {scoring_team_name} snatches a crucial lead, leaving {conceding_team_name} with virtually no time to respond.",
+                        "Absolute madness! {scoring_team_name} takes the lead at the death, forcing {conceding_team_name} into pure panic mode.",
+                        "A devastating stoppage-time strike puts {scoring_team_name} in front, leaving {conceding_team_name} desperate for a last-second miracle.",
+                        "Have they just won it at the death?! {scoring_team_name} stuns {conceding_team_name} with a massive go-ahead goal in the dying moments."
+                    ],
+                    "ctas": ["Can they survive the final whistle? Follow live:", "Don't miss the frantic ending. See live stats and pitch data here:", "Will there be one last twist? Track the closing seconds here:", "Watch the desperate final push unfold live:"]
+                },
+                "standard_upset": {
+                    "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
+                    "blurbs": [
+                        "The underdogs have taken the lead! {scoring_team_name} strikes against {conceding_team_name}.",
+                        "A surprising turn of events puts {scoring_team_name} ahead of heavy favorites {conceding_team_name}.",
+                        "The heavy favorites find themselves trailing as {scoring_team_name} takes the game right to {conceding_team_name}!",
+                        "Vegas might be sweating a bit as {scoring_team_name} snatches the lead from {conceding_team_name}.",
+                        "The script is flipped! {scoring_team_name} grabs the advantage over {conceding_team_name}."
+                    ],
+                    "ctas": ["Can they hold on for the upset? Track live here:", "Follow the live match center and pitch data here:", "See the live odds and full stats here:"]
+                },
+                "massive_upset": {
+                    "titles": ["🚨🔥 MAJOR UPSET ALERT!", "🚨🔥 SHOCKER IN PROGRESS!", "🚨🔥 MASSIVE UPSET BREWING!", "🚨🔥 DAVID VS GOLIATH!"],
+                    "blurbs": [
+                        "A massive shocker is unfolding! {scoring_team_name} takes a stunning lead over {conceding_team_name}.",
+                        "Nobody saw this coming! Massive underdogs {scoring_team_name} are out in front of {conceding_team_name}.",
+                        "Stunning scenes! The heavy favorites are on the ropes as {scoring_team_name} goes up on {conceding_team_name}.",
+                        "A potential shocker of the weekend is happening right now, with {scoring_team_name} leading {conceding_team_name}.",
+                        "Parlays are in serious danger! {scoring_team_name} just flipped the script on {conceding_team_name}."
+                    ],
+                    "ctas": ["Witness the upset attempt live:", "Don't miss this potential shocker. Live stats and odds:", "Will the favorites respond? Follow the live action here:"]
+                },
+                "late_upset": {
+                    "titles": ["🚨⚠️ LATE UPSET BREWING!", "🚨⚠️ LATE UNDERDOG ALERT!", "🚨⚠️ UPSET WATCH: CLOSING STAGES!", "🚨⚠️ VEGAS IS SWEATING!"],
+                    "blurbs": [
+                        "{scoring_team_name} snatches a crucial late lead, putting {conceding_team_name} in serious danger of a huge upset!",
+                        "A massive late goal puts heavy favorites {conceding_team_name} on the brink of defeat against {scoring_team_name}.",
+                        "With time running out, {scoring_team_name} takes a shocking late lead over {conceding_team_name}!",
+                        "Live bettors take note: {scoring_team_name} just struck late to put {conceding_team_name} on the ropes!"
+                    ],
+                    "ctas": ["Watch the frantic final push live here:", "Can the underdogs hold the line? Live stats:", "Will Goliath respond? Follow the live action here:"]
+                },
+                "stoppage_upset": {
+                    "titles": ["🚨🔥 STUNNER IN STOPPAGE TIME!", "🚨🔥 LATE UPSET THRILLER!", "🚨🔥 MADNESS AT THE DEATH!", "🚨🔥 THE ULTIMATE SHOCKER!"],
+                    "blurbs": [
+                        "A staggering stoppage-time strike! {scoring_team_name} takes a shocking lead, forcing {conceding_team_name} into a desperate final push.",
+                        "Parlays are in critical danger! {scoring_team_name} strikes in stoppage time to go ahead of {conceding_team_name}. Will there be one last twist?",
+                        "You cannot write a better script! {scoring_team_name} takes a massive late lead, leaving {conceding_team_name} stunned with the clock ticking down.",
+                        "Absolute pandemonium! {scoring_team_name} scores deep in stoppage time, putting heavy favorites {conceding_team_name} on the brink of an epic collapse.",
+                        "A potential miracle in the making! {scoring_team_name} snatches a shock lead, leaving {conceding_team_name} desperate for a last-gasp response."
+                    ],
+                    "ctas": ["Witness the final frantic moments live:", "Don't miss the final whistle of this shocker. Live stats:", "See the post-goal chaos and live match center here:"]
                 }
+            }
 
-                is_late = 75 <= event_time < 90
-                is_stoppage = event_time >= 90
-                is_equalizer = (calc_home_score == calc_away_score)
+            is_late = 75 <= event_time < 90
+            is_stoppage = event_time >= 90
+            is_equalizer = (calc_home_score == calc_away_score)
+            
+            is_go_ahead = (team_id == h_id and calc_home_score - calc_away_score == 1) or \
+                          (team_id == a_id and calc_away_score - calc_home_score == 1)
+            
+            scorer_odds = home_odds if team_id == h_id else away_odds
+            is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
+            is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
+            
+            scenario_key = None
+            
+            if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
+            elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
+            elif is_massive_upset: scenario_key = "massive_upset"
+            elif is_standard_upset: scenario_key = "standard_upset"
+            elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
+            elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
+            elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
+            elif is_late and is_equalizer: scenario_key = "late_equalizer"
                 
-                is_go_ahead = (team_id == h_id and calc_home_score - calc_away_score == 1) or \
-                              (team_id == a_id and calc_away_score - calc_home_score == 1)
-                
-                scorer_odds = home_odds if team_id == h_id else away_odds
-                is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
-                is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
-                
-                scenario_key = None
-                
-                if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
-                elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
-                elif is_massive_upset: scenario_key = "massive_upset"
-                elif is_standard_upset: scenario_key = "standard_upset"
-                elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
-                elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
-                elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
-                elif is_late and is_equalizer: scenario_key = "late_equalizer"
-                    
-                if not scenario_key: continue
+            if not scenario_key: continue
 
-                if fixture_status in ['FT', 'AET', 'PEN']:
-                    # Only silence the tweet if the game has been over for more than 20 minutes
-                    is_stale = True
-                    match_ended_str = match.get("match_ended_at")
-                    
-                    if match_ended_str:
-                        try:
-                            ended_time = datetime.fromisoformat(match_ended_str)
-                            mins_since_end = (datetime.now(timezone.utc) - ended_time).total_seconds() / 60
-                            if mins_since_end < 20:
-                                is_stale = False # The game just finished! Let the late tweet through!
-                        except Exception:
-                            pass
-                            
-                    if is_stale:
-                        log_target_date.append(event_key)
-                        tweeted_recently.append(event_key)
-                        memory[target_date_str] = log_target_date
-                        save_memory_safely(memory)
-                        continue
-                    
-                scoring_team_name = h_name if team_id == h_id else a_name
-                conceding_team_name = a_name if team_id == h_id else h_name
-                scorer = event.get('player')
+            if fixture_status in ['FT', 'AET', 'PEN']:
+                # Only silence the tweet if the game has been over for more than 20 minutes
+                is_stale = True
+                match_ended_str = match.get("match_ended_at")
                 
-                scorer_str = f"{scorer} ({scoring_team_name})" if scorer and scorer != "null" else f"{scoring_team_name}"
-                american_odds = f"+{int((scorer_odds - 1) * 100)}"
-                
-                h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
-                a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
-                
-                # Link uses target_date_str, NOT the global date_str
-                link = f"https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={target_date_str}#card-{fixture_id}"
-                
-                title = random.choice(PHRASES[scenario_key]["titles"])
-                blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
-                cta = random.choice(PHRASES[scenario_key]["ctas"])
-                
-                blurb = blurb_raw.format(scoring_team_name=scoring_team_name, conceding_team_name=conceding_team_name)
-
-                tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {calc_home_score} - {calc_away_score} {a_name}\n\n"
-                if "upset" in scenario_key: tweet_text += f"📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\n"
-                tweet_text += f"{blurb}\n\n{cta}\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
-                
-                try:
-                    futbol_client.create_tweet(text=tweet_text)
-                    print(f"✅ Successfully tweeted ALERTS for {scoring_team_name}!")
-                    
+                if match_ended_str:
+                    try:
+                        ended_time = datetime.fromisoformat(match_ended_str)
+                        mins_since_end = (datetime.now(timezone.utc) - ended_time).total_seconds() / 60
+                        if mins_since_end < 20:
+                            is_stale = False # The game just finished! Let the late tweet through!
+                    except Exception:
+                        pass
+                        
+                if is_stale:
                     log_target_date.append(event_key)
                     tweeted_recently.append(event_key)
-                    new_tweets_sent = True
                     memory[target_date_str] = log_target_date
                     save_memory_safely(memory)
-                    time.sleep(5)
-                    
-                except Exception as e:
-                    print(f"❌ Failed to tweet ALERT: {e}")
+                    continue
+                
+            scoring_team_name = h_name if team_id == h_id else a_name
+            conceding_team_name = a_name if team_id == h_id else h_name
+            scorer = event.get('player')
+            
+            scorer_str = f"{scorer} ({scoring_team_name})" if scorer and scorer != "null" else f"{scoring_team_name}"
+            american_odds = f"+{int((scorer_odds - 1) * 100)}"
+            
+            h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
+            a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+            
+            # Link uses target_date_str, NOT the global date_str
+            link = f"https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={target_date_str}#card-{fixture_id}"
+            
+            title = random.choice(PHRASES[scenario_key]["titles"])
+            blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
+            cta = random.choice(PHRASES[scenario_key]["ctas"])
+            
+            blurb = blurb_raw.format(scoring_team_name=scoring_team_name, conceding_team_name=conceding_team_name)
+
+            tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {calc_home_score} - {calc_away_score} {a_name}\n\n"
+            if "upset" in scenario_key: tweet_text += f"📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\n"
+            tweet_text += f"{blurb}\n\n{cta}\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+            
+            try:
+                futbol_client.create_tweet(text=tweet_text)
+                print(f"✅ Successfully tweeted ALERTS for {scoring_team_name}!")
+                
+                log_target_date.append(event_key)
+                tweeted_recently.append(event_key)
+                new_tweets_sent = True
+                memory[target_date_str] = log_target_date
+                save_memory_safely(memory)
+                time.sleep(5)
+                
+            except Exception as e:
+                print(f"❌ Failed to tweet ALERT: {e}")
 
 # ==========================================
 # 7. SAVE MEMORY
