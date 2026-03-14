@@ -1,4 +1,4 @@
-name: Update MLB Matchup Stats
+name: Site_Builder
 
 on:
   workflow_dispatch:
@@ -31,11 +31,14 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Stage the cache AND the new daily files directory
           git add data/matchups.json
+          git add data/daily_files/
           
           # Check if there are staged changes ready to be committed
           if ! git diff --quiet --staged; then
-            git commit -m "📊 Automated update: BvP and Split stats [skip ci]"
+            git commit -m "📊 Automated update: Master Board and Matchup Stats [skip ci]"
             
             # Pull latest changes and rebase BEFORE pushing
             git pull --rebase origin main || echo "Nothing to pull"
@@ -43,5 +46,5 @@ jobs:
             # Try pushing. If rejected, pull again and immediately push.
             git push origin main || (git pull --rebase origin main && git push origin main)
           else
-            echo "No new matchup stats. Skipping commit."
+            echo "No new matchup stats or daily files. Skipping commit."
           fi
