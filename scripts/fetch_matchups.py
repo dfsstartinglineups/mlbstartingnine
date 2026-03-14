@@ -220,8 +220,12 @@ def main():
     save_cache(cache)
 
     # Write the Daily JSON Files!
+    daily_files_dir = os.path.join(DATA_DIR, 'daily_files')
+    os.makedirs(daily_files_dir, exist_ok=True) # This creates the folder!
+    
     for date_str, games_list in master_dates.items():
-        daily_file = os.path.join(DATA_DIR, f'games_{date_str}.json')
+        # Notice we are using daily_files_dir here, not DATA_DIR
+        daily_file = os.path.join(daily_files_dir, f'games_{date_str}.json')
         with open(daily_file, 'w') as f:
             json.dump(games_list, f, indent=4)
         print(f"✅ Created {daily_file} with {len(games_list)} games.")
