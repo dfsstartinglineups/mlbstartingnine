@@ -34306,12 +34306,12 @@
             "gameDate": "2026-03-15T01:00:00Z",
             "officialDate": "2026-03-14",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -34321,11 +34321,12 @@
                         "link": "/api/v1/teams/944"
                     },
                     "leagueRecord": {
-                        "wins": 0,
+                        "wins": 1,
                         "losses": 0,
-                        "pct": ".000"
+                        "pct": "1.000"
                     },
                     "score": 8,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 624133,
                         "fullName": "Ranger Suarez",
@@ -34385,10 +34386,11 @@
                     },
                     "leagueRecord": {
                         "wins": 0,
-                        "losses": 0,
+                        "losses": 1,
                         "pct": ".000"
                     },
                     "score": 5,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 808967,
                         "fullName": "Yoshinobu Yamamoto",
@@ -34580,6 +34582,7 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -34911,7 +34914,7 @@
                 },
                 "balls": 2,
                 "strikes": 1,
-                "outs": 2
+                "outs": 3
             },
             "venue": {
                 "id": 4169,
@@ -34921,6 +34924,7 @@
             "content": {
                 "link": "/api/v1/game/788097/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
