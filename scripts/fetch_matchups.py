@@ -7,20 +7,16 @@ from datetime import datetime, timedelta
 
 # --- CONFIGURATION ---
 DATA_DIR = 'data'
-MATCHUPS_FILE = os.path.join(DATA_DIR, 'matchups.json')
+DAILY_FILES_DIR = os.path.join(DATA_DIR, 'daily_files')
 UMPIRES_FILE = os.path.join(DATA_DIR, 'umpires.json')
 PARKS_FILE = os.path.join(DATA_DIR, 'parks.json')
 
 os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(DAILY_FILES_DIR, exist_ok=True)
 
 # --- API TRACKING ---
 API_CALL_TRACKER = {
-    "schedule": 0,
-    "odds": 0,
-    "live_feed": 0,
-    "bvp": 0,
-    "splits": 0,
-    "people": 0
+    "schedule": 0, "odds": 0, "live_feed": 0, "bvp": 0, "splits": 0
 }
 
 def get_active_sport_ids():
@@ -38,14 +34,13 @@ def load_json(path, default_val):
         except Exception: pass
     return default_val
 
-def save_cache(data):
-    with open(MATCHUPS_FILE, 'w') as f:
+def save_json(path, data):
+    with open(path, 'w') as f:
         json.dump(data, f, indent=4)
 
 def fetch_bvp(session, batter_id, pitcher_id):
     global API_CALL_TRACKER
     API_CALL_TRACKER["bvp"] += 1
-    
     url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=vsPlayer&opposingPlayerId={pitcher_id}&group=hitting&gameType=R"
     try:
         res = session.get(url, timeout=10).json()
@@ -61,7 +56,6 @@ def fetch_bvp(session, batter_id, pitcher_id):
 
 def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
     global API_CALL_TRACKER
-    
     current_year = datetime.utcnow().year
     years = [current_year - 1, current_year]
     totals = {"ab": 0, "h": 0, "2b": 0, "3b": 0, "hr": 0, "bb": 0, "hbp": 0, "sf": 0, "k": 0}
@@ -97,62 +91,65 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
 
 def main():
     global API_CALL_TRACKER
-    
-    # --- 🛑 THE DEEP SLEEP CHECK ---
     est_tz = zoneinfo.ZoneInfo("America/New_York")
     current_est_time = datetime.now(est_tz)
     
+    # --- 🛑 THE DEEP SLEEP CHECK ---
     if 3 <= current_est_time.hour < 8:
         print(f"💤 SLEEP MODE ACTIVE: It is currently {current_est_time.strftime('%I:%M %p')} EST.")
-        print("No MLB action happens between 3 AM and 8 AM. Shutting down to save server resources.")
-        return # This kills the script instantly and perfectly
+        return
         
     today_est_str = current_est_time.strftime('%Y-%m-%d')
     start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
     end_date = (current_est_time + timedelta(days=1)).strftime('%Y-%m-%d')
     
-    print(f"🚀 Building Master JSONs for window: {start_date} to {end_date}")
+    print(f"🚀 Building Master JSONs using the Daily File as Memory")
     
     session = requests.Session()
     session.headers.update({"User-Agent": "MLBStartingNine-DataBot/1.0"})
     
-    # Load Caches & Static Data
-    cache = load_json(MATCHUPS_FILE, {"games": {}, "handedness": {}})
-    games_cache = cache.get('games', {})
-    hand_cache = cache.get('handedness', {})
     ump_cache = load_json(UMPIRES_FILE, {}).get('umpires', {})
     park_cache = load_json(PARKS_FILE, {}).get('parks', {})
     
     # Fetch Odds
     API_CALL_TRACKER["odds"] += 1
-    try:
-        odds_data = requests.get("https://weathermlb.com/data/odds.json", timeout=10).json().get('odds', [])
-    except Exception:
-        odds_data = []
+    try: odds_data = requests.get("https://weathermlb.com/data/odds.json", timeout=10).json().get('odds', [])
+    except Exception: odds_data = []
 
     # Fetch Schedule
+    API_CALL_TRACKER["schedule"] += 1
     sport_ids = get_active_sport_ids()
     schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person"
-    API_CALL_TRACKER["schedule"] += 1
-    try:
-        schedule_data = session.get(schedule_url, timeout=15).json()
+    try: schedule_data = session.get(schedule_url, timeout=15).json()
     except Exception as e:
         print(f"❌ Failed to fetch schedule: {e}")
         return
 
-    valid_game_pks = set()
     master_dates = {}
 
     for date_item in schedule_data.get('dates', []):
         date_str = date_item['date']
         master_dates[date_str] = []
         
+        # --- 📖 READ TODAY'S NEWSPAPER (THE DAILY FILE) ---
+        daily_file_path = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
+        daily_memory = {}
+        if os.path.exists(daily_file_path):
+            existing_games = load_json(daily_file_path, [])
+            for g in existing_games:
+                daily_memory[str(g['gameRaw']['gamePk'])] = g
+        
         for game in date_item.get('games', []):
             game_pk = str(game['gamePk'])
-            valid_game_pks.add(game_pk)
             
-            if game_pk not in games_cache: games_cache[game_pk] = {}
-
+            # --- EXTRACT EVERYTHING WE ALREADY KNOW ABOUT THIS GAME ---
+            existing_game_state = daily_memory.get(game_pk, {})
+            game_deep_stats = existing_game_state.get('deepStats', {})
+            game_positions = existing_game_state.get('gamePositions', {})
+            lineup_handedness = existing_game_state.get('lineupHandedness', {})
+            hp_umpire = existing_game_state.get('hpUmpire', "TBD")
+            ump_stats = ump_cache.get(hp_umpire) if hp_umpire != "TBD" else None
+            
             teams = game.get('teams', {})
             away_team_name = teams.get('away', {}).get('team', {}).get('name', '')
             home_team_name = teams.get('home', {}).get('team', {}).get('name', '')
@@ -164,21 +161,21 @@ def main():
             if potential_odds:
                 game_odds = sorted(potential_odds, key=lambda o: abs(datetime.strptime(o['commence_time'], "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000 - game_time_ms))[0]
 
-            # Probable Pitchers & Deep Stats
+            # Probable Pitchers
             away_starter = teams.get('away', {}).get('probablePitcher')
             home_starter = teams.get('home', {}).get('probablePitcher')
             away_starter_id = str(away_starter.get('id')) if away_starter else None
             home_starter_id = str(home_starter.get('id')) if home_starter else None
             
+            # --- FETCH STATS ONLY IF MISSING FROM TODAY'S FILE ---
             for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
-                if p_id and p_id not in games_cache[game_pk]:
+                if p_id and p_id not in game_deep_stats:
                     print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
-                    games_cache[game_pk][p_id] = {
+                    game_deep_stats[p_id] = {
                         "name": p_data['fullName'], "is_pitcher": True,
                         "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
                         "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
                     }
-                    save_cache(cache)
 
             lineups = game.get('lineups', {})
             away_lineup = lineups.get('awayPlayers', [])
@@ -186,100 +183,77 @@ def main():
             
             for batter in away_lineup:
                 batter_id = str(batter['id'])
-                if home_starter_id and batter_id not in games_cache[game_pk]:
-                    games_cache[game_pk][batter_id] = {
-                        "name": batter['fullName'], "bvp": fetch_bvp(session, batter_id, home_starter_id),
-                        "split_vL": fetch_combined_splits(session, batter_id, 'vl'), "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                if batter_id not in game_deep_stats:
+                    game_deep_stats[batter_id] = {
+                        "name": batter['fullName'], 
+                        "bvp": fetch_bvp(session, batter_id, home_starter_id) if home_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
+                        "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
+                        "split_vR": fetch_combined_splits(session, batter_id, 'vr')
                     }
-                    save_cache(cache)
-            
+
             for batter in home_lineup:
                 batter_id = str(batter['id'])
-                if away_starter_id and batter_id not in games_cache[game_pk]:
-                    games_cache[game_pk][batter_id] = {
-                        "name": batter['fullName'], "bvp": fetch_bvp(session, batter_id, away_starter_id),
-                        "split_vL": fetch_combined_splits(session, batter_id, 'vl'), "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                if batter_id not in game_deep_stats:
+                    game_deep_stats[batter_id] = {
+                        "name": batter['fullName'], 
+                        "bvp": fetch_bvp(session, batter_id, away_starter_id) if away_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
+                        "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
+                        "split_vR": fetch_combined_splits(session, batter_id, 'vr')
                     }
-                    save_cache(cache)
 
-            # Handedness Caching & Live Feed (Positions/Umpires)
-            game_positions = {}
-            hp_umpire = "TBD"
-            ump_stats = None
+            # --- 🛑 LIVE FEED OPTIMIZATION (USING DAILY MEMORY) ---
+            game_state = game.get('status', {}).get('abstractGameState', '')
+            needs_live_feed = False
             
-            # --- 🛑 LIVE FEED OPTIMIZATION ---
-            # ONLY ping the live feed if the game is TODAY and lineups are actually posted!
+            # Only fetch if lineups are out AND it's not Final (or if it went final before we grabbed the ump)
             if date_str == today_est_str and (len(away_lineup) > 0 or len(home_lineup) > 0):
+                if game_state != 'Final': needs_live_feed = True
+                elif hp_umpire == "TBD" or not game_positions: needs_live_feed = True
+
+            if needs_live_feed:
                 try:
                     API_CALL_TRACKER["live_feed"] += 1
                     live_data = session.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live", timeout=5).json()
                     
-                    # 1. Grab Umpire Name
                     officials = live_data.get('liveData', {}).get('boxscore', {}).get('officials', [])
                     hp = next((o for o in officials if o.get('officialType') == 'Home Plate'), None)
                     if hp and hp.get('official'):
                         hp_umpire = hp['official']['fullName']
-                        # Look up umpire's name inside your local umpires.json cache!
                         ump_stats = ump_cache.get(hp_umpire)
 
-                    # 2. Grab Player Positions
                     box_teams = live_data.get('liveData', {}).get('boxscore', {}).get('teams', {})
                     all_live_players = {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}
                     
                     for p_key, p_val in all_live_players.items():
                         pid = str(p_val.get('person', {}).get('id'))
-                        # Extract Position
                         if p_val.get('allPositions'): game_positions[pid] = p_val['allPositions'][0].get('abbreviation')
                         elif p_val.get('position'): game_positions[pid] = p_val['position'].get('abbreviation')
-                        # Extract & Cache Handedness
-                        if p_val.get('person', {}).get('batSide'):
-                            hand_cache[pid] = p_val['person']['batSide'].get('code')
+                        if p_val.get('person', {}).get('batSide'): lineup_handedness[pid] = p_val['person']['batSide'].get('code')
                 except Exception: pass
 
-            # Re-map handedness for the frontend
-            lineup_handedness = {pid: hand_cache.get(pid, "") for pid in [str(p['id']) for p in away_lineup + home_lineup]}
-
-            # Final Unified Object!
             master_dates[date_str].append({
                 "gameRaw": game,
                 "odds": game_odds,
                 "lineupHandedness": lineup_handedness,
                 "gamePositions": game_positions,
-                "deepStats": games_cache.get(game_pk, {}),
+                "deepStats": game_deep_stats,
                 "hpUmpire": hp_umpire,
                 "umpStats": ump_stats,
                 "parkStats": park_cache.get(game.get('venue', {}).get('name'))
             })
 
-    # Purge stale cache
-    cache['games'] = {pk: data for pk, data in games_cache.items() if pk in valid_game_pks}
-    cache['handedness'] = hand_cache
-    current_utc_time = datetime.utcnow()
-    cache['last_updated'] = current_utc_time.strftime('%Y-%m-%d %H:%M:%S UTC')
-    save_cache(cache)
-
     # Write the Daily JSON Files!
-    daily_files_dir = os.path.join(DATA_DIR, 'daily_files')
-    os.makedirs(daily_files_dir, exist_ok=True) # This creates the folder!
-    
     for date_str, games_list in master_dates.items():
-        # Notice we are using daily_files_dir here, not DATA_DIR
-        daily_file = os.path.join(daily_files_dir, f'games_{date_str}.json')
-        with open(daily_file, 'w') as f:
-            json.dump(games_list, f, indent=4)
-        print(f"✅ Created {daily_file} with {len(games_list)} games.")
+        daily_file = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
+        save_json(daily_file, games_list)
+        print(f"✅ Created/Updated {daily_file} with {len(games_list)} games.")
 
     # --- PRINT API METRICS ---
     total_calls = sum(API_CALL_TRACKER.values())
     print("\n" + "="*40)
     print(f"📊 API CALL SUMMARY: {total_calls} Total Requests")
     print("="*40)
-    print(f"  - MLB Schedule (Master): {API_CALL_TRACKER['schedule']}")
-    print(f"  - MLB Live Feed (Pos/Ump): {API_CALL_TRACKER['live_feed']}")
-    print(f"  - MLB BvP Lookup: {API_CALL_TRACKER['bvp']}")
-    print(f"  - MLB Splits Lookup: {API_CALL_TRACKER['splits']}")
-    print(f"  - MLB Player Lookup: {API_CALL_TRACKER['people']}")
-    print(f"  - WeatherMLB Odds: {API_CALL_TRACKER['odds']}")
+    for k, v in API_CALL_TRACKER.items(): print(f"  - {k.replace('_', ' ').title()}: {v}")
     print("="*40 + "\n")
 
 if __name__ == "__main__":
