@@ -564,29 +564,7 @@ for target_date_str in futbol_dates_to_check:
         official_home_score = int(match.get('goals', {}).get('home') or 0)
         official_away_score = int(match.get('goals', {}).get('away') or 0)
         
-        # --- 🛡️ SHOOTOUT PRE-FILTER ---
-        # API-Sports sends shootout penalties as regular "Penalty" events, which causes massive spam.
-        valid_goal_events = []
-        is_shootout = fixture_status in ['P', 'PEN']
-        
-        # Fallback Check: If status is lagging but multiple late penalties appear, it's a shootout
-        late_penalties = sum(1 for e in events if e.get('type') == 'Goal' and e.get('detail') == 'Penalty' and int(str(e.get('time', '0')) if str(e.get('time', '0')).isdigit() else 0) >= 90)
-        if late_penalties > 1:
-            is_shootout = True
-            
-        for e in events:
-            if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty']:
-                e_time = int(str(e.get('time', '0'))) if str(e.get('time', '0')).isdigit() else 0
-                
-                # Nuke shootout penalties so they don't corrupt the live score or trigger tweets
-                if e.get('detail') == 'Penalty' and e_time >= 90 and is_shootout:
-                    continue
-                
-                valid_goal_events.append(e)
-
-        # --- REMOVED 'if not valid_goal_events: continue' so 1-0 reversals work! ---
-        
-        # --- 🕒 CRITICAL FIX: STOPPAGE TIME MATH & CHRONOLOGICAL SORT ---
+        # --- 🕒 CRITICAL FIX: UNIVERSAL TIME EXTRACTOR ---
         def get_actual_minute(e):
             t_str = str(e.get('time', '0')).replace("'", "").strip()
             if '+' in t_str:
@@ -594,6 +572,25 @@ for target_date_str in futbol_dates_to_check:
                 try: return int(parts[0]) + int(parts[1])
                 except ValueError: return int(parts[0]) if parts[0].isdigit() else 90
             return int(t_str) if t_str.isdigit() else 0
+
+        # --- 🛡️ SHOOTOUT PRE-FILTER ---
+        valid_goal_events = []
+        is_shootout = fixture_status in ['P', 'PEN']
+        
+        # Fallback Check using the new universal time math
+        late_penalties = sum(1 for e in events if e.get('type') == 'Goal' and e.get('detail') == 'Penalty' and get_actual_minute(e) >= 90)
+        if late_penalties > 1:
+            is_shootout = True
+            
+        for e in events:
+            if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty']:
+                e_time = get_actual_minute(e)
+                
+                # Nuke shootout penalties so they don't corrupt the live score or trigger tweets
+                if e.get('detail') == 'Penalty' and e_time >= 90 and is_shootout:
+                    continue
+                
+                valid_goal_events.append(e)
 
         # Sort goals chronologically to prevent out-of-order API arrays
         valid_goal_events.sort(key=get_actual_minute)
