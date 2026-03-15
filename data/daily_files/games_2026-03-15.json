@@ -10,9 +10,9 @@
             "officialDate": "2026-03-15",
             "status": {
                 "abstractGameState": "Preview",
-                "codedGameState": "S",
-                "detailedState": "Scheduled",
-                "statusCode": "S",
+                "codedGameState": "P",
+                "detailedState": "Pre-Game",
+                "statusCode": "P",
                 "startTimeTBD": false,
                 "abstractGameCode": "P"
             },
@@ -28,6 +28,7 @@
                         "losses": 6,
                         "pct": ".647"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 571945,
                         "fullName": "Miles Mikolas",
@@ -93,6 +94,7 @@
                         "losses": 8,
                         "pct": ".579"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 669461,
                         "fullName": "Matthew Liberatore",
@@ -148,26 +150,363 @@
                 }
             },
             "linescore": {
+                "currentInning": 1,
+                "currentInningOrdinal": "1st",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
-                "innings": [],
+                "innings": [
+                    {
+                        "num": 1,
+                        "ordinalNum": "1st",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    }
+                ],
                 "teams": {
-                    "home": {},
-                    "away": {}
+                    "home": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    },
+                    "away": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 690916,
+                        "fullName": "Richard Fitts",
+                        "link": "/api/v1/people/690916",
+                        "firstName": "Richard",
+                        "lastName": "Fitts",
+                        "primaryNumber": "35",
+                        "birthDate": "1999-12-17",
+                        "currentAge": 26,
+                        "birthCity": "Helena",
+                        "birthStateProvince": "AL",
+                        "birthCountry": "USA",
+                        "height": "6' 3\"",
+                        "weight": 230,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Richard",
+                        "useLastName": "Fitts",
+                        "middleName": "Logan",
+                        "boxscoreName": "Fitts",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2024-09-08",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Richard Fitts",
+                        "nameSlug": "richard-fitts-690916",
+                        "firstLastName": "Richard Fitts",
+                        "lastFirstName": "Fitts, Richard",
+                        "lastInitName": "Fitts, R",
+                        "initLastName": "R Fitts",
+                        "fullFMLName": "Richard Logan Fitts",
+                        "fullLFMName": "Fitts, Richard Logan",
+                        "strikeZoneTop": 3.344,
+                        "strikeZoneBottom": 1.688
+                    },
+                    "catcher": {
+                        "id": 686780,
+                        "fullName": "Pedro Pag\u00e9s",
+                        "link": "/api/v1/people/686780"
+                    },
+                    "first": {
+                        "id": 676475,
+                        "fullName": "Alec Burleson",
+                        "link": "/api/v1/people/676475"
+                    },
+                    "second": {
+                        "id": 802139,
+                        "fullName": "JJ Wetherholt",
+                        "link": "/api/v1/people/802139"
+                    },
+                    "third": {
+                        "id": 665877,
+                        "fullName": "Jos\u00e9 Ferm\u00edn",
+                        "link": "/api/v1/people/665877"
+                    },
+                    "shortstop": {
+                        "id": 691026,
+                        "fullName": "Masyn Winn",
+                        "link": "/api/v1/people/691026"
+                    },
+                    "left": {
+                        "id": 676369,
+                        "fullName": "Nelson Vel\u00e1zquez",
+                        "link": "/api/v1/people/676369"
+                    },
+                    "center": {
+                        "id": 687363,
+                        "fullName": "Victor Scott II",
+                        "link": "/api/v1/people/687363"
+                    },
+                    "right": {
+                        "id": 701675,
+                        "fullName": "Nathan Church",
+                        "link": "/api/v1/people/701675"
+                    },
+                    "batter": {
+                        "id": 802139,
+                        "fullName": "JJ Wetherholt",
+                        "link": "/api/v1/people/802139"
+                    },
+                    "onDeck": {
+                        "id": 691026,
+                        "fullName": "Masyn Winn",
+                        "link": "/api/v1/people/691026"
+                    },
+                    "inHole": {
+                        "id": 676475,
+                        "fullName": "Alec Burleson",
+                        "link": "/api/v1/people/676475"
+                    },
+                    "battingOrder": 1,
+                    "team": {
+                        "id": 138,
+                        "name": "St. Louis Cardinals",
+                        "link": "/api/v1/teams/138"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 682928,
+                        "fullName": "CJ Abrams",
+                        "link": "/api/v1/people/682928",
+                        "firstName": "Paul",
+                        "lastName": "Abrams",
+                        "primaryNumber": "5",
+                        "birthDate": "2000-10-03",
+                        "currentAge": 25,
+                        "birthCity": "Alpharetta",
+                        "birthStateProvince": "GA",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 191,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "CJ",
+                        "useLastName": "Abrams",
+                        "middleName": "Christopher",
+                        "boxscoreName": "Abrams",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "mlbDebutDate": "2022-04-08",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "CJ Abrams",
+                        "nameSlug": "cj-abrams-682928",
+                        "firstLastName": "CJ Abrams",
+                        "lastFirstName": "Abrams, CJ",
+                        "lastInitName": "Abrams, C",
+                        "initLastName": "C Abrams",
+                        "fullFMLName": "Paul Christopher Abrams",
+                        "fullLFMName": "Abrams, Paul Christopher",
+                        "strikeZoneTop": 3.223,
+                        "strikeZoneBottom": 1.626
+                    },
+                    "onDeck": {
+                        "id": 695578,
+                        "fullName": "James Wood",
+                        "link": "/api/v1/people/695578",
+                        "firstName": "James",
+                        "lastName": "Wood",
+                        "primaryNumber": "29",
+                        "birthDate": "2002-09-17",
+                        "currentAge": 23,
+                        "birthCity": "Rockville",
+                        "birthStateProvince": "MD",
+                        "birthCountry": "USA",
+                        "height": "6' 6\"",
+                        "weight": 234,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "James",
+                        "useLastName": "Wood",
+                        "middleName": "Irvin",
+                        "boxscoreName": "Wood",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2024-07-01",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "James Wood",
+                        "nameSlug": "james-wood-695578",
+                        "firstLastName": "James Wood",
+                        "lastFirstName": "Wood, James",
+                        "lastInitName": "Wood, J",
+                        "initLastName": "J Wood",
+                        "fullFMLName": "James Irvin Wood",
+                        "fullLFMName": "Wood, James Irvin",
+                        "strikeZoneTop": 3.489,
+                        "strikeZoneBottom": 1.761
+                    },
+                    "inHole": {
+                        "id": 660688,
+                        "fullName": "Keibert Ruiz",
+                        "link": "/api/v1/people/660688",
+                        "firstName": "Keibert",
+                        "lastName": "Ruiz",
+                        "primaryNumber": "20",
+                        "birthDate": "1998-07-20",
+                        "currentAge": 27,
+                        "birthCity": "Valencia",
+                        "birthCountry": "Venezuela",
+                        "height": "5' 11\"",
+                        "weight": 238,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Keibert",
+                        "useLastName": "Ruiz",
+                        "middleName": "Jose",
+                        "boxscoreName": "Ruiz, K",
+                        "gender": "M",
+                        "nameMatrilineal": "Lugo",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "pronunciation": "kay-bert roo-EEZ",
+                        "mlbDebutDate": "2020-08-16",
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Keibert Ruiz",
+                        "nameSlug": "keibert-ruiz-660688",
+                        "firstLastName": "Keibert Ruiz",
+                        "lastFirstName": "Ruiz, Keibert",
+                        "lastInitName": "Ruiz, K",
+                        "initLastName": "K Ruiz",
+                        "fullFMLName": "Keibert Jose Ruiz",
+                        "fullLFMName": "Ruiz, Keibert Jose",
+                        "strikeZoneTop": 3.175,
+                        "strikeZoneBottom": 1.602
+                    },
+                    "pitcher": {
+                        "id": 571945,
+                        "fullName": "Miles Mikolas",
+                        "link": "/api/v1/people/571945",
+                        "firstName": "Miles",
+                        "lastName": "Mikolas",
+                        "primaryNumber": "36",
+                        "birthDate": "1988-08-23",
+                        "currentAge": 37,
+                        "birthCity": "Jupiter",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 230,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Miles",
+                        "useLastName": "Mikolas",
+                        "middleName": "Tice",
+                        "boxscoreName": "Mikolas",
+                        "nickName": "5280's",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2009,
+                        "pronunciation": "MY-koh-lahs",
+                        "mlbDebutDate": "2012-05-05",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Miles Mikolas",
+                        "nameSlug": "miles-mikolas-571945",
+                        "firstLastName": "Miles Mikolas",
+                        "lastFirstName": "Mikolas, Miles",
+                        "lastInitName": "Mikolas, M",
+                        "initLastName": "M Mikolas",
+                        "fullFMLName": "Miles Tice Mikolas",
+                        "fullLFMName": "Mikolas, Miles Tice",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
+                    },
+                    "battingOrder": 1,
                     "team": {
                         "id": 120,
                         "name": "Washington Nationals",
                         "link": "/api/v1/teams/120"
                     }
                 },
-                "offense": {
-                    "team": {
-                        "id": 138,
-                        "name": "St. Louis Cardinals",
-                        "link": "/api/v1/teams/138"
-                    }
-                }
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2520,
@@ -194,7 +533,264 @@
             "recordSource": "S",
             "ifNecessary": "N",
             "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "lineups": {
+                "homePlayers": [
+                    {
+                        "id": 802139,
+                        "fullName": "JJ Wetherholt",
+                        "link": "/api/v1/people/802139",
+                        "firstName": "Jonathan",
+                        "lastName": "Wetherholt",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "JJ"
+                    },
+                    {
+                        "id": 691026,
+                        "fullName": "Masyn Winn",
+                        "link": "/api/v1/people/691026",
+                        "firstName": "Masyn",
+                        "lastName": "Winn",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Masyn"
+                    },
+                    {
+                        "id": 676475,
+                        "fullName": "Alec Burleson",
+                        "link": "/api/v1/people/676475",
+                        "firstName": "Alec",
+                        "lastName": "Burleson",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Alec"
+                    },
+                    {
+                        "id": 669357,
+                        "fullName": "Nolan Gorman",
+                        "link": "/api/v1/people/669357",
+                        "firstName": "Nolan",
+                        "lastName": "Gorman",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Nolan"
+                    },
+                    {
+                        "id": 676369,
+                        "fullName": "Nelson Vel\u00e1zquez",
+                        "link": "/api/v1/people/676369",
+                        "firstName": "Nelson",
+                        "lastName": "Vel\u00e1zquez",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Nelson"
+                    },
+                    {
+                        "id": 665877,
+                        "fullName": "Jos\u00e9 Ferm\u00edn",
+                        "link": "/api/v1/people/665877",
+                        "firstName": "Jos\u00e9",
+                        "lastName": "Ferm\u00edn",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Jos\u00e9"
+                    },
+                    {
+                        "id": 701675,
+                        "fullName": "Nathan Church",
+                        "link": "/api/v1/people/701675",
+                        "firstName": "Nathan",
+                        "lastName": "Church",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Nathan"
+                    },
+                    {
+                        "id": 686780,
+                        "fullName": "Pedro Pag\u00e9s",
+                        "link": "/api/v1/people/686780",
+                        "firstName": "Pedro",
+                        "lastName": "Pag\u00e9s",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Pedro"
+                    },
+                    {
+                        "id": 687363,
+                        "fullName": "Victor Scott II",
+                        "link": "/api/v1/people/687363",
+                        "firstName": "Victor",
+                        "lastName": "Scott",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Victor"
+                    }
+                ],
+                "awayPlayers": [
+                    {
+                        "id": 682928,
+                        "fullName": "CJ Abrams",
+                        "link": "/api/v1/people/682928",
+                        "firstName": "Paul",
+                        "lastName": "Abrams",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "CJ"
+                    },
+                    {
+                        "id": 695578,
+                        "fullName": "James Wood",
+                        "link": "/api/v1/people/695578",
+                        "firstName": "James",
+                        "lastName": "Wood",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "James"
+                    },
+                    {
+                        "id": 660688,
+                        "fullName": "Keibert Ruiz",
+                        "link": "/api/v1/people/660688",
+                        "firstName": "Keibert",
+                        "lastName": "Ruiz",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Keibert"
+                    },
+                    {
+                        "id": 695734,
+                        "fullName": "Daylen Lile",
+                        "link": "/api/v1/people/695734",
+                        "firstName": "Daylen",
+                        "lastName": "Lile",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Daylen"
+                    },
+                    {
+                        "id": 671277,
+                        "fullName": "Luis Garc\u00eda Jr.",
+                        "link": "/api/v1/people/671277",
+                        "firstName": "Luis",
+                        "lastName": "Garc\u00eda",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Luis"
+                    },
+                    {
+                        "id": 686611,
+                        "fullName": "Dylan Crews",
+                        "link": "/api/v1/people/686611",
+                        "firstName": "Dylan",
+                        "lastName": "Crews",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Dylan"
+                    },
+                    {
+                        "id": 691781,
+                        "fullName": "Brady House",
+                        "link": "/api/v1/people/691781",
+                        "firstName": "Brady",
+                        "lastName": "House",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Brady"
+                    },
+                    {
+                        "id": 683083,
+                        "fullName": "Nasim Nu\u00f1ez",
+                        "link": "/api/v1/people/683083",
+                        "firstName": "Nasim",
+                        "lastName": "Nu\u00f1ez",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Nasim"
+                    },
+                    {
+                        "id": 686894,
+                        "fullName": "Joey Wiemer",
+                        "link": "/api/v1/people/686894",
+                        "firstName": "Joseph",
+                        "lastName": "Wiemer",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Joey"
+                    }
+                ]
+            }
         },
         "odds": {
             "id": "22a0a8a17e1306db71132161eaaf6c65",
@@ -249,7 +845,278 @@
             ]
         },
         "lineupHandedness": {},
-        "gamePositions": {},
+        "gamePositions": {
+            "691781": "3B",
+            "691024": "3B",
+            "683083": "2B",
+            "701552": "P",
+            "813707": "P",
+            "625510": "P",
+            "703612": "LF",
+            "681854": "P",
+            "680770": "P",
+            "824600": "P",
+            "805809": "P",
+            "800195": "SS",
+            "678973": "P",
+            "695734": "DH",
+            "678854": "2B",
+            "679788": "LF",
+            "695578": "RF",
+            "810022": "P",
+            "702110": "C",
+            "693791": "P",
+            "806046": "P",
+            "691251": "P",
+            "685010": "P",
+            "686463": "P",
+            "680998": "1B",
+            "702358": "3B",
+            "686982": "LF",
+            "641793": "P",
+            "702877": "P",
+            "682775": "SS",
+            "622098": "P",
+            "821188": "P",
+            "642759": "P",
+            "698990": "RF",
+            "681171": "2B",
+            "676026": "P",
+            "671131": "P",
+            "802486": "P",
+            "695604": "1B",
+            "693822": "1B",
+            "695722": "C",
+            "690593": "P",
+            "668663": "C",
+            "666121": "P",
+            "829272": "P",
+            "694673": "1B",
+            "695763": "CF",
+            "694399": "LF",
+            "815906": "SS",
+            "665953": "1B",
+            "687984": "P",
+            "815983": "SS",
+            "686894": "CF",
+            "826723": "SS",
+            "676571": "P",
+            "690987": "CF",
+            "806999": "2B",
+            "824667": "P",
+            "670234": "P",
+            "694544": "P",
+            "703143": "RF",
+            "808243": "P",
+            "696285": "CF",
+            "814409": "SS",
+            "680899": "P",
+            "702612": "P",
+            "686912": "C",
+            "687606": "P",
+            "684976": "RF",
+            "828514": "P",
+            "687605": "LF",
+            "694939": "SS",
+            "678868": "P",
+            "676046": "P",
+            "825926": "P",
+            "671277": "1B",
+            "833381": "OF",
+            "821049": "C",
+            "670223": "1B",
+            "811323": "3B",
+            "702685": "RF",
+            "691183": "SS",
+            "688692": "P",
+            "656180": "C",
+            "682624": "P",
+            "680686": "P",
+            "811325": "IF",
+            "801128": "P",
+            "642727": "SS",
+            "690925": "P",
+            "800393": "CF",
+            "694848": "1B",
+            "693759": "P",
+            "669371": "P",
+            "695418": "P",
+            "695538": "SS",
+            "805724": "P",
+            "693756": "P",
+            "695378": "P",
+            "701862": "1B",
+            "682619": "2B",
+            "695494": "C",
+            "671726": "P",
+            "687751": "SS",
+            "681402": "P",
+            "702712": "P",
+            "824015": "P",
+            "805957": "C",
+            "678883": "P",
+            "660688": "C",
+            "641627": "P",
+            "656755": "P",
+            "829702": "C",
+            "812158": "RF",
+            "692454": "P",
+            "691002": "1B",
+            "807480": "P",
+            "682928": "SS",
+            "701299": "P",
+            "807485": "P",
+            "701298": "LF",
+            "806550": "C",
+            "686452": "C",
+            "701337": "OF",
+            "816113": "SS",
+            "571945": "P",
+            "686611": "LF",
+            "683068": "P",
+            "701616": "C",
+            "686610": "P",
+            "682653": "3B",
+            "681047": "LF",
+            "815380": "SS",
+            "805741": "P",
+            "672335": "P",
+            "677588": "3B",
+            "703186": "P",
+            "676917": "P",
+            "815818": "SS",
+            "695670": "C",
+            "701327": "CF",
+            "680734": "P",
+            "683176": "C",
+            "694182": "SS",
+            "663623": "P",
+            "682119": "CF",
+            "687377": "P",
+            "683610": "RF",
+            "800201": "SS",
+            "824753": "C",
+            "656492": "P",
+            "805214": "P",
+            "691023": "RF",
+            "701675": "RF",
+            "802371": "P",
+            "813668": "1B",
+            "811765": "3B",
+            "802139": "2B",
+            "699031": "SS",
+            "800231": "RF",
+            "676153": "P",
+            "690443": "CF",
+            "693832": "2B",
+            "695579": "SS",
+            "695336": "2B",
+            "694885": "P",
+            "669467": "P",
+            "650968": "C",
+            "694363": "P",
+            "701388": "P",
+            "687273": "P",
+            "669461": "P",
+            "602104": "3B",
+            "702119": "P",
+            "680636": "2B",
+            "703602": "SS",
+            "703725": "P",
+            "647378": "C",
+            "821107": "SS",
+            "691008": "P",
+            "809100": "P",
+            "669357": "DH",
+            "703158": "SS",
+            "814413": "OF",
+            "695003": "P",
+            "829794": "IF",
+            "681517": "P",
+            "700720": "CF",
+            "806191": "OF",
+            "815104": "C",
+            "668941": "P",
+            "676050": "P",
+            "801629": "3B",
+            "692405": "SS",
+            "691711": "P",
+            "692404": "P",
+            "801187": "C",
+            "692401": "P",
+            "692369": "P",
+            "702331": "3B",
+            "701481": "C",
+            "701800": "C",
+            "592773": "P",
+            "828594": "P",
+            "691828": "P",
+            "699027": "RF",
+            "690971": "CF",
+            "691026": "SS",
+            "694335": "P",
+            "687363": "CF",
+            "688297": "P",
+            "692390": "LF",
+            "642575": "P",
+            "700669": "P",
+            "690928": "P",
+            "675382": "OF",
+            "676632": "OF",
+            "691458": "1B",
+            "807742": "CF",
+            "676475": "1B",
+            "822501": "SS",
+            "678016": "P",
+            "676617": "P",
+            "813852": "3B",
+            "666277": "P",
+            "669145": "P",
+            "805550": "SS",
+            "802680": "P",
+            "686780": "C",
+            "701469": "P",
+            "703766": "SS",
+            "681884": "P",
+            "690916": "P",
+            "800266": "CF",
+            "826314": "P",
+            "684516": "P",
+            "690914": "2B",
+            "822472": "P",
+            "800305": "SS",
+            "809633": "3B",
+            "671056": "C",
+            "695766": "P",
+            "700241": "P",
+            "690155": "P",
+            "689288": "LF",
+            "815829": "SS",
+            "800728": "OF",
+            "663457": "LF",
+            "665877": "3B",
+            "668868": "P",
+            "681676": "P",
+            "813766": "P",
+            "823651": "C",
+            "656240": "P",
+            "677865": "P",
+            "802353": "2B",
+            "695835": "P",
+            "692568": "LF",
+            "692446": "2B",
+            "804241": "OF",
+            "811339": "C",
+            "800840": "C",
+            "802469": "LF",
+            "803679": "C",
+            "800320": "P",
+            "801130": "C",
+            "677337": "P",
+            "669160": "P",
+            "823787": "C",
+            "676369": "LF"
+        },
         "deepStats": {
             "669461": {
                 "name": "Matthew Liberatore",
@@ -294,10 +1161,519 @@
                     "avg": ".274",
                     "ops": ".798"
                 }
+            },
+            "682928": {
+                "name": "CJ Abrams",
+                "bvp": {
+                    "ab": 1,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 186,
+                    "hr": 4,
+                    "k": 53,
+                    "bb": 8,
+                    "avg": ".231",
+                    "ops": ".619"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 394,
+                    "hr": 15,
+                    "k": 72,
+                    "bb": 29,
+                    "avg": ".269",
+                    "ops": ".809"
+                }
+            },
+            "695578": {
+                "name": "James Wood",
+                "bvp": {
+                    "ab": 3,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".333",
+                    "ops": "1.000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 209,
+                    "hr": 12,
+                    "k": 71,
+                    "bb": 17,
+                    "avg": ".278",
+                    "ops": ".823"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 389,
+                    "hr": 19,
+                    "k": 150,
+                    "bb": 68,
+                    "avg": ".244",
+                    "ops": ".825"
+                }
+            },
+            "660688": {
+                "name": "Keibert Ruiz",
+                "bvp": {
+                    "ab": 4,
+                    "hits": 1,
+                    "hr": 1,
+                    "avg": ".250",
+                    "ops": "1.250"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 51,
+                    "hr": 1,
+                    "k": 4,
+                    "bb": 2,
+                    "avg": ".294",
+                    "ops": ".725"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 204,
+                    "hr": 1,
+                    "k": 22,
+                    "bb": 6,
+                    "avg": ".235",
+                    "ops": ".562"
+                }
+            },
+            "695734": {
+                "name": "Daylen Lile",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 71,
+                    "hr": 2,
+                    "k": 17,
+                    "bb": 3,
+                    "avg": ".254",
+                    "ops": ".683"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 250,
+                    "hr": 7,
+                    "k": 39,
+                    "bb": 18,
+                    "avg": ".312",
+                    "ops": ".891"
+                }
+            },
+            "671277": {
+                "name": "Luis Garc\u00eda Jr.",
+                "bvp": {
+                    "ab": 4,
+                    "hits": 2,
+                    "hr": 0,
+                    "avg": ".500",
+                    "ops": "1.000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 95,
+                    "hr": 0,
+                    "k": 18,
+                    "bb": 6,
+                    "avg": ".179",
+                    "ops": ".445"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 393,
+                    "hr": 16,
+                    "k": 66,
+                    "bb": 21,
+                    "avg": ".270",
+                    "ops": ".764"
+                }
+            },
+            "686611": {
+                "name": "Dylan Crews",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 75,
+                    "hr": 1,
+                    "k": 18,
+                    "bb": 3,
+                    "avg": ".200",
+                    "ops": ".521"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 218,
+                    "hr": 9,
+                    "k": 58,
+                    "bb": 21,
+                    "avg": ".211",
+                    "ops": ".668"
+                }
+            },
+            "691781": {
+                "name": "Brady House",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 79,
+                    "hr": 0,
+                    "k": 26,
+                    "bb": 2,
+                    "avg": ".215",
+                    "ops": ".498"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 182,
+                    "hr": 4,
+                    "k": 52,
+                    "bb": 6,
+                    "avg": ".242",
+                    "ops": ".607"
+                }
+            },
+            "683083": {
+                "name": "Nasim Nu\u00f1ez",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 30,
+                    "hr": 2,
+                    "k": 3,
+                    "bb": 5,
+                    "avg": ".267",
+                    "ops": ".871"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 52,
+                    "hr": 2,
+                    "k": 17,
+                    "bb": 3,
+                    "avg": ".212",
+                    "ops": ".596"
+                }
+            },
+            "686894": {
+                "name": "Joey Wiemer",
+                "bvp": {
+                    "ab": 3,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 28,
+                    "hr": 2,
+                    "k": 12,
+                    "bb": 2,
+                    "avg": ".214",
+                    "ops": ".794"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 27,
+                    "hr": 1,
+                    "k": 11,
+                    "bb": 0,
+                    "avg": ".259",
+                    "ops": ".630"
+                }
+            },
+            "802139": {
+                "name": "JJ Wetherholt",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                }
+            },
+            "691026": {
+                "name": "Masyn Winn",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 149,
+                    "hr": 2,
+                    "k": 31,
+                    "bb": 11,
+                    "avg": ".255",
+                    "ops": ".662"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 342,
+                    "hr": 7,
+                    "k": 71,
+                    "bb": 23,
+                    "avg": ".251",
+                    "ops": ".678"
+                }
+            },
+            "676475": {
+                "name": "Alec Burleson",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 118,
+                    "hr": 3,
+                    "k": 20,
+                    "bb": 7,
+                    "avg": ".271",
+                    "ops": ".708"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 379,
+                    "hr": 15,
+                    "k": 59,
+                    "bb": 32,
+                    "avg": ".296",
+                    "ops": ".830"
+                }
+            },
+            "669357": {
+                "name": "Nolan Gorman",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 82,
+                    "hr": 5,
+                    "k": 25,
+                    "bb": 10,
+                    "avg": ".220",
+                    "ops": ".740"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 269,
+                    "hr": 9,
+                    "k": 111,
+                    "bb": 37,
+                    "avg": ".201",
+                    "ops": ".644"
+                }
+            },
+            "676369": {
+                "name": "Nelson Vel\u00e1zquez",
+                "bvp": {
+                    "ab": 7,
+                    "hits": 2,
+                    "hr": 0,
+                    "avg": ".286",
+                    "ops": ".804"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                }
+            },
+            "665877": {
+                "name": "Jos\u00e9 Ferm\u00edn",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 10,
+                    "hr": 0,
+                    "k": 2,
+                    "bb": 1,
+                    "avg": ".300",
+                    "ops": ".764"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 50,
+                    "hr": 1,
+                    "k": 8,
+                    "bb": 7,
+                    "avg": ".280",
+                    "ops": ".799"
+                }
+            },
+            "701675": {
+                "name": "Nathan Church",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 12,
+                    "hr": 0,
+                    "k": 4,
+                    "bb": 0,
+                    "avg": ".417",
+                    "ops": ".917"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 44,
+                    "hr": 1,
+                    "k": 14,
+                    "bb": 3,
+                    "avg": ".114",
+                    "ops": ".398"
+                }
+            },
+            "686780": {
+                "name": "Pedro Pag\u00e9s",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 103,
+                    "hr": 2,
+                    "k": 35,
+                    "bb": 7,
+                    "avg": ".243",
+                    "ops": ".651"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 258,
+                    "hr": 9,
+                    "k": 72,
+                    "bb": 12,
+                    "avg": ".225",
+                    "ops": ".628"
+                }
+            },
+            "687363": {
+                "name": "Victor Scott II",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 108,
+                    "hr": 0,
+                    "k": 36,
+                    "bb": 11,
+                    "avg": ".204",
+                    "ops": ".531"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 290,
+                    "hr": 5,
+                    "k": 75,
+                    "bb": 31,
+                    "avg": ".221",
+                    "ops": ".627"
+                }
             }
         },
-        "hpUmpire": "TBD",
-        "umpStats": null,
+        "hpUmpire": "James Jean",
+        "umpStats": {
+            "k_rate": "20.7%",
+            "bb_rate": "8.4%",
+            "rpg": "9.6",
+            "games": 26
+        },
         "parkStats": null
     },
     {
@@ -609,9 +1985,9 @@
             "officialDate": "2026-03-15",
             "status": {
                 "abstractGameState": "Preview",
-                "codedGameState": "S",
-                "detailedState": "Scheduled",
-                "statusCode": "S",
+                "codedGameState": "P",
+                "detailedState": "Pre-Game",
+                "statusCode": "P",
                 "startTimeTBD": false,
                 "abstractGameCode": "P"
             },
@@ -627,6 +2003,7 @@
                         "losses": 13,
                         "pct": ".350"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 805673,
                         "fullName": "Zebby Matthews",
@@ -690,6 +2067,7 @@
                         "losses": 11,
                         "pct": ".450"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 676979,
                         "fullName": "Garrett Crochet",
@@ -745,26 +2123,363 @@
                 }
             },
             "linescore": {
+                "currentInning": 1,
+                "currentInningOrdinal": "1st",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
-                "innings": [],
+                "innings": [
+                    {
+                        "num": 1,
+                        "ordinalNum": "1st",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    }
+                ],
                 "teams": {
-                    "home": {},
-                    "away": {}
+                    "home": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    },
+                    "away": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 676979,
+                        "fullName": "Garrett Crochet",
+                        "link": "/api/v1/people/676979",
+                        "firstName": "Garrett",
+                        "lastName": "Crochet",
+                        "primaryNumber": "35",
+                        "birthDate": "1999-06-21",
+                        "currentAge": 26,
+                        "birthCity": "Ocean Springs",
+                        "birthStateProvince": "MS",
+                        "birthCountry": "USA",
+                        "height": "6' 6\"",
+                        "weight": 245,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Garrett",
+                        "useLastName": "Crochet",
+                        "middleName": "Nolan",
+                        "boxscoreName": "Crochet",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2020,
+                        "pronunciation": "crow-SHAY",
+                        "mlbDebutDate": "2020-09-18",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Garrett Crochet",
+                        "nameSlug": "garrett-crochet-676979",
+                        "firstLastName": "Garrett Crochet",
+                        "lastFirstName": "Crochet, Garrett",
+                        "lastInitName": "Crochet, G",
+                        "initLastName": "G Crochet",
+                        "fullFMLName": "Garrett Nolan Crochet",
+                        "fullLFMName": "Crochet, Garrett Nolan",
+                        "strikeZoneTop": 3.66,
+                        "strikeZoneBottom": 1.68
+                    },
+                    "catcher": {
+                        "id": 665966,
+                        "fullName": "Carlos Narv\u00e1ez",
+                        "link": "/api/v1/people/665966"
+                    },
+                    "first": {
+                        "id": 686765,
+                        "fullName": "Nick Sogard",
+                        "link": "/api/v1/people/686765"
+                    },
+                    "second": {
+                        "id": 691785,
+                        "fullName": "Marcelo Mayer",
+                        "link": "/api/v1/people/691785"
+                    },
+                    "third": {
+                        "id": 702332,
+                        "fullName": "Caleb Durbin",
+                        "link": "/api/v1/people/702332"
+                    },
+                    "shortstop": {
+                        "id": 643396,
+                        "fullName": "Isiah Kiner-Falefa",
+                        "link": "/api/v1/people/643396"
+                    },
+                    "left": {
+                        "id": 680776,
+                        "fullName": "Jarren Duran",
+                        "link": "/api/v1/people/680776"
+                    },
+                    "center": {
+                        "id": 678882,
+                        "fullName": "Ceddanne Rafaela",
+                        "link": "/api/v1/people/678882"
+                    },
+                    "right": {
+                        "id": 681987,
+                        "fullName": "Nate Eaton",
+                        "link": "/api/v1/people/681987"
+                    },
+                    "batter": {
+                        "id": 680776,
+                        "fullName": "Jarren Duran",
+                        "link": "/api/v1/people/680776"
+                    },
+                    "onDeck": {
+                        "id": 678882,
+                        "fullName": "Ceddanne Rafaela",
+                        "link": "/api/v1/people/678882"
+                    },
+                    "inHole": {
+                        "id": 702332,
+                        "fullName": "Caleb Durbin",
+                        "link": "/api/v1/people/702332"
+                    },
+                    "battingOrder": 1,
+                    "team": {
+                        "id": 111,
+                        "name": "Boston Red Sox",
+                        "link": "/api/v1/teams/111"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 668885,
+                        "fullName": "Austin Martin",
+                        "link": "/api/v1/people/668885",
+                        "firstName": "Christopher",
+                        "lastName": "Martin",
+                        "primaryNumber": "16",
+                        "birthDate": "1999-03-23",
+                        "currentAge": 26,
+                        "birthCity": "DeLand",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "5' 10\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Austin",
+                        "useLastName": "Martin",
+                        "middleName": "Austin",
+                        "boxscoreName": "Martin",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2020,
+                        "mlbDebutDate": "2024-03-30",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Austin Martin",
+                        "nameSlug": "austin-martin-668885",
+                        "firstLastName": "Austin Martin",
+                        "lastFirstName": "Martin, Austin",
+                        "lastInitName": "Martin, A",
+                        "initLastName": "A Martin",
+                        "fullFMLName": "Christopher Austin Martin",
+                        "fullLFMName": "Martin, Christopher Austin",
+                        "strikeZoneTop": 3.13,
+                        "strikeZoneBottom": 1.579
+                    },
+                    "onDeck": {
+                        "id": 807712,
+                        "fullName": "Luke Keaschall",
+                        "link": "/api/v1/people/807712",
+                        "firstName": "Luke",
+                        "lastName": "Keaschall",
+                        "primaryNumber": "15",
+                        "birthDate": "2002-08-15",
+                        "currentAge": 23,
+                        "birthCity": "Watsonville",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 190,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Luke",
+                        "useLastName": "Keaschall",
+                        "middleName": "T.",
+                        "boxscoreName": "Keaschall",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2023,
+                        "pronunciation": "KEY-shull",
+                        "mlbDebutDate": "2025-04-18",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Luke Keaschall",
+                        "nameSlug": "luke-keaschall-807712",
+                        "firstLastName": "Luke Keaschall",
+                        "lastFirstName": "Keaschall, Luke",
+                        "lastInitName": "Keaschall, L",
+                        "initLastName": "L Keaschall",
+                        "fullFMLName": "Luke T. Keaschall",
+                        "fullLFMName": "Keaschall, Luke T.",
+                        "strikeZoneTop": 3.214,
+                        "strikeZoneBottom": 1.622
+                    },
+                    "inHole": {
+                        "id": 680777,
+                        "fullName": "Ryan Jeffers",
+                        "link": "/api/v1/people/680777",
+                        "firstName": "Ryan",
+                        "lastName": "Jeffers",
+                        "primaryNumber": "27",
+                        "birthDate": "1997-06-03",
+                        "currentAge": 28,
+                        "birthCity": "Raleigh",
+                        "birthStateProvince": "NC",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 235,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Ryan",
+                        "useLastName": "Jeffers",
+                        "middleName": "Michael",
+                        "boxscoreName": "Jeffers",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2018,
+                        "mlbDebutDate": "2020-08-20",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Ryan Jeffers",
+                        "nameSlug": "ryan-jeffers-680777",
+                        "firstLastName": "Ryan Jeffers",
+                        "lastFirstName": "Jeffers, Ryan",
+                        "lastInitName": "Jeffers, R",
+                        "initLastName": "R Jeffers",
+                        "fullFMLName": "Ryan Michael Jeffers",
+                        "fullLFMName": "Jeffers, Ryan Michael",
+                        "strikeZoneTop": 3.285,
+                        "strikeZoneBottom": 1.658
+                    },
+                    "pitcher": {
+                        "id": 805673,
+                        "fullName": "Zebby Matthews",
+                        "link": "/api/v1/people/805673",
+                        "firstName": "Daniel",
+                        "lastName": "Matthews",
+                        "primaryNumber": "52",
+                        "birthDate": "2000-05-22",
+                        "currentAge": 25,
+                        "birthCity": "Cullowhee",
+                        "birthStateProvince": "NC",
+                        "birthCountry": "USA",
+                        "height": "6' 5\"",
+                        "weight": 225,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Zebby",
+                        "useLastName": "Matthews",
+                        "middleName": "Zebulon",
+                        "boxscoreName": "Matthews",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2022,
+                        "mlbDebutDate": "2024-08-13",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Zebby Matthews",
+                        "nameSlug": "zebby-matthews-805673",
+                        "firstLastName": "Zebby Matthews",
+                        "lastFirstName": "Matthews, Zebby",
+                        "lastInitName": "Matthews, Z",
+                        "initLastName": "Z Matthews",
+                        "fullFMLName": "Daniel Zebulon Matthews",
+                        "fullLFMName": "Matthews, Daniel Zebulon",
+                        "strikeZoneTop": 3.433,
+                        "strikeZoneBottom": 1.733
+                    },
+                    "battingOrder": 1,
                     "team": {
                         "id": 142,
                         "name": "Minnesota Twins",
                         "link": "/api/v1/teams/142"
                     }
                 },
-                "offense": {
-                    "team": {
-                        "id": 111,
-                        "name": "Boston Red Sox",
-                        "link": "/api/v1/teams/111"
-                    }
-                }
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 4309,
@@ -791,7 +2506,264 @@
             "recordSource": "S",
             "ifNecessary": "N",
             "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "lineups": {
+                "homePlayers": [
+                    {
+                        "id": 680776,
+                        "fullName": "Jarren Duran",
+                        "link": "/api/v1/people/680776",
+                        "firstName": "Jarren",
+                        "lastName": "Duran",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Jarren"
+                    },
+                    {
+                        "id": 678882,
+                        "fullName": "Ceddanne Rafaela",
+                        "link": "/api/v1/people/678882",
+                        "firstName": "Ceddanne",
+                        "lastName": "Rafaela",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Ceddanne"
+                    },
+                    {
+                        "id": 702332,
+                        "fullName": "Caleb Durbin",
+                        "link": "/api/v1/people/702332",
+                        "firstName": "Caleb",
+                        "lastName": "Durbin",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Caleb"
+                    },
+                    {
+                        "id": 643396,
+                        "fullName": "Isiah Kiner-Falefa",
+                        "link": "/api/v1/people/643396",
+                        "firstName": "Isiah",
+                        "lastName": "Kiner-Falefa",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Isiah"
+                    },
+                    {
+                        "id": 691785,
+                        "fullName": "Marcelo Mayer",
+                        "link": "/api/v1/people/691785",
+                        "firstName": "Marcelo",
+                        "lastName": "Mayer",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Marcelo"
+                    },
+                    {
+                        "id": 686765,
+                        "fullName": "Nick Sogard",
+                        "link": "/api/v1/people/686765",
+                        "firstName": "Nicholas",
+                        "lastName": "Sogard",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Nick"
+                    },
+                    {
+                        "id": 665966,
+                        "fullName": "Carlos Narv\u00e1ez",
+                        "link": "/api/v1/people/665966",
+                        "firstName": "Carlos",
+                        "lastName": "Narv\u00e1ez",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Carlos"
+                    },
+                    {
+                        "id": 657136,
+                        "fullName": "Connor Wong",
+                        "link": "/api/v1/people/657136",
+                        "firstName": "Connor",
+                        "lastName": "Wong",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Connor"
+                    },
+                    {
+                        "id": 681987,
+                        "fullName": "Nate Eaton",
+                        "link": "/api/v1/people/681987",
+                        "firstName": "Nathan",
+                        "lastName": "Eaton",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Nate"
+                    }
+                ],
+                "awayPlayers": [
+                    {
+                        "id": 668885,
+                        "fullName": "Austin Martin",
+                        "link": "/api/v1/people/668885",
+                        "firstName": "Christopher",
+                        "lastName": "Martin",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Austin"
+                    },
+                    {
+                        "id": 807712,
+                        "fullName": "Luke Keaschall",
+                        "link": "/api/v1/people/807712",
+                        "firstName": "Luke",
+                        "lastName": "Keaschall",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Luke"
+                    },
+                    {
+                        "id": 680777,
+                        "fullName": "Ryan Jeffers",
+                        "link": "/api/v1/people/680777",
+                        "firstName": "Ryan",
+                        "lastName": "Jeffers",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Ryan"
+                    },
+                    {
+                        "id": 605137,
+                        "fullName": "Josh Bell",
+                        "link": "/api/v1/people/605137",
+                        "firstName": "Joshua",
+                        "lastName": "Bell",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Josh"
+                    },
+                    {
+                        "id": 668904,
+                        "fullName": "Royce Lewis",
+                        "link": "/api/v1/people/668904",
+                        "firstName": "Royce",
+                        "lastName": "Lewis",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Royce"
+                    },
+                    {
+                        "id": 686797,
+                        "fullName": "Brooks Lee",
+                        "link": "/api/v1/people/686797",
+                        "firstName": "Brooks",
+                        "lastName": "Lee",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Brooks"
+                    },
+                    {
+                        "id": 663616,
+                        "fullName": "Trevor Larnach",
+                        "link": "/api/v1/people/663616",
+                        "firstName": "Trevor",
+                        "lastName": "Larnach",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Trevor"
+                    },
+                    {
+                        "id": 668952,
+                        "fullName": "Ryan Kreidler",
+                        "link": "/api/v1/people/668952",
+                        "firstName": "Ryan",
+                        "lastName": "Kreidler",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Ryan"
+                    },
+                    {
+                        "id": 702176,
+                        "fullName": "Alan Roden",
+                        "link": "/api/v1/people/702176",
+                        "firstName": "Alan",
+                        "lastName": "Roden",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Alan"
+                    }
+                ]
+            }
         },
         "odds": {
             "id": "c060f9338f4230de4b33794dd9f42dc9",
@@ -846,7 +2818,224 @@
             ]
         },
         "lineupHandedness": {},
-        "gamePositions": {},
+        "gamePositions": {
+            "815966": "C",
+            "665019": "2B",
+            "668885": "CF",
+            "683764": "P",
+            "805805": "CF",
+            "680253": "P",
+            "837351": "P",
+            "800875": "P",
+            "806337": "P",
+            "702474": "P",
+            "701785": "SS",
+            "828492": "P",
+            "663485": "P",
+            "701549": "P",
+            "657240": "P",
+            "690953": "P",
+            "703160": "CF",
+            "621439": "CF",
+            "693306": "1B",
+            "669993": "P",
+            "689520": "P",
+            "695000": "C",
+            "701771": "3B",
+            "675915": "C",
+            "623437": "P",
+            "605170": "C",
+            "605177": "P",
+            "687857": "P",
+            "823295": "3B",
+            "676572": "1B",
+            "693459": "LF",
+            "804610": "SS",
+            "695634": "RF",
+            "693850": "RF",
+            "702176": "RF",
+            "813676": "P",
+            "814522": "OF",
+            "690462": "P",
+            "687295": "P",
+            "701643": "P",
+            "680777": "C",
+            "696160": "2B",
+            "687856": "P",
+            "668952": "3B",
+            "681355": "C",
+            "573124": "P",
+            "687849": "P",
+            "641927": "P",
+            "701519": "P",
+            "694536": "P",
+            "656577": "C",
+            "807712": "2B",
+            "830242": "P",
+            "671737": "P",
+            "621199": "P",
+            "686797": "SS",
+            "521230": "P",
+            "680573": "P",
+            "687879": "P",
+            "607455": "P",
+            "656186": "P",
+            "570482": "3B",
+            "809766": "P",
+            "834575": "P",
+            "701581": "P",
+            "823719": "2B",
+            "681892": "P",
+            "691605": "LF",
+            "806368": "CF",
+            "805673": "P",
+            "675375": "P",
+            "695527": "C",
+            "670242": "RF",
+            "702025": "SS",
+            "680868": "C",
+            "681315": "P",
+            "681433": "C",
+            "680740": "OF",
+            "701339": "SS",
+            "804539": "P",
+            "656484": "3B",
+            "605137": "1B",
+            "805346": "SS",
+            "802355": "2B",
+            "806713": "P",
+            "814291": "P",
+            "703191": "SS",
+            "696521": "RF",
+            "806263": "SS",
+            "681306": "P",
+            "691191": "2B",
+            "681546": "CF",
+            "699061": "3B",
+            "606115": "SS",
+            "691627": "C",
+            "668904": "DH",
+            "663616": "LF",
+            "657746": "P",
+            "679358": "P",
+            "821523": "C",
+            "691385": "C",
+            "703455": "CF",
+            "695467": "C",
+            "694896": "OF",
+            "703175": "3B",
+            "808631": "OF",
+            "642136": "C",
+            "815204": "CF",
+            "813944": "OF",
+            "690967": "P",
+            "677800": "RF",
+            "699157": "2B",
+            "805365": "OF",
+            "806333": "P",
+            "692225": "2B",
+            "805801": "3B",
+            "676710": "P",
+            "702995": "3B",
+            "691370": "RF",
+            "686580": "P",
+            "801829": "P",
+            "702517": "SS",
+            "681962": "3B",
+            "686623": "P",
+            "821100": "CF",
+            "828499": "P",
+            "691369": "CF",
+            "814810": "P",
+            "808252": "P",
+            "594027": "P",
+            "663776": "P",
+            "682967": "P",
+            "663898": "2B",
+            "657136": "DH",
+            "800256": "RF",
+            "800496": "3B",
+            "821150": "CF",
+            "674674": "P",
+            "678478": "P",
+            "679602": "C",
+            "838799": "P",
+            "643396": "SS",
+            "814366": "P",
+            "681508": "2B",
+            "685274": "CF",
+            "702332": "3B",
+            "624133": "P",
+            "665966": "C",
+            "681987": "RF",
+            "680776": "LF",
+            "686765": "1B",
+            "681468": "RF",
+            "665048": "P",
+            "687208": "C",
+            "807799": "LF",
+            "822416": "P",
+            "806985": "SS",
+            "676047": "P",
+            "543056": "P",
+            "806983": "CF",
+            "691785": "2B",
+            "694812": "OF",
+            "701350": "RF",
+            "695026": "P",
+            "575929": "1B",
+            "813349": "P",
+            "813745": "P",
+            "678011": "2B",
+            "684128": "P",
+            "664918": "P",
+            "596115": "SS",
+            "677161": "P",
+            "821130": "SS",
+            "661527": "P",
+            "676477": "P",
+            "805964": "LF",
+            "676979": "P",
+            "689651": "CF",
+            "670912": "P",
+            "808265": "SS",
+            "700413": "P",
+            "641511": "C",
+            "800421": "SS",
+            "678882": "CF",
+            "681132": "2B",
+            "681252": "P",
+            "663558": "P",
+            "679977": "P",
+            "671213": "1B",
+            "670245": "P",
+            "808571": "3B",
+            "813400": "3B",
+            "836168": "OF",
+            "702540": "SS",
+            "694194": "RF",
+            "687941": "P",
+            "701856": "P",
+            "669711": "P",
+            "657697": "P",
+            "821112": "OF",
+            "682011": "1B",
+            "678394": "P",
+            "815143": "P",
+            "543243": "P",
+            "655316": "SS",
+            "821236": "SS",
+            "814444": "OF",
+            "701288": "P",
+            "686960": "C",
+            "681544": "P",
+            "691907": "SS",
+            "701719": "P",
+            "801139": "P",
+            "807511": "OF",
+            "547973": "P",
+            "809933": "P"
+        },
         "deepStats": {
             "805673": {
                 "name": "Zebby Matthews",
@@ -891,10 +3080,519 @@
                     "avg": ".229",
                     "ops": ".654"
                 }
+            },
+            "668885": {
+                "name": "Austin Martin",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".500",
+                    "ops": "1.667"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 52,
+                    "hr": 1,
+                    "k": 10,
+                    "bb": 5,
+                    "avg": ".346",
+                    "ops": ".884"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 104,
+                    "hr": 0,
+                    "k": 21,
+                    "bb": 17,
+                    "avg": ".250",
+                    "ops": ".668"
+                }
+            },
+            "807712": {
+                "name": "Luke Keaschall",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 59,
+                    "hr": 1,
+                    "k": 15,
+                    "bb": 3,
+                    "avg": ".169",
+                    "ops": ".514"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 123,
+                    "hr": 3,
+                    "k": 14,
+                    "bb": 16,
+                    "avg": ".366",
+                    "ops": ".975"
+                }
+            },
+            "680777": {
+                "name": "Ryan Jeffers",
+                "bvp": {
+                    "ab": 1,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".500"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 112,
+                    "hr": 2,
+                    "k": 23,
+                    "bb": 28,
+                    "avg": ".312",
+                    "ops": ".885"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 294,
+                    "hr": 7,
+                    "k": 68,
+                    "bb": 22,
+                    "avg": ".248",
+                    "ops": ".693"
+                }
+            },
+            "605137": {
+                "name": "Josh Bell",
+                "bvp": {
+                    "ab": 3,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".333",
+                    "ops": ".666"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 106,
+                    "hr": 4,
+                    "k": 28,
+                    "bb": 14,
+                    "avg": ".151",
+                    "ops": ".552"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 362,
+                    "hr": 18,
+                    "k": 60,
+                    "bb": 43,
+                    "avg": ".262",
+                    "ops": ".797"
+                }
+            },
+            "668904": {
+                "name": "Royce Lewis",
+                "bvp": {
+                    "ab": 1,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".500"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 109,
+                    "hr": 4,
+                    "k": 22,
+                    "bb": 9,
+                    "avg": ".239",
+                    "ops": ".689"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 267,
+                    "hr": 9,
+                    "k": 58,
+                    "bb": 16,
+                    "avg": ".236",
+                    "ops": ".664"
+                }
+            },
+            "686797": {
+                "name": "Brooks Lee",
+                "bvp": {
+                    "ab": 1,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 169,
+                    "hr": 5,
+                    "k": 37,
+                    "bb": 6,
+                    "avg": ".266",
+                    "ops": ".676"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 318,
+                    "hr": 11,
+                    "k": 55,
+                    "bb": 25,
+                    "avg": ".220",
+                    "ops": ".643"
+                }
+            },
+            "663616": {
+                "name": "Trevor Larnach",
+                "bvp": {
+                    "ab": 6,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".167",
+                    "ops": ".334"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 106,
+                    "hr": 1,
+                    "k": 30,
+                    "bb": 9,
+                    "avg": ".236",
+                    "ops": ".608"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 397,
+                    "hr": 16,
+                    "k": 92,
+                    "bb": 44,
+                    "avg": ".254",
+                    "ops": ".759"
+                }
+            },
+            "668952": {
+                "name": "Ryan Kreidler",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 13,
+                    "hr": 0,
+                    "k": 6,
+                    "bb": 2,
+                    "avg": ".077",
+                    "ops": ".277"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 25,
+                    "hr": 0,
+                    "k": 13,
+                    "bb": 2,
+                    "avg": ".120",
+                    "ops": ".305"
+                }
+            },
+            "702176": {
+                "name": "Alan Roden",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".333"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 11,
+                    "hr": 1,
+                    "k": 2,
+                    "bb": 0,
+                    "avg": ".182",
+                    "ops": ".762"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 88,
+                    "hr": 1,
+                    "k": 23,
+                    "bb": 5,
+                    "avg": ".216",
+                    "ops": ".610"
+                }
+            },
+            "680776": {
+                "name": "Jarren Duran",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 194,
+                    "hr": 3,
+                    "k": 57,
+                    "bb": 10,
+                    "avg": ".211",
+                    "ops": ".600"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 426,
+                    "hr": 13,
+                    "k": 112,
+                    "bb": 50,
+                    "avg": ".277",
+                    "ops": ".852"
+                }
+            },
+            "678882": {
+                "name": "Ceddanne Rafaela",
+                "bvp": {
+                    "ab": 4,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".250",
+                    "ops": ".750"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 150,
+                    "hr": 7,
+                    "k": 33,
+                    "bb": 7,
+                    "avg": ".220",
+                    "ops": ".679"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 396,
+                    "hr": 9,
+                    "k": 84,
+                    "bb": 21,
+                    "avg": ".260",
+                    "ops": ".720"
+                }
+            },
+            "702332": {
+                "name": "Caleb Durbin",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 120,
+                    "hr": 4,
+                    "k": 7,
+                    "bb": 7,
+                    "avg": ".258",
+                    "ops": ".717"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 325,
+                    "hr": 7,
+                    "k": 43,
+                    "bb": 23,
+                    "avg": ".255",
+                    "ops": ".722"
+                }
+            },
+            "643396": {
+                "name": "Isiah Kiner-Falefa",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 20,
+                    "hr": 1,
+                    "k": 5,
+                    "bb": 0,
+                    "avg": ".250",
+                    "ops": ".686"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 302,
+                    "hr": 0,
+                    "k": 54,
+                    "bb": 15,
+                    "avg": ".278",
+                    "ops": ".673"
+                }
+            },
+            "691785": {
+                "name": "Marcelo Mayer",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 26,
+                    "hr": 0,
+                    "k": 10,
+                    "bb": 1,
+                    "avg": ".154",
+                    "ops": ".416"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 101,
+                    "hr": 4,
+                    "k": 31,
+                    "bb": 7,
+                    "avg": ".248",
+                    "ops": ".739"
+                }
+            },
+            "686765": {
+                "name": "Nick Sogard",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".500",
+                    "ops": "1.500"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 35,
+                    "hr": 0,
+                    "k": 9,
+                    "bb": 0,
+                    "avg": ".371",
+                    "ops": ".857"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 61,
+                    "hr": 0,
+                    "k": 15,
+                    "bb": 5,
+                    "avg": ".197",
+                    "ops": ".552"
+                }
+            },
+            "665966": {
+                "name": "Carlos Narv\u00e1ez",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 115,
+                    "hr": 4,
+                    "k": 28,
+                    "bb": 15,
+                    "avg": ".243",
+                    "ops": ".731"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 288,
+                    "hr": 11,
+                    "k": 83,
+                    "bb": 23,
+                    "avg": ".240",
+                    "ops": ".723"
+                }
+            },
+            "657136": {
+                "name": "Connor Wong",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 39,
+                    "hr": 0,
+                    "k": 12,
+                    "bb": 6,
+                    "avg": ".179",
+                    "ops": ".488"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 129,
+                    "hr": 0,
+                    "k": 30,
+                    "bb": 10,
+                    "avg": ".194",
+                    "ops": ".503"
+                }
+            },
+            "681987": {
+                "name": "Nate Eaton",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 43,
+                    "hr": 0,
+                    "k": 10,
+                    "bb": 4,
+                    "avg": ".279",
+                    "ops": ".673"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 38,
+                    "hr": 1,
+                    "k": 9,
+                    "bb": 2,
+                    "avg": ".316",
+                    "ops": ".797"
+                }
             }
         },
-        "hpUmpire": "TBD",
-        "umpStats": null,
+        "hpUmpire": "Marvin Hudson",
+        "umpStats": {
+            "k_rate": "22.2%",
+            "bb_rate": "8.5%",
+            "rpg": "8.1",
+            "games": 28
+        },
         "parkStats": null
     },
     {
@@ -1208,9 +3906,9 @@
             "officialDate": "2026-03-15",
             "status": {
                 "abstractGameState": "Preview",
-                "codedGameState": "S",
-                "detailedState": "Scheduled",
-                "statusCode": "S",
+                "codedGameState": "P",
+                "detailedState": "Pre-Game",
+                "statusCode": "P",
                 "startTimeTBD": false,
                 "abstractGameCode": "P"
             },
@@ -1387,7 +4085,136 @@
             "recordSource": "S",
             "ifNecessary": "N",
             "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "lineups": {
+                "homePlayers": [
+                    {
+                        "id": 805904,
+                        "fullName": "Zach Cole",
+                        "link": "/api/v1/people/805904",
+                        "firstName": "Zachary",
+                        "lastName": "Cole",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Zach"
+                    },
+                    {
+                        "id": 514888,
+                        "fullName": "Jose Altuve",
+                        "link": "/api/v1/people/514888",
+                        "firstName": "Jose",
+                        "lastName": "Altuve",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Jose"
+                    },
+                    {
+                        "id": 670541,
+                        "fullName": "Yordan Alvarez",
+                        "link": "/api/v1/people/670541",
+                        "firstName": "Yordan",
+                        "lastName": "Alvarez",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Yordan"
+                    },
+                    {
+                        "id": 673237,
+                        "fullName": "Yainer Diaz",
+                        "link": "/api/v1/people/673237",
+                        "firstName": "Yainer",
+                        "lastName": "Diaz",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Yainer"
+                    },
+                    {
+                        "id": 829037,
+                        "fullName": "Kevin Alvarez",
+                        "link": "/api/v1/people/829037",
+                        "firstName": "Kevin",
+                        "lastName": "Alvarez",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Kevin"
+                    },
+                    {
+                        "id": 572233,
+                        "fullName": "Christian Walker",
+                        "link": "/api/v1/people/572233",
+                        "firstName": "Christian",
+                        "lastName": "Walker",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Christian"
+                    },
+                    {
+                        "id": 701358,
+                        "fullName": "Cam Smith",
+                        "link": "/api/v1/people/701358",
+                        "firstName": "Cameron",
+                        "lastName": "Smith",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Cam"
+                    },
+                    {
+                        "id": 694376,
+                        "fullName": "Shay Whitcomb",
+                        "link": "/api/v1/people/694376",
+                        "firstName": "Shay",
+                        "lastName": "Whitcomb",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Shay"
+                    },
+                    {
+                        "id": 669397,
+                        "fullName": "Nick Allen",
+                        "link": "/api/v1/people/669397",
+                        "firstName": "Nicholas",
+                        "lastName": "Allen",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Nick"
+                    }
+                ]
+            }
         },
         "odds": {
             "id": "fafbda374a55e83bba2ee9b9426acbba",
@@ -1442,7 +4269,252 @@
             ]
         },
         "lineupHandedness": {},
-        "gamePositions": {},
+        "gamePositions": {
+            "808510": "P",
+            "687287": "P",
+            "666624": "LF",
+            "681977": "P",
+            "833439": "P",
+            "800476": "RF",
+            "665923": "LF",
+            "829854": "SS",
+            "814193": "P",
+            "808516": "CF",
+            "679029": "P",
+            "802082": "1B",
+            "701784": "SS",
+            "659381": "P",
+            "679928": "P",
+            "703563": "RF",
+            "688363": "3B",
+            "703200": "3B",
+            "669065": "LF",
+            "815793": "SS",
+            "814508": "P",
+            "681449": "P",
+            "683353": "C",
+            "703448": "OF",
+            "669622": "P",
+            "683357": "RF",
+            "682663": "C",
+            "677354": "P",
+            "801957": "SS",
+            "702906": "3B",
+            "640459": "1B",
+            "808503": "C",
+            "808500": "SS",
+            "801276": "SS",
+            "808903": "SS",
+            "806965": "SS",
+            "694555": "P",
+            "694795": "P",
+            "676604": "P",
+            "669199": "P",
+            "805144": "P",
+            "829035": "IF",
+            "666129": "P",
+            "701777": "C",
+            "685321": "P",
+            "681357": "2B",
+            "824028": "2B",
+            "800254": "2B",
+            "807720": "3B",
+            "805300": "CF",
+            "801464": "CF",
+            "676974": "P",
+            "667463": "P",
+            "702696": "P",
+            "701360": "1B",
+            "688540": "P",
+            "806188": "P",
+            "669364": "SS",
+            "687210": "1B",
+            "702571": "P",
+            "656848": "P",
+            "689359": "P",
+            "702977": "CF",
+            "815734": "1B",
+            "689508": "P",
+            "827665": "OF",
+            "801737": "P",
+            "827388": "OF",
+            "670183": "P",
+            "691788": "C",
+            "806982": "CF",
+            "691268": "SS",
+            "672640": "2B",
+            "801696": "P",
+            "671217": "C",
+            "691185": "SS",
+            "665052": "LF",
+            "664126": "P",
+            "678093": "OF",
+            "801249": "P",
+            "665846": "SS",
+            "800957": "CF",
+            "806258": "P",
+            "801881": "OF",
+            "694207": "P",
+            "702281": "P",
+            "696501": "CF",
+            "811310": "P",
+            "687473": "P",
+            "701980": "C",
+            "689414": "C",
+            "688445": "P",
+            "702315": "C",
+            "830894": "P",
+            "702708": "LF",
+            "815909": "OF",
+            "836071": "P",
+            "801995": "P",
+            "814458": "OF",
+            "667652": "P",
+            "622786": "P",
+            "810891": "1B",
+            "813883": "C",
+            "694350": "P",
+            "694351": "1B",
+            "808694": "C",
+            "703596": "P",
+            "681715": "LF",
+            "645261": "P",
+            "663969": "P",
+            "805104": "LF",
+            "814172": "SS",
+            "676534": "P",
+            "703861": "C",
+            "691594": "2B",
+            "806262": "P",
+            "669288": "CF",
+            "807751": "CF",
+            "823817": "SS",
+            "836056": "P",
+            "698929": "3B",
+            "694183": "SS",
+            "694580": "RF",
+            "687134": "P",
+            "702656": "2B",
+            "702418": "P",
+            "676083": "P",
+            "688617": "3B",
+            "682240": "P",
+            "681393": "3B",
+            "675394": "SS",
+            "663978": "P",
+            "677053": "P",
+            "804123": "P",
+            "803033": "LF",
+            "691587": "P",
+            "800448": "SS",
+            "695426": "C",
+            "694974": "OF",
+            "691588": "2B",
+            "800049": "P",
+            "702520": "OF",
+            "694376": "SS",
+            "650556": "P",
+            "689223": "P",
+            "680769": "1B",
+            "680802": "P",
+            "669854": "P",
+            "680890": "2B",
+            "595345": "P",
+            "805123": "P",
+            "800516": "SS",
+            "813896": "CF",
+            "691012": "P",
+            "696264": "RF",
+            "701305": "LF",
+            "686223": "P",
+            "664299": "P",
+            "621043": "SS",
+            "801039": "C",
+            "800067": "P",
+            "683988": "P",
+            "663878": "P",
+            "681293": "P",
+            "543877": "C",
+            "813842": "RF",
+            "809860": "OF",
+            "702462": "P",
+            "703676": "OF",
+            "690474": "SS",
+            "670623": "3B",
+            "695001": "P",
+            "624523": "2B",
+            "678906": "P",
+            "813844": "C",
+            "676694": "CF",
+            "829037": "LF",
+            "806993": "SS",
+            "803247": "P",
+            "800139": "SS",
+            "701121": "P",
+            "514888": "2B",
+            "675989": "P",
+            "837227": "P",
+            "694388": "LF",
+            "624415": "1B",
+            "665161": "SS",
+            "694381": "P",
+            "681347": "P",
+            "681077": "P",
+            "828599": "OF",
+            "676680": "P",
+            "702293": "OF",
+            "809338": "SS",
+            "542208": "C",
+            "702847": "P",
+            "687005": "RF",
+            "701358": "RF",
+            "641521": "SS",
+            "687888": "P",
+            "813865": "P",
+            "811718": "OF",
+            "694728": "SS",
+            "806014": "C",
+            "656986": "P",
+            "672277": "P",
+            "805672": "C",
+            "663445": "3B",
+            "663567": "P",
+            "621121": "P",
+            "687911": "P",
+            "682610": "P",
+            "801075": "C",
+            "676466": "2B",
+            "808027": "LF",
+            "673237": "C",
+            "805953": "CF",
+            "809143": "2B",
+            "695048": "C",
+            "695046": "CF",
+            "669397": "3B",
+            "814299": "2B",
+            "686294": "P",
+            "823809": "CF",
+            "685005": "P",
+            "641585": "P",
+            "669713": "P",
+            "686613": "P",
+            "687424": "P",
+            "702547": "SS",
+            "623352": "P",
+            "805904": "CF",
+            "801700": "P",
+            "660853": "P",
+            "822162": "2B",
+            "663967": "C",
+            "690667": "P",
+            "666211": "LF",
+            "836055": "SS",
+            "828395": "C",
+            "687776": "P",
+            "572233": "1B",
+            "804522": "P",
+            "670541": "DH"
+        },
         "deepStats": {
             "691587": {
                 "name": "Eury P\u00e9rez",
@@ -1487,10 +4559,267 @@
                     "avg": ".212",
                     "ops": ".642"
                 }
+            },
+            "805904": {
+                "name": "Zach Cole",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 8,
+                    "hr": 0,
+                    "k": 4,
+                    "bb": 3,
+                    "avg": ".125",
+                    "ops": ".489"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 39,
+                    "hr": 4,
+                    "k": 16,
+                    "bb": 2,
+                    "avg": ".282",
+                    "ops": ".958"
+                }
+            },
+            "514888": {
+                "name": "Jose Altuve",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 111,
+                    "hr": 7,
+                    "k": 28,
+                    "bb": 12,
+                    "avg": ".261",
+                    "ops": ".799"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 477,
+                    "hr": 19,
+                    "k": 81,
+                    "bb": 43,
+                    "avg": ".266",
+                    "ops": ".765"
+                }
+            },
+            "670541": {
+                "name": "Yordan Alvarez",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 32,
+                    "hr": 2,
+                    "k": 4,
+                    "bb": 6,
+                    "avg": ".344",
+                    "ops": "1.104"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 133,
+                    "hr": 4,
+                    "k": 29,
+                    "bb": 22,
+                    "avg": ".256",
+                    "ops": ".724"
+                }
+            },
+            "673237": {
+                "name": "Yainer Diaz",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 113,
+                    "hr": 6,
+                    "k": 25,
+                    "bb": 6,
+                    "avg": ".257",
+                    "ops": ".725"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 429,
+                    "hr": 14,
+                    "k": 70,
+                    "bb": 14,
+                    "avg": ".256",
+                    "ops": ".694"
+                }
+            },
+            "829037": {
+                "name": "Kevin Alvarez",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                }
+            },
+            "572233": {
+                "name": "Christian Walker",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 121,
+                    "hr": 4,
+                    "k": 35,
+                    "bb": 8,
+                    "avg": ".248",
+                    "ops": ".697"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 464,
+                    "hr": 23,
+                    "k": 142,
+                    "bb": 32,
+                    "avg": ".235",
+                    "ops": ".723"
+                }
+            },
+            "701358": {
+                "name": "Cam Smith",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 115,
+                    "hr": 4,
+                    "k": 38,
+                    "bb": 17,
+                    "avg": ".261",
+                    "ops": ".817"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 326,
+                    "hr": 5,
+                    "k": 99,
+                    "bb": 26,
+                    "avg": ".227",
+                    "ops": ".617"
+                }
+            },
+            "694376": {
+                "name": "Shay Whitcomb",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 10,
+                    "hr": 1,
+                    "k": 1,
+                    "bb": 0,
+                    "avg": ".100",
+                    "ops": ".500"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 22,
+                    "hr": 0,
+                    "k": 9,
+                    "bb": 0,
+                    "avg": ".136",
+                    "ops": ".273"
+                }
+            },
+            "669397": {
+                "name": "Nick Allen",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 97,
+                    "hr": 0,
+                    "k": 20,
+                    "bb": 12,
+                    "avg": ".216",
+                    "ops": ".537"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 274,
+                    "hr": 0,
+                    "k": 79,
+                    "bb": 19,
+                    "avg": ".223",
+                    "ops": ".534"
+                }
             }
         },
-        "hpUmpire": "TBD",
-        "umpStats": null,
+        "hpUmpire": "Ron Kulpa",
+        "umpStats": {
+            "k_rate": "25.3%",
+            "bb_rate": "7.2%",
+            "rpg": "7.7",
+            "games": 25
+        },
         "parkStats": null
     },
     {
