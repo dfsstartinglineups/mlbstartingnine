@@ -6158,9 +6158,9 @@
             "officialDate": "2026-03-15",
             "status": {
                 "abstractGameState": "Preview",
-                "codedGameState": "S",
-                "detailedState": "Scheduled",
-                "statusCode": "S",
+                "codedGameState": "P",
+                "detailedState": "Pre-Game",
+                "statusCode": "P",
                 "startTimeTBD": false,
                 "abstractGameCode": "P"
             },
@@ -6176,6 +6176,7 @@
                         "losses": 11,
                         "pct": ".313"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 664285,
                         "fullName": "Framber Valdez",
@@ -6238,6 +6239,7 @@
                         "losses": 8,
                         "pct": ".619"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 661563,
                         "fullName": "Luis Gil",
@@ -6292,26 +6294,361 @@
                 }
             },
             "linescore": {
+                "currentInning": 1,
+                "currentInningOrdinal": "1st",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
-                "innings": [],
+                "innings": [
+                    {
+                        "num": 1,
+                        "ordinalNum": "1st",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    }
+                ],
                 "teams": {
-                    "home": {},
-                    "away": {}
+                    "home": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    },
+                    "away": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 661563,
+                        "fullName": "Luis Gil",
+                        "link": "/api/v1/people/661563",
+                        "firstName": "Luis",
+                        "lastName": "Gil",
+                        "primaryNumber": "81",
+                        "birthDate": "1998-06-03",
+                        "currentAge": 27,
+                        "birthCity": "Azua",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 2\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Luis",
+                        "useLastName": "Gil",
+                        "middleName": "Angel",
+                        "boxscoreName": "Gil",
+                        "gender": "M",
+                        "nameMatrilineal": "Brito",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "HEEL",
+                        "mlbDebutDate": "2021-08-03",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Luis Gil",
+                        "nameSlug": "luis-gil-661563",
+                        "firstLastName": "Luis Gil",
+                        "lastFirstName": "Gil, Luis",
+                        "lastInitName": "Gil, L",
+                        "initLastName": "L Gil",
+                        "fullFMLName": "Luis Angel Gil",
+                        "fullLFMName": "Gil, Luis Angel",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
+                    },
+                    "catcher": {
+                        "id": 645305,
+                        "fullName": "Ali S\u00e1nchez",
+                        "link": "/api/v1/people/645305"
+                    },
+                    "first": {
+                        "id": 667803,
+                        "fullName": "Ernesto Martinez Jr.",
+                        "link": "/api/v1/people/667803"
+                    },
+                    "second": {
+                        "id": 680474,
+                        "fullName": "Max Schuemann",
+                        "link": "/api/v1/people/680474"
+                    },
+                    "third": {
+                        "id": 641857,
+                        "fullName": "Ryan McMahon",
+                        "link": "/api/v1/people/641857"
+                    },
+                    "shortstop": {
+                        "id": 657557,
+                        "fullName": "Paul DeJong",
+                        "link": "/api/v1/people/657557"
+                    },
+                    "left": {
+                        "id": 545341,
+                        "fullName": "Randal Grichuk",
+                        "link": "/api/v1/people/545341"
+                    },
+                    "center": {
+                        "id": 663757,
+                        "fullName": "Trent Grisham",
+                        "link": "/api/v1/people/663757"
+                    },
+                    "right": {
+                        "id": 641355,
+                        "fullName": "Cody Bellinger",
+                        "link": "/api/v1/people/641355"
+                    },
+                    "batter": {
+                        "id": 663757,
+                        "fullName": "Trent Grisham",
+                        "link": "/api/v1/people/663757"
+                    },
+                    "onDeck": {
+                        "id": 545341,
+                        "fullName": "Randal Grichuk",
+                        "link": "/api/v1/people/545341"
+                    },
+                    "inHole": {
+                        "id": 641355,
+                        "fullName": "Cody Bellinger",
+                        "link": "/api/v1/people/641355"
+                    },
+                    "battingOrder": 1,
+                    "team": {
+                        "id": 147,
+                        "name": "New York Yankees",
+                        "link": "/api/v1/teams/147"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 663837,
+                        "fullName": "Matt Vierling",
+                        "link": "/api/v1/people/663837",
+                        "firstName": "Matthew",
+                        "lastName": "Vierling",
+                        "primaryNumber": "8",
+                        "birthDate": "1996-09-16",
+                        "currentAge": 29,
+                        "birthCity": "St. Louis",
+                        "birthStateProvince": "MO",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 205,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Matt",
+                        "useLastName": "Vierling",
+                        "middleName": "Gregory",
+                        "boxscoreName": "Vierling",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2018,
+                        "pronunciation": "VEER-ling",
+                        "mlbDebutDate": "2021-06-19",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Matt Vierling",
+                        "nameSlug": "matt-vierling-663837",
+                        "firstLastName": "Matt Vierling",
+                        "lastFirstName": "Vierling, Matt",
+                        "lastInitName": "Vierling, M",
+                        "initLastName": "M Vierling",
+                        "fullFMLName": "Matthew Gregory Vierling",
+                        "fullLFMName": "Vierling, Matthew Gregory",
+                        "strikeZoneTop": 3.274,
+                        "strikeZoneBottom": 1.652
+                    },
+                    "onDeck": {
+                        "id": 681481,
+                        "fullName": "Kerry Carpenter",
+                        "link": "/api/v1/people/681481",
+                        "firstName": "Kerry",
+                        "lastName": "Carpenter",
+                        "primaryNumber": "30",
+                        "birthDate": "1997-09-02",
+                        "currentAge": 28,
+                        "birthCity": "Eustis",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Kerry",
+                        "useLastName": "Carpenter",
+                        "middleName": "William",
+                        "boxscoreName": "Carpenter",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "mlbDebutDate": "2022-08-10",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Kerry Carpenter",
+                        "nameSlug": "kerry-carpenter-681481",
+                        "firstLastName": "Kerry Carpenter",
+                        "lastFirstName": "Carpenter, Kerry",
+                        "lastInitName": "Carpenter, K",
+                        "initLastName": "K Carpenter",
+                        "fullFMLName": "Kerry William Carpenter",
+                        "fullLFMName": "Carpenter, Kerry William",
+                        "strikeZoneTop": 3.234,
+                        "strikeZoneBottom": 1.632
+                    },
+                    "inHole": {
+                        "id": 690993,
+                        "fullName": "Colt Keith",
+                        "link": "/api/v1/people/690993",
+                        "firstName": "Colten",
+                        "lastName": "Keith",
+                        "primaryNumber": "33",
+                        "birthDate": "2001-08-14",
+                        "currentAge": 24,
+                        "birthCity": "Zanesville",
+                        "birthStateProvince": "OH",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 211,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Colt",
+                        "useLastName": "Keith",
+                        "middleName": "Thomas",
+                        "boxscoreName": "Keith",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2020,
+                        "mlbDebutDate": "2024-03-28",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Colt Keith",
+                        "nameSlug": "colt-keith-690993",
+                        "firstLastName": "Colt Keith",
+                        "lastFirstName": "Keith, Colt",
+                        "lastInitName": "Keith, C",
+                        "initLastName": "C Keith",
+                        "fullFMLName": "Colten Thomas Keith",
+                        "fullLFMName": "Keith, Colten Thomas",
+                        "strikeZoneTop": 3.278,
+                        "strikeZoneBottom": 1.654
+                    },
+                    "pitcher": {
+                        "id": 664285,
+                        "fullName": "Framber Valdez",
+                        "link": "/api/v1/people/664285",
+                        "firstName": "Framber",
+                        "lastName": "Valdez",
+                        "primaryNumber": "59",
+                        "birthDate": "1993-11-19",
+                        "currentAge": 32,
+                        "birthCity": "Palenque",
+                        "birthCountry": "Dominican Republic",
+                        "height": "5' 11\"",
+                        "weight": 230,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Framber",
+                        "useLastName": "Valdez",
+                        "boxscoreName": "Valdez, F",
+                        "gender": "M",
+                        "nameMatrilineal": "Pinales",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "FRAHM-burr",
+                        "mlbDebutDate": "2018-08-21",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Framber Valdez",
+                        "nameSlug": "framber-valdez-664285",
+                        "firstLastName": "Framber Valdez",
+                        "lastFirstName": "Valdez, Framber",
+                        "lastInitName": "Valdez, F",
+                        "initLastName": "F Valdez",
+                        "fullFMLName": "Framber Valdez",
+                        "fullLFMName": "Valdez, Framber",
+                        "strikeZoneTop": 3.32,
+                        "strikeZoneBottom": 1.51
+                    },
+                    "battingOrder": 1,
                     "team": {
                         "id": 116,
                         "name": "Detroit Tigers",
                         "link": "/api/v1/teams/116"
                     }
                 },
-                "offense": {
-                    "team": {
-                        "id": 147,
-                        "name": "New York Yankees",
-                        "link": "/api/v1/teams/147"
-                    }
-                }
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2523,
@@ -6338,11 +6675,516 @@
             "recordSource": "S",
             "ifNecessary": "N",
             "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "lineups": {
+                "homePlayers": [
+                    {
+                        "id": 663757,
+                        "fullName": "Trent Grisham",
+                        "link": "/api/v1/people/663757",
+                        "firstName": "Trenton",
+                        "lastName": "Grisham",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Trent"
+                    },
+                    {
+                        "id": 545341,
+                        "fullName": "Randal Grichuk",
+                        "link": "/api/v1/people/545341",
+                        "firstName": "Randal",
+                        "lastName": "Grichuk",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Randal"
+                    },
+                    {
+                        "id": 641355,
+                        "fullName": "Cody Bellinger",
+                        "link": "/api/v1/people/641355",
+                        "firstName": "Cody",
+                        "lastName": "Bellinger",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Cody"
+                    },
+                    {
+                        "id": 519317,
+                        "fullName": "Giancarlo Stanton",
+                        "link": "/api/v1/people/519317",
+                        "firstName": "Giancarlo",
+                        "lastName": "Stanton",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Giancarlo"
+                    },
+                    {
+                        "id": 657557,
+                        "fullName": "Paul DeJong",
+                        "link": "/api/v1/people/657557",
+                        "firstName": "Paul",
+                        "lastName": "DeJong",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Paul"
+                    },
+                    {
+                        "id": 641857,
+                        "fullName": "Ryan McMahon",
+                        "link": "/api/v1/people/641857",
+                        "firstName": "Ryan",
+                        "lastName": "McMahon",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Ryan"
+                    },
+                    {
+                        "id": 680474,
+                        "fullName": "Max Schuemann",
+                        "link": "/api/v1/people/680474",
+                        "firstName": "Maxwell",
+                        "lastName": "Schuemann",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Max"
+                    },
+                    {
+                        "id": 667803,
+                        "fullName": "Ernesto Martinez Jr.",
+                        "link": "/api/v1/people/667803",
+                        "firstName": "Ernesto",
+                        "lastName": "Martinez ",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Ernesto"
+                    },
+                    {
+                        "id": 645305,
+                        "fullName": "Ali S\u00e1nchez",
+                        "link": "/api/v1/people/645305",
+                        "firstName": "Ali",
+                        "lastName": "S\u00e1nchez",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Ali"
+                    }
+                ],
+                "awayPlayers": [
+                    {
+                        "id": 663837,
+                        "fullName": "Matt Vierling",
+                        "link": "/api/v1/people/663837",
+                        "firstName": "Matthew",
+                        "lastName": "Vierling",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Matt"
+                    },
+                    {
+                        "id": 681481,
+                        "fullName": "Kerry Carpenter",
+                        "link": "/api/v1/people/681481",
+                        "firstName": "Kerry",
+                        "lastName": "Carpenter",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Kerry"
+                    },
+                    {
+                        "id": 690993,
+                        "fullName": "Colt Keith",
+                        "link": "/api/v1/people/690993",
+                        "firstName": "Colten",
+                        "lastName": "Keith",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Colt"
+                    },
+                    {
+                        "id": 679529,
+                        "fullName": "Spencer Torkelson",
+                        "link": "/api/v1/people/679529",
+                        "firstName": "Spencer",
+                        "lastName": "Torkelson",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Spencer"
+                    },
+                    {
+                        "id": 682985,
+                        "fullName": "Riley Greene",
+                        "link": "/api/v1/people/682985",
+                        "firstName": "Riley",
+                        "lastName": "Greene",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Riley"
+                    },
+                    {
+                        "id": 693307,
+                        "fullName": "Dillon Dingler",
+                        "link": "/api/v1/people/693307",
+                        "firstName": "Francis",
+                        "lastName": "Dingler",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Dillon"
+                    },
+                    {
+                        "id": 595879,
+                        "fullName": "Javier B\u00e1ez",
+                        "link": "/api/v1/people/595879",
+                        "firstName": "Ednel",
+                        "lastName": "B\u00e1ez",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Javier"
+                    },
+                    {
+                        "id": 656716,
+                        "fullName": "Zach McKinstry",
+                        "link": "/api/v1/people/656716",
+                        "firstName": "Zachary",
+                        "lastName": "McKinstry",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Zach"
+                    },
+                    {
+                        "id": 596103,
+                        "fullName": "Austin Slater",
+                        "link": "/api/v1/people/596103",
+                        "firstName": "Austin",
+                        "lastName": "Slater",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Austin"
+                    }
+                ]
+            }
         },
         "odds": null,
         "lineupHandedness": {},
-        "gamePositions": {},
+        "gamePositions": {
+            "664285": "P",
+            "676428": "P",
+            "814477": "P",
+            "690291": "3B",
+            "694496": "P",
+            "827672": "SS",
+            "701557": "P",
+            "689225": "P",
+            "623454": "P",
+            "668766": "P",
+            "681458": "P",
+            "825094": "OF",
+            "800510": "2B",
+            "805808": "SS",
+            "656427": "P",
+            "829338": "P",
+            "689450": "P",
+            "696148": "P",
+            "687033": "P",
+            "808344": "C",
+            "690162": "P",
+            "687830": "P",
+            "703601": "CF",
+            "661733": "2B",
+            "687308": "P",
+            "808986": "P",
+            "693307": "C",
+            "667452": "LF",
+            "701493": "C",
+            "674944": "P",
+            "696059": "P",
+            "656716": "2B",
+            "595879": "SS",
+            "802953": "P",
+            "822487": "OF",
+            "680273": "OF",
+            "681481": "DH",
+            "640448": "P",
+            "801221": "P",
+            "669193": "P",
+            "807726": "SS",
+            "676614": "P",
+            "694425": "RF",
+            "668670": "C",
+            "596103": "RF",
+            "669360": "CF",
+            "434378": "P",
+            "676684": "P",
+            "672761": "RF",
+            "825924": "CF",
+            "679712": "P",
+            "676568": "P",
+            "800522": "C",
+            "641360": "P",
+            "693243": "1B",
+            "813620": "SS",
+            "694331": "P",
+            "814430": "LF",
+            "621512": "C",
+            "669373": "P",
+            "663554": "P",
+            "664123": "P",
+            "682985": "LF",
+            "663432": "P",
+            "663947": "P",
+            "700939": "C",
+            "826942": "P",
+            "828603": "P",
+            "802219": "SS",
+            "572143": "P",
+            "445276": "P",
+            "690523": "SS",
+            "676910": "P",
+            "699911": "P",
+            "687074": "P",
+            "691452": "C",
+            "650402": "2B",
+            "801194": "2B",
+            "701464": "P",
+            "803252": "P",
+            "689931": "SS",
+            "700931": "CF",
+            "693073": "1B",
+            "646241": "P",
+            "685337": "C",
+            "663837": "CF",
+            "685329": "P",
+            "672380": "P",
+            "681890": "P",
+            "678009": "CF",
+            "691449": "OF",
+            "690993": "3B",
+            "676987": "P",
+            "800423": "P",
+            "669398": "3B",
+            "685481": "P",
+            "700365": "P",
+            "808970": "P",
+            "806275": "SS",
+            "700242": "SS",
+            "687543": "1B",
+            "663455": "P",
+            "686972": "P",
+            "815268": "OF",
+            "663330": "RF",
+            "681289": "P",
+            "803723": "SS",
+            "821591": "C",
+            "679529": "1B",
+            "670276": "OF",
+            "690544": "P",
+            "802599": "SS",
+            "701162": "CF",
+            "834672": "C",
+            "694184": "3B",
+            "669724": "P",
+            "800723": "P",
+            "695589": "P",
+            "692110": "SS",
+            "814512": "P",
+            "687280": "P",
+            "695066": "P",
+            "606160": "P",
+            "669699": "SS",
+            "683522": "P",
+            "684725": "P",
+            "801726": "SS",
+            "674370": "P",
+            "684608": "P",
+            "694805": "P",
+            "691411": "LF",
+            "675502": "P",
+            "702750": "C",
+            "669224": "C",
+            "692585": "RF",
+            "690440": "P",
+            "702874": "P",
+            "669740": "P",
+            "687396": "P",
+            "701542": "P",
+            "687554": "LF",
+            "641555": "C",
+            "663757": "CF",
+            "675296": "P",
+            "670280": "P",
+            "806963": "CF",
+            "691004": "P",
+            "822915": "P",
+            "676609": "SS",
+            "670868": "C",
+            "702068": "CF",
+            "701778": "LF",
+            "607074": "P",
+            "696292": "P",
+            "681116": "P",
+            "687589": "P",
+            "642232": "P",
+            "665828": "3B",
+            "545341": "LF",
+            "682692": "C",
+            "692646": "P",
+            "804698": "P",
+            "691795": "P",
+            "694662": "P",
+            "703149": "SS",
+            "694660": "P",
+            "815454": "P",
+            "683011": "SS",
+            "608331": "P",
+            "666808": "P",
+            "800246": "C",
+            "804603": "3B",
+            "660787": "P",
+            "683409": "P",
+            "801739": "P",
+            "690977": "P",
+            "676442": "P",
+            "676205": "1B",
+            "692550": "P",
+            "621112": "P",
+            "809763": "SS",
+            "694696": "P",
+            "814431": "RF",
+            "826142": "OF",
+            "815089": "IF",
+            "685067": "P",
+            "685464": "P",
+            "814715": "P",
+            "685744": "CF",
+            "813866": "P",
+            "666148": "P",
+            "668721": "C",
+            "804912": "P",
+            "680572": "P",
+            "664913": "LF",
+            "670097": "3B",
+            "677960": "P",
+            "657557": "SS",
+            "502671": "1B",
+            "694964": "P",
+            "691176": "LF",
+            "700250": "1B",
+            "810102": "P",
+            "806244": "P",
+            "680716": "SS",
+            "702036": "P",
+            "803131": "P",
+            "682617": "OF",
+            "686540": "SS",
+            "667803": "1B",
+            "518585": "P",
+            "641355": "RF",
+            "519317": "DH",
+            "665862": "2B",
+            "703923": "P",
+            "656234": "P",
+            "679693": "P",
+            "543037": "P",
+            "812431": "P",
+            "645305": "C",
+            "669395": "P",
+            "695560": "P",
+            "657051": "OF",
+            "815147": "CF",
+            "678391": "2B",
+            "680474": "2B",
+            "642708": "3B",
+            "800299": "C",
+            "592450": "RF",
+            "641857": "3B",
+            "529017": "P",
+            "657612": "P",
+            "668752": "CF",
+            "694742": "1B",
+            "702130": "P",
+            "694341": "P",
+            "703748": "P",
+            "665645": "P",
+            "701206": "CF",
+            "701727": "SS",
+            "661563": "P",
+            "682003": "RF",
+            "800285": "3B",
+            "806146": "SS",
+            "693645": "P",
+            "672442": "P",
+            "694215": "3B"
+        },
         "deepStats": {
             "664285": {
                 "name": "Framber Valdez",
@@ -6387,10 +7229,519 @@
                     "avg": ".232",
                     "ops": ".691"
                 }
+            },
+            "663837": {
+                "name": "Matt Vierling",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 38,
+                    "hr": 1,
+                    "k": 11,
+                    "bb": 3,
+                    "avg": ".289",
+                    "ops": ".744"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 50,
+                    "hr": 0,
+                    "k": 13,
+                    "bb": 4,
+                    "avg": ".200",
+                    "ops": ".521"
+                }
+            },
+            "681481": {
+                "name": "Kerry Carpenter",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 60,
+                    "hr": 3,
+                    "k": 14,
+                    "bb": 2,
+                    "avg": ".217",
+                    "ops": ".638"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 373,
+                    "hr": 23,
+                    "k": 92,
+                    "bb": 16,
+                    "avg": ".257",
+                    "ops": ".812"
+                }
+            },
+            "690993": {
+                "name": "Colt Keith",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 43,
+                    "hr": 0,
+                    "k": 12,
+                    "bb": 3,
+                    "avg": ".163",
+                    "ops": ".403"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 371,
+                    "hr": 13,
+                    "k": 90,
+                    "bb": 45,
+                    "avg": ".267",
+                    "ops": ".785"
+                }
+            },
+            "679529": {
+                "name": "Spencer Torkelson",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 159,
+                    "hr": 10,
+                    "k": 42,
+                    "bb": 28,
+                    "avg": ".264",
+                    "ops": ".884"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 404,
+                    "hr": 21,
+                    "k": 127,
+                    "bb": 44,
+                    "avg": ".230",
+                    "ops": ".751"
+                }
+            },
+            "682985": {
+                "name": "Riley Greene",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 179,
+                    "hr": 4,
+                    "k": 60,
+                    "bb": 17,
+                    "avg": ".218",
+                    "ops": ".620"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 421,
+                    "hr": 32,
+                    "k": 141,
+                    "bb": 29,
+                    "avg": ".276",
+                    "ops": ".886"
+                }
+            },
+            "693307": {
+                "name": "Dillon Dingler",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 112,
+                    "hr": 5,
+                    "k": 27,
+                    "bb": 9,
+                    "avg": ".330",
+                    "ops": ".961"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 323,
+                    "hr": 8,
+                    "k": 83,
+                    "bb": 14,
+                    "avg": ".260",
+                    "ops": ".680"
+                }
+            },
+            "595879": {
+                "name": "Javier B\u00e1ez",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 129,
+                    "hr": 2,
+                    "k": 31,
+                    "bb": 3,
+                    "avg": ".318",
+                    "ops": ".770"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 288,
+                    "hr": 10,
+                    "k": 78,
+                    "bb": 7,
+                    "avg": ".229",
+                    "ops": ".640"
+                }
+            },
+            "656716": {
+                "name": "Zach McKinstry",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 108,
+                    "hr": 1,
+                    "k": 26,
+                    "bb": 7,
+                    "avg": ".296",
+                    "ops": ".854"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 344,
+                    "hr": 11,
+                    "k": 85,
+                    "bb": 39,
+                    "avg": ".247",
+                    "ops": ".746"
+                }
+            },
+            "596103": {
+                "name": "Austin Slater",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 69,
+                    "hr": 5,
+                    "k": 17,
+                    "bb": 8,
+                    "avg": ".261",
+                    "ops": ".859"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 9,
+                    "hr": 0,
+                    "k": 5,
+                    "bb": 0,
+                    "avg": ".222",
+                    "ops": ".444"
+                }
+            },
+            "663757": {
+                "name": "Trent Grisham",
+                "bvp": {
+                    "ab": 6,
+                    "hits": 4,
+                    "hr": 1,
+                    "avg": ".667",
+                    "ops": "1.834"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 132,
+                    "hr": 7,
+                    "k": 41,
+                    "bb": 21,
+                    "avg": ".182",
+                    "ops": ".652"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 362,
+                    "hr": 27,
+                    "k": 96,
+                    "bb": 61,
+                    "avg": ".254",
+                    "ops": ".869"
+                }
+            },
+            "545341": {
+                "name": "Randal Grichuk",
+                "bvp": {
+                    "ab": 6,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".167",
+                    "ops": ".334"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 57,
+                    "hr": 2,
+                    "k": 15,
+                    "bb": 3,
+                    "avg": ".228",
+                    "ops": ".635"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 60,
+                    "hr": 2,
+                    "k": 10,
+                    "bb": 2,
+                    "avg": ".267",
+                    "ops": ".727"
+                }
+            },
+            "641355": {
+                "name": "Cody Bellinger",
+                "bvp": {
+                    "ab": 4,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 153,
+                    "hr": 8,
+                    "k": 17,
+                    "bb": 18,
+                    "avg": ".353",
+                    "ops": "1.016"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 435,
+                    "hr": 21,
+                    "k": 73,
+                    "bb": 39,
+                    "avg": ".244",
+                    "ops": ".741"
+                }
+            },
+            "519317": {
+                "name": "Giancarlo Stanton",
+                "bvp": {
+                    "ab": 15,
+                    "hits": 6,
+                    "hr": 1,
+                    "avg": ".400",
+                    "ops": "1.138"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 65,
+                    "hr": 5,
+                    "k": 24,
+                    "bb": 13,
+                    "avg": ".277",
+                    "ops": ".951"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 184,
+                    "hr": 19,
+                    "k": 72,
+                    "bb": 16,
+                    "avg": ".272",
+                    "ops": ".940"
+                }
+            },
+            "657557": {
+                "name": "Paul DeJong",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 1,
+                    "hr": 1,
+                    "avg": ".500",
+                    "ops": "2.333"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 65,
+                    "hr": 5,
+                    "k": 28,
+                    "bb": 3,
+                    "avg": ".185",
+                    "ops": ".664"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 128,
+                    "hr": 1,
+                    "k": 42,
+                    "bb": 8,
+                    "avg": ".250",
+                    "ops": ".631"
+                }
+            },
+            "641857": {
+                "name": "Ryan McMahon",
+                "bvp": {
+                    "ab": 1,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".667"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 87,
+                    "hr": 2,
+                    "k": 31,
+                    "bb": 9,
+                    "avg": ".207",
+                    "ops": ".599"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 132,
+                    "hr": 4,
+                    "k": 52,
+                    "bb": 18,
+                    "avg": ".227",
+                    "ops": ".706"
+                }
+            },
+            "680474": {
+                "name": "Max Schuemann",
+                "bvp": {
+                    "ab": 1,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".500"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 56,
+                    "hr": 0,
+                    "k": 7,
+                    "bb": 7,
+                    "avg": ".161",
+                    "ops": ".462"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 127,
+                    "hr": 2,
+                    "k": 28,
+                    "bb": 15,
+                    "avg": ".213",
+                    "ops": ".615"
+                }
+            },
+            "667803": {
+                "name": "Ernesto Martinez Jr.",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                }
+            },
+            "645305": {
+                "name": "Ali S\u00e1nchez",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 4,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": ".500",
+                    "ops": "1.250"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 17,
+                    "hr": 0,
+                    "k": 5,
+                    "bb": 0,
+                    "avg": ".176",
+                    "ops": ".412"
+                }
             }
         },
-        "hpUmpire": "TBD",
-        "umpStats": null,
+        "hpUmpire": "Laz Diaz",
+        "umpStats": {
+            "k_rate": "22.7%",
+            "bb_rate": "8.3%",
+            "rpg": "9.0",
+            "games": 32
+        },
         "parkStats": null
     },
     {
