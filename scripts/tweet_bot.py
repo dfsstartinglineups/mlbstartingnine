@@ -523,8 +523,7 @@ for target_date_str in futbol_dates_to_check:
         a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
         
         # Link uses target_date_str, NOT the global date_str
-        footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={target_date_str}#card-{fixture_id}\n\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
-        
+        footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#card-{fixture_id}\n\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
         tweet_parts = [header, home_str, away_str, odds_str]
         if inj_str: tweet_parts.append(inj_str)
         tweet_parts.append(footer)
@@ -772,7 +771,7 @@ for target_date_str in futbol_dates_to_check:
             a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
             
             # Link uses target_date_str, NOT the global date_str
-            link = f"https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={target_date_str}#card-{fixture_id}"
+            link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#card-{fixture_id}"
             
             title = random.choice(PHRASES[scenario_key]["titles"])
             blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
@@ -828,7 +827,7 @@ for target_date_str in futbol_dates_to_check:
                 h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
                 a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
                 
-                link = f"https://futbolstartingeleven.com/?league={league_info['url_slug']}&date={target_date_str}#card-{fixture_id}"
+                link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#card-{fixture_id}"
                 
                 disallowed_tweet += f"\n\nLive match center:\n⬇️\n{link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
                 
