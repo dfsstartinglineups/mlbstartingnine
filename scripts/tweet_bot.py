@@ -427,6 +427,11 @@ FUTBOL_LEAGUES = {
     94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
     239: {"name": "PRIMERA A 🇨🇴", "tag": "#LigaBetPlay #Dimayor", "url_slug": "colombia"}
 }
+    #203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig #Galatasaray #Fenerbahce", "url_slug": "turkey"},
+    #144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
+    #179: {"name": "PREMIERSHIP 🏴󠁧󠁢󠁳󠁣󠁴󠁿", "tag": "#ScottishPremiership #CinchPrem", "url_slug": "scotland"},
+    #188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
+    #119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"}
 
 def parse_futbol_lineup(startXI):
     pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
