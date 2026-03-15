@@ -12,6 +12,16 @@ PARKS_FILE = os.path.join(DATA_DIR, 'parks.json')
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
+# --- API TRACKING ---
+API_CALL_TRACKER = {
+    "schedule": 0,
+    "odds": 0,
+    "live_feed": 0,
+    "bvp": 0,
+    "splits": 0,
+    "people": 0
+}
+
 def get_active_sport_ids():
     current_date = datetime.utcnow().date()
     wbc_start = datetime(2026, 3, 4).date()
@@ -32,6 +42,9 @@ def save_cache(data):
         json.dump(data, f, indent=4)
 
 def fetch_bvp(session, batter_id, pitcher_id):
+    global API_CALL_TRACKER
+    API_CALL_TRACKER["bvp"] += 1
+    
     url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=vsPlayer&opposingPlayerId={pitcher_id}&group=hitting&gameType=R"
     try:
         res = session.get(url, timeout=10).json()
@@ -46,11 +59,14 @@ def fetch_bvp(session, batter_id, pitcher_id):
     return {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
 
 def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
+    global API_CALL_TRACKER
+    
     current_year = datetime.utcnow().year
     years = [current_year - 1, current_year]
     totals = {"ab": 0, "h": 0, "2b": 0, "3b": 0, "hr": 0, "bb": 0, "hbp": 0, "sf": 0, "k": 0}
     
     for year in years:
+        API_CALL_TRACKER["splits"] += 1
         url = f"https://statsapi.mlb.com/api/v1/people/{person_id}/stats?stats=statSplits&sitCodes={hand_code}&group={group_type}&gameType=R&season={year}"
         try:
             res = session.get(url, timeout=10).json()
@@ -79,6 +95,7 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
     return {"split_type": split_label, "ab": ab, "hr": hr, "k": k, "bb": bb, "avg": avg_str, "ops": ops_str}
 
 def main():
+    global API_CALL_TRACKER
     today_obj = datetime.utcnow()
     start_date = (today_obj - timedelta(days=1)).strftime('%Y-%m-%d')
     end_date = (today_obj + timedelta(days=1)).strftime('%Y-%m-%d')
@@ -96,6 +113,7 @@ def main():
     park_cache = load_json(PARKS_FILE, {}).get('parks', {})
     
     # Fetch Odds
+    API_CALL_TRACKER["odds"] += 1
     try:
         odds_data = requests.get("https://weathermlb.com/data/odds.json", timeout=10).json().get('odds', [])
     except Exception:
@@ -104,6 +122,7 @@ def main():
     # Fetch Schedule
     sport_ids = get_active_sport_ids()
     schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person"
+    API_CALL_TRACKER["schedule"] += 1
     try:
         schedule_data = session.get(schedule_url, timeout=15).json()
     except Exception as e:
@@ -178,6 +197,7 @@ def main():
             ump_stats = None
             
             try:
+                API_CALL_TRACKER["live_feed"] += 1
                 live_data = session.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live", timeout=5).json()
                 officials = live_data.get('liveData', {}).get('boxscore', {}).get('officials', [])
                 hp = next((o for o in officials if o.get('officialType') == 'Home Plate'), None)
@@ -229,6 +249,19 @@ def main():
         with open(daily_file, 'w') as f:
             json.dump(games_list, f, indent=4)
         print(f"✅ Created {daily_file} with {len(games_list)} games.")
+
+    # --- PRINT API METRICS ---
+    total_calls = sum(API_CALL_TRACKER.values())
+    print("\n" + "="*40)
+    print(f"📊 API CALL SUMMARY: {total_calls} Total Requests")
+    print("="*40)
+    print(f"  - MLB Schedule (Master): {API_CALL_TRACKER['schedule']}")
+    print(f"  - MLB Live Feed (Pos/Ump): {API_CALL_TRACKER['live_feed']}")
+    print(f"  - MLB BvP Lookup: {API_CALL_TRACKER['bvp']}")
+    print(f"  - MLB Splits Lookup: {API_CALL_TRACKER['splits']}")
+    print(f"  - MLB Player Lookup: {API_CALL_TRACKER['people']}")
+    print(f"  - WeatherMLB Odds: {API_CALL_TRACKER['odds']}")
+    print("="*40 + "\n")
 
 if __name__ == "__main__":
     main()
