@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import time
+import zoneinfo
 from datetime import datetime, timedelta
 
 # --- CONFIGURATION ---
@@ -96,9 +97,19 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
 
 def main():
     global API_CALL_TRACKER
-    today_obj = datetime.utcnow()
-    start_date = (today_obj - timedelta(days=1)).strftime('%Y-%m-%d')
-    end_date = (today_obj + timedelta(days=1)).strftime('%Y-%m-%d')
+    
+    # --- 🛑 THE DEEP SLEEP CHECK ---
+    est_tz = zoneinfo.ZoneInfo("America/New_York")
+    current_est_time = datetime.now(est_tz)
+    
+    if 3 <= current_est_time.hour < 8:
+        print(f"💤 SLEEP MODE ACTIVE: It is currently {current_est_time.strftime('%I:%M %p')} EST.")
+        print("No MLB action happens between 3 AM and 8 AM. Shutting down to save server resources.")
+        return # This kills the script instantly and perfectly
+        
+    today_est_str = current_est_time.strftime('%Y-%m-%d')
+    start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
+    end_date = (current_est_time + timedelta(days=1)).strftime('%Y-%m-%d')
     
     print(f"🚀 Building Master JSONs for window: {start_date} to {end_date}")
     
@@ -196,27 +207,34 @@ def main():
             hp_umpire = "TBD"
             ump_stats = None
             
-            try:
-                API_CALL_TRACKER["live_feed"] += 1
-                live_data = session.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live", timeout=5).json()
-                officials = live_data.get('liveData', {}).get('boxscore', {}).get('officials', [])
-                hp = next((o for o in officials if o.get('officialType') == 'Home Plate'), None)
-                if hp and hp.get('official'):
-                    hp_umpire = hp['official']['fullName']
-                    ump_stats = ump_cache.get(hp_umpire)
+            # --- 🛑 LIVE FEED OPTIMIZATION ---
+            # ONLY ping the live feed if the game is TODAY and lineups are actually posted!
+            if date_str == today_est_str and (len(away_lineup) > 0 or len(home_lineup) > 0):
+                try:
+                    API_CALL_TRACKER["live_feed"] += 1
+                    live_data = session.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live", timeout=5).json()
+                    
+                    # 1. Grab Umpire Name
+                    officials = live_data.get('liveData', {}).get('boxscore', {}).get('officials', [])
+                    hp = next((o for o in officials if o.get('officialType') == 'Home Plate'), None)
+                    if hp and hp.get('official'):
+                        hp_umpire = hp['official']['fullName']
+                        # Look up umpire's name inside your local umpires.json cache!
+                        ump_stats = ump_cache.get(hp_umpire)
 
-                box_teams = live_data.get('liveData', {}).get('boxscore', {}).get('teams', {})
-                all_live_players = {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}
-                
-                for p_key, p_val in all_live_players.items():
-                    pid = str(p_val.get('person', {}).get('id'))
-                    # Extract Position
-                    if p_val.get('allPositions'): game_positions[pid] = p_val['allPositions'][0].get('abbreviation')
-                    elif p_val.get('position'): game_positions[pid] = p_val['position'].get('abbreviation')
-                    # Extract & Cache Handedness
-                    if p_val.get('person', {}).get('batSide'):
-                        hand_cache[pid] = p_val['person']['batSide'].get('code')
-            except Exception: pass
+                    # 2. Grab Player Positions
+                    box_teams = live_data.get('liveData', {}).get('boxscore', {}).get('teams', {})
+                    all_live_players = {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}
+                    
+                    for p_key, p_val in all_live_players.items():
+                        pid = str(p_val.get('person', {}).get('id'))
+                        # Extract Position
+                        if p_val.get('allPositions'): game_positions[pid] = p_val['allPositions'][0].get('abbreviation')
+                        elif p_val.get('position'): game_positions[pid] = p_val['position'].get('abbreviation')
+                        # Extract & Cache Handedness
+                        if p_val.get('person', {}).get('batSide'):
+                            hand_cache[pid] = p_val['person']['batSide'].get('code')
+                except Exception: pass
 
             # Re-map handedness for the frontend
             lineup_handedness = {pid: hand_cache.get(pid, "") for pid in [str(p['id']) for p in away_lineup + home_lineup]}
@@ -236,7 +254,8 @@ def main():
     # Purge stale cache
     cache['games'] = {pk: data for pk, data in games_cache.items() if pk in valid_game_pks}
     cache['handedness'] = hand_cache
-    cache['last_updated'] = today_obj.strftime('%Y-%m-%d %H:%M:%S UTC')
+    current_utc_time = datetime.utcnow()
+    cache['last_updated'] = current_utc_time.strftime('%Y-%m-%d %H:%M:%S UTC')
     save_cache(cache)
 
     # Write the Daily JSON Files!
