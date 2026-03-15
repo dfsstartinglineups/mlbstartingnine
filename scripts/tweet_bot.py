@@ -429,7 +429,7 @@ FUTBOL_LEAGUES = {
 }
     #203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig #Galatasaray #Fenerbahce", "url_slug": "turkey"},
     #144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
-    #179: {"name": "PREMIERSHIP 🏴󠁧󠁢󠁳󠁣󠁴󠁿", "tag": "#ScottishPremiership #CinchPrem", "url_slug": "scotland"},
+    #179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership #CinchPrem", "url_slug": "scotland"},
     #188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
     #119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"}
 
