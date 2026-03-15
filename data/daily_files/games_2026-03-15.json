@@ -412,53 +412,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 680636,
-                        "fullName": "Ramon Mendoza",
-                        "link": "/api/v1/people/680636",
-                        "firstName": "Ramon",
-                        "lastName": "Mendoza",
-                        "primaryNumber": "83",
-                        "birthDate": "2000-08-31",
-                        "currentAge": 25,
-                        "birthCity": "Tijuana",
-                        "birthStateProvince": "Baja California",
-                        "birthCountry": "Mexico",
-                        "height": "5' 11\"",
-                        "weight": 174,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Ramon",
-                        "useLastName": "Mendoza",
-                        "boxscoreName": "Mendoza, R",
-                        "gender": "M",
-                        "nameMatrilineal": "Nevarez",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ramon Mendoza",
-                        "nameSlug": "ramon-mendoza-680636",
-                        "firstLastName": "Ramon Mendoza",
-                        "lastFirstName": "Mendoza, Ramon",
-                        "lastInitName": "Mendoza, R",
-                        "initLastName": "R Mendoza",
-                        "fullFMLName": "Ramon  Mendoza",
-                        "fullLFMName": "Mendoza, Ramon",
-                        "strikeZoneTop": 3.175,
-                        "strikeZoneBottom": 1.602
-                    },
-                    "onDeck": {
                         "id": 689288,
                         "fullName": "Matt Koperniak",
                         "link": "/api/v1/people/689288",
@@ -506,7 +459,7 @@
                         "strikeZoneTop": 3.216,
                         "strikeZoneBottom": 1.623
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 647378,
                         "fullName": "Andy Yerzy",
                         "link": "/api/v1/people/647378",
@@ -553,6 +506,53 @@
                         "fullLFMName": "Yerzy, Andrew J.",
                         "strikeZoneTop": 3.34,
                         "strikeZoneBottom": 1.686
+                    },
+                    "inHole": {
+                        "id": 692390,
+                        "fullName": "Jose Cordoba",
+                        "link": "/api/v1/people/692390",
+                        "firstName": "Jose",
+                        "lastName": "Cordoba",
+                        "primaryNumber": "92",
+                        "birthDate": "2003-01-03",
+                        "currentAge": 23,
+                        "birthCity": "Puerto Ordaz",
+                        "birthCountry": "Venezuela",
+                        "height": "5' 11\"",
+                        "weight": 165,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Jose",
+                        "useLastName": "Cordoba",
+                        "middleName": "Manuel",
+                        "boxscoreName": "Cordoba",
+                        "gender": "M",
+                        "nameMatrilineal": "Ventura",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jose Cordoba",
+                        "nameSlug": "jose-cordoba-692390",
+                        "firstLastName": "Jose Cordoba",
+                        "lastFirstName": "Cordoba, Jose",
+                        "lastInitName": "Cordoba, J",
+                        "initLastName": "J Cordoba",
+                        "fullFMLName": "Jose Manuel Cordoba",
+                        "fullLFMName": "Cordoba, Jose Manuel",
+                        "strikeZoneTop": 3.165,
+                        "strikeZoneBottom": 1.598
                     },
                     "first": {
                         "id": 699027,
@@ -650,16 +650,16 @@
                         "strikeZoneTop": 3.388,
                         "strikeZoneBottom": 1.71
                     },
-                    "battingOrder": 6,
+                    "battingOrder": 7,
                     "team": {
                         "id": 138,
                         "name": "St. Louis Cardinals",
                         "link": "/api/v1/teams/138"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
-                "outs": 0
+                "balls": 0,
+                "strikes": 0,
+                "outs": 1
             },
             "venue": {
                 "id": 2520,
@@ -2276,11 +2276,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 8,
-                "currentInningOrdinal": "8th",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 9,
+                "currentInningOrdinal": "9th",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -2410,6 +2410,20 @@
                             "errors": 0,
                             "leftOnBase": 0
                         }
+                    },
+                    {
+                        "num": 9,
+                        "ordinalNum": "9th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
                     }
                 ],
                 "teams": {
@@ -2428,19 +2442,18 @@
                 },
                 "defense": {
                     "pitcher": {
-                        "id": 694680,
-                        "fullName": "Trevor Martin",
-                        "link": "/api/v1/people/694680",
-                        "firstName": "Trevor",
-                        "lastName": "Martin",
-                        "primaryNumber": "83",
-                        "birthDate": "2000-12-15",
+                        "id": 692285,
+                        "fullName": "Luis Guerrero",
+                        "link": "/api/v1/people/692285",
+                        "firstName": "Luis",
+                        "lastName": "Guerrero",
+                        "primaryNumber": "99",
+                        "birthDate": "2000-08-05",
                         "currentAge": 25,
-                        "birthCity": "Poteau",
-                        "birthStateProvince": "OK",
-                        "birthCountry": "USA",
-                        "height": "6' 5\"",
-                        "weight": 238,
+                        "birthCity": "Bani",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 0\"",
+                        "weight": 215,
                         "active": true,
                         "primaryPosition": {
                             "code": "1",
@@ -2448,14 +2461,16 @@
                             "type": "Pitcher",
                             "abbreviation": "P"
                         },
-                        "useName": "Trevor",
-                        "useLastName": "Martin",
-                        "middleName": "Zane",
-                        "boxscoreName": "Martin",
+                        "useName": "Luis",
+                        "useLastName": "Guerrero",
+                        "middleName": "Sadiel",
+                        "boxscoreName": "Guerrero, L",
                         "gender": "M",
+                        "nameMatrilineal": "Reynoso",
                         "isPlayer": true,
                         "isVerified": true,
-                        "draftYear": 2022,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2024-09-08",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
@@ -2464,16 +2479,16 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Trevor Martin",
-                        "nameSlug": "trevor-martin-694680",
-                        "firstLastName": "Trevor Martin",
-                        "lastFirstName": "Martin, Trevor",
-                        "lastInitName": "Martin, T",
-                        "initLastName": "T Martin",
-                        "fullFMLName": "Trevor Zane Martin",
-                        "fullLFMName": "Martin, Trevor Zane",
-                        "strikeZoneTop": 3.433,
-                        "strikeZoneBottom": 1.733
+                        "nameFirstLast": "Luis Guerrero",
+                        "nameSlug": "luis-guerrero-692285",
+                        "firstLastName": "Luis Guerrero",
+                        "lastFirstName": "Guerrero, Luis",
+                        "lastInitName": "Guerrero, L",
+                        "initLastName": "L Guerrero",
+                        "fullFMLName": "Luis Sadiel Guerrero",
+                        "fullLFMName": "Guerrero, Luis Sadiel",
+                        "strikeZoneTop": 3.21,
+                        "strikeZoneBottom": 1.62
                     },
                     "catcher": {
                         "id": 694420,
@@ -2739,7 +2754,7 @@
                 },
                 "balls": 0,
                 "strikes": 0,
-                "outs": 3
+                "outs": 0
             },
             "venue": {
                 "id": 2534,
@@ -4404,7 +4419,7 @@
                             "leftOnBase": 0
                         },
                         "away": {
-                            "hits": 1,
+                            "hits": 2,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -4419,7 +4434,7 @@
                     },
                     "away": {
                         "runs": 1,
-                        "hits": 6,
+                        "hits": 7,
                         "errors": 2,
                         "leftOnBase": 8
                     }
@@ -4538,53 +4553,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 570482,
-                        "fullName": "Gio Urshela",
-                        "link": "/api/v1/people/570482",
-                        "firstName": "Giovanny",
-                        "lastName": "Urshela",
-                        "primaryNumber": "12",
-                        "birthDate": "1991-10-11",
-                        "currentAge": 34,
-                        "birthCity": "Cartagena",
-                        "birthCountry": "Colombia",
-                        "height": "6' 0\"",
-                        "weight": 215,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "5",
-                            "name": "Third Base",
-                            "type": "Infielder",
-                            "abbreviation": "3B"
-                        },
-                        "useName": "Gio",
-                        "useLastName": "Urshela",
-                        "boxscoreName": "Urshela",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "urr-SHELL-ah",
-                        "mlbDebutDate": "2015-06-09",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Gio Urshela",
-                        "nameSlug": "gio-urshela-570482",
-                        "firstLastName": "Gio Urshela",
-                        "lastFirstName": "Urshela, Gio",
-                        "lastInitName": "Urshela, G",
-                        "initLastName": "G Urshela",
-                        "fullFMLName": "Giovanny Urshela",
-                        "fullLFMName": "Urshela, Giovanny",
-                        "strikeZoneTop": 3.201,
-                        "strikeZoneBottom": 1.615
-                    },
-                    "onDeck": {
                         "id": 702176,
                         "fullName": "Alan Roden",
                         "link": "/api/v1/people/702176",
@@ -4634,7 +4602,7 @@
                         "strikeZoneTop": 3.159,
                         "strikeZoneBottom": 1.594
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 668904,
                         "fullName": "Royce Lewis",
                         "link": "/api/v1/people/668904",
@@ -4683,7 +4651,103 @@
                         "strikeZoneTop": 3.205,
                         "strikeZoneBottom": 1.618
                     },
+                    "inHole": {
+                        "id": 656577,
+                        "fullName": "Alex Jackson",
+                        "link": "/api/v1/people/656577",
+                        "firstName": "Alexander",
+                        "lastName": "Jackson",
+                        "primaryNumber": "70",
+                        "birthDate": "1995-12-25",
+                        "currentAge": 30,
+                        "birthCity": "San Diego",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 238,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Alex",
+                        "useLastName": "Jackson",
+                        "middleName": "James",
+                        "boxscoreName": "Jackson, A",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2014,
+                        "mlbDebutDate": "2019-04-07",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Alex Jackson",
+                        "nameSlug": "alex-jackson-656577",
+                        "firstLastName": "Alex Jackson",
+                        "lastFirstName": "Jackson, Alex",
+                        "lastInitName": "Jackson, A",
+                        "initLastName": "A Jackson",
+                        "fullFMLName": "Alexander James Jackson",
+                        "fullLFMName": "Jackson, Alexander James",
+                        "strikeZoneTop": 3.254,
+                        "strikeZoneBottom": 1.642
+                    },
                     "first": {
+                        "id": 570482,
+                        "fullName": "Gio Urshela",
+                        "link": "/api/v1/people/570482",
+                        "firstName": "Giovanny",
+                        "lastName": "Urshela",
+                        "primaryNumber": "12",
+                        "birthDate": "1991-10-11",
+                        "currentAge": 34,
+                        "birthCity": "Cartagena",
+                        "birthCountry": "Colombia",
+                        "height": "6' 0\"",
+                        "weight": 215,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Gio",
+                        "useLastName": "Urshela",
+                        "boxscoreName": "Urshela",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "urr-SHELL-ah",
+                        "mlbDebutDate": "2015-06-09",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Gio Urshela",
+                        "nameSlug": "gio-urshela-570482",
+                        "firstLastName": "Gio Urshela",
+                        "lastFirstName": "Urshela, Gio",
+                        "lastInitName": "Urshela, G",
+                        "initLastName": "G Urshela",
+                        "fullFMLName": "Giovanny Urshela",
+                        "fullLFMName": "Urshela, Giovanny",
+                        "strikeZoneTop": 3.201,
+                        "strikeZoneBottom": 1.615
+                    },
+                    "second": {
                         "id": 676572,
                         "fullName": "Eric Wagaman",
                         "link": "/api/v1/people/676572",
@@ -4782,15 +4846,15 @@
                         "strikeZoneTop": 3.21,
                         "strikeZoneBottom": 1.62
                     },
-                    "battingOrder": 3,
+                    "battingOrder": 4,
                     "team": {
                         "id": 142,
                         "name": "Minnesota Twins",
                         "link": "/api/v1/teams/142"
                     }
                 },
-                "balls": 1,
-                "strikes": 2,
+                "balls": 0,
+                "strikes": 0,
                 "outs": 1
             },
             "venue": {
@@ -6289,7 +6353,7 @@
                         "losses": 5,
                         "pct": ".737"
                     },
-                    "score": 0,
+                    "score": 1,
                     "probablePitcher": {
                         "id": 660761,
                         "fullName": "Jos\u00e9 Suarez",
@@ -6555,7 +6619,8 @@
                             "leftOnBase": 0
                         },
                         "away": {
-                            "hits": 0,
+                            "runs": 1,
+                            "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -6569,8 +6634,8 @@
                         "leftOnBase": 7
                     },
                     "away": {
-                        "runs": 0,
-                        "hits": 4,
+                        "runs": 1,
+                        "hits": 5,
                         "errors": 0,
                         "leftOnBase": 6
                     }
@@ -6689,54 +6754,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 681172,
-                        "fullName": "Tyler Tolve",
-                        "link": "/api/v1/people/681172",
-                        "firstName": "Tyler",
-                        "lastName": "Tolve",
-                        "primaryNumber": "96",
-                        "birthDate": "2000-07-16",
-                        "currentAge": 25,
-                        "birthCity": "Atlanta",
-                        "birthStateProvince": "GA",
-                        "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 200,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Tyler",
-                        "useLastName": "Tolve",
-                        "middleName": "John",
-                        "boxscoreName": "Tolve",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Tyler Tolve",
-                        "nameSlug": "tyler-tolve-681172",
-                        "firstLastName": "Tyler Tolve",
-                        "lastFirstName": "Tolve, Tyler",
-                        "lastInitName": "Tolve, T",
-                        "initLastName": "T Tolve",
-                        "fullFMLName": "Tyler John Tolve",
-                        "fullLFMName": "Tolve, Tyler John",
-                        "strikeZoneTop": 3.255,
-                        "strikeZoneBottom": 1.643
-                    },
-                    "onDeck": {
                         "id": 806994,
                         "fullName": "Luis Guanipa",
                         "link": "/api/v1/people/806994",
@@ -6783,7 +6800,7 @@
                         "strikeZoneTop": 3.165,
                         "strikeZoneBottom": 1.598
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 644433,
                         "fullName": "Chadwick Tromp",
                         "link": "/api/v1/people/644433",
@@ -6829,6 +6846,54 @@
                         "fullLFMName": "Tromp, Chadwick Chandler",
                         "strikeZoneTop": 3.024,
                         "strikeZoneBottom": 1.526
+                    },
+                    "inHole": {
+                        "id": 702582,
+                        "fullName": "Dallas Macias",
+                        "link": "/api/v1/people/702582",
+                        "firstName": "Dallas",
+                        "lastName": "Macias",
+                        "primaryNumber": "50",
+                        "birthDate": "2003-10-28",
+                        "currentAge": 22,
+                        "birthCity": "Parker",
+                        "birthStateProvince": "CO",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 203,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "O",
+                            "name": "Outfield",
+                            "type": "Outfielder",
+                            "abbreviation": "OF"
+                        },
+                        "useName": "Dallas",
+                        "useLastName": "Macias",
+                        "middleName": "Elijah",
+                        "boxscoreName": "Macias",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2025,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Dallas Macias",
+                        "nameSlug": "dallas-macias-702582",
+                        "firstLastName": "Dallas Macias",
+                        "lastFirstName": "Macias, Dallas",
+                        "lastInitName": "Macias, D",
+                        "initLastName": "D Macias",
+                        "fullFMLName": "Dallas Elijah Macias",
+                        "fullLFMName": "Macias, Dallas Elijah",
+                        "strikeZoneTop": 3.21,
+                        "strikeZoneBottom": 1.62
                     },
                     "pitcher": {
                         "id": 702275,
@@ -6879,15 +6944,15 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 144,
                         "name": "Atlanta Braves",
                         "link": "/api/v1/teams/144"
                     }
                 },
-                "balls": 3,
-                "strikes": 0,
+                "balls": 0,
+                "strikes": 2,
                 "outs": 1
             },
             "venue": {
@@ -28380,7 +28445,8 @@
             "672841": "P",
             "808004": "2B",
             "821073": "C",
-            "828718": "P"
+            "828718": "P",
+            "835621": "OF"
         },
         "deepStats": {
             "669923": {
