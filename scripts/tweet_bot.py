@@ -585,13 +585,22 @@ for target_date_str in futbol_dates_to_check:
                 valid_goal_events.append(e)
 
         # --- REMOVED 'if not valid_goal_events: continue' so 1-0 reversals work! ---
-            
-        # Recalculate totals using ONLY the valid regular-play goals
-        home_events_total = sum(1 for e in valid_goal_events if e.get('team_id') == h_id)
-        away_events_total = sum(1 for e in valid_goal_events if e.get('team_id') == a_id)
         
-        current_home_score = max(0, official_home_score - home_events_total)
-        current_away_score = max(0, official_away_score - away_events_total)
+        # --- 🕒 CRITICAL FIX: STOPPAGE TIME MATH & CHRONOLOGICAL SORT ---
+        def get_actual_minute(e):
+            t_str = str(e.get('time', '0')).replace("'", "").strip()
+            if '+' in t_str:
+                parts = t_str.split('+')
+                try: return int(parts[0]) + int(parts[1])
+                except ValueError: return int(parts[0]) if parts[0].isdigit() else 90
+            return int(t_str) if t_str.isdigit() else 0
+
+        # Sort goals chronologically to prevent out-of-order API arrays
+        valid_goal_events.sort(key=get_actual_minute)
+
+        # 🛑 START AT ZERO! Only count goals that actually exist in the events array!
+        current_home_score = 0
+        current_away_score = 0
         
         home_odds_str = match.get('odds', {}).get('home', 'TBD')
         away_odds_str = match.get('odds', {}).get('away', 'TBD')
@@ -600,7 +609,7 @@ for target_date_str in futbol_dates_to_check:
         try: away_odds = float(away_odds_str) if away_odds_str != 'TBD' else 0.0
         except ValueError: away_odds = 0.0
 
-        for event in valid_goal_events: # <--- Make sure this line is looping the valid events!
+        for event in valid_goal_events: 
             team_id = event.get('team_id')
             
             if team_id == h_id:
@@ -610,9 +619,8 @@ for target_date_str in futbol_dates_to_check:
                 current_away_score += 1
                 team_goal_count = current_away_score
                 
-            event_time_str = str(event.get('time', '0'))
-            try: event_time = int(event_time_str)
-            except ValueError: event_time = 0
+            # Automatically adds 90 + 4 to output 94
+            event_time = get_actual_minute(event)
             
             event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{team_goal_count}"
             
