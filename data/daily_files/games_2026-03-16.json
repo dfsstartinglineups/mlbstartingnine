@@ -314,55 +314,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 680777,
-                        "fullName": "Ryan Jeffers",
-                        "link": "/api/v1/people/680777",
-                        "firstName": "Ryan",
-                        "lastName": "Jeffers",
-                        "primaryNumber": "27",
-                        "birthDate": "1997-06-03",
-                        "currentAge": 28,
-                        "birthCity": "Raleigh",
-                        "birthStateProvince": "NC",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 235,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Ryan",
-                        "useLastName": "Jeffers",
-                        "middleName": "Michael",
-                        "boxscoreName": "Jeffers",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "draftYear": 2018,
-                        "mlbDebutDate": "2020-08-20",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ryan Jeffers",
-                        "nameSlug": "ryan-jeffers-680777",
-                        "firstLastName": "Ryan Jeffers",
-                        "lastFirstName": "Jeffers, Ryan",
-                        "lastInitName": "Jeffers, R",
-                        "initLastName": "R Jeffers",
-                        "fullFMLName": "Ryan Michael Jeffers",
-                        "fullLFMName": "Jeffers, Ryan Michael",
-                        "strikeZoneTop": 3.285,
-                        "strikeZoneBottom": 1.658
-                    },
-                    "onDeck": {
                         "id": 686797,
                         "fullName": "Brooks Lee",
                         "link": "/api/v1/people/686797",
@@ -411,7 +362,7 @@
                         "strikeZoneTop": 3.209,
                         "strikeZoneBottom": 1.619
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 702176,
                         "fullName": "Alan Roden",
                         "link": "/api/v1/people/702176",
@@ -460,6 +411,55 @@
                         "fullLFMName": "Roden, Alan Eric",
                         "strikeZoneTop": 3.159,
                         "strikeZoneBottom": 1.594
+                    },
+                    "inHole": {
+                        "id": 668885,
+                        "fullName": "Austin Martin",
+                        "link": "/api/v1/people/668885",
+                        "firstName": "Christopher",
+                        "lastName": "Martin",
+                        "primaryNumber": "16",
+                        "birthDate": "1999-03-23",
+                        "currentAge": 26,
+                        "birthCity": "DeLand",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "5' 10\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Austin",
+                        "useLastName": "Martin",
+                        "middleName": "Austin",
+                        "boxscoreName": "Martin",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2020,
+                        "mlbDebutDate": "2024-03-30",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Austin Martin",
+                        "nameSlug": "austin-martin-668885",
+                        "firstLastName": "Austin Martin",
+                        "lastFirstName": "Martin, Austin",
+                        "lastInitName": "Martin, A",
+                        "initLastName": "A Martin",
+                        "fullFMLName": "Christopher Austin Martin",
+                        "fullLFMName": "Martin, Christopher Austin",
+                        "strikeZoneTop": 3.13,
+                        "strikeZoneBottom": 1.579
                     },
                     "pitcher": {
                         "id": 657746,
@@ -510,16 +510,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 142,
                         "name": "Minnesota Twins",
                         "link": "/api/v1/teams/142"
                     }
                 },
-                "balls": 1,
+                "balls": 0,
                 "strikes": 0,
-                "outs": 0
+                "outs": 1
             },
             "venue": {
                 "id": 2862,
@@ -2098,11 +2098,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 1,
-                "currentInningOrdinal": "1st",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 2,
+                "currentInningOrdinal": "2nd",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -2116,6 +2116,20 @@
                         },
                         "away": {
                             "runs": 0,
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    },
+                    {
+                        "num": 2,
+                        "ordinalNum": "2nd",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -2452,9 +2466,9 @@
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 3,
-                "strikes": 3,
-                "outs": 3
+                "balls": 1,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2511,
@@ -4053,7 +4067,7 @@
                         "ordinalNum": "2nd",
                         "home": {
                             "runs": 1,
-                            "hits": 2,
+                            "hits": 3,
                             "errors": 0,
                             "leftOnBase": 0
                         },
@@ -4068,7 +4082,7 @@
                 "teams": {
                     "home": {
                         "runs": 1,
-                        "hits": 3,
+                        "hits": 4,
                         "errors": 1,
                         "leftOnBase": 1
                     },
@@ -4192,55 +4206,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 642201,
-                        "fullName": "Eli White",
-                        "link": "/api/v1/people/642201",
-                        "firstName": "Elijah",
-                        "lastName": "White",
-                        "primaryNumber": "36",
-                        "birthDate": "1994-06-26",
-                        "currentAge": 31,
-                        "birthCity": "Greenville",
-                        "birthStateProvince": "SC",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 195,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "9",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "RF"
-                        },
-                        "useName": "Eli",
-                        "useLastName": "White",
-                        "middleName": "Thomas",
-                        "boxscoreName": "White, E",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2016,
-                        "mlbDebutDate": "2020-09-01",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Eli White",
-                        "nameSlug": "eli-white-642201",
-                        "firstLastName": "Eli White",
-                        "lastFirstName": "White, Eli",
-                        "lastInitName": "White, E",
-                        "initLastName": "E White",
-                        "fullFMLName": "Elijah Thomas White",
-                        "fullLFMName": "White, Elijah Thomas",
-                        "strikeZoneTop": 3.316,
-                        "strikeZoneBottom": 1.673
-                    },
-                    "onDeck": {
                         "id": 622761,
                         "fullName": "Jorge Mateo",
                         "link": "/api/v1/people/622761",
@@ -4288,7 +4253,7 @@
                         "strikeZoneTop": 3.198,
                         "strikeZoneBottom": 1.614
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 643289,
                         "fullName": "Mauricio Dub\u00f3n",
                         "link": "/api/v1/people/643289",
@@ -4337,7 +4302,105 @@
                         "strikeZoneTop": 3.171,
                         "strikeZoneBottom": 1.6
                     },
+                    "inHole": {
+                        "id": 686948,
+                        "fullName": "Drake Baldwin",
+                        "link": "/api/v1/people/686948",
+                        "firstName": "Drake",
+                        "lastName": "Baldwin",
+                        "primaryNumber": "30",
+                        "birthDate": "2001-03-28",
+                        "currentAge": 24,
+                        "birthCity": "Madison",
+                        "birthStateProvince": "WI",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 225,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Drake",
+                        "useLastName": "Baldwin",
+                        "middleName": "Randall",
+                        "boxscoreName": "Baldwin, D",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2022,
+                        "mlbDebutDate": "2025-03-27",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Drake Baldwin",
+                        "nameSlug": "drake-baldwin-686948",
+                        "firstLastName": "Drake Baldwin",
+                        "lastFirstName": "Baldwin, Drake",
+                        "lastInitName": "Baldwin, D",
+                        "initLastName": "D Baldwin",
+                        "fullFMLName": "Drake Randall Baldwin",
+                        "fullLFMName": "Baldwin, Drake Randall",
+                        "strikeZoneTop": 3.206,
+                        "strikeZoneBottom": 1.618
+                    },
                     "first": {
+                        "id": 642201,
+                        "fullName": "Eli White",
+                        "link": "/api/v1/people/642201",
+                        "firstName": "Elijah",
+                        "lastName": "White",
+                        "primaryNumber": "36",
+                        "birthDate": "1994-06-26",
+                        "currentAge": 31,
+                        "birthCity": "Greenville",
+                        "birthStateProvince": "SC",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 195,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Eli",
+                        "useLastName": "White",
+                        "middleName": "Thomas",
+                        "boxscoreName": "White, E",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2016,
+                        "mlbDebutDate": "2020-09-01",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Eli White",
+                        "nameSlug": "eli-white-642201",
+                        "firstLastName": "Eli White",
+                        "lastFirstName": "White, Eli",
+                        "lastInitName": "White, E",
+                        "initLastName": "E White",
+                        "fullFMLName": "Elijah Thomas White",
+                        "fullLFMName": "White, Elijah Thomas",
+                        "strikeZoneTop": 3.316,
+                        "strikeZoneBottom": 1.673
+                    },
+                    "third": {
                         "id": 645277,
                         "fullName": "Ozzie Albies",
                         "link": "/api/v1/people/645277",
@@ -4436,7 +4499,7 @@
                         "strikeZoneTop": 3.478,
                         "strikeZoneBottom": 1.755
                     },
-                    "battingOrder": 8,
+                    "battingOrder": 9,
                     "team": {
                         "id": 144,
                         "name": "Atlanta Braves",
@@ -4444,7 +4507,7 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 2,
+                "strikes": 0,
                 "outs": 1
             },
             "venue": {
@@ -6402,8 +6465,8 @@
                         "link": "/api/v1/teams/141"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
+                "balls": 2,
+                "strikes": 3,
                 "outs": 0
             },
             "venue": {
@@ -7959,6 +8022,55 @@
                         "pct": ".458"
                     },
                     "score": 0,
+                    "probablePitcher": {
+                        "id": 605488,
+                        "fullName": "Jeffrey Springs",
+                        "link": "/api/v1/people/605488",
+                        "firstName": "Jeffrey",
+                        "lastName": "Springs",
+                        "primaryNumber": "59",
+                        "birthDate": "1992-09-20",
+                        "currentAge": 33,
+                        "birthCity": "Belmont",
+                        "birthStateProvince": "NC",
+                        "birthCountry": "USA",
+                        "height": "6' 3\"",
+                        "weight": 218,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Jeffrey",
+                        "useLastName": "Springs",
+                        "middleName": "Scott",
+                        "boxscoreName": "Springs",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "mlbDebutDate": "2018-07-31",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Jeffrey Springs",
+                        "nameSlug": "jeffrey-springs-605488",
+                        "firstLastName": "Jeffrey Springs",
+                        "lastFirstName": "Springs, Jeffrey",
+                        "lastInitName": "Springs, J",
+                        "initLastName": "J Springs",
+                        "fullFMLName": "Jeffrey Scott Springs",
+                        "fullLFMName": "Springs, Jeffrey Scott",
+                        "strikeZoneTop": 3.344,
+                        "strikeZoneBottom": 1.688
+                    },
                     "splitSquad": false,
                     "seriesNumber": 25
                 }
@@ -9615,6 +9727,28 @@
                     "bb": 4,
                     "avg": ".242",
                     "ops": ".642"
+                }
+            },
+            "605488": {
+                "name": "Jeffrey Springs",
+                "is_pitcher": true,
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 133,
+                    "hr": 3,
+                    "k": 27,
+                    "bb": 10,
+                    "avg": ".241",
+                    "ops": ".660"
+                },
+                "split_vR": {
+                    "split_type": "RHB",
+                    "ab": 514,
+                    "hr": 25,
+                    "k": 111,
+                    "bb": 44,
+                    "avg": ".235",
+                    "ops": ".732"
                 }
             }
         },
