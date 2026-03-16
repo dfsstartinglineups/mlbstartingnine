@@ -2612,7 +2612,7 @@
                         "link": "/api/v1/teams/116"
                     }
                 },
-                "balls": 0,
+                "balls": 2,
                 "strikes": 2,
                 "outs": 0
             },
@@ -6089,12 +6089,13 @@
             "gameDate": "2026-03-16T17:10:00Z",
             "officialDate": "2026-03-16",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Completed Early",
+                "statusCode": "OR",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "reason": "Rain",
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -6104,11 +6105,12 @@
                         "link": "/api/v1/teams/141"
                     },
                     "leagueRecord": {
-                        "wins": 8,
+                        "wins": 9,
                         "losses": 12,
-                        "pct": ".400"
+                        "pct": ".429"
                     },
                     "score": 5,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 681751,
                         "fullName": "Lazaro Estrada",
@@ -6169,10 +6171,11 @@
                     },
                     "leagueRecord": {
                         "wins": 8,
-                        "losses": 11,
-                        "pct": ".421"
+                        "losses": 12,
+                        "pct": ".400"
                     },
                     "score": 4,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 676083,
                         "fullName": "Janson Junk",
@@ -6227,6 +6230,7 @@
                 }
             },
             "linescore": {
+                "note": "Game called (rain)  with 2 out in the bottom of the 6th and a 0-0 count on Griffin Conine.",
                 "currentInning": 6,
                 "currentInningOrdinal": "6th",
                 "inningState": "Bottom",
@@ -6320,11 +6324,53 @@
                         "home": {
                             "hits": 2,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         },
                         "away": {
                             "runs": 0,
                             "hits": 1,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    },
+                    {
+                        "num": 7,
+                        "ordinalNum": "7th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    },
+                    {
+                        "num": 8,
+                        "ordinalNum": "8th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    },
+                    {
+                        "num": 9,
+                        "ordinalNum": "9th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -6335,7 +6381,7 @@
                         "runs": 4,
                         "hits": 8,
                         "errors": 0,
-                        "leftOnBase": 1
+                        "leftOnBase": 2
                     },
                     "away": {
                         "runs": 5,
@@ -6722,6 +6768,7 @@
             "content": {
                 "link": "/api/v1/game/831559/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
