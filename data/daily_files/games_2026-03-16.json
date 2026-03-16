@@ -147,11 +147,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 2,
-                "currentInningOrdinal": "2nd",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 3,
+                "currentInningOrdinal": "3rd",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -184,6 +184,20 @@
                             "hits": 2,
                             "errors": 0,
                             "leftOnBase": 2
+                        }
+                    },
+                    {
+                        "num": 3,
+                        "ordinalNum": "3rd",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
                         }
                     }
                 ],
@@ -517,8 +531,8 @@
                     }
                 },
                 "balls": 2,
-                "strikes": 0,
-                "outs": 3
+                "strikes": 1,
+                "outs": 0
             },
             "venue": {
                 "id": 2862,
@@ -1978,7 +1992,7 @@
                         "losses": 12,
                         "pct": ".400"
                     },
-                    "score": 0,
+                    "score": 3,
                     "probablePitcher": {
                         "id": 666155,
                         "fullName": "Chuck King",
@@ -2129,7 +2143,8 @@
                             "leftOnBase": 0
                         },
                         "away": {
-                            "hits": 1,
+                            "runs": 3,
+                            "hits": 2,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -2143,8 +2158,8 @@
                         "leftOnBase": 1
                     },
                     "away": {
-                        "runs": 0,
-                        "hits": 1,
+                        "runs": 3,
+                        "hits": 2,
                         "errors": 0,
                         "leftOnBase": 0
                     }
@@ -2264,53 +2279,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 694025,
-                        "fullName": "Felix Reyes",
-                        "link": "/api/v1/people/694025",
-                        "firstName": "Felix",
-                        "lastName": "Reyes",
-                        "primaryNumber": "82",
-                        "birthDate": "2001-03-26",
-                        "currentAge": 24,
-                        "birthCity": "Bani",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 3\"",
-                        "weight": 195,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Felix",
-                        "useLastName": "Reyes",
-                        "middleName": "Yomael",
-                        "boxscoreName": "Reyes, F",
-                        "gender": "M",
-                        "nameMatrilineal": "Soto",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Felix Reyes",
-                        "nameSlug": "felix-reyes-694025",
-                        "firstLastName": "Felix Reyes",
-                        "lastFirstName": "Reyes, Felix",
-                        "lastInitName": "Reyes, F",
-                        "initLastName": "F Reyes",
-                        "fullFMLName": "Felix Yomael Reyes",
-                        "fullLFMName": "Reyes, Felix Yomael",
-                        "strikeZoneTop": 3.353,
-                        "strikeZoneBottom": 1.692
-                    },
-                    "onDeck": {
                         "id": 678894,
                         "fullName": "Liover Peguero",
                         "link": "/api/v1/people/678894",
@@ -2358,7 +2326,7 @@
                         "strikeZoneTop": 3.221,
                         "strikeZoneBottom": 1.625
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 686551,
                         "fullName": "Christian Cairo",
                         "link": "/api/v1/people/686551",
@@ -2407,84 +2375,34 @@
                         "strikeZoneTop": 3.021,
                         "strikeZoneBottom": 1.525
                     },
-                    "first": {
-                        "id": 650559,
-                        "fullName": "Bryan De La Cruz",
-                        "link": "/api/v1/people/650559",
-                        "firstName": "Bryan",
-                        "lastName": "De La Cruz",
-                        "primaryNumber": "41",
-                        "birthDate": "1996-12-16",
-                        "currentAge": 29,
-                        "birthCity": "Santo Domingo Este",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 0\"",
-                        "weight": 175,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "O",
-                            "name": "Outfield",
-                            "type": "Outfielder",
-                            "abbreviation": "OF"
-                        },
-                        "useName": "Bryan",
-                        "useLastName": "De La Cruz",
-                        "middleName": "Starling",
-                        "boxscoreName": "De La Cruz, B",
-                        "gender": "M",
-                        "nameMatrilineal": "Quezada",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "mlbDebutDate": "2021-04-11",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Bryan De La Cruz",
-                        "nameSlug": "bryan-de-la-cruz-650559",
-                        "firstLastName": "Bryan De La Cruz",
-                        "lastFirstName": "De La Cruz, Bryan",
-                        "lastInitName": "De La Cruz, B",
-                        "initLastName": "B De La Cruz",
-                        "fullFMLName": "Bryan Starling De La Cruz",
-                        "fullLFMName": "De La Cruz, Bryan Starling",
-                        "strikeZoneTop": 3.228,
-                        "strikeZoneBottom": 1.629
-                    },
-                    "third": {
-                        "id": 596117,
-                        "fullName": "Garrett Stubbs",
-                        "link": "/api/v1/people/596117",
-                        "firstName": "Garrett",
-                        "lastName": "Stubbs",
-                        "primaryNumber": "21",
-                        "birthDate": "1993-05-26",
-                        "currentAge": 32,
-                        "birthCity": "San Diego",
-                        "birthStateProvince": "CA",
+                    "inHole": {
+                        "id": 702222,
+                        "fullName": "Justin Crawford",
+                        "link": "/api/v1/people/702222",
+                        "firstName": "Justin",
+                        "lastName": "Crawford",
+                        "primaryNumber": "80",
+                        "birthDate": "2004-01-13",
+                        "currentAge": 22,
+                        "birthCity": "Phoenix",
+                        "birthStateProvince": "AZ",
                         "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 170,
+                        "height": "6' 2\"",
+                        "weight": 188,
                         "active": true,
                         "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
                         },
-                        "useName": "Garrett",
-                        "useLastName": "Stubbs",
-                        "middleName": "Patrick",
-                        "boxscoreName": "Stubbs, G",
+                        "useName": "Justin",
+                        "useLastName": "Crawford",
+                        "boxscoreName": "Crawford",
                         "gender": "M",
                         "isPlayer": true,
                         "isVerified": true,
-                        "draftYear": 2015,
-                        "mlbDebutDate": "2019-05-28",
+                        "draftYear": 2022,
                         "batSide": {
                             "code": "L",
                             "description": "Left"
@@ -2493,16 +2411,16 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Garrett Stubbs",
-                        "nameSlug": "garrett-stubbs-596117",
-                        "firstLastName": "Garrett Stubbs",
-                        "lastFirstName": "Stubbs, Garrett",
-                        "lastInitName": "Stubbs, G",
-                        "initLastName": "G Stubbs",
-                        "fullFMLName": "Garrett Patrick Stubbs",
-                        "fullLFMName": "Stubbs, Garrett Patrick",
-                        "strikeZoneTop": 3.073,
-                        "strikeZoneBottom": 1.551
+                        "nameFirstLast": "Justin Crawford",
+                        "nameSlug": "justin-crawford-702222",
+                        "firstLastName": "Justin Crawford",
+                        "lastFirstName": "Crawford, Justin",
+                        "lastInitName": "Crawford, J",
+                        "initLastName": "J Crawford",
+                        "fullFMLName": "Justin Crawford",
+                        "fullLFMName": "Crawford, Justin",
+                        "strikeZoneTop": 3.279,
+                        "strikeZoneBottom": 1.655
                     },
                     "pitcher": {
                         "id": 679702,
@@ -2552,7 +2470,7 @@
                         "strikeZoneTop": 3.388,
                         "strikeZoneBottom": 1.71
                     },
-                    "battingOrder": 7,
+                    "battingOrder": 8,
                     "team": {
                         "id": 143,
                         "name": "Philadelphia Phillies",
@@ -4555,7 +4473,7 @@
                         "link": "/api/v1/teams/144"
                     }
                 },
-                "balls": 0,
+                "balls": 1,
                 "strikes": 0,
                 "outs": 2
             },
@@ -6175,7 +6093,7 @@
                         "num": 2,
                         "ordinalNum": "2nd",
                         "home": {
-                            "hits": 0,
+                            "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
                         },
@@ -6190,7 +6108,7 @@
                 "teams": {
                     "home": {
                         "runs": 1,
-                        "hits": 1,
+                        "hits": 2,
                         "errors": 0,
                         "leftOnBase": 0
                     },
@@ -6315,55 +6233,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 681393,
-                        "fullName": "Connor Norby",
-                        "link": "/api/v1/people/681393",
-                        "firstName": "Connor",
-                        "lastName": "Norby",
-                        "primaryNumber": "1",
-                        "birthDate": "2000-06-08",
-                        "currentAge": 25,
-                        "birthCity": "Brooklyn Park",
-                        "birthStateProvince": "MN",
-                        "birthCountry": "USA",
-                        "height": "5' 10\"",
-                        "weight": 180,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "5",
-                            "name": "Third Base",
-                            "type": "Infielder",
-                            "abbreviation": "3B"
-                        },
-                        "useName": "Connor",
-                        "useLastName": "Norby",
-                        "middleName": "David",
-                        "boxscoreName": "Norby",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "mlbDebutDate": "2024-06-03",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Connor Norby",
-                        "nameSlug": "connor-norby-681393",
-                        "firstLastName": "Connor Norby",
-                        "lastFirstName": "Norby, Connor",
-                        "lastInitName": "Norby, C",
-                        "initLastName": "C Norby",
-                        "fullFMLName": "Connor David Norby",
-                        "fullLFMName": "Norby, Connor David",
-                        "strikeZoneTop": 3.113,
-                        "strikeZoneBottom": 1.571
-                    },
-                    "onDeck": {
                         "id": 665052,
                         "fullName": "Griffin Conine",
                         "link": "/api/v1/people/665052",
@@ -6412,7 +6281,7 @@
                         "strikeZoneTop": 3.234,
                         "strikeZoneBottom": 1.632
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 665923,
                         "fullName": "Esteury Ruiz",
                         "link": "/api/v1/people/665923",
@@ -6459,6 +6328,103 @@
                         "fullLFMName": "Ruiz, Esteury",
                         "strikeZoneTop": 3.166,
                         "strikeZoneBottom": 1.598
+                    },
+                    "inHole": {
+                        "id": 669288,
+                        "fullName": "Daniel Johnson",
+                        "link": "/api/v1/people/669288",
+                        "firstName": "Daniel",
+                        "lastName": "Johnson",
+                        "primaryNumber": "36",
+                        "birthDate": "1995-07-11",
+                        "currentAge": 30,
+                        "birthCity": "Vallejo",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "5' 10\"",
+                        "weight": 200,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Daniel",
+                        "useLastName": "Johnson",
+                        "boxscoreName": "Johnson, Da",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2016,
+                        "mlbDebutDate": "2020-07-25",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Daniel Johnson",
+                        "nameSlug": "daniel-johnson-669288",
+                        "firstLastName": "Daniel Johnson",
+                        "lastFirstName": "Johnson, Daniel",
+                        "lastInitName": "Johnson, D",
+                        "initLastName": "D Johnson",
+                        "fullFMLName": "Daniel Johnson",
+                        "fullLFMName": "Johnson, Daniel",
+                        "strikeZoneTop": 3.11,
+                        "strikeZoneBottom": 1.57
+                    },
+                    "first": {
+                        "id": 681393,
+                        "fullName": "Connor Norby",
+                        "link": "/api/v1/people/681393",
+                        "firstName": "Connor",
+                        "lastName": "Norby",
+                        "primaryNumber": "1",
+                        "birthDate": "2000-06-08",
+                        "currentAge": 25,
+                        "birthCity": "Brooklyn Park",
+                        "birthStateProvince": "MN",
+                        "birthCountry": "USA",
+                        "height": "5' 10\"",
+                        "weight": 180,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Connor",
+                        "useLastName": "Norby",
+                        "middleName": "David",
+                        "boxscoreName": "Norby",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2024-06-03",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Connor Norby",
+                        "nameSlug": "connor-norby-681393",
+                        "firstLastName": "Connor Norby",
+                        "lastFirstName": "Norby, Connor",
+                        "lastInitName": "Norby, C",
+                        "initLastName": "C Norby",
+                        "fullFMLName": "Connor David Norby",
+                        "fullLFMName": "Norby, Connor David",
+                        "strikeZoneTop": 3.113,
+                        "strikeZoneBottom": 1.571
                     },
                     "pitcher": {
                         "id": 676083,
@@ -6509,14 +6475,14 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 146,
                         "name": "Miami Marlins",
                         "link": "/api/v1/teams/146"
                     }
                 },
-                "balls": 1,
+                "balls": 0,
                 "strikes": 0,
                 "outs": 0
             },
