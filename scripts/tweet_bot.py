@@ -425,7 +425,21 @@ FUTBOL_LEAGUES = {
     262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
     98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
     94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-    239: {"name": "PRIMERA A 🇨🇴", "tag": "#LigaBetPlay #Dimayor", "url_slug": "colombia"}
+    239: {"name": "PRIMERA A 🇨🇴", "tag": "#LigaBetPlay #Dimayor", "url_slug": "colombia"},
+    203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig #Galatasaray #Fenerbahce", "url_slug": "turkey"},
+    144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
+    179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership #CinchPrem", "url_slug": "scotland"},
+    188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
+    119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"},
+    292: {"name": "K LEAGUE 1 🇰🇷", "tag": "#KLeague #KLeague1 #SouthKorea", "url_slug": "k1"},
+    11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
+    143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
+    137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia #Frecciarossa", "url_slug": "coppaitalia"},
+    81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal"},
+    5:   {"name": "UEFA NATIONS LEAGUE 🇪🇺", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
+    531: {"name": "CONCACAF NATIONS LEAGUE 🌎", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
+    44:  {"name": "WOMEN'S SUPER LEAGUE 🇬🇧", "tag": "#BarclaysWSL #WSL", "url_slug": "wsl"},
+    254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl"}
 }
 # ---------------------------------------------------------
 # VERIFIED MIDNIGHT ADDITIONS (Sync'd with script.js)
