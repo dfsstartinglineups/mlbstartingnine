@@ -7376,9 +7376,9 @@
             "officialDate": "2026-03-16",
             "status": {
                 "abstractGameState": "Preview",
-                "codedGameState": "S",
-                "detailedState": "Scheduled",
-                "statusCode": "S",
+                "codedGameState": "P",
+                "detailedState": "Pre-Game",
+                "statusCode": "P",
                 "startTimeTBD": false,
                 "abstractGameCode": "P"
             },
@@ -7394,6 +7394,7 @@
                         "losses": 12,
                         "pct": ".500"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 691946,
                         "fullName": "George Klassen",
@@ -7457,31 +7458,368 @@
                         "losses": 13,
                         "pct": ".458"
                     },
+                    "score": 0,
                     "splitSquad": false,
                     "seriesNumber": 25
                 }
             },
             "linescore": {
+                "currentInning": 1,
+                "currentInningOrdinal": "1st",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
-                "innings": [],
+                "innings": [
+                    {
+                        "num": 1,
+                        "ordinalNum": "1st",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    }
+                ],
                 "teams": {
-                    "home": {},
-                    "away": {}
+                    "home": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    },
+                    "away": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 605488,
+                        "fullName": "Jeffrey Springs",
+                        "link": "/api/v1/people/605488",
+                        "firstName": "Jeffrey",
+                        "lastName": "Springs",
+                        "primaryNumber": "59",
+                        "birthDate": "1992-09-20",
+                        "currentAge": 33,
+                        "birthCity": "Belmont",
+                        "birthStateProvince": "NC",
+                        "birthCountry": "USA",
+                        "height": "6' 3\"",
+                        "weight": 218,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Jeffrey",
+                        "useLastName": "Springs",
+                        "middleName": "Scott",
+                        "boxscoreName": "Springs",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "mlbDebutDate": "2018-07-31",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Jeffrey Springs",
+                        "nameSlug": "jeffrey-springs-605488",
+                        "firstLastName": "Jeffrey Springs",
+                        "lastFirstName": "Springs, Jeffrey",
+                        "lastInitName": "Springs, J",
+                        "initLastName": "J Springs",
+                        "fullFMLName": "Jeffrey Scott Springs",
+                        "fullLFMName": "Springs, Jeffrey Scott",
+                        "strikeZoneTop": 3.344,
+                        "strikeZoneBottom": 1.688
+                    },
+                    "catcher": {
+                        "id": 669127,
+                        "fullName": "Shea Langeliers",
+                        "link": "/api/v1/people/669127"
+                    },
+                    "first": {
+                        "id": 701762,
+                        "fullName": "Nick Kurtz",
+                        "link": "/api/v1/people/701762"
+                    },
+                    "second": {
+                        "id": 643446,
+                        "fullName": "Jeff McNeil",
+                        "link": "/api/v1/people/643446"
+                    },
+                    "third": {
+                        "id": 691777,
+                        "fullName": "Max Muncy",
+                        "link": "/api/v1/people/691777"
+                    },
+                    "shortstop": {
+                        "id": 805779,
+                        "fullName": "Jacob Wilson",
+                        "link": "/api/v1/people/805779"
+                    },
+                    "left": {
+                        "id": 691016,
+                        "fullName": "Tyler Soderstrom",
+                        "link": "/api/v1/people/691016"
+                    },
+                    "center": {
+                        "id": 672016,
+                        "fullName": "Denzel Clarke",
+                        "link": "/api/v1/people/672016"
+                    },
+                    "right": {
+                        "id": 680869,
+                        "fullName": "Zack Gelof",
+                        "link": "/api/v1/people/680869"
+                    },
+                    "batter": {
+                        "id": 701762,
+                        "fullName": "Nick Kurtz",
+                        "link": "/api/v1/people/701762"
+                    },
+                    "onDeck": {
+                        "id": 669127,
+                        "fullName": "Shea Langeliers",
+                        "link": "/api/v1/people/669127"
+                    },
+                    "inHole": {
+                        "id": 691016,
+                        "fullName": "Tyler Soderstrom",
+                        "link": "/api/v1/people/691016"
+                    },
+                    "battingOrder": 1,
+                    "team": {
+                        "id": 133,
+                        "name": "Athletics",
+                        "link": "/api/v1/teams/133"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 672724,
+                        "fullName": "Oswald Peraza",
+                        "link": "/api/v1/people/672724",
+                        "firstName": "Oswald",
+                        "lastName": "Peraza",
+                        "primaryNumber": "17",
+                        "birthDate": "2000-06-15",
+                        "currentAge": 25,
+                        "birthCity": "Barquisimeto",
+                        "birthCountry": "Venezuela",
+                        "height": "5' 11\"",
+                        "weight": 200,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Oswald",
+                        "useLastName": "Peraza",
+                        "middleName": "Dair",
+                        "boxscoreName": "Peraza, O",
+                        "gender": "M",
+                        "nameMatrilineal": "Sandoval",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "mlbDebutDate": "2022-09-02",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Oswald Peraza",
+                        "nameSlug": "oswald-peraza-672724",
+                        "firstLastName": "Oswald Peraza",
+                        "lastFirstName": "Peraza, Oswald",
+                        "lastInitName": "Peraza, O",
+                        "initLastName": "O Peraza",
+                        "fullFMLName": "Oswald Dair Peraza",
+                        "fullLFMName": "Peraza, Oswald Dair",
+                        "strikeZoneTop": 3.187,
+                        "strikeZoneBottom": 1.608
+                    },
+                    "onDeck": {
+                        "id": 545361,
+                        "fullName": "Mike Trout",
+                        "link": "/api/v1/people/545361",
+                        "firstName": "Michael",
+                        "lastName": "Trout",
+                        "primaryNumber": "27",
+                        "birthDate": "1991-08-07",
+                        "currentAge": 34,
+                        "birthCity": "Vineland",
+                        "birthStateProvince": "NJ",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 235,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Mike",
+                        "useLastName": "Trout",
+                        "middleName": "Nelson",
+                        "boxscoreName": "Trout",
+                        "nickName": "Kiiiiid",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2009,
+                        "mlbDebutDate": "2011-07-08",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Mike Trout",
+                        "nameSlug": "mike-trout-545361",
+                        "firstLastName": "Mike Trout",
+                        "lastFirstName": "Trout, Mike",
+                        "lastInitName": "Trout, M",
+                        "initLastName": "M Trout",
+                        "fullFMLName": "Michael Nelson Trout",
+                        "fullLFMName": "Trout, Michael Nelson",
+                        "strikeZoneTop": 3.244,
+                        "strikeZoneBottom": 1.637
+                    },
+                    "inHole": {
+                        "id": 660162,
+                        "fullName": "Yo\u00e1n Moncada",
+                        "link": "/api/v1/people/660162",
+                        "firstName": "Yo\u00e1n",
+                        "lastName": "Moncada",
+                        "primaryNumber": "10",
+                        "birthDate": "1995-05-27",
+                        "currentAge": 30,
+                        "birthCity": "Cienfuegos",
+                        "birthCountry": "Cuba",
+                        "height": "6' 0\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Yo\u00e1n",
+                        "useLastName": "Moncada",
+                        "middleName": "Manuel",
+                        "boxscoreName": "Moncada",
+                        "nickName": "Yoyo",
+                        "gender": "M",
+                        "nameMatrilineal": "Olivera",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "YO-on moan-CAH-duh",
+                        "mlbDebutDate": "2016-09-02",
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Yo\u00e1n Moncada",
+                        "nameSlug": "yoan-moncada-660162",
+                        "firstLastName": "Yo\u00e1n Moncada",
+                        "lastFirstName": "Moncada, Yo\u00e1n",
+                        "lastInitName": "Moncada, Y",
+                        "initLastName": "Y Moncada",
+                        "fullFMLName": "Yo\u00e1n Manuel Moncada",
+                        "fullLFMName": "Moncada, Yo\u00e1n Manuel",
+                        "strikeZoneTop": 3.217,
+                        "strikeZoneBottom": 1.624
+                    },
+                    "pitcher": {
+                        "id": 691946,
+                        "fullName": "George Klassen",
+                        "link": "/api/v1/people/691946",
+                        "firstName": "George",
+                        "lastName": "Klassen",
+                        "primaryNumber": "78",
+                        "birthDate": "2002-01-26",
+                        "currentAge": 24,
+                        "birthCity": "West Bend",
+                        "birthStateProvince": "WI",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 195,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "George",
+                        "useLastName": "Klassen",
+                        "middleName": "Edward",
+                        "boxscoreName": "Klassen",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2023,
+                        "pronunciation": "CLAW-sen",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "George Klassen",
+                        "nameSlug": "george-klassen-691946",
+                        "firstLastName": "George Klassen",
+                        "lastFirstName": "Klassen, George",
+                        "lastInitName": "Klassen, G",
+                        "initLastName": "G Klassen",
+                        "fullFMLName": "George Edward Klassen",
+                        "fullLFMName": "Klassen, George Edward",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
+                    },
+                    "battingOrder": 1,
                     "team": {
                         "id": 108,
                         "name": "Los Angeles Angels",
                         "link": "/api/v1/teams/108"
                     }
                 },
-                "offense": {
-                    "team": {
-                        "id": 133,
-                        "name": "Athletics",
-                        "link": "/api/v1/teams/133"
-                    }
-                }
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2507,
@@ -7508,7 +7846,264 @@
             "recordSource": "S",
             "ifNecessary": "N",
             "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "lineups": {
+                "homePlayers": [
+                    {
+                        "id": 701762,
+                        "fullName": "Nick Kurtz",
+                        "link": "/api/v1/people/701762",
+                        "firstName": "Nicholas",
+                        "lastName": "Kurtz",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Nick"
+                    },
+                    {
+                        "id": 669127,
+                        "fullName": "Shea Langeliers",
+                        "link": "/api/v1/people/669127",
+                        "firstName": "Shea",
+                        "lastName": "Langeliers",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Shea"
+                    },
+                    {
+                        "id": 691016,
+                        "fullName": "Tyler Soderstrom",
+                        "link": "/api/v1/people/691016",
+                        "firstName": "Tyler",
+                        "lastName": "Soderstrom",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Tyler"
+                    },
+                    {
+                        "id": 667670,
+                        "fullName": "Brent Rooker",
+                        "link": "/api/v1/people/667670",
+                        "firstName": "Terry",
+                        "lastName": "Rooker",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Brent"
+                    },
+                    {
+                        "id": 805779,
+                        "fullName": "Jacob Wilson",
+                        "link": "/api/v1/people/805779",
+                        "firstName": "Jacob",
+                        "lastName": "Wilson",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Jacob"
+                    },
+                    {
+                        "id": 643446,
+                        "fullName": "Jeff McNeil",
+                        "link": "/api/v1/people/643446",
+                        "firstName": "Jeffrey",
+                        "lastName": "McNeil",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Jeff"
+                    },
+                    {
+                        "id": 691777,
+                        "fullName": "Max Muncy",
+                        "link": "/api/v1/people/691777",
+                        "firstName": "Maxwell",
+                        "lastName": "Muncy",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Max"
+                    },
+                    {
+                        "id": 680869,
+                        "fullName": "Zack Gelof",
+                        "link": "/api/v1/people/680869",
+                        "firstName": "Zachary",
+                        "lastName": "Gelof",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Zack"
+                    },
+                    {
+                        "id": 672016,
+                        "fullName": "Denzel Clarke",
+                        "link": "/api/v1/people/672016",
+                        "firstName": "Denzel",
+                        "lastName": "Clarke",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Denzel"
+                    }
+                ],
+                "awayPlayers": [
+                    {
+                        "id": 672724,
+                        "fullName": "Oswald Peraza",
+                        "link": "/api/v1/people/672724",
+                        "firstName": "Oswald",
+                        "lastName": "Peraza",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Oswald"
+                    },
+                    {
+                        "id": 545361,
+                        "fullName": "Mike Trout",
+                        "link": "/api/v1/people/545361",
+                        "firstName": "Michael",
+                        "lastName": "Trout",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Mike"
+                    },
+                    {
+                        "id": 660162,
+                        "fullName": "Yo\u00e1n Moncada",
+                        "link": "/api/v1/people/660162",
+                        "firstName": "Yo\u00e1n",
+                        "lastName": "Moncada",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Yo\u00e1n"
+                    },
+                    {
+                        "id": 666176,
+                        "fullName": "Jo Adell",
+                        "link": "/api/v1/people/666176",
+                        "firstName": "Jordon",
+                        "lastName": "Adell",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Jo"
+                    },
+                    {
+                        "id": 694384,
+                        "fullName": "Nolan Schanuel",
+                        "link": "/api/v1/people/694384",
+                        "firstName": "Nolan",
+                        "lastName": "Schanuel",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Nolan"
+                    },
+                    {
+                        "id": 681351,
+                        "fullName": "Logan O'Hoppe",
+                        "link": "/api/v1/people/681351",
+                        "firstName": "Logan",
+                        "lastName": "O'Hoppe",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Logan"
+                    },
+                    {
+                        "id": 621035,
+                        "fullName": "Chris Taylor",
+                        "link": "/api/v1/people/621035",
+                        "firstName": "Christopher",
+                        "lastName": "Taylor",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Chris"
+                    },
+                    {
+                        "id": 624428,
+                        "fullName": "Adam Frazier",
+                        "link": "/api/v1/people/624428",
+                        "firstName": "Adam",
+                        "lastName": "Frazier",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Adam"
+                    },
+                    {
+                        "id": 669326,
+                        "fullName": "Bryce Teodosio",
+                        "link": "/api/v1/people/669326",
+                        "firstName": "Bryce",
+                        "lastName": "Teodosio",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Bryce"
+                    }
+                ]
+            }
         },
         "odds": {
             "id": "7a8dbba3f62d1edd91190d3b1e1c8cc7",
@@ -7728,7 +8323,7 @@
             "829171": "SS",
             "570560": "3B",
             "824200": "P",
-            "545361": "RF",
+            "545361": "DH",
             "692228": "C",
             "692624": "P",
             "827719": "3B",
@@ -7818,7 +8413,7 @@
             "694559": "P",
             "676502": "P",
             "695049": "P",
-            "672724": "3B",
+            "672724": "SS",
             "622268": "2B",
             "672569": "OF",
             "803285": "P",
@@ -7840,7 +8435,7 @@
             "805744": "1B",
             "677347": "2B",
             "821238": "C",
-            "666176": "CF",
+            "666176": "RF",
             "687093": "2B",
             "702494": "P",
             "666171": "P",
@@ -7848,7 +8443,7 @@
             "668876": "C",
             "682239": "2B",
             "684665": "P",
-            "669326": "CF",
+            "669326": "LF",
             "821000": "SS",
             "660623": "P",
             "686438": "1B",
@@ -7860,7 +8455,7 @@
             "821126": "C",
             "800203": "CF",
             "829052": "OF",
-            "667670": "RF",
+            "667670": "DH",
             "641962": "P",
             "686993": "P",
             "593833": "P",
@@ -7964,7 +8559,7 @@
             "669434": "P",
             "695720": "3B",
             "622663": "P",
-            "680869": "2B",
+            "680869": "RF",
             "701699": "C",
             "669439": "3B",
             "683101": "P",
@@ -7990,7 +8585,10 @@
             "595453": "C",
             "675430": "C",
             "691863": "C",
-            "803314": "P"
+            "803314": "P",
+            "800514": "P",
+            "815151": "2B",
+            "809814": "P"
         },
         "deepStats": {
             "691946": {
@@ -8014,10 +8612,519 @@
                     "avg": "-",
                     "ops": "-"
                 }
+            },
+            "672724": {
+                "name": "Oswald Peraza",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 57,
+                    "hr": 0,
+                    "k": 22,
+                    "bb": 4,
+                    "avg": ".123",
+                    "ops": ".356"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 67,
+                    "hr": 2,
+                    "k": 26,
+                    "bb": 4,
+                    "avg": ".224",
+                    "ops": ".602"
+                }
+            },
+            "545361": {
+                "name": "Mike Trout",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 90,
+                    "hr": 3,
+                    "k": 39,
+                    "bb": 13,
+                    "avg": ".222",
+                    "ops": ".681"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 366,
+                    "hr": 23,
+                    "k": 139,
+                    "bb": 74,
+                    "avg": ".235",
+                    "ops": ".825"
+                }
+            },
+            "660162": {
+                "name": "Yo\u00e1n Moncada",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 23,
+                    "hr": 0,
+                    "k": 6,
+                    "bb": 2,
+                    "avg": ".174",
+                    "ops": ".477"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 225,
+                    "hr": 12,
+                    "k": 69,
+                    "bb": 30,
+                    "avg": ".240",
+                    "ops": ".815"
+                }
+            },
+            "666176": {
+                "name": "Jo Adell",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 94,
+                    "hr": 7,
+                    "k": 24,
+                    "bb": 10,
+                    "avg": ".277",
+                    "ops": ".931"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 432,
+                    "hr": 30,
+                    "k": 127,
+                    "bb": 23,
+                    "avg": ".227",
+                    "ops": ".744"
+                }
+            },
+            "694384": {
+                "name": "Nolan Schanuel",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 106,
+                    "hr": 2,
+                    "k": 14,
+                    "bb": 13,
+                    "avg": ".274",
+                    "ops": ".731"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 382,
+                    "hr": 10,
+                    "k": 57,
+                    "bb": 46,
+                    "avg": ".262",
+                    "ops": ".745"
+                }
+            },
+            "681351": {
+                "name": "Logan O'Hoppe",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 74,
+                    "hr": 4,
+                    "k": 19,
+                    "bb": 5,
+                    "avg": ".257",
+                    "ops": ".745"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 349,
+                    "hr": 15,
+                    "k": 120,
+                    "bb": 19,
+                    "avg": ".203",
+                    "ops": ".604"
+                }
+            },
+            "621035": {
+                "name": "Chris Taylor",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 12,
+                    "hr": 0,
+                    "k": 4,
+                    "bb": 0,
+                    "avg": ".250",
+                    "ops": ".583"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 56,
+                    "hr": 2,
+                    "k": 21,
+                    "bb": 3,
+                    "avg": ".232",
+                    "ops": ".762"
+                }
+            },
+            "624428": {
+                "name": "Adam Frazier",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 35,
+                    "hr": 1,
+                    "k": 13,
+                    "bb": 2,
+                    "avg": ".229",
+                    "ops": ".718"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 149,
+                    "hr": 3,
+                    "k": 23,
+                    "bb": 7,
+                    "avg": ".295",
+                    "ops": ".723"
+                }
+            },
+            "669326": {
+                "name": "Bryce Teodosio",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 24,
+                    "hr": 1,
+                    "k": 9,
+                    "bb": 1,
+                    "avg": ".250",
+                    "ops": ".755"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 114,
+                    "hr": 0,
+                    "k": 38,
+                    "bb": 4,
+                    "avg": ".193",
+                    "ops": ".510"
+                }
+            },
+            "701762": {
+                "name": "Nick Kurtz",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 137,
+                    "hr": 9,
+                    "k": 54,
+                    "bb": 12,
+                    "avg": ".197",
+                    "ops": ".685"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 283,
+                    "hr": 27,
+                    "k": 97,
+                    "bb": 51,
+                    "avg": ".336",
+                    "ops": "1.153"
+                }
+            },
+            "669127": {
+                "name": "Shea Langeliers",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 120,
+                    "hr": 10,
+                    "k": 26,
+                    "bb": 2,
+                    "avg": ".367",
+                    "ops": "1.041"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 361,
+                    "hr": 21,
+                    "k": 77,
+                    "bb": 34,
+                    "avg": ".247",
+                    "ops": ".803"
+                }
+            },
+            "691016": {
+                "name": "Tyler Soderstrom",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 137,
+                    "hr": 5,
+                    "k": 38,
+                    "bb": 8,
+                    "avg": ".270",
+                    "ops": ".738"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 424,
+                    "hr": 20,
+                    "k": 103,
+                    "bb": 47,
+                    "avg": ".278",
+                    "ops": ".846"
+                }
+            },
+            "667670": {
+                "name": "Brent Rooker",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 140,
+                    "hr": 5,
+                    "k": 26,
+                    "bb": 21,
+                    "avg": ".293",
+                    "ops": ".885"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 486,
+                    "hr": 25,
+                    "k": 129,
+                    "bb": 44,
+                    "avg": ".253",
+                    "ops": ".794"
+                }
+            },
+            "805779": {
+                "name": "Jacob Wilson",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 110,
+                    "hr": 4,
+                    "k": 8,
+                    "bb": 5,
+                    "avg": ".336",
+                    "ops": ".862"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 376,
+                    "hr": 9,
+                    "k": 31,
+                    "bb": 22,
+                    "avg": ".303",
+                    "ops": ".781"
+                }
+            },
+            "643446": {
+                "name": "Jeff McNeil",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 89,
+                    "hr": 1,
+                    "k": 16,
+                    "bb": 14,
+                    "avg": ".236",
+                    "ops": ".712"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 310,
+                    "hr": 11,
+                    "k": 39,
+                    "bb": 35,
+                    "avg": ".245",
+                    "ops": ".755"
+                }
+            },
+            "691777": {
+                "name": "Max Muncy",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 40,
+                    "hr": 1,
+                    "k": 14,
+                    "bb": 4,
+                    "avg": ".200",
+                    "ops": ".548"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 166,
+                    "hr": 8,
+                    "k": 54,
+                    "bb": 6,
+                    "avg": ".217",
+                    "ops": ".659"
+                }
+            },
+            "680869": {
+                "name": "Zack Gelof",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 25,
+                    "hr": 0,
+                    "k": 16,
+                    "bb": 1,
+                    "avg": ".120",
+                    "ops": ".314"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 67,
+                    "hr": 2,
+                    "k": 30,
+                    "bb": 6,
+                    "avg": ".194",
+                    "ops": ".570"
+                }
+            },
+            "672016": {
+                "name": "Denzel Clarke",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 28,
+                    "hr": 1,
+                    "k": 12,
+                    "bb": 2,
+                    "avg": ".179",
+                    "ops": ".662"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 120,
+                    "hr": 2,
+                    "k": 49,
+                    "bb": 4,
+                    "avg": ".242",
+                    "ops": ".642"
+                }
             }
         },
-        "hpUmpire": "TBD",
-        "umpStats": null,
+        "hpUmpire": "Dexter Kelley",
+        "umpStats": {
+            "k_rate": "27.8%",
+            "bb_rate": "7.7%",
+            "rpg": "8.8",
+            "games": 5
+        },
         "parkStats": null
     },
     {
