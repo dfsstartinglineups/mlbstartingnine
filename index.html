@@ -15,22 +15,22 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
-    <title id="dynamic-title">Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors</title>
+    <title>Today's MLB Starting Lineups, Odds & Player Projections | MLBStartingNine</title>
     
-    <meta name="description" id="dynamic-desc" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), umpire tendencies, and park factors for DFS and sports bettors.">
-    <meta name="keywords" content="MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders">
+    <meta name="description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily MLB player projections, Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
+    <meta name="keywords" content="MLB starting lineups, MLB player projections, MLB odds, baseball projections, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers">
 
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mlbstartingnine.com/">
-    <meta property="og:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors">
-    <meta property="og:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
+    <meta property="og:title" content="Today's MLB Starting Lineups, Odds & Player Projections">
+    <meta property="og:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily MLB player projections, Batter vs. Pitcher (BvP) matchups, pitcher splits, and umpire tendencies.">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="mlbstartingnine.com">
     <meta property="twitter:url" content="https://mlbstartingnine.com/">
-    <meta name="twitter:title" content="Today's MLB Starting Lineups & Odds | BvP, Splits, Umps & Park Factors">
-    <meta name="twitter:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
+    <meta name="twitter:title" content="Today's MLB Starting Lineups, Odds & Player Projections">
+    <meta name="twitter:description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily MLB player projections, Batter vs. Pitcher (BvP) matchups, pitcher splits, and umpire tendencies.">
     <meta name="twitter:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -118,18 +118,7 @@
             height: 14px;
         }
 
-        .sr-only {
-          position: absolute !important;
-          width: 1px !important;
-          height: 1px !important;
-          padding: 0 !important;
-          margin: -1px !important;
-          overflow: hidden !important;
-          clip: rect(0, 0, 0, 0) !important;
-          white-space: nowrap !important;
-          border: 0 !important;
-        }
-
+        
         /* EXPANDING SEARCH BOX (MLB THEME) */
         #team-search { 
             color: #ffffff !important; 
@@ -154,87 +143,12 @@
         }
     </style>
 
-    <script>
-        // GLOBALLY ACCESSIBLE SEO FUNCTION
-        window.updateSEO = function(dateStr) {
-            let dateObj;
-            
-            // If the calendar passes a date, use it. Otherwise, default to exactly right now.
-            if (dateStr) {
-                const [year, month, day] = dateStr.split('-');
-                dateObj = new Date(year, month - 1, day);
-            } else {
-                dateObj = new Date();
-            }
-
-            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            
-            // Set Date Boundaries (Using correct zero-indexed months: 2 = March)
-            const wbcStart = new Date(2026, 2, 4);   
-            const wbcEnd = new Date(2026, 2, 17);    
-            const openingDay = new Date(2026, 2, 25);
-            
-            const isWBC = dateObj >= wbcStart && dateObj <= wbcEnd;
-            const isSpringTraining = dateObj < openingDay;
-            
-            // Default Evergreen Tags (Regular Season)
-            let titlePrefix = "Today's MLB Starting Lineups";
-            let ogTitleText = "Today's MLB Starting Lineups";
-            let descPrefix = "Live MLB starting lineups, probable pitchers, moneylines, and totals.";
-            let h1Text = "Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds";
-            let keywordsText = "MLB starting lineups, MLB odds, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers, baseball moneylines, over unders";
-            
-            if (isWBC) {
-                // WBC + Spring Training Overrides
-                titlePrefix = "Today's World Baseball Classic(WBC) & MLB Spring Training Lineups";
-                ogTitleText = "Today's World Baseball Classic(WBC) & MLB Spring Training Lineups";
-                descPrefix = "Live World Baseball Classic and MLB Spring Training starting lineups, probable pitchers, live odds, and totals.";
-                h1Text = "Daily World Baseball Classic & MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, and Betting Odds";
-                keywordsText = "WBC lineups, World Baseball Classic odds, World Baseball Classic lineups, WBC betting, MLB Spring Training lineups, MLB Spring Training odds, DFS lineups, BvP matchups, pitcher splits";
-            } else if (isSpringTraining) {
-                // Spring Training Only Overrides
-                titlePrefix = "Today's MLB Spring Training Lineups";
-                ogTitleText = "Today's MLB Spring Training Lineups";
-                descPrefix = "Live MLB Spring Training starting lineups, probable pitchers, live odds, and totals.";
-                h1Text = "Daily MLB Spring Training Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds";
-            }
-            
-            const fullTitle = `${titlePrefix} for ${formattedDate} | BvP, Splits & Umps`;
-            const fullDesc = `${descPrefix} Plus daily Batter vs. Pitcher (BvP) matchups, pitcher splits (vL/vR), and umpire tendencies for ${formattedDate}. Built for DFS, fantasy baseball, and sports bettors.`;
-
-            // Update the DOM
-            document.title = fullTitle;
-            
-            const metaDesc = document.querySelector('meta[name="description"]');
-            if (metaDesc) metaDesc.content = fullDesc;
-            
-            const metaKeywords = document.querySelector('meta[name="keywords"]');
-            if (metaKeywords) metaKeywords.content = keywordsText;
-
-            const ogTitle = document.querySelector('meta[property="og:title"]');
-            if (ogTitle) ogTitle.content = ogTitleText;
-            const ogDesc = document.querySelector('meta[property="og:description"]');
-            if (ogDesc) ogDesc.content = fullDesc;
-            
-            const twTitle = document.querySelector('meta[name="twitter:title"]');
-            if (twTitle) twTitle.content = ogTitleText;
-            const twDesc = document.querySelector('meta[name="twitter:description"]');
-            if (twDesc) twDesc.content = fullDesc;
-
-            const h1 = document.getElementById('main-header');
-            if (h1) h1.innerText = h1Text;
-        };
-
-        // Fire instantly on load so Google sees it!
-        document.addEventListener('DOMContentLoaded', () => {
-            window.updateSEO();
-        });
-    </script>
+    
+        
 </head>
     
 <body>
 
-<h1 id="main-header" class="sr-only">Daily MLB Starting Lineups, BvP Matchups, Pitcher Splits, Umpire Tendencies, Park Factors, and Betting Odds</h1>
 
 <nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
@@ -251,8 +165,12 @@
     </div>
 </nav>
 
-<div class="container mb-3">
-    <div class="text-center text-muted px-2" style="font-size: 0.70rem; letter-spacing: 0.2px;">
+<div class="container mt-3 mb-3 text-center">
+    <h1 class="h5 fw-bold text-dark mb-1">Today's MLB Starting Lineups, Odds & Player Projections</h1>
+    
+    <p class="text-muted mb-2" style="font-size: 0.85rem;">Live BvP matchups, pitcher splits, umpire tendencies, daily fantasy projections, and park factors.</p>
+    
+    <div class="text-muted px-2" style="font-size: 0.70rem; letter-spacing: 0.2px;">
         📊 <strong>Data Note:</strong> To ensure relevant sample sizes, all player splits (vL/vR) combine data from the current and last season. Batter vs. Pitcher (vP) history is lifetime. Umpire data is a 365 day window.
     </div>
 </div>
