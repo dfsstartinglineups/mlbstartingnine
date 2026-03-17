@@ -601,8 +601,8 @@
                         "link": "/api/v1/teams/110"
                     }
                 },
-                "balls": 2,
-                "strikes": 0,
+                "balls": 3,
+                "strikes": 2,
                 "outs": 0
             },
             "venue": {
@@ -2183,9 +2183,9 @@
             "linescore": {
                 "currentInning": 3,
                 "currentInningOrdinal": "3rd",
-                "inningState": "Middle",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -2568,8 +2568,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 1,
-                "outs": 3
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2526,
@@ -3990,10 +3990,11 @@
             "officialDate": "2026-03-17",
             "status": {
                 "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "codedGameState": "M",
+                "detailedState": "Player challenge",
+                "statusCode": "MJ",
                 "startTimeTBD": false,
+                "reason": "Pitch Result",
                 "abstractGameCode": "L"
             },
             "teams": {
@@ -4312,53 +4313,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 681047,
-                        "fullName": "Christian Franklin",
-                        "link": "/api/v1/people/681047",
-                        "firstName": "Christian",
-                        "lastName": "Franklin",
-                        "primaryNumber": "33",
-                        "birthDate": "1999-11-30",
-                        "currentAge": 26,
-                        "birthCity": "Overland Park",
-                        "birthStateProvince": "KS",
-                        "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 195,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "7",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "LF"
-                        },
-                        "useName": "Christian",
-                        "useLastName": "Franklin",
-                        "boxscoreName": "Franklin, C",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "draftYear": 2021,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Christian Franklin",
-                        "nameSlug": "christian-franklin-681047",
-                        "firstLastName": "Christian Franklin",
-                        "lastFirstName": "Franklin, Christian",
-                        "lastInitName": "Franklin, C",
-                        "initLastName": "C Franklin",
-                        "fullFMLName": "Christian  Franklin",
-                        "fullLFMName": "Franklin, Christian",
-                        "strikeZoneTop": 3.072,
-                        "strikeZoneBottom": 1.55
-                    },
-                    "onDeck": {
                         "id": 665953,
                         "fullName": "Andr\u00e9s Chaparro",
                         "link": "/api/v1/people/665953",
@@ -4407,7 +4361,7 @@
                         "strikeZoneTop": 3.205,
                         "strikeZoneBottom": 1.618
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 691781,
                         "fullName": "Brady House",
                         "link": "/api/v1/people/691781",
@@ -4455,6 +4409,55 @@
                         "fullLFMName": "House, Brady Hunter",
                         "strikeZoneTop": 3.371,
                         "strikeZoneBottom": 1.701
+                    },
+                    "inHole": {
+                        "id": 660688,
+                        "fullName": "Keibert Ruiz",
+                        "link": "/api/v1/people/660688",
+                        "firstName": "Keibert",
+                        "lastName": "Ruiz",
+                        "primaryNumber": "20",
+                        "birthDate": "1998-07-20",
+                        "currentAge": 27,
+                        "birthCity": "Valencia",
+                        "birthCountry": "Venezuela",
+                        "height": "5' 11\"",
+                        "weight": 238,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Keibert",
+                        "useLastName": "Ruiz",
+                        "middleName": "Jose",
+                        "boxscoreName": "Ruiz, K",
+                        "gender": "M",
+                        "nameMatrilineal": "Lugo",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "pronunciation": "kay-bert roo-EEZ",
+                        "mlbDebutDate": "2020-08-16",
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Keibert Ruiz",
+                        "nameSlug": "keibert-ruiz-660688",
+                        "firstLastName": "Keibert Ruiz",
+                        "lastFirstName": "Ruiz, Keibert",
+                        "lastInitName": "Ruiz, K",
+                        "initLastName": "K Ruiz",
+                        "fullFMLName": "Keibert Jose Ruiz",
+                        "fullLFMName": "Ruiz, Keibert Jose",
+                        "strikeZoneTop": 3.175,
+                        "strikeZoneBottom": 1.602
                     },
                     "pitcher": {
                         "id": 663623,
@@ -4505,16 +4508,16 @@
                         "strikeZoneTop": 3.478,
                         "strikeZoneBottom": 1.755
                     },
-                    "battingOrder": 2,
+                    "battingOrder": 3,
                     "team": {
                         "id": 120,
                         "name": "Washington Nationals",
                         "link": "/api/v1/teams/120"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
-                "outs": 1
+                "balls": 1,
+                "strikes": 0,
+                "outs": 2
             },
             "venue": {
                 "id": 5000,
@@ -6529,8 +6532,8 @@
                         "link": "/api/v1/teams/142"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
+                "balls": 1,
+                "strikes": 1,
                 "outs": 0
             },
             "venue": {
@@ -7962,7 +7965,7 @@
                         "losses": 5,
                         "pct": ".762"
                     },
-                    "score": 1,
+                    "score": 2,
                     "probablePitcher": {
                         "id": 625643,
                         "fullName": "Reynaldo L\u00f3pez",
@@ -8130,8 +8133,8 @@
                             "leftOnBase": 0
                         },
                         "away": {
-                            "runs": 1,
-                            "hits": 2,
+                            "runs": 2,
+                            "hits": 3,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -8145,8 +8148,8 @@
                         "leftOnBase": 2
                     },
                     "away": {
-                        "runs": 1,
-                        "hits": 3,
+                        "runs": 2,
+                        "hits": 4,
                         "errors": 0,
                         "leftOnBase": 2
                     }
@@ -8266,56 +8269,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 571657,
-                        "fullName": "Kyle Farmer",
-                        "link": "/api/v1/people/571657",
-                        "firstName": "James",
-                        "lastName": "Farmer",
-                        "primaryNumber": "15",
-                        "birthDate": "1990-08-17",
-                        "currentAge": 35,
-                        "birthCity": "Atlanta",
-                        "birthStateProvince": "GA",
-                        "birthCountry": "USA",
-                        "height": "5' 11\"",
-                        "weight": 205,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Kyle",
-                        "useLastName": "Farmer",
-                        "middleName": "Kyle",
-                        "boxscoreName": "Farmer, K",
-                        "nickName": "Farm Dawg",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2013,
-                        "mlbDebutDate": "2017-07-30",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Kyle Farmer",
-                        "nameSlug": "kyle-farmer-571657",
-                        "firstLastName": "Kyle Farmer",
-                        "lastFirstName": "Farmer, Kyle",
-                        "lastInitName": "Farmer, K",
-                        "initLastName": "K Farmer",
-                        "fullFMLName": "James Kyle Farmer",
-                        "fullLFMName": "Farmer, James Kyle",
-                        "strikeZoneTop": 3.167,
-                        "strikeZoneBottom": 1.598
-                    },
-                    "onDeck": {
                         "id": 592325,
                         "fullName": "Ben Gamel",
                         "link": "/api/v1/people/592325",
@@ -8365,7 +8318,7 @@
                         "strikeZoneTop": 3.116,
                         "strikeZoneBottom": 1.573
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 665856,
                         "fullName": "Jair Camargo",
                         "link": "/api/v1/people/665856",
@@ -8414,69 +8367,20 @@
                         "strikeZoneTop": 3.116,
                         "strikeZoneBottom": 1.572
                     },
-                    "first": {
-                        "id": 689172,
-                        "fullName": "Brett Wisely",
-                        "link": "/api/v1/people/689172",
-                        "firstName": "Brett",
-                        "lastName": "Wisely",
-                        "primaryNumber": "0",
-                        "birthDate": "1999-05-08",
-                        "currentAge": 26,
-                        "birthCity": "Jacksonville",
-                        "birthStateProvince": "FL",
+                    "inHole": {
+                        "id": 663897,
+                        "fullName": "Luke Williams",
+                        "link": "/api/v1/people/663897",
+                        "firstName": "Lucas",
+                        "lastName": "Williams",
+                        "primaryNumber": "63",
+                        "birthDate": "1996-08-09",
+                        "currentAge": 29,
+                        "birthCity": "Park Ridge",
+                        "birthStateProvince": "IL",
                         "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 185,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Brett",
-                        "useLastName": "Wisely",
-                        "middleName": "Michael",
-                        "boxscoreName": "Wisely",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2019,
-                        "pronunciation": "WISE-lee",
-                        "mlbDebutDate": "2023-03-30",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Brett Wisely",
-                        "nameSlug": "brett-wisely-689172",
-                        "firstLastName": "Brett Wisely",
-                        "lastFirstName": "Wisely, Brett",
-                        "lastInitName": "Wisely, B",
-                        "initLastName": "B Wisely",
-                        "fullFMLName": "Brett Michael Wisely",
-                        "fullLFMName": "Wisely, Brett Michael",
-                        "strikeZoneTop": 3.085,
-                        "strikeZoneBottom": 1.557
-                    },
-                    "third": {
-                        "id": 622761,
-                        "fullName": "Jorge Mateo",
-                        "link": "/api/v1/people/622761",
-                        "firstName": "Jorge",
-                        "lastName": "Mateo",
-                        "primaryNumber": "2",
-                        "birthDate": "1995-06-23",
-                        "currentAge": 30,
-                        "birthCity": "Santo Domingo Oeste",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 0\"",
-                        "weight": 200,
+                        "height": "6' 1\"",
+                        "weight": 186,
                         "active": true,
                         "primaryPosition": {
                             "code": "6",
@@ -8484,15 +8388,16 @@
                             "type": "Infielder",
                             "abbreviation": "SS"
                         },
-                        "useName": "Jorge",
-                        "useLastName": "Mateo",
-                        "middleName": "Luis",
-                        "boxscoreName": "Mateo",
+                        "useName": "Luke",
+                        "useLastName": "Williams",
+                        "middleName": "Daniel",
+                        "boxscoreName": "Williams, L",
                         "gender": "M",
                         "isPlayer": true,
-                        "isVerified": false,
-                        "pronunciation": "mah-TAY-oh",
-                        "mlbDebutDate": "2020-08-13",
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "pronunciation": "WILL-yims",
+                        "mlbDebutDate": "2021-06-08",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
@@ -8501,16 +8406,66 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Jorge Mateo",
-                        "nameSlug": "jorge-mateo-622761",
-                        "firstLastName": "Jorge Mateo",
-                        "lastFirstName": "Mateo, Jorge",
-                        "lastInitName": "Mateo, J",
-                        "initLastName": "J Mateo",
-                        "fullFMLName": "Jorge Luis Mateo",
-                        "fullLFMName": "Mateo, Jorge Luis",
-                        "strikeZoneTop": 3.198,
-                        "strikeZoneBottom": 1.614
+                        "nameFirstLast": "Luke Williams",
+                        "nameSlug": "luke-williams-663897",
+                        "firstLastName": "Luke Williams",
+                        "lastFirstName": "Williams, Luke",
+                        "lastInitName": "Williams, L",
+                        "initLastName": "L Williams",
+                        "fullFMLName": "Lucas Daniel Williams",
+                        "fullLFMName": "Williams, Lucas Daniel",
+                        "strikeZoneTop": 3.235,
+                        "strikeZoneBottom": 1.633
+                    },
+                    "first": {
+                        "id": 571657,
+                        "fullName": "Kyle Farmer",
+                        "link": "/api/v1/people/571657",
+                        "firstName": "James",
+                        "lastName": "Farmer",
+                        "primaryNumber": "15",
+                        "birthDate": "1990-08-17",
+                        "currentAge": 35,
+                        "birthCity": "Atlanta",
+                        "birthStateProvince": "GA",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 205,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Kyle",
+                        "useLastName": "Farmer",
+                        "middleName": "Kyle",
+                        "boxscoreName": "Farmer, K",
+                        "nickName": "Farm Dawg",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2013,
+                        "mlbDebutDate": "2017-07-30",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Kyle Farmer",
+                        "nameSlug": "kyle-farmer-571657",
+                        "firstLastName": "Kyle Farmer",
+                        "lastFirstName": "Farmer, Kyle",
+                        "lastInitName": "Farmer, K",
+                        "initLastName": "K Farmer",
+                        "fullFMLName": "James Kyle Farmer",
+                        "fullLFMName": "Farmer, James Kyle",
+                        "strikeZoneTop": 3.167,
+                        "strikeZoneBottom": 1.598
                     },
                     "pitcher": {
                         "id": 625643,
@@ -8561,16 +8516,16 @@
                         "strikeZoneTop": 3.255,
                         "strikeZoneBottom": 1.643
                     },
-                    "battingOrder": 3,
+                    "battingOrder": 4,
                     "team": {
                         "id": 144,
                         "name": "Atlanta Braves",
                         "link": "/api/v1/teams/144"
                     }
                 },
-                "balls": 1,
-                "strikes": 0,
-                "outs": 0
+                "balls": 0,
+                "strikes": 1,
+                "outs": 1
             },
             "venue": {
                 "id": 4309,
@@ -10181,7 +10136,7 @@
                         "num": 3,
                         "ordinalNum": "3rd",
                         "home": {
-                            "hits": 0,
+                            "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
                         },
@@ -10196,7 +10151,7 @@
                 "teams": {
                     "home": {
                         "runs": 0,
-                        "hits": 0,
+                        "hits": 1,
                         "errors": 1,
                         "leftOnBase": 1
                     },
@@ -10321,55 +10276,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 650490,
-                        "fullName": "Yandy D\u00edaz",
-                        "link": "/api/v1/people/650490",
-                        "firstName": "Yandy",
-                        "lastName": "D\u00edaz",
-                        "primaryNumber": "2",
-                        "birthDate": "1991-08-08",
-                        "currentAge": 34,
-                        "birthCity": "Sagua la Grande",
-                        "birthCountry": "Cuba",
-                        "height": "6' 0\"",
-                        "weight": 235,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Yandy",
-                        "useLastName": "D\u00edaz",
-                        "boxscoreName": "D\u00edaz, Y",
-                        "nickName": "Aranita Diaz",
-                        "gender": "M",
-                        "nameMatrilineal": "Fernandez",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "YAHN-dee",
-                        "mlbDebutDate": "2017-04-03",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Yandy D\u00edaz",
-                        "nameSlug": "yandy-diaz-650490",
-                        "firstLastName": "Yandy D\u00edaz",
-                        "lastFirstName": "D\u00edaz, Yandy",
-                        "lastInitName": "D\u00edaz, Y",
-                        "initLastName": "Y D\u00edaz",
-                        "fullFMLName": "Yandy D\u00edaz",
-                        "fullLFMName": "D\u00edaz, Yandy",
-                        "strikeZoneTop": 3.228,
-                        "strikeZoneBottom": 1.629
-                    },
-                    "onDeck": {
                         "id": 666018,
                         "fullName": "Jonathan Aranda",
                         "link": "/api/v1/people/666018",
@@ -10419,7 +10325,7 @@
                         "strikeZoneTop": 3.189,
                         "strikeZoneBottom": 1.61
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 691406,
                         "fullName": "Junior Caminero",
                         "link": "/api/v1/people/691406",
@@ -10467,6 +10373,106 @@
                         "fullLFMName": "Caminero, Junior Alberto",
                         "strikeZoneTop": 3.244,
                         "strikeZoneBottom": 1.637
+                    },
+                    "inHole": {
+                        "id": 656775,
+                        "fullName": "Cedric Mullins",
+                        "link": "/api/v1/people/656775",
+                        "firstName": "Boyce",
+                        "lastName": "Mullins",
+                        "primaryNumber": "31",
+                        "birthDate": "1994-10-01",
+                        "currentAge": 31,
+                        "birthCity": "Greensboro",
+                        "birthStateProvince": "NC",
+                        "birthCountry": "USA",
+                        "height": "5' 7\"",
+                        "weight": 175,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Cedric",
+                        "useLastName": "Mullins",
+                        "middleName": "Cedric",
+                        "boxscoreName": "Mullins",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "mlbDebutDate": "2018-08-10",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Cedric Mullins",
+                        "nameTitle": "II",
+                        "nameSuffix": "II",
+                        "nameSlug": "cedric-mullins-656775",
+                        "firstLastName": "Cedric Mullins",
+                        "lastFirstName": "Mullins, Cedric",
+                        "lastInitName": "Mullins, C",
+                        "initLastName": "C Mullins",
+                        "fullFMLName": "Boyce Cedric Mullins",
+                        "fullLFMName": "Mullins, Boyce Cedric",
+                        "strikeZoneTop": 3.005,
+                        "strikeZoneBottom": 1.517
+                    },
+                    "second": {
+                        "id": 650490,
+                        "fullName": "Yandy D\u00edaz",
+                        "link": "/api/v1/people/650490",
+                        "firstName": "Yandy",
+                        "lastName": "D\u00edaz",
+                        "primaryNumber": "2",
+                        "birthDate": "1991-08-08",
+                        "currentAge": 34,
+                        "birthCity": "Sagua la Grande",
+                        "birthCountry": "Cuba",
+                        "height": "6' 0\"",
+                        "weight": 235,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Yandy",
+                        "useLastName": "D\u00edaz",
+                        "boxscoreName": "D\u00edaz, Y",
+                        "nickName": "Aranita Diaz",
+                        "gender": "M",
+                        "nameMatrilineal": "Fernandez",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "YAHN-dee",
+                        "mlbDebutDate": "2017-04-03",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Yandy D\u00edaz",
+                        "nameSlug": "yandy-diaz-650490",
+                        "firstLastName": "Yandy D\u00edaz",
+                        "lastFirstName": "D\u00edaz, Yandy",
+                        "lastInitName": "D\u00edaz, Y",
+                        "initLastName": "Y D\u00edaz",
+                        "fullFMLName": "Yandy D\u00edaz",
+                        "fullLFMName": "D\u00edaz, Yandy",
+                        "strikeZoneTop": 3.228,
+                        "strikeZoneBottom": 1.629
                     },
                     "pitcher": {
                         "id": 686752,
@@ -10518,15 +10524,15 @@
                         "strikeZoneTop": 3.344,
                         "strikeZoneBottom": 1.688
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 139,
                         "name": "Tampa Bay Rays",
                         "link": "/api/v1/teams/139"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
+                "balls": 1,
+                "strikes": 0,
                 "outs": 2
             },
             "venue": {
@@ -12498,7 +12504,7 @@
                         "link": "/api/v1/teams/146"
                     }
                 },
-                "balls": 1,
+                "balls": 2,
                 "strikes": 2,
                 "outs": 1
             },
@@ -19485,16 +19491,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 944,
-                        "name": "Venezuela",
-                        "link": "/api/v1/teams/944"
+                        "id": 940,
+                        "name": "United States",
+                        "link": "/api/v1/teams/940"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 940,
-                        "name": "United States",
-                        "link": "/api/v1/teams/940"
+                        "id": 944,
+                        "name": "Venezuela",
+                        "link": "/api/v1/teams/944"
                     }
                 }
             },
@@ -19737,16 +19743,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 108,
-                        "name": "Los Angeles Angels",
-                        "link": "/api/v1/teams/108"
+                        "id": 112,
+                        "name": "Chicago Cubs",
+                        "link": "/api/v1/teams/112"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 112,
-                        "name": "Chicago Cubs",
-                        "link": "/api/v1/teams/112"
+                        "id": 108,
+                        "name": "Los Angeles Angels",
+                        "link": "/api/v1/teams/108"
                     }
                 }
             },
@@ -20183,16 +20189,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 114,
-                        "name": "Cleveland Guardians",
-                        "link": "/api/v1/teams/114"
+                        "id": 113,
+                        "name": "Cincinnati Reds",
+                        "link": "/api/v1/teams/113"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 113,
-                        "name": "Cincinnati Reds",
-                        "link": "/api/v1/teams/113"
+                        "id": 114,
+                        "name": "Cleveland Guardians",
+                        "link": "/api/v1/teams/114"
                     }
                 }
             },
@@ -20647,16 +20653,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 119,
-                        "name": "Los Angeles Dodgers",
-                        "link": "/api/v1/teams/119"
+                        "id": 118,
+                        "name": "Kansas City Royals",
+                        "link": "/api/v1/teams/118"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 118,
-                        "name": "Kansas City Royals",
-                        "link": "/api/v1/teams/118"
+                        "id": 119,
+                        "name": "Los Angeles Dodgers",
+                        "link": "/api/v1/teams/119"
                     }
                 }
             },
