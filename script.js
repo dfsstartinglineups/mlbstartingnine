@@ -47,7 +47,7 @@ function handleHashNavigation() {
 }
 
 // ==========================================
-// 2. DATA FETCHING (MASSIVELY OPTIMIZED)
+// 2. DATA FETCHING (WITH LIVE API FALLBACK)
 // ==========================================
 async function init(dateToFetch) {
     if (window.updateSEO) window.updateSEO(dateToFetch); 
@@ -67,19 +67,59 @@ async function init(dateToFetch) {
     }
     
     try {
-        // Look at how fast this is now! One single file load.
+        // 1. Try to load your Python-generated file first (Fastest & has Deep Stats)
         const response = await fetch(`data/daily_files/games_${dateToFetch}.json?v=` + new Date().getTime());
-        if (!response.ok) throw new Error("No Data");
+        
+        if (!response.ok) {
+            throw new Error("Local JSON not found");
+        }
         
         ALL_GAMES_DATA = await response.json();
 
-        if (ALL_GAMES_DATA.length === 0) {
-            container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">No games scheduled for ${dateToFetch}</h5></div></div>`;
+    } catch (error) {
+        console.log(`No local file for ${dateToFetch}. Falling back to live MLB API...`);
+        
+        try {
+            // 2. Fallback: Hit the MLB API directly to construct the board on the fly
+            // The MLB API prefers MM/DD/YYYY formatting
+            const [year, month, day] = dateToFetch.split('-');
+            const mlbApiDate = `${month}/${day}/${year}`;
+            
+            const mlbRes = await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${mlbApiDate}&hydrate=probablePitcher,lineups`);
+            
+            if (!mlbRes.ok) throw new Error("MLB API Failed");
+            
+            const mlbData = await mlbRes.json();
+            
+            if (mlbData.dates && mlbData.dates.length > 0) {
+                // Map the raw MLB data into the structure your rendering engine expects
+                ALL_GAMES_DATA = mlbData.dates[0].games.map(game => {
+                    return {
+                        gameRaw: game,
+                        lineupHandedness: {},
+                        deepStats: {},
+                        parkStats: null,
+                        hpUmpire: "TBD",
+                        umpStats: null
+                    };
+                });
+            }
+        } catch (fallbackError) {
+            console.error("Fallback failed:", fallbackError);
+            container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
             return;
         }
+    }
 
-        renderGames();
-        handleHashNavigation();
+    // Render what we have (either the deep file or the raw fallback)
+    if (ALL_GAMES_DATA.length === 0) {
+        container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">No games scheduled for ${dateToFetch}</h5></div></div>`;
+        return;
+    }
+
+    renderGames();
+    handleHashNavigation();
+
         
     } catch (error) {
         container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
