@@ -305,15 +305,13 @@
                         "runs": 5,
                         "hits": 10,
                         "errors": 0,
-                        "leftOnBase": 9,
-                        "isWinner": true
+                        "leftOnBase": 9
                     },
                     "away": {
                         "runs": 1,
                         "hits": 6,
                         "errors": 0,
-                        "leftOnBase": 7,
-                        "isWinner": false
+                        "leftOnBase": 7
                     }
                 },
                 "defense": {
@@ -568,101 +566,6 @@
                         "fullLFMName": "De Los Santos, Yordany",
                         "strikeZoneTop": 3.275,
                         "strikeZoneBottom": 1.653
-                    },
-                    "first": {
-                        "id": 702262,
-                        "fullName": "Jared Jones",
-                        "link": "/api/v1/people/702262",
-                        "firstName": "Jared",
-                        "lastName": "Jones",
-                        "primaryNumber": "96",
-                        "birthDate": "2003-08-01",
-                        "currentAge": 22,
-                        "birthCity": "Marietta",
-                        "birthStateProvince": "GA",
-                        "birthCountry": "USA",
-                        "height": "6' 5\"",
-                        "weight": 246,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Jared",
-                        "useLastName": "Jones",
-                        "middleName": "Roger",
-                        "boxscoreName": "Jones",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2025,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Jared Jones",
-                        "nameSlug": "jared-jones-702262",
-                        "firstLastName": "Jared Jones",
-                        "lastFirstName": "Jones, Jared",
-                        "lastInitName": "Jones, J",
-                        "initLastName": "J Jones",
-                        "fullFMLName": "Jared Roger Jones",
-                        "fullLFMName": "Jones, Jared Roger",
-                        "strikeZoneTop": 3.414,
-                        "strikeZoneBottom": 1.723
-                    },
-                    "second": {
-                        "id": 676566,
-                        "fullName": "Shawn Ross",
-                        "link": "/api/v1/people/676566",
-                        "firstName": "Shawn",
-                        "lastName": "Ross",
-                        "primaryNumber": "73",
-                        "birthDate": "1999-09-30",
-                        "currentAge": 26,
-                        "birthCity": "Santurce",
-                        "birthCountry": "Puerto Rico",
-                        "height": "6' 0\"",
-                        "weight": 215,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Shawn",
-                        "useLastName": "Ross",
-                        "middleName": "Michael",
-                        "boxscoreName": "Ross",
-                        "gender": "M",
-                        "nameMatrilineal": "Tarabochie",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Shawn Ross",
-                        "nameSlug": "shawn-ross-676566",
-                        "firstLastName": "Shawn Ross",
-                        "lastFirstName": "Ross, Shawn",
-                        "lastInitName": "Ross, S",
-                        "initLastName": "S Ross",
-                        "fullFMLName": "Shawn Michael Ross",
-                        "fullLFMName": "Ross, Shawn Michael",
-                        "strikeZoneTop": 3.221,
-                        "strikeZoneBottom": 1.625
                     },
                     "pitcher": {
                         "id": 663366,
@@ -22308,12 +22211,12 @@
             "gameDate": "2026-03-17T01:05:00Z",
             "officialDate": "2026-03-16",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -22323,11 +22226,12 @@
                         "link": "/api/v1/teams/112"
                     },
                     "leagueRecord": {
-                        "wins": 9,
+                        "wins": 10,
                         "losses": 13,
-                        "pct": ".409"
+                        "pct": ".435"
                     },
                     "score": 5,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 690990,
                         "fullName": "Cade Horton",
@@ -22388,10 +22292,11 @@
                     },
                     "leagueRecord": {
                         "wins": 11,
-                        "losses": 11,
-                        "pct": ".500"
+                        "losses": 12,
+                        "pct": ".478"
                     },
                     "score": 2,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 668909,
                         "fullName": "Gavin Williams",
@@ -22927,7 +22832,7 @@
                 },
                 "balls": 0,
                 "strikes": 1,
-                "outs": 2
+                "outs": 3
             },
             "venue": {
                 "id": 3834,
@@ -22937,6 +22842,7 @@
             "content": {
                 "link": "/api/v1/game/831924/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
