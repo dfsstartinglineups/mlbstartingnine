@@ -119,11 +119,6 @@ async function init(dateToFetch) {
 
     renderGames();
     handleHashNavigation();
-
-        
-    } catch (error) {
-        container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
-    }
 }
 
 // ==========================================
