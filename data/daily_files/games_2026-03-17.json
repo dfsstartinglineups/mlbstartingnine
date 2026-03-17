@@ -149,11 +149,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 1,
-                "currentInningOrdinal": "1st",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 2,
+                "currentInningOrdinal": "2nd",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -170,6 +170,20 @@
                             "hits": 1,
                             "errors": 0,
                             "leftOnBase": 1
+                        }
+                    },
+                    {
+                        "num": 2,
+                        "ordinalNum": "2nd",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
                         }
                     }
                 ],
@@ -505,9 +519,9 @@
                         "link": "/api/v1/teams/110"
                     }
                 },
-                "balls": 0,
+                "balls": 1,
                 "strikes": 0,
-                "outs": 3
+                "outs": 0
             },
             "venue": {
                 "id": 2511,
@@ -2239,56 +2253,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 656811,
-                        "fullName": "Ryan O'Hearn",
-                        "link": "/api/v1/people/656811",
-                        "firstName": "Ryan",
-                        "lastName": "O'Hearn",
-                        "primaryNumber": "29",
-                        "birthDate": "1993-07-26",
-                        "currentAge": 32,
-                        "birthCity": "Dunedin",
-                        "birthStateProvince": "FL",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 220,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Ryan",
-                        "useLastName": "O'Hearn",
-                        "middleName": "Patrick",
-                        "boxscoreName": "O'Hearn",
-                        "nickName": "Brohearn",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2014,
-                        "mlbDebutDate": "2018-07-31",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "nameFirstLast": "Ryan O'Hearn",
-                        "nameSlug": "ryan-o-hearn-656811",
-                        "firstLastName": "Ryan O'Hearn",
-                        "lastFirstName": "O'Hearn, Ryan",
-                        "lastInitName": "O'Hearn, R",
-                        "initLastName": "R O'Hearn",
-                        "fullFMLName": "Ryan Patrick O'Hearn",
-                        "fullLFMName": "O'Hearn, Ryan Patrick",
-                        "strikeZoneTop": 3.289,
-                        "strikeZoneBottom": 1.66
-                    },
-                    "onDeck": {
                         "id": 668804,
                         "fullName": "Bryan Reynolds",
                         "link": "/api/v1/people/668804",
@@ -2338,7 +2302,7 @@
                         "strikeZoneTop": 3.284,
                         "strikeZoneBottom": 1.657
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 542303,
                         "fullName": "Marcell Ozuna",
                         "link": "/api/v1/people/542303",
@@ -2386,6 +2350,107 @@
                         "fullLFMName": "Ozuna, Marcell",
                         "strikeZoneTop": 3.256,
                         "strikeZoneBottom": 1.643
+                    },
+                    "inHole": {
+                        "id": 664040,
+                        "fullName": "Brandon Lowe",
+                        "link": "/api/v1/people/664040",
+                        "firstName": "Brandon",
+                        "lastName": "Lowe",
+                        "primaryNumber": "5",
+                        "birthDate": "1994-07-06",
+                        "currentAge": 31,
+                        "birthCity": "Suffolk",
+                        "birthStateProvince": "VA",
+                        "birthCountry": "USA",
+                        "height": "5' 9\"",
+                        "weight": 181,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Brandon",
+                        "useLastName": "Lowe",
+                        "middleName": "Norman",
+                        "boxscoreName": "Lowe, B",
+                        "nickName": "Bamm-Bamm",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "pronunciation": "rhymes with \"now\"",
+                        "mlbDebutDate": "2018-08-05",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Brandon Lowe",
+                        "nameSlug": "brandon-lowe-664040",
+                        "firstLastName": "Brandon Lowe",
+                        "lastFirstName": "Lowe, Brandon",
+                        "lastInitName": "Lowe, B",
+                        "initLastName": "B Lowe",
+                        "fullFMLName": "Brandon Norman Lowe",
+                        "fullLFMName": "Lowe, Brandon Norman",
+                        "strikeZoneTop": 3.088,
+                        "strikeZoneBottom": 1.559
+                    },
+                    "first": {
+                        "id": 656811,
+                        "fullName": "Ryan O'Hearn",
+                        "link": "/api/v1/people/656811",
+                        "firstName": "Ryan",
+                        "lastName": "O'Hearn",
+                        "primaryNumber": "29",
+                        "birthDate": "1993-07-26",
+                        "currentAge": 32,
+                        "birthCity": "Dunedin",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Ryan",
+                        "useLastName": "O'Hearn",
+                        "middleName": "Patrick",
+                        "boxscoreName": "O'Hearn",
+                        "nickName": "Brohearn",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2014,
+                        "mlbDebutDate": "2018-07-31",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Ryan O'Hearn",
+                        "nameSlug": "ryan-o-hearn-656811",
+                        "firstLastName": "Ryan O'Hearn",
+                        "lastFirstName": "O'Hearn, Ryan",
+                        "lastInitName": "O'Hearn, R",
+                        "initLastName": "R O'Hearn",
+                        "fullFMLName": "Ryan Patrick O'Hearn",
+                        "fullLFMName": "O'Hearn, Ryan Patrick",
+                        "strikeZoneTop": 3.289,
+                        "strikeZoneBottom": 1.66
                     },
                     "second": {
                         "id": 665833,
@@ -2483,15 +2548,15 @@
                         "strikeZoneTop": 3.66,
                         "strikeZoneBottom": 1.68
                     },
-                    "battingOrder": 2,
+                    "battingOrder": 3,
                     "team": {
                         "id": 134,
                         "name": "Pittsburgh Pirates",
                         "link": "/api/v1/teams/134"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
+                "balls": 1,
+                "strikes": 1,
                 "outs": 0
             },
             "venue": {
@@ -4456,7 +4521,7 @@
                         "link": "/api/v1/teams/120"
                     }
                 },
-                "balls": 1,
+                "balls": 2,
                 "strikes": 2,
                 "outs": 2
             },
@@ -6428,7 +6493,7 @@
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 0,
+                "balls": 2,
                 "strikes": 2,
                 "outs": 1
             },
@@ -8434,7 +8499,7 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 0,
+                "strikes": 2,
                 "outs": 1
             },
             "venue": {
@@ -10373,8 +10438,8 @@
                         "link": "/api/v1/teams/147"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
+                "balls": 2,
+                "strikes": 1,
                 "outs": 0
             },
             "venue": {
@@ -12421,8 +12486,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 1,
-                "outs": 1
+                "strikes": 3,
+                "outs": 2
             },
             "venue": {
                 "id": 2520,
@@ -19407,16 +19472,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 944,
-                        "name": "Venezuela",
-                        "link": "/api/v1/teams/944"
+                        "id": 940,
+                        "name": "United States",
+                        "link": "/api/v1/teams/940"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 940,
-                        "name": "United States",
-                        "link": "/api/v1/teams/940"
+                        "id": 944,
+                        "name": "Venezuela",
+                        "link": "/api/v1/teams/944"
                     }
                 }
             },
@@ -19659,16 +19724,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 108,
-                        "name": "Los Angeles Angels",
-                        "link": "/api/v1/teams/108"
+                        "id": 112,
+                        "name": "Chicago Cubs",
+                        "link": "/api/v1/teams/112"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 112,
-                        "name": "Chicago Cubs",
-                        "link": "/api/v1/teams/112"
+                        "id": 108,
+                        "name": "Los Angeles Angels",
+                        "link": "/api/v1/teams/108"
                     }
                 }
             },
@@ -20105,16 +20170,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 114,
-                        "name": "Cleveland Guardians",
-                        "link": "/api/v1/teams/114"
+                        "id": 113,
+                        "name": "Cincinnati Reds",
+                        "link": "/api/v1/teams/113"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 113,
-                        "name": "Cincinnati Reds",
-                        "link": "/api/v1/teams/113"
+                        "id": 114,
+                        "name": "Cleveland Guardians",
+                        "link": "/api/v1/teams/114"
                     }
                 }
             },
@@ -20569,16 +20634,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 119,
-                        "name": "Los Angeles Dodgers",
-                        "link": "/api/v1/teams/119"
+                        "id": 118,
+                        "name": "Kansas City Royals",
+                        "link": "/api/v1/teams/118"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 118,
-                        "name": "Kansas City Royals",
-                        "link": "/api/v1/teams/118"
+                        "id": 119,
+                        "name": "Los Angeles Dodgers",
+                        "link": "/api/v1/teams/119"
                     }
                 }
             },
