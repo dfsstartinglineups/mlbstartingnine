@@ -148,11 +148,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 3,
-                "currentInningOrdinal": "3rd",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 4,
+                "currentInningOrdinal": "4th",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -198,6 +198,20 @@
                         },
                         "away": {
                             "runs": 0,
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    },
+                    {
+                        "num": 4,
+                        "ordinalNum": "4th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -537,8 +551,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 1,
-                "outs": 3
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2520,
@@ -1963,10 +1977,11 @@
             "officialDate": "2026-03-18",
             "status": {
                 "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "codedGameState": "M",
+                "detailedState": "Player challenge",
+                "statusCode": "MJ",
                 "startTimeTBD": false,
+                "reason": "Pitch Result",
                 "abstractGameCode": "L"
             },
             "teams": {
@@ -2297,55 +2312,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 650907,
-                        "fullName": "Ren\u00e9 Pinto",
-                        "link": "/api/v1/people/650907",
-                        "firstName": "Ren\u00e9",
-                        "lastName": "Pinto",
-                        "primaryNumber": "35",
-                        "birthDate": "1996-11-02",
-                        "currentAge": 29,
-                        "birthCity": "Maracay",
-                        "birthCountry": "Venezuela",
-                        "height": "5' 10\"",
-                        "weight": 195,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Ren\u00e9",
-                        "useLastName": "Pinto",
-                        "middleName": "Rafael",
-                        "boxscoreName": "Pinto, R",
-                        "gender": "M",
-                        "nameMatrilineal": "Escobar",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "Reh-NEH Peen-toh",
-                        "mlbDebutDate": "2022-04-26",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ren\u00e9 Pinto",
-                        "nameSlug": "rene-pinto-650907",
-                        "firstLastName": "Ren\u00e9 Pinto",
-                        "lastFirstName": "Pinto, Ren\u00e9",
-                        "lastInitName": "Pinto, R",
-                        "initLastName": "R Pinto",
-                        "fullFMLName": "Ren\u00e9 Rafael Pinto",
-                        "fullLFMName": "Pinto, Ren\u00e9 Rafael",
-                        "strikeZoneTop": 3.11,
-                        "strikeZoneBottom": 1.57
-                    },
-                    "onDeck": {
                         "id": 596117,
                         "fullName": "Garrett Stubbs",
                         "link": "/api/v1/people/596117",
@@ -2394,7 +2360,7 @@
                         "strikeZoneTop": 3.073,
                         "strikeZoneBottom": 1.551
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 805249,
                         "fullName": "Otto Kemp",
                         "link": "/api/v1/people/805249",
@@ -2442,6 +2408,55 @@
                         "fullLFMName": "Kemp, Otto Severson",
                         "strikeZoneTop": 3.158,
                         "strikeZoneBottom": 1.594
+                    },
+                    "inHole": {
+                        "id": 665561,
+                        "fullName": "Rafael March\u00e1n",
+                        "link": "/api/v1/people/665561",
+                        "firstName": "Rafael",
+                        "lastName": "March\u00e1n",
+                        "primaryNumber": "13",
+                        "birthDate": "1999-02-25",
+                        "currentAge": 27,
+                        "birthCity": "San Cristobal",
+                        "birthCountry": "Venezuela",
+                        "height": "5' 9\"",
+                        "weight": 170,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Rafael",
+                        "useLastName": "March\u00e1n",
+                        "middleName": "Alejandro",
+                        "boxscoreName": "March\u00e1n",
+                        "gender": "M",
+                        "nameMatrilineal": "Amado",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "rah-fah-ELL mar-SHAHN",
+                        "mlbDebutDate": "2020-09-14",
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Rafael March\u00e1n",
+                        "nameSlug": "rafael-marchan-665561",
+                        "firstLastName": "Rafael March\u00e1n",
+                        "lastFirstName": "March\u00e1n, Rafael",
+                        "lastInitName": "March\u00e1n, R",
+                        "initLastName": "R March\u00e1n",
+                        "fullFMLName": "Rafael Alejandro March\u00e1n",
+                        "fullLFMName": "March\u00e1n, Rafael Alejandro",
+                        "strikeZoneTop": 3.056,
+                        "strikeZoneBottom": 1.542
                     },
                     "pitcher": {
                         "id": 691725,
@@ -2491,16 +2506,16 @@
                         "strikeZoneTop": 3.756,
                         "strikeZoneBottom": 1.746
                     },
-                    "battingOrder": 9,
+                    "battingOrder": 1,
                     "team": {
                         "id": 143,
                         "name": "Philadelphia Phillies",
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
-                "outs": 0
+                "balls": 0,
+                "strikes": 2,
+                "outs": 1
             },
             "venue": {
                 "id": 5380,
@@ -4260,55 +4275,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 700250,
-                        "fullName": "Ben Rice",
-                        "link": "/api/v1/people/700250",
-                        "firstName": "Benjamin",
-                        "lastName": "Rice",
-                        "primaryNumber": "22",
-                        "birthDate": "1999-02-22",
-                        "currentAge": 27,
-                        "birthCity": "Cohasset",
-                        "birthStateProvince": "MA",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 228,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Ben",
-                        "useLastName": "Rice",
-                        "middleName": "Kimball",
-                        "boxscoreName": "Rice",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "mlbDebutDate": "2024-06-18",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ben Rice",
-                        "nameSlug": "ben-rice-700250",
-                        "firstLastName": "Ben Rice",
-                        "lastFirstName": "Rice, Ben",
-                        "lastInitName": "Rice, B",
-                        "initLastName": "B Rice",
-                        "fullFMLName": "Benjamin Kimball Rice",
-                        "fullLFMName": "Rice, Benjamin Kimball",
-                        "strikeZoneTop": 3.281,
-                        "strikeZoneBottom": 1.656
-                    },
-                    "onDeck": {
                         "id": 519317,
                         "fullName": "Giancarlo Stanton",
                         "link": "/api/v1/people/519317",
@@ -4359,7 +4325,7 @@
                         "strikeZoneTop": 3.432,
                         "strikeZoneBottom": 1.732
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 641355,
                         "fullName": "Cody Bellinger",
                         "link": "/api/v1/people/641355",
@@ -4409,6 +4375,57 @@
                         "strikeZoneTop": 3.345,
                         "strikeZoneBottom": 1.688
                     },
+                    "inHole": {
+                        "id": 545341,
+                        "fullName": "Randal Grichuk",
+                        "link": "/api/v1/people/545341",
+                        "firstName": "Randal",
+                        "lastName": "Grichuk",
+                        "primaryNumber": "34",
+                        "birthDate": "1991-08-13",
+                        "currentAge": 34,
+                        "birthCity": "Rosenberg",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 216,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Randal",
+                        "useLastName": "Grichuk",
+                        "middleName": "Alexander",
+                        "boxscoreName": "Grichuk",
+                        "nickName": "Grich",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2009,
+                        "pronunciation": "GRICH-ick",
+                        "mlbDebutDate": "2014-04-28",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Randal Grichuk",
+                        "nameSlug": "randal-grichuk-545341",
+                        "firstLastName": "Randal Grichuk",
+                        "lastFirstName": "Grichuk, Randal",
+                        "lastInitName": "Grichuk, R",
+                        "initLastName": "R Grichuk",
+                        "fullFMLName": "Randal Alexander Grichuk",
+                        "fullLFMName": "Grichuk, Randal Alexander",
+                        "strikeZoneTop": 3.209,
+                        "strikeZoneBottom": 1.619
+                    },
                     "pitcher": {
                         "id": 801739,
                         "fullName": "Carlos Lagrange",
@@ -4456,16 +4473,16 @@
                         "strikeZoneTop": 3.522,
                         "strikeZoneBottom": 1.778
                     },
-                    "battingOrder": 2,
+                    "battingOrder": 3,
                     "team": {
                         "id": 147,
                         "name": "New York Yankees",
                         "link": "/api/v1/teams/147"
                     }
                 },
-                "balls": 1,
+                "balls": 0,
                 "strikes": 2,
-                "outs": 0
+                "outs": 1
             },
             "venue": {
                 "id": 2523,
@@ -6440,8 +6457,8 @@
                         "link": "/api/v1/teams/141"
                     }
                 },
-                "balls": 1,
-                "strikes": 0,
+                "balls": 3,
+                "strikes": 1,
                 "outs": 1
             },
             "venue": {
