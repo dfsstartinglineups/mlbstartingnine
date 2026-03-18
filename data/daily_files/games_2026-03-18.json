@@ -8228,12 +8228,12 @@
             "gameDate": "2026-03-18T20:05:00Z",
             "officialDate": "2026-03-18",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -8248,6 +8248,7 @@
                         "pct": ".478"
                     },
                     "score": 8,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 500779,
                         "fullName": "Jose Quintana",
@@ -8312,6 +8313,7 @@
                         "pct": ".480"
                     },
                     "score": 6,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 663903,
                         "fullName": "Brady Singer",
@@ -8505,6 +8507,7 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -8842,8 +8845,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 0,
-                "outs": 2
+                "strikes": 1,
+                "outs": 3
             },
             "venue": {
                 "id": 3834,
@@ -8853,6 +8856,7 @@
             "content": {
                 "link": "/api/v1/game/831866/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -12428,55 +12432,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 694374,
-                        "fullName": "Tim Tawa",
-                        "link": "/api/v1/people/694374",
-                        "firstName": "Timothy",
-                        "lastName": "Tawa",
-                        "primaryNumber": "13",
-                        "birthDate": "1999-04-07",
-                        "currentAge": 26,
-                        "birthCity": "West Linn",
-                        "birthStateProvince": "OR",
-                        "birthCountry": "USA",
-                        "height": "5' 11\"",
-                        "weight": 196,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Tim",
-                        "useLastName": "Tawa",
-                        "middleName": "John",
-                        "boxscoreName": "Tawa",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "mlbDebutDate": "2025-04-05",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Tim Tawa",
-                        "nameSlug": "tim-tawa-694374",
-                        "firstLastName": "Tim Tawa",
-                        "lastFirstName": "Tawa, Tim",
-                        "lastInitName": "Tawa, T",
-                        "initLastName": "T Tawa",
-                        "fullFMLName": "Timothy John Tawa",
-                        "fullLFMName": "Tawa, Timothy John",
-                        "strikeZoneTop": 3.163,
-                        "strikeZoneBottom": 1.596
-                    },
-                    "onDeck": {
                         "id": 703519,
                         "fullName": "Brady Counsell",
                         "link": "/api/v1/people/703519",
@@ -12524,7 +12479,7 @@
                         "strikeZoneTop": 3.344,
                         "strikeZoneBottom": 1.688
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 699471,
                         "fullName": "Ivan Melendez",
                         "link": "/api/v1/people/699471",
@@ -12571,6 +12526,52 @@
                         "fullLFMName": "Melendez, Raul Ivan",
                         "strikeZoneTop": 3.245,
                         "strikeZoneBottom": 1.637
+                    },
+                    "inHole": {
+                        "id": 699229,
+                        "fullName": "Alexander Benua",
+                        "link": "/api/v1/people/699229",
+                        "firstName": "Alexander",
+                        "lastName": "Benua",
+                        "primaryNumber": "30",
+                        "birthDate": "2003-10-19",
+                        "currentAge": 22,
+                        "birthCity": "San Pedro de Macoris",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 2\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Alexander",
+                        "useLastName": "Benua",
+                        "boxscoreName": "Benua",
+                        "gender": "M",
+                        "nameMatrilineal": "Ramirez",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Alexander Benua",
+                        "nameSlug": "alexander-benua-699229",
+                        "firstLastName": "Alexander Benua",
+                        "lastFirstName": "Benua, Alexander",
+                        "lastInitName": "Benua, A",
+                        "initLastName": "A Benua",
+                        "fullFMLName": "Alexander  Benua",
+                        "fullLFMName": "Benua, Alexander",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
                     },
                     "pitcher": {
                         "id": 623149,
@@ -12623,16 +12624,16 @@
                         "strikeZoneTop": 3.344,
                         "strikeZoneBottom": 1.688
                     },
-                    "battingOrder": 3,
+                    "battingOrder": 4,
                     "team": {
                         "id": 109,
                         "name": "Arizona Diamondbacks",
                         "link": "/api/v1/teams/109"
                     }
                 },
-                "balls": 3,
+                "balls": 1,
                 "strikes": 2,
-                "outs": 1
+                "outs": 2
             },
             "venue": {
                 "id": 4249,
@@ -15776,9 +15777,9 @@
             "linescore": {
                 "currentInning": 9,
                 "currentInningOrdinal": "9th",
-                "inningState": "Middle",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -16250,8 +16251,8 @@
                     }
                 },
                 "balls": 1,
-                "strikes": 3,
-                "outs": 3
+                "strikes": 1,
+                "outs": 0
             },
             "venue": {
                 "id": 2518,
@@ -19672,8 +19673,8 @@
                         "link": "/api/v1/teams/116"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
+                "balls": 2,
+                "strikes": 2,
                 "outs": 1
             },
             "venue": {
