@@ -8184,53 +8184,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 680890,
-                        "fullName": "Jax Biggers",
-                        "link": "/api/v1/people/680890",
-                        "firstName": "Jax",
-                        "lastName": "Biggers",
-                        "primaryNumber": "81",
-                        "birthDate": "1997-04-07",
-                        "currentAge": 28,
-                        "birthCity": "Missouri City",
-                        "birthStateProvince": "TX",
-                        "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 175,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Jax",
-                        "useLastName": "Biggers",
-                        "boxscoreName": "Biggers",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "draftYear": 2018,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Jax Biggers",
-                        "nameSlug": "jax-biggers-680890",
-                        "firstLastName": "Jax Biggers",
-                        "lastFirstName": "Biggers, Jax",
-                        "lastInitName": "Biggers, J",
-                        "initLastName": "J Biggers",
-                        "fullFMLName": "Jax  Biggers",
-                        "fullLFMName": "Biggers, Jax",
-                        "strikeZoneTop": 3.067,
-                        "strikeZoneBottom": 1.548
-                    },
-                    "onDeck": {
                         "id": 663445,
                         "fullName": "James Nelson",
                         "link": "/api/v1/people/663445",
@@ -8278,7 +8231,7 @@
                         "strikeZoneTop": 3.215,
                         "strikeZoneBottom": 1.622
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 809860,
                         "fullName": "Mason Lytle",
                         "link": "/api/v1/people/809860",
@@ -8325,6 +8278,56 @@
                         "fullLFMName": "Lytle, Mason Rylan",
                         "strikeZoneTop": 3.121,
                         "strikeZoneBottom": 1.575
+                    },
+                    "inHole": {
+                        "id": 572233,
+                        "fullName": "Christian Walker",
+                        "link": "/api/v1/people/572233",
+                        "firstName": "Christian",
+                        "lastName": "Walker",
+                        "primaryNumber": "8",
+                        "birthDate": "1991-03-28",
+                        "currentAge": 34,
+                        "birthCity": "Norristown",
+                        "birthStateProvince": "PA",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 208,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Christian",
+                        "useLastName": "Walker",
+                        "middleName": "Dickson",
+                        "boxscoreName": "Walker, C",
+                        "nickName": "C. Walk",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2012,
+                        "mlbDebutDate": "2014-09-17",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Christian Walker",
+                        "nameSlug": "christian-walker-572233",
+                        "firstLastName": "Christian Walker",
+                        "lastFirstName": "Walker, Christian",
+                        "lastInitName": "Walker, C",
+                        "initLastName": "C Walker",
+                        "fullFMLName": "Christian Dickson Walker",
+                        "fullLFMName": "Walker, Christian Dickson",
+                        "strikeZoneTop": 3.179,
+                        "strikeZoneBottom": 1.604
                     },
                     "pitcher": {
                         "id": 804522,
@@ -8373,16 +8376,16 @@
                         "strikeZoneTop": 3.076,
                         "strikeZoneBottom": 1.553
                     },
-                    "battingOrder": 4,
+                    "battingOrder": 5,
                     "team": {
                         "id": 117,
                         "name": "Houston Astros",
                         "link": "/api/v1/teams/117"
                     }
                 },
-                "balls": 1,
-                "strikes": 2,
-                "outs": 0
+                "balls": 0,
+                "strikes": 0,
+                "outs": 1
             },
             "venue": {
                 "id": 5000,
@@ -11515,12 +11518,12 @@
             "gameDate": "2026-03-19T22:05:00Z",
             "officialDate": "2026-03-19",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -11531,10 +11534,11 @@
                     },
                     "leagueRecord": {
                         "wins": 8,
-                        "losses": 15,
-                        "pct": ".348"
+                        "losses": 16,
+                        "pct": ".333"
                     },
                     "score": 2,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 690953,
                         "fullName": "Mick Abel",
@@ -11595,11 +11599,12 @@
                         "link": "/api/v1/teams/111"
                     },
                     "leagueRecord": {
-                        "wins": 11,
+                        "wins": 12,
                         "losses": 12,
-                        "pct": ".478"
+                        "pct": ".500"
                     },
                     "score": 4,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 678394,
                         "fullName": "Brayan Bello",
@@ -11800,7 +11805,7 @@
                             "runs": 1,
                             "hits": 1,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 2
                         }
                     }
                 ],
@@ -11815,7 +11820,7 @@
                         "runs": 2,
                         "hits": 6,
                         "errors": 1,
-                        "leftOnBase": 5
+                        "leftOnBase": 7
                     }
                 },
                 "defense": {
@@ -12075,103 +12080,6 @@
                         "strikeZoneTop": 3.41,
                         "strikeZoneBottom": 1.57
                     },
-                    "first": {
-                        "id": 570482,
-                        "fullName": "Gio Urshela",
-                        "link": "/api/v1/people/570482",
-                        "firstName": "Giovanny",
-                        "lastName": "Urshela",
-                        "primaryNumber": "12",
-                        "birthDate": "1991-10-11",
-                        "currentAge": 34,
-                        "birthCity": "Cartagena",
-                        "birthCountry": "Colombia",
-                        "height": "6' 0\"",
-                        "weight": 215,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "5",
-                            "name": "Third Base",
-                            "type": "Infielder",
-                            "abbreviation": "3B"
-                        },
-                        "useName": "Gio",
-                        "useLastName": "Urshela",
-                        "boxscoreName": "Urshela",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "urr-SHELL-ah",
-                        "mlbDebutDate": "2015-06-09",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Gio Urshela",
-                        "nameSlug": "gio-urshela-570482",
-                        "firstLastName": "Gio Urshela",
-                        "lastFirstName": "Urshela, Gio",
-                        "lastInitName": "Urshela, G",
-                        "initLastName": "G Urshela",
-                        "fullFMLName": "Giovanny Urshela",
-                        "fullLFMName": "Urshela, Giovanny",
-                        "strikeZoneTop": 3.201,
-                        "strikeZoneBottom": 1.615
-                    },
-                    "second": {
-                        "id": 668952,
-                        "fullName": "Ryan Kreidler",
-                        "link": "/api/v1/people/668952",
-                        "firstName": "Ryan",
-                        "lastName": "Kreidler",
-                        "primaryNumber": "5",
-                        "birthDate": "1997-11-12",
-                        "currentAge": 28,
-                        "birthCity": "Davis",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 3\"",
-                        "weight": 208,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "8",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "CF"
-                        },
-                        "useName": "Ryan",
-                        "useLastName": "Kreidler",
-                        "middleName": "Michael",
-                        "boxscoreName": "Kreidler",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2019,
-                        "pronunciation": "cried-ler",
-                        "mlbDebutDate": "2022-09-02",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ryan Kreidler",
-                        "nameSlug": "ryan-kreidler-668952",
-                        "firstLastName": "Ryan Kreidler",
-                        "lastFirstName": "Kreidler, Ryan",
-                        "lastInitName": "Kreidler, R",
-                        "initLastName": "R Kreidler",
-                        "fullFMLName": "Ryan Michael Kreidler",
-                        "fullLFMName": "Kreidler, Ryan Michael",
-                        "strikeZoneTop": 3.34,
-                        "strikeZoneBottom": 1.686
-                    },
                     "pitcher": {
                         "id": 621199,
                         "fullName": "Matt Bowman",
@@ -12231,7 +12139,7 @@
                 },
                 "balls": 1,
                 "strikes": 2,
-                "outs": 2
+                "outs": 3
             },
             "venue": {
                 "id": 4309,
@@ -12241,6 +12149,7 @@
             "content": {
                 "link": "/api/v1/game/831606/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -18467,12 +18376,12 @@
             "gameDate": "2026-03-20T01:10:00Z",
             "officialDate": "2026-03-19",
             "status": {
-                "abstractGameState": "Preview",
+                "abstractGameState": "Live",
                 "codedGameState": "P",
-                "detailedState": "Pre-Game",
-                "statusCode": "P",
+                "detailedState": "Warmup",
+                "statusCode": "PW",
                 "startTimeTBD": false,
-                "abstractGameCode": "P"
+                "abstractGameCode": "L"
             },
             "teams": {
                 "away": {
