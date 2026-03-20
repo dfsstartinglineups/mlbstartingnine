@@ -2063,11 +2063,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 1,
-                "currentInningOrdinal": "1st",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 2,
+                "currentInningOrdinal": "2nd",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -2084,6 +2084,20 @@
                             "hits": 2,
                             "errors": 0,
                             "leftOnBase": 2
+                        }
+                    },
+                    {
+                        "num": 2,
+                        "ordinalNum": "2nd",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
                         }
                     }
                 ],
@@ -2415,9 +2429,9 @@
                         "link": "/api/v1/teams/141"
                     }
                 },
-                "balls": 0,
+                "balls": 1,
                 "strikes": 2,
-                "outs": 3
+                "outs": 0
             },
             "venue": {
                 "id": 2862,
@@ -4121,56 +4135,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 664761,
-                        "fullName": "Alec Bohm",
-                        "link": "/api/v1/people/664761",
-                        "firstName": "Alec",
-                        "lastName": "Bohm",
-                        "primaryNumber": "28",
-                        "birthDate": "1996-08-03",
-                        "currentAge": 29,
-                        "birthCity": "Omaha",
-                        "birthStateProvince": "NE",
-                        "birthCountry": "USA",
-                        "height": "6' 4\"",
-                        "weight": 218,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "5",
-                            "name": "Third Base",
-                            "type": "Infielder",
-                            "abbreviation": "3B"
-                        },
-                        "useName": "Alec",
-                        "useLastName": "Bohm",
-                        "middleName": "Daniel",
-                        "boxscoreName": "Bohm",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2018,
-                        "pronunciation": "bome; like home",
-                        "mlbDebutDate": "2020-08-13",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Alec Bohm",
-                        "nameSlug": "alec-bohm-664761",
-                        "firstLastName": "Alec Bohm",
-                        "lastFirstName": "Bohm, Alec",
-                        "lastInitName": "Bohm, A",
-                        "initLastName": "A Bohm",
-                        "fullFMLName": "Alec Daniel Bohm",
-                        "fullLFMName": "Bohm, Alec Daniel",
-                        "strikeZoneTop": 3.407,
-                        "strikeZoneBottom": 1.719
-                    },
-                    "onDeck": {
                         "id": 666969,
                         "fullName": "Adolis Garc\u00eda",
                         "link": "/api/v1/people/666969",
@@ -4220,7 +4184,7 @@
                         "strikeZoneTop": 3.216,
                         "strikeZoneBottom": 1.623
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 592663,
                         "fullName": "J.T. Realmuto",
                         "link": "/api/v1/people/592663",
@@ -4271,6 +4235,54 @@
                         "strikeZoneTop": 3.2,
                         "strikeZoneBottom": 1.615
                     },
+                    "inHole": {
+                        "id": 624641,
+                        "fullName": "Edmundo Sosa",
+                        "link": "/api/v1/people/624641",
+                        "firstName": "Edmundo",
+                        "lastName": "Sosa",
+                        "primaryNumber": "33",
+                        "birthDate": "1996-03-06",
+                        "currentAge": 30,
+                        "birthCity": "Panama City",
+                        "birthCountry": "Panama",
+                        "height": "5' 11\"",
+                        "weight": 210,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Edmundo",
+                        "useLastName": "Sosa",
+                        "middleName": "Israel",
+                        "boxscoreName": "Sosa, E",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "pronunciation": "ed-MOON-doh SOH-sah",
+                        "mlbDebutDate": "2018-09-23",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Edmundo Sosa",
+                        "nameSlug": "edmundo-sosa-624641",
+                        "firstLastName": "Edmundo Sosa",
+                        "lastFirstName": "Sosa, Edmundo",
+                        "lastInitName": "Sosa, E",
+                        "initLastName": "E Sosa",
+                        "fullFMLName": "Edmundo Israel Sosa",
+                        "fullLFMName": "Sosa, Edmundo Israel",
+                        "strikeZoneTop": 3.187,
+                        "strikeZoneBottom": 1.608
+                    },
                     "pitcher": {
                         "id": 650911,
                         "fullName": "Cristopher S\u00e1nchez",
@@ -4320,16 +4332,16 @@
                         "strikeZoneTop": 3.478,
                         "strikeZoneBottom": 1.755
                     },
-                    "battingOrder": 4,
+                    "battingOrder": 5,
                     "team": {
                         "id": 143,
                         "name": "Philadelphia Phillies",
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
-                "outs": 0
+                "balls": 1,
+                "strikes": 1,
+                "outs": 1
             },
             "venue": {
                 "id": 2700,
@@ -6286,7 +6298,7 @@
                         "link": "/api/v1/teams/138"
                     }
                 },
-                "balls": 0,
+                "balls": 1,
                 "strikes": 0,
                 "outs": 0
             },
