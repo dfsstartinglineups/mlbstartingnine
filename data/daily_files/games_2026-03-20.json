@@ -10309,12 +10309,12 @@
             "gameDate": "2026-03-20T22:05:00Z",
             "officialDate": "2026-03-20",
             "status": {
-                "abstractGameState": "Preview",
+                "abstractGameState": "Live",
                 "codedGameState": "P",
-                "detailedState": "Pre-Game",
-                "statusCode": "P",
+                "detailedState": "Warmup",
+                "statusCode": "PW",
                 "startTimeTBD": false,
-                "abstractGameCode": "P"
+                "abstractGameCode": "L"
             },
             "teams": {
                 "away": {
@@ -19090,6 +19090,7 @@
                         "losses": 14,
                         "pct": ".462"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 682227,
                         "fullName": "Brandon Williamson",
@@ -19153,6 +19154,7 @@
                         "losses": 14,
                         "pct": ".440"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 571510,
                         "fullName": "Matthew Boyd",
@@ -19208,26 +19210,362 @@
                 }
             },
             "linescore": {
+                "currentInning": 1,
+                "currentInningOrdinal": "1st",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
-                "innings": [],
+                "innings": [
+                    {
+                        "num": 1,
+                        "ordinalNum": "1st",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    }
+                ],
                 "teams": {
-                    "home": {},
-                    "away": {}
+                    "home": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    },
+                    "away": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 571510,
+                        "fullName": "Matthew Boyd",
+                        "link": "/api/v1/people/571510",
+                        "firstName": "Matthew",
+                        "lastName": "Boyd",
+                        "primaryNumber": "16",
+                        "birthDate": "1991-02-02",
+                        "currentAge": 35,
+                        "birthCity": "Mercer Island",
+                        "birthStateProvince": "WA",
+                        "birthCountry": "USA",
+                        "height": "6' 3\"",
+                        "weight": 223,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Matthew",
+                        "useLastName": "Boyd",
+                        "middleName": "Robert",
+                        "boxscoreName": "Boyd",
+                        "nickName": "Matty B",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2013,
+                        "mlbDebutDate": "2015-06-27",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Matthew Boyd",
+                        "nameSlug": "matthew-boyd-571510",
+                        "firstLastName": "Matthew Boyd",
+                        "lastFirstName": "Boyd, Matthew",
+                        "lastInitName": "Boyd, M",
+                        "initLastName": "M Boyd",
+                        "fullFMLName": "Matthew Robert Boyd",
+                        "fullLFMName": "Boyd, Matthew Robert",
+                        "strikeZoneTop": 3.344,
+                        "strikeZoneBottom": 1.688
+                    },
+                    "catcher": {
+                        "id": 694208,
+                        "fullName": "Mois\u00e9s Ballesteros",
+                        "link": "/api/v1/people/694208"
+                    },
+                    "first": {
+                        "id": 608348,
+                        "fullName": "Carson Kelly",
+                        "link": "/api/v1/people/608348"
+                    },
+                    "second": {
+                        "id": 800473,
+                        "fullName": "Jefferson Rojas",
+                        "link": "/api/v1/people/800473"
+                    },
+                    "third": {
+                        "id": 608324,
+                        "fullName": "Alex Bregman",
+                        "link": "/api/v1/people/608324"
+                    },
+                    "shortstop": {
+                        "id": 621020,
+                        "fullName": "Dansby Swanson",
+                        "link": "/api/v1/people/621020"
+                    },
+                    "left": {
+                        "id": 664023,
+                        "fullName": "Ian Happ",
+                        "link": "/api/v1/people/664023"
+                    },
+                    "center": {
+                        "id": 691718,
+                        "fullName": "Pete Crow-Armstrong",
+                        "link": "/api/v1/people/691718"
+                    },
+                    "right": {
+                        "id": 807713,
+                        "fullName": "Matt Shaw",
+                        "link": "/api/v1/people/807713"
+                    },
+                    "batter": {
+                        "id": 691718,
+                        "fullName": "Pete Crow-Armstrong",
+                        "link": "/api/v1/people/691718"
+                    },
+                    "onDeck": {
+                        "id": 608324,
+                        "fullName": "Alex Bregman",
+                        "link": "/api/v1/people/608324"
+                    },
+                    "inHole": {
+                        "id": 664023,
+                        "fullName": "Ian Happ",
+                        "link": "/api/v1/people/664023"
+                    },
+                    "battingOrder": 1,
+                    "team": {
+                        "id": 112,
+                        "name": "Chicago Cubs",
+                        "link": "/api/v1/teams/112"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 624431,
+                        "fullName": "Jose Trevino",
+                        "link": "/api/v1/people/624431",
+                        "firstName": "Jose",
+                        "lastName": "Trevino",
+                        "primaryNumber": "35",
+                        "birthDate": "1992-11-28",
+                        "currentAge": 33,
+                        "birthCity": "Corpus Christi",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "5' 9\"",
+                        "weight": 215,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Jose",
+                        "useLastName": "Trevino",
+                        "boxscoreName": "Trevino",
+                        "nickName": "Trevi",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2014,
+                        "pronunciation": "Tre-vee-nyo",
+                        "mlbDebutDate": "2018-06-15",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jose Trevino",
+                        "nameSlug": "jose-trevino-624431",
+                        "firstLastName": "Jose Trevino",
+                        "lastFirstName": "Trevino, Jose",
+                        "lastInitName": "Trevino, J",
+                        "initLastName": "J Trevino",
+                        "fullFMLName": "Jose Trevino",
+                        "fullLFMName": "Trevino, Jose",
+                        "strikeZoneTop": 3.061,
+                        "strikeZoneBottom": 1.545
+                    },
+                    "onDeck": {
+                        "id": 680574,
+                        "fullName": "Matt McLain",
+                        "link": "/api/v1/people/680574",
+                        "firstName": "Matthew",
+                        "lastName": "McLain",
+                        "primaryNumber": "9",
+                        "birthDate": "1999-08-06",
+                        "currentAge": 26,
+                        "birthCity": "Orange",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "5' 8\"",
+                        "weight": 180,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Matt",
+                        "useLastName": "McLain",
+                        "middleName": "Michael",
+                        "boxscoreName": "McLain, M",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2023-05-15",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Matt McLain",
+                        "nameSlug": "matt-mclain-680574",
+                        "firstLastName": "Matt McLain",
+                        "lastFirstName": "McLain, Matt",
+                        "lastInitName": "McLain, M",
+                        "initLastName": "M McLain",
+                        "fullFMLName": "Matthew Michael McLain",
+                        "fullLFMName": "McLain, Matthew Michael",
+                        "strikeZoneTop": 3.047,
+                        "strikeZoneBottom": 1.538
+                    },
+                    "inHole": {
+                        "id": 682829,
+                        "fullName": "Elly De La Cruz",
+                        "link": "/api/v1/people/682829",
+                        "firstName": "Elly",
+                        "lastName": "De La Cruz",
+                        "primaryNumber": "44",
+                        "birthDate": "2002-01-11",
+                        "currentAge": 24,
+                        "birthCity": "Sabana Grande de Boya",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 6\"",
+                        "weight": 200,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Elly",
+                        "useLastName": "De La Cruz",
+                        "middleName": "Antonio",
+                        "boxscoreName": "De La Cruz, E",
+                        "gender": "M",
+                        "nameMatrilineal": "Sanchez",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "mlbDebutDate": "2023-06-06",
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Elly De La Cruz",
+                        "nameSlug": "elly-de-la-cruz-682829",
+                        "firstLastName": "Elly De La Cruz",
+                        "lastFirstName": "De La Cruz, Elly",
+                        "lastInitName": "De La Cruz, E",
+                        "initLastName": "E De La Cruz",
+                        "fullFMLName": "Elly Antonio De La Cruz",
+                        "fullLFMName": "De La Cruz, Elly Antonio",
+                        "strikeZoneTop": 3.46,
+                        "strikeZoneBottom": 1.746
+                    },
+                    "pitcher": {
+                        "id": 682227,
+                        "fullName": "Brandon Williamson",
+                        "link": "/api/v1/people/682227",
+                        "firstName": "Brandon",
+                        "lastName": "Williamson",
+                        "primaryNumber": "55",
+                        "birthDate": "1998-04-02",
+                        "currentAge": 27,
+                        "birthCity": "Fairmont",
+                        "birthStateProvince": "MN",
+                        "birthCountry": "USA",
+                        "height": "6' 6\"",
+                        "weight": 210,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Brandon",
+                        "useLastName": "Williamson",
+                        "middleName": "Martin",
+                        "boxscoreName": "Williamson",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "mlbDebutDate": "2023-05-16",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Brandon Williamson",
+                        "nameSlug": "brandon-williamson-682227",
+                        "firstLastName": "Brandon Williamson",
+                        "lastFirstName": "Williamson, Brandon",
+                        "lastInitName": "Williamson, B",
+                        "initLastName": "B Williamson",
+                        "fullFMLName": "Brandon Martin Williamson",
+                        "fullLFMName": "Williamson, Brandon Martin",
+                        "strikeZoneTop": 3.478,
+                        "strikeZoneBottom": 1.755
+                    },
+                    "battingOrder": 1,
                     "team": {
                         "id": 113,
                         "name": "Cincinnati Reds",
                         "link": "/api/v1/teams/113"
                     }
                 },
-                "offense": {
-                    "team": {
-                        "id": 112,
-                        "name": "Chicago Cubs",
-                        "link": "/api/v1/teams/112"
-                    }
-                }
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 4629,
@@ -19255,6 +19593,134 @@
             "ifNecessary": "N",
             "ifNecessaryDescription": "Normal Game",
             "lineups": {
+                "homePlayers": [
+                    {
+                        "id": 691718,
+                        "fullName": "Pete Crow-Armstrong",
+                        "link": "/api/v1/people/691718",
+                        "firstName": "Pete",
+                        "lastName": "Crow-Armstrong",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Pete"
+                    },
+                    {
+                        "id": 608324,
+                        "fullName": "Alex Bregman",
+                        "link": "/api/v1/people/608324",
+                        "firstName": "Alexander",
+                        "lastName": "Bregman",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Alex"
+                    },
+                    {
+                        "id": 664023,
+                        "fullName": "Ian Happ",
+                        "link": "/api/v1/people/664023",
+                        "firstName": "Ian",
+                        "lastName": "Happ",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Ian"
+                    },
+                    {
+                        "id": 621020,
+                        "fullName": "Dansby Swanson",
+                        "link": "/api/v1/people/621020",
+                        "firstName": "James",
+                        "lastName": "Swanson",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Dansby"
+                    },
+                    {
+                        "id": 608348,
+                        "fullName": "Carson Kelly",
+                        "link": "/api/v1/people/608348",
+                        "firstName": "Carson",
+                        "lastName": "Kelly",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Carson"
+                    },
+                    {
+                        "id": 694208,
+                        "fullName": "Mois\u00e9s Ballesteros",
+                        "link": "/api/v1/people/694208",
+                        "firstName": "Mois\u00e9s",
+                        "lastName": "Ballesteros",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Mois\u00e9s"
+                    },
+                    {
+                        "id": 807713,
+                        "fullName": "Matt Shaw",
+                        "link": "/api/v1/people/807713",
+                        "firstName": "Matthew",
+                        "lastName": "Shaw",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Matt"
+                    },
+                    {
+                        "id": 701649,
+                        "fullName": "James Triantos",
+                        "link": "/api/v1/people/701649",
+                        "firstName": "James",
+                        "lastName": "Triantos",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "James"
+                    },
+                    {
+                        "id": 800473,
+                        "fullName": "Jefferson Rojas",
+                        "link": "/api/v1/people/800473",
+                        "firstName": "Jefferson",
+                        "lastName": "Rojas",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Jefferson"
+                    }
+                ],
                 "awayPlayers": [
                     {
                         "id": 624431,
@@ -19523,8 +19989,8 @@
             "687168": "P",
             "686754": "P",
             "801205": "P",
-            "800473": "SS",
-            "608348": "C",
+            "800473": "2B",
+            "608348": "1B",
             "665804": "C",
             "813939": "OF",
             "801561": "3B",
@@ -19579,7 +20045,7 @@
             "663538": "2B",
             "676962": "P",
             "807714": "C",
-            "807713": "3B",
+            "807713": "RF",
             "699944": "P",
             "696513": "LF",
             "592826": "P",
@@ -19637,7 +20103,8 @@
             "820835": "LF",
             "676801": "LF",
             "823702": "SS",
-            "656257": "P"
+            "656257": "P",
+            "701649": "DH"
         },
         "deepStats": {
             "682227": {
@@ -19934,6 +20401,258 @@
                     "bb": 12,
                     "avg": ".208",
                     "ops": ".532"
+                }
+            },
+            "691718": {
+                "name": "Pete Crow-Armstrong",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 170,
+                    "hr": 7,
+                    "k": 55,
+                    "bb": 5,
+                    "avg": ".188",
+                    "ops": ".594"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 421,
+                    "hr": 24,
+                    "k": 100,
+                    "bb": 24,
+                    "avg": ".271",
+                    "ops": ".838"
+                }
+            },
+            "608324": {
+                "name": "Alex Bregman",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 113,
+                    "hr": 3,
+                    "k": 20,
+                    "bb": 19,
+                    "avg": ".319",
+                    "ops": ".855"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 320,
+                    "hr": 15,
+                    "k": 50,
+                    "bb": 32,
+                    "avg": ".256",
+                    "ops": ".809"
+                }
+            },
+            "664023": {
+                "name": "Ian Happ",
+                "bvp": {
+                    "ab": 4,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".250",
+                    "ops": ".900"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 160,
+                    "hr": 5,
+                    "k": 42,
+                    "bb": 21,
+                    "avg": ".231",
+                    "ops": ".687"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 409,
+                    "hr": 18,
+                    "k": 109,
+                    "bb": 66,
+                    "avg": ".247",
+                    "ops": ".791"
+                }
+            },
+            "621020": {
+                "name": "Dansby Swanson",
+                "bvp": {
+                    "ab": 5,
+                    "hits": 3,
+                    "hr": 1,
+                    "avg": ".600",
+                    "ops": "2.200"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 129,
+                    "hr": 7,
+                    "k": 40,
+                    "bb": 9,
+                    "avg": ".287",
+                    "ops": ".829"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 461,
+                    "hr": 17,
+                    "k": 128,
+                    "bb": 38,
+                    "avg": ".232",
+                    "ops": ".685"
+                }
+            },
+            "608348": {
+                "name": "Carson Kelly",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 111,
+                    "hr": 5,
+                    "k": 22,
+                    "bb": 14,
+                    "avg": ".270",
+                    "ops": ".809"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 258,
+                    "hr": 12,
+                    "k": 58,
+                    "bb": 31,
+                    "avg": ".240",
+                    "ops": ".740"
+                }
+            },
+            "694208": {
+                "name": "Mois\u00e9s Ballesteros",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 2,
+                    "hr": 0,
+                    "k": 2,
+                    "bb": 2,
+                    "avg": ".000",
+                    "ops": ".500"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 55,
+                    "hr": 2,
+                    "k": 10,
+                    "bb": 7,
+                    "avg": ".309",
+                    "ops": ".878"
+                }
+            },
+            "807713": {
+                "name": "Matt Shaw",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 100,
+                    "hr": 6,
+                    "k": 22,
+                    "bb": 10,
+                    "avg": ".250",
+                    "ops": ".808"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 293,
+                    "hr": 7,
+                    "k": 72,
+                    "bb": 28,
+                    "avg": ".218",
+                    "ops": ".649"
+                }
+            },
+            "701649": {
+                "name": "James Triantos",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                }
+            },
+            "800473": {
+                "name": "Jefferson Rojas",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
                 }
             }
         },
