@@ -6145,12 +6145,12 @@
             "gameDate": "2026-03-20T17:10:00Z",
             "officialDate": "2026-03-20",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -6160,11 +6160,12 @@
                         "link": "/api/v1/teams/138"
                     },
                     "leagueRecord": {
-                        "wins": 14,
+                        "wins": 15,
                         "losses": 9,
-                        "pct": ".609"
+                        "pct": ".625"
                     },
                     "score": 4,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 669461,
                         "fullName": "Matthew Liberatore",
@@ -6226,10 +6227,11 @@
                     },
                     "leagueRecord": {
                         "wins": 12,
-                        "losses": 9,
-                        "pct": ".571"
+                        "losses": 10,
+                        "pct": ".545"
                     },
                     "score": 3,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 668964,
                         "fullName": "Tobias Myers",
@@ -6423,9 +6425,10 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         },
                         "away": {
                             "runs": 0,
@@ -6440,7 +6443,7 @@
                         "runs": 3,
                         "hits": 3,
                         "errors": 0,
-                        "leftOnBase": 6
+                        "leftOnBase": 7
                     },
                     "away": {
                         "runs": 4,
@@ -6707,55 +6710,6 @@
                         "strikeZoneTop": 3.102,
                         "strikeZoneBottom": 1.565
                     },
-                    "first": {
-                        "id": 665506,
-                        "fullName": "Cristian Pache",
-                        "link": "/api/v1/people/665506",
-                        "firstName": "Cristian",
-                        "lastName": "Pache",
-                        "primaryNumber": "71",
-                        "birthDate": "1998-11-19",
-                        "currentAge": 27,
-                        "birthCity": "Santo Domingo Centro",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 2\"",
-                        "weight": 215,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "O",
-                            "name": "Outfield",
-                            "type": "Outfielder",
-                            "abbreviation": "OF"
-                        },
-                        "useName": "Cristian",
-                        "useLastName": "Pache",
-                        "middleName": "Rafael",
-                        "boxscoreName": "Pache",
-                        "gender": "M",
-                        "nameMatrilineal": "Torres",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "Pah-Chay",
-                        "mlbDebutDate": "2020-08-21",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Cristian Pache",
-                        "nameSlug": "cristian-pache-665506",
-                        "firstLastName": "Cristian Pache",
-                        "lastFirstName": "Pache, Cristian",
-                        "lastInitName": "Pache, C",
-                        "initLastName": "C Pache",
-                        "fullFMLName": "Cristian Rafael Pache",
-                        "fullLFMName": "Pache, Cristian Rafael",
-                        "strikeZoneTop": 3.287,
-                        "strikeZoneBottom": 1.659
-                    },
                     "pitcher": {
                         "id": 802363,
                         "fullName": "Jordan Geber",
@@ -6811,8 +6765,8 @@
                     }
                 },
                 "balls": 2,
-                "strikes": 2,
-                "outs": 2
+                "strikes": 3,
+                "outs": 3
             },
             "venue": {
                 "id": 2856,
@@ -6822,6 +6776,7 @@
             "content": {
                 "link": "/api/v1/game/831456/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -8396,9 +8351,9 @@
             "linescore": {
                 "currentInning": 2,
                 "currentInningOrdinal": "2nd",
-                "inningState": "Top",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -8426,6 +8381,7 @@
                             "leftOnBase": 0
                         },
                         "away": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -8447,6 +8403,266 @@
                     }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 681343,
+                        "fullName": "Shane Smith",
+                        "link": "/api/v1/people/681343",
+                        "firstName": "Shane",
+                        "lastName": "Smith",
+                        "primaryNumber": "64",
+                        "birthDate": "2000-04-04",
+                        "currentAge": 25,
+                        "birthCity": "Danvers",
+                        "birthStateProvince": "MA",
+                        "birthCountry": "USA",
+                        "height": "6' 3\"",
+                        "weight": 240,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Shane",
+                        "useLastName": "Smith",
+                        "middleName": "Jeffrey",
+                        "boxscoreName": "Smith, S",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2025-04-01",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Shane Smith",
+                        "nameSlug": "shane-smith-681343",
+                        "firstLastName": "Shane Smith",
+                        "lastFirstName": "Smith, Shane",
+                        "lastInitName": "Smith, S",
+                        "initLastName": "S Smith",
+                        "fullFMLName": "Shane Jeffrey Smith",
+                        "fullLFMName": "Smith, Shane Jeffrey",
+                        "strikeZoneTop": 3.344,
+                        "strikeZoneBottom": 1.688
+                    },
+                    "catcher": {
+                        "id": 691011,
+                        "fullName": "Drew Romo",
+                        "link": "/api/v1/people/691011"
+                    },
+                    "first": {
+                        "id": 814436,
+                        "fullName": "Ryan Galanie",
+                        "link": "/api/v1/people/814436"
+                    },
+                    "second": {
+                        "id": 678554,
+                        "fullName": "Curtis Mead",
+                        "link": "/api/v1/people/678554"
+                    },
+                    "third": {
+                        "id": 672820,
+                        "fullName": "Lenyn Sosa",
+                        "link": "/api/v1/people/672820"
+                    },
+                    "shortstop": {
+                        "id": 695020,
+                        "fullName": "Tanner Murray",
+                        "link": "/api/v1/people/695020"
+                    },
+                    "left": {
+                        "id": 803011,
+                        "fullName": "Sam Antonacci",
+                        "link": "/api/v1/people/803011"
+                    },
+                    "center": {
+                        "id": 672284,
+                        "fullName": "Jarred Kelenic",
+                        "link": "/api/v1/people/672284"
+                    },
+                    "right": {
+                        "id": 671976,
+                        "fullName": "Tristan Peters",
+                        "link": "/api/v1/people/671976"
+                    },
+                    "batter": {
+                        "id": 814436,
+                        "fullName": "Ryan Galanie",
+                        "link": "/api/v1/people/814436"
+                    },
+                    "onDeck": {
+                        "id": 803011,
+                        "fullName": "Sam Antonacci",
+                        "link": "/api/v1/people/803011"
+                    },
+                    "inHole": {
+                        "id": 672820,
+                        "fullName": "Lenyn Sosa",
+                        "link": "/api/v1/people/672820"
+                    },
+                    "battingOrder": 9,
+                    "team": {
+                        "id": 145,
+                        "name": "Chicago White Sox",
+                        "link": "/api/v1/teams/145"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 701742,
+                        "fullName": "LeTrey McCollum",
+                        "link": "/api/v1/people/701742",
+                        "firstName": "LeTrey",
+                        "lastName": "McCollum",
+                        "primaryNumber": "37",
+                        "birthDate": "2003-03-24",
+                        "currentAge": 22,
+                        "birthCity": "San Diego",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 212,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "O",
+                            "name": "Outfield",
+                            "type": "Outfielder",
+                            "abbreviation": "OF"
+                        },
+                        "useName": "LeTrey",
+                        "useLastName": "McCollum",
+                        "middleName": "Dozier",
+                        "boxscoreName": "McCollum",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2025,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "LeTrey McCollum",
+                        "nameSlug": "letrey-mccollum-701742",
+                        "firstLastName": "LeTrey McCollum",
+                        "lastFirstName": "McCollum, LeTrey",
+                        "lastInitName": "McCollum, L",
+                        "initLastName": "L McCollum",
+                        "fullFMLName": "LeTrey Dozier McCollum",
+                        "fullLFMName": "McCollum, LeTrey Dozier",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
+                    },
+                    "onDeck": {
+                        "id": 687263,
+                        "fullName": "Zach Neto",
+                        "link": "/api/v1/people/687263",
+                        "firstName": "Zachary",
+                        "lastName": "Neto",
+                        "primaryNumber": "9",
+                        "birthDate": "2001-01-31",
+                        "currentAge": 25,
+                        "birthCity": "Miami",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Zach",
+                        "useLastName": "Neto",
+                        "middleName": "Adam",
+                        "boxscoreName": "Neto",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2022,
+                        "pronunciation": "NET-oh",
+                        "mlbDebutDate": "2023-04-15",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Zach Neto",
+                        "nameSlug": "zach-neto-687263",
+                        "firstLastName": "Zach Neto",
+                        "lastFirstName": "Neto, Zach",
+                        "lastInitName": "Neto, Z",
+                        "initLastName": "Z Neto",
+                        "fullFMLName": "Zachary Adam Neto",
+                        "fullLFMName": "Neto, Zachary Adam",
+                        "strikeZoneTop": 3.17,
+                        "strikeZoneBottom": 1.6
+                    },
+                    "inHole": {
+                        "id": 545361,
+                        "fullName": "Mike Trout",
+                        "link": "/api/v1/people/545361",
+                        "firstName": "Michael",
+                        "lastName": "Trout",
+                        "primaryNumber": "27",
+                        "birthDate": "1991-08-07",
+                        "currentAge": 34,
+                        "birthCity": "Vineland",
+                        "birthStateProvince": "NJ",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 235,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Mike",
+                        "useLastName": "Trout",
+                        "middleName": "Nelson",
+                        "boxscoreName": "Trout",
+                        "nickName": "Kiiiiid",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2009,
+                        "mlbDebutDate": "2011-07-08",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Mike Trout",
+                        "nameSlug": "mike-trout-545361",
+                        "firstLastName": "Mike Trout",
+                        "lastFirstName": "Trout, Mike",
+                        "lastInitName": "Trout, M",
+                        "initLastName": "M Trout",
+                        "fullFMLName": "Michael Nelson Trout",
+                        "fullLFMName": "Trout, Michael Nelson",
+                        "strikeZoneTop": 3.244,
+                        "strikeZoneBottom": 1.637
+                    },
                     "pitcher": {
                         "id": 667755,
                         "fullName": "Jos\u00e9 Soriano",
@@ -8495,61 +8711,6 @@
                         "strikeZoneTop": 3.344,
                         "strikeZoneBottom": 1.688
                     },
-                    "catcher": {
-                        "id": 665861,
-                        "fullName": "Sebasti\u00e1n Rivero",
-                        "link": "/api/v1/people/665861"
-                    },
-                    "first": {
-                        "id": 694384,
-                        "fullName": "Nolan Schanuel",
-                        "link": "/api/v1/people/694384"
-                    },
-                    "second": {
-                        "id": 624428,
-                        "fullName": "Adam Frazier",
-                        "link": "/api/v1/people/624428"
-                    },
-                    "third": {
-                        "id": 660162,
-                        "fullName": "Yo\u00e1n Moncada",
-                        "link": "/api/v1/people/660162"
-                    },
-                    "shortstop": {
-                        "id": 687263,
-                        "fullName": "Zach Neto",
-                        "link": "/api/v1/people/687263"
-                    },
-                    "left": {
-                        "id": 666139,
-                        "fullName": "Josh Lowe",
-                        "link": "/api/v1/people/666139"
-                    },
-                    "center": {
-                        "id": 669326,
-                        "fullName": "Bryce Teodosio",
-                        "link": "/api/v1/people/669326"
-                    },
-                    "right": {
-                        "id": 701742,
-                        "fullName": "LeTrey McCollum",
-                        "link": "/api/v1/people/701742"
-                    },
-                    "batter": {
-                        "id": 701742,
-                        "fullName": "LeTrey McCollum",
-                        "link": "/api/v1/people/701742"
-                    },
-                    "onDeck": {
-                        "id": 687263,
-                        "fullName": "Zach Neto",
-                        "link": "/api/v1/people/687263"
-                    },
-                    "inHole": {
-                        "id": 545361,
-                        "fullName": "Mike Trout",
-                        "link": "/api/v1/people/545361"
-                    },
                     "battingOrder": 9,
                     "team": {
                         "id": 108,
@@ -8557,209 +8718,9 @@
                         "link": "/api/v1/teams/108"
                     }
                 },
-                "offense": {
-                    "batter": {
-                        "id": 695020,
-                        "fullName": "Tanner Murray",
-                        "link": "/api/v1/people/695020",
-                        "firstName": "Tanner",
-                        "lastName": "Murray",
-                        "primaryNumber": "41",
-                        "birthDate": "1999-09-03",
-                        "currentAge": 26,
-                        "birthCity": "Santa Clara",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 190,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Tanner",
-                        "useLastName": "Murray",
-                        "middleName": "Kane",
-                        "boxscoreName": "Murray, T",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2020,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Tanner Murray",
-                        "nameSlug": "tanner-murray-695020",
-                        "firstLastName": "Tanner Murray",
-                        "lastFirstName": "Murray, Tanner",
-                        "lastInitName": "Murray, T",
-                        "initLastName": "T Murray",
-                        "fullFMLName": "Tanner Kane Murray",
-                        "fullLFMName": "Murray, Tanner Kane",
-                        "strikeZoneTop": 3.275,
-                        "strikeZoneBottom": 1.653
-                    },
-                    "onDeck": {
-                        "id": 814436,
-                        "fullName": "Ryan Galanie",
-                        "link": "/api/v1/people/814436",
-                        "firstName": "Ryan",
-                        "lastName": "Galanie",
-                        "primaryNumber": "88",
-                        "birthDate": "2000-06-20",
-                        "currentAge": 25,
-                        "birthCity": "Covington",
-                        "birthStateProvince": "LA",
-                        "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 215,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Ryan",
-                        "useLastName": "Galanie",
-                        "middleName": "Johannessen",
-                        "boxscoreName": "Galanie",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2023,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ryan Galanie",
-                        "nameSlug": "ryan-galanie-814436",
-                        "firstLastName": "Ryan Galanie",
-                        "lastFirstName": "Galanie, Ryan",
-                        "lastInitName": "Galanie, R",
-                        "initLastName": "R Galanie",
-                        "fullFMLName": "Ryan Galanie",
-                        "fullLFMName": "Galanie, Ryan ",
-                        "strikeZoneTop": 3.257,
-                        "strikeZoneBottom": 1.644
-                    },
-                    "inHole": {
-                        "id": 803011,
-                        "fullName": "Sam Antonacci",
-                        "link": "/api/v1/people/803011",
-                        "firstName": "Samuel",
-                        "lastName": "Antonacci",
-                        "primaryNumber": "92",
-                        "birthDate": "2003-02-06",
-                        "currentAge": 23,
-                        "birthCity": "Springfield",
-                        "birthStateProvince": "IL",
-                        "birthCountry": "USA",
-                        "height": "5' 11\"",
-                        "weight": 193,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Sam",
-                        "useLastName": "Antonacci",
-                        "middleName": "Joseph",
-                        "boxscoreName": "Antonacci",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Sam Antonacci",
-                        "nameSlug": "sam-antonacci-803011",
-                        "firstLastName": "Sam Antonacci",
-                        "lastFirstName": "Antonacci, Sam",
-                        "lastInitName": "Antonacci, S",
-                        "initLastName": "S Antonacci",
-                        "fullFMLName": "Samuel Joseph Antonacci",
-                        "fullLFMName": "Antonacci, Samuel Joseph",
-                        "strikeZoneTop": 3.154,
-                        "strikeZoneBottom": 1.592
-                    },
-                    "pitcher": {
-                        "id": 676881,
-                        "fullName": "Garrett Schoenle",
-                        "link": "/api/v1/people/676881",
-                        "firstName": "Garrett",
-                        "lastName": "Schoenle",
-                        "primaryNumber": "90",
-                        "birthDate": "1998-06-21",
-                        "currentAge": 27,
-                        "birthCity": "Fort Wayne",
-                        "birthStateProvince": "IN",
-                        "birthCountry": "USA",
-                        "height": "6' 5\"",
-                        "weight": 185,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "1",
-                            "name": "Pitcher",
-                            "type": "Pitcher",
-                            "abbreviation": "P"
-                        },
-                        "useName": "Garrett",
-                        "useLastName": "Schoenle",
-                        "middleName": "Jeffrey",
-                        "boxscoreName": "Schoenle",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "nameFirstLast": "Garrett Schoenle",
-                        "nameSlug": "garrett-schoenle-676881",
-                        "firstLastName": "Garrett Schoenle",
-                        "lastFirstName": "Schoenle, Garrett",
-                        "lastInitName": "Schoenle, G",
-                        "initLastName": "G Schoenle",
-                        "fullFMLName": "Garrett Jeffrey Schoenle",
-                        "fullLFMName": "Schoenle, Garrett Jeffrey",
-                        "strikeZoneTop": 3.433,
-                        "strikeZoneBottom": 1.733
-                    },
-                    "battingOrder": 8,
-                    "team": {
-                        "id": 145,
-                        "name": "Chicago White Sox",
-                        "link": "/api/v1/teams/145"
-                    }
-                },
-                "balls": 1,
-                "strikes": 2,
-                "outs": 2
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2500,
