@@ -13582,12 +13582,12 @@
             "gameDate": "2026-03-20T01:05:00Z",
             "officialDate": "2026-03-19",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -13597,11 +13597,12 @@
                         "link": "/api/v1/teams/108"
                     },
                     "leagueRecord": {
-                        "wins": 14,
+                        "wins": 15,
                         "losses": 14,
-                        "pct": ".500"
+                        "pct": ".517"
                     },
                     "score": 4,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 579328,
                         "fullName": "Yusei Kikuchi",
@@ -13661,10 +13662,11 @@
                     },
                     "leagueRecord": {
                         "wins": 8,
-                        "losses": 17,
-                        "pct": ".320"
+                        "losses": 18,
+                        "pct": ".308"
                     },
                     "score": 3,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 663460,
                         "fullName": "Kris Bubic",
@@ -13858,6 +13860,7 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -14193,9 +14196,9 @@
                         "link": "/api/v1/teams/118"
                     }
                 },
-                "balls": 0,
-                "strikes": 1,
-                "outs": 2
+                "balls": 1,
+                "strikes": 3,
+                "outs": 3
             },
             "venue": {
                 "id": 2603,
@@ -14205,6 +14208,7 @@
             "content": {
                 "link": "/api/v1/game/831822/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -15353,8 +15357,8 @@
                     },
                     "leagueRecord": {
                         "wins": 8,
-                        "losses": 17,
-                        "pct": ".320"
+                        "losses": 18,
+                        "pct": ".308"
                     },
                     "score": 5,
                     "isWinner": false,
@@ -18994,7 +18998,7 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
-                            "hits": 0,
+                            "hits": 1,
                             "errors": 1,
                             "leftOnBase": 0
                         },
@@ -19009,7 +19013,7 @@
                 "teams": {
                     "home": {
                         "runs": 4,
-                        "hits": 5,
+                        "hits": 6,
                         "errors": 1,
                         "leftOnBase": 3
                     },
@@ -19278,6 +19282,54 @@
                         "strikeZoneTop": 3.245,
                         "strikeZoneBottom": 1.638
                     },
+                    "first": {
+                        "id": 669439,
+                        "fullName": "Drew Swift",
+                        "link": "/api/v1/people/669439",
+                        "firstName": "Andrew",
+                        "lastName": "Swift",
+                        "primaryNumber": "90",
+                        "birthDate": "1999-02-15",
+                        "currentAge": 27,
+                        "birthCity": "Chandler",
+                        "birthStateProvince": "AZ",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 165,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Drew",
+                        "useLastName": "Swift",
+                        "middleName": "Patrick",
+                        "boxscoreName": "Swift, D",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Drew Swift",
+                        "nameSlug": "drew-swift-669439",
+                        "firstLastName": "Drew Swift",
+                        "lastFirstName": "Swift, Drew",
+                        "lastInitName": "Swift, D",
+                        "initLastName": "D Swift",
+                        "fullFMLName": "Andrew Patrick Swift",
+                        "fullLFMName": "Swift, Andrew Patrick",
+                        "strikeZoneTop": 3.207,
+                        "strikeZoneBottom": 1.618
+                    },
                     "pitcher": {
                         "id": 678022,
                         "fullName": "Jack Perkins",
@@ -19334,8 +19386,8 @@
                         "link": "/api/v1/teams/133"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
+                "balls": 3,
+                "strikes": 2,
                 "outs": 0
             },
             "venue": {
@@ -19936,7 +19988,7 @@
         "lineupHandedness": {},
         "gamePositions": {
             "647304": "1B",
-            "702522": "OF",
+            "702522": "RF",
             "678606": "P",
             "695342": "LF",
             "686470": "P",
@@ -20784,7 +20836,7 @@
                         "losses": 8,
                         "pct": ".667"
                     },
-                    "score": 9,
+                    "score": 11,
                     "probablePitcher": {
                         "id": 657277,
                         "fullName": "Logan Webb",
@@ -21029,7 +21081,8 @@
                             "leftOnBase": 0
                         },
                         "away": {
-                            "hits": 2,
+                            "runs": 2,
+                            "hits": 3,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -21043,8 +21096,8 @@
                         "leftOnBase": 4
                     },
                     "away": {
-                        "runs": 9,
-                        "hits": 15,
+                        "runs": 11,
+                        "hits": 16,
                         "errors": 1,
                         "leftOnBase": 4
                     }
@@ -21163,56 +21216,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 666931,
-                        "fullName": "Jared Oliva",
-                        "link": "/api/v1/people/666931",
-                        "firstName": "Jared",
-                        "lastName": "Oliva",
-                        "primaryNumber": "56",
-                        "birthDate": "1995-11-27",
-                        "currentAge": 30,
-                        "birthCity": "Santa Clarita",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 202,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "O",
-                            "name": "Outfield",
-                            "type": "Outfielder",
-                            "abbreviation": "OF"
-                        },
-                        "useName": "Jared",
-                        "useLastName": "Oliva",
-                        "middleName": "Cole",
-                        "boxscoreName": "Oliva",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2017,
-                        "pronunciation": "AH-lih-vuh",
-                        "mlbDebutDate": "2020-09-21",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Jared Oliva",
-                        "nameSlug": "jared-oliva-666931",
-                        "firstLastName": "Jared Oliva",
-                        "lastFirstName": "Oliva, Jared",
-                        "lastInitName": "Oliva, J",
-                        "initLastName": "J Oliva",
-                        "fullFMLName": "Jared Cole Oliva",
-                        "fullLFMName": "Oliva, Jared Cole",
-                        "strikeZoneTop": 3.31,
-                        "strikeZoneBottom": 1.67
-                    },
-                    "onDeck": {
                         "id": 686823,
                         "fullName": "Will Brennan",
                         "link": "/api/v1/people/686823",
@@ -21261,7 +21264,7 @@
                         "strikeZoneTop": 3.16,
                         "strikeZoneBottom": 1.59
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 606992,
                         "fullName": "Eric Haase",
                         "link": "/api/v1/people/606992",
@@ -21311,7 +21314,106 @@
                         "strikeZoneTop": 3.1,
                         "strikeZoneBottom": 1.57
                     },
-                    "first": {
+                    "inHole": {
+                        "id": 666464,
+                        "fullName": "Jerar Encarnacion",
+                        "link": "/api/v1/people/666464",
+                        "firstName": "Jerar",
+                        "lastName": "Encarnacion",
+                        "primaryNumber": "19",
+                        "birthDate": "1997-10-22",
+                        "currentAge": 28,
+                        "birthCity": "Bayaguana",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 4\"",
+                        "weight": 265,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Jerar",
+                        "useLastName": "Encarnacion",
+                        "middleName": "Luis",
+                        "boxscoreName": "Encarnacion",
+                        "gender": "M",
+                        "nameMatrilineal": "Olmos",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "jer-ARE",
+                        "mlbDebutDate": "2022-06-19",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jerar Encarnacion",
+                        "nameSlug": "jerar-encarnacion-666464",
+                        "firstLastName": "Jerar Encarnacion",
+                        "lastFirstName": "Encarnacion, Jerar",
+                        "lastInitName": "Encarnacion, J",
+                        "initLastName": "J Encarnacion",
+                        "fullFMLName": "Jerar Luis Encarnacion",
+                        "fullLFMName": "Encarnacion, Jerar Luis",
+                        "strikeZoneTop": 3.4,
+                        "strikeZoneBottom": 1.72
+                    },
+                    "second": {
+                        "id": 666931,
+                        "fullName": "Jared Oliva",
+                        "link": "/api/v1/people/666931",
+                        "firstName": "Jared",
+                        "lastName": "Oliva",
+                        "primaryNumber": "56",
+                        "birthDate": "1995-11-27",
+                        "currentAge": 30,
+                        "birthCity": "Santa Clarita",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 202,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "O",
+                            "name": "Outfield",
+                            "type": "Outfielder",
+                            "abbreviation": "OF"
+                        },
+                        "useName": "Jared",
+                        "useLastName": "Oliva",
+                        "middleName": "Cole",
+                        "boxscoreName": "Oliva",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2017,
+                        "pronunciation": "AH-lih-vuh",
+                        "mlbDebutDate": "2020-09-21",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jared Oliva",
+                        "nameSlug": "jared-oliva-666931",
+                        "firstLastName": "Jared Oliva",
+                        "lastFirstName": "Oliva, Jared",
+                        "lastInitName": "Oliva, J",
+                        "initLastName": "J Oliva",
+                        "fullFMLName": "Jared Cole Oliva",
+                        "fullLFMName": "Oliva, Jared Cole",
+                        "strikeZoneTop": 3.31,
+                        "strikeZoneBottom": 1.67
+                    },
+                    "third": {
                         "id": 687551,
                         "fullName": "Drew Gilbert",
                         "link": "/api/v1/people/687551",
@@ -21359,101 +21461,6 @@
                         "fullLFMName": "Gilbert, Andrew Christopher",
                         "strikeZoneTop": 3.06,
                         "strikeZoneBottom": 1.54
-                    },
-                    "second": {
-                        "id": 692348,
-                        "fullName": "Aeverson Arteaga",
-                        "link": "/api/v1/people/692348",
-                        "firstName": "Aeverson",
-                        "lastName": "Arteaga",
-                        "primaryNumber": "1",
-                        "birthDate": "2003-03-16",
-                        "currentAge": 23,
-                        "birthCity": "Chirgua",
-                        "birthCountry": "Venezuela",
-                        "height": "5' 11\"",
-                        "weight": 201,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Aeverson",
-                        "useLastName": "Arteaga",
-                        "middleName": "Javier",
-                        "boxscoreName": "Arteaga",
-                        "gender": "M",
-                        "nameMatrilineal": "Perez",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Aeverson Arteaga",
-                        "nameSlug": "aeverson-arteaga-692348",
-                        "firstLastName": "Aeverson Arteaga",
-                        "lastFirstName": "Arteaga, Aeverson",
-                        "lastInitName": "Arteaga, A",
-                        "initLastName": "A Arteaga",
-                        "fullFMLName": "Aeverson Javier Arteaga",
-                        "fullLFMName": "Arteaga, Aeverson Javier",
-                        "strikeZoneTop": 3.165,
-                        "strikeZoneBottom": 1.598
-                    },
-                    "third": {
-                        "id": 683766,
-                        "fullName": "Christian Koss",
-                        "link": "/api/v1/people/683766",
-                        "firstName": "Christian",
-                        "lastName": "Koss",
-                        "primaryNumber": "50",
-                        "birthDate": "1998-01-27",
-                        "currentAge": 28,
-                        "birthCity": "Riverside",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 185,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Christian",
-                        "useLastName": "Koss",
-                        "boxscoreName": "Koss",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2019,
-                        "mlbDebutDate": "2025-04-01",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Christian Koss",
-                        "nameSlug": "christian-koss-683766",
-                        "firstLastName": "Christian Koss",
-                        "lastFirstName": "Koss, Christian",
-                        "lastInitName": "Koss, C",
-                        "initLastName": "C Koss",
-                        "fullFMLName": "Christian Koss",
-                        "fullLFMName": "Koss, Christian ",
-                        "strikeZoneTop": 3.25,
-                        "strikeZoneBottom": 1.64
                     },
                     "pitcher": {
                         "id": 664141,
@@ -21505,7 +21512,7 @@
                         "strikeZoneTop": 3.3,
                         "strikeZoneBottom": 1.55
                     },
-                    "battingOrder": 2,
+                    "battingOrder": 3,
                     "team": {
                         "id": 137,
                         "name": "San Francisco Giants",
@@ -23457,8 +23464,8 @@
                         "link": "/api/v1/teams/145"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
+                "balls": 3,
+                "strikes": 2,
                 "outs": 2
             },
             "venue": {
@@ -24976,56 +24983,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 674441,
-                        "fullName": "Jacob Hurtubise",
-                        "link": "/api/v1/people/674441",
-                        "firstName": "Jacob",
-                        "lastName": "Hurtubise",
-                        "primaryNumber": "77",
-                        "birthDate": "1997-12-11",
-                        "currentAge": 28,
-                        "birthCity": "Indianapolis",
-                        "birthStateProvince": "IN",
-                        "birthCountry": "USA",
-                        "height": "5' 11\"",
-                        "weight": 180,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "7",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "LF"
-                        },
-                        "useName": "Jacob",
-                        "useLastName": "Hurtubise",
-                        "middleName": "Gilles",
-                        "boxscoreName": "Hurtubise",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2020,
-                        "pronunciation": "HURT-uh-bees",
-                        "mlbDebutDate": "2024-05-13",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Jacob Hurtubise",
-                        "nameSlug": "jacob-hurtubise-674441",
-                        "firstLastName": "Jacob Hurtubise",
-                        "lastFirstName": "Hurtubise, Jacob",
-                        "lastInitName": "Hurtubise, J",
-                        "initLastName": "J Hurtubise",
-                        "fullFMLName": "Jacob Gilles Hurtubise",
-                        "fullLFMName": "Hurtubise, Jacob Gilles",
-                        "strikeZoneTop": 3.159,
-                        "strikeZoneBottom": 1.594
-                    },
-                    "onDeck": {
                         "id": 823658,
                         "fullName": "Daniel Dickinson",
                         "link": "/api/v1/people/823658",
@@ -25073,7 +25030,7 @@
                         "strikeZoneTop": 3.21,
                         "strikeZoneBottom": 1.62
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 592885,
                         "fullName": "Christian Yelich",
                         "link": "/api/v1/people/592885",
@@ -25124,6 +25081,52 @@
                         "strikeZoneTop": 3.37,
                         "strikeZoneBottom": 1.7
                     },
+                    "inHole": {
+                        "id": 800345,
+                        "fullName": "Juan Baez",
+                        "link": "/api/v1/people/800345",
+                        "firstName": "Juan",
+                        "lastName": "Baez",
+                        "primaryNumber": "62",
+                        "birthDate": "2005-06-27",
+                        "currentAge": 20,
+                        "birthCity": "Santiago",
+                        "birthCountry": "Dominican Republic",
+                        "height": "5' 10\"",
+                        "weight": 175,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Juan",
+                        "useLastName": "Baez",
+                        "middleName": "Luis",
+                        "boxscoreName": "Baez, J",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Juan Baez",
+                        "nameSlug": "juan-baez-800345",
+                        "firstLastName": "Juan Baez",
+                        "lastFirstName": "Baez, Juan",
+                        "lastInitName": "Baez, J",
+                        "initLastName": "J Baez",
+                        "fullFMLName": "Juan Luis Baez",
+                        "fullLFMName": "Baez, Juan Luis",
+                        "strikeZoneTop": 3.14,
+                        "strikeZoneBottom": 1.585
+                    },
                     "pitcher": {
                         "id": 681982,
                         "fullName": "Grant Anderson",
@@ -25173,7 +25176,7 @@
                         "strikeZoneTop": 3.21,
                         "strikeZoneBottom": 1.62
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 158,
                         "name": "Milwaukee Brewers",
@@ -25182,7 +25185,7 @@
                 },
                 "balls": 0,
                 "strikes": 0,
-                "outs": 1
+                "outs": 2
             },
             "venue": {
                 "id": 2518,
