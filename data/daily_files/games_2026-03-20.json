@@ -9,12 +9,12 @@
             "gameDate": "2026-03-20T17:05:00Z",
             "officialDate": "2026-03-20",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -25,10 +25,11 @@
                     },
                     "leagueRecord": {
                         "wins": 12,
-                        "losses": 12,
-                        "pct": ".500"
+                        "losses": 13,
+                        "pct": ".480"
                     },
                     "score": 0,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 687762,
                         "fullName": "Blake Wehunt",
@@ -87,11 +88,12 @@
                         "link": "/api/v1/teams/139"
                     },
                     "leagueRecord": {
-                        "wins": 8,
+                        "wins": 9,
                         "losses": 16,
-                        "pct": ".333"
+                        "pct": ".360"
                     },
                     "score": 2,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 663556,
                         "fullName": "Shane McClanahan",
@@ -289,6 +291,7 @@
                             "leftOnBase": 0
                         },
                         "away": {
+                            "runs": 0,
                             "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
@@ -568,53 +571,6 @@
                         "strikeZoneTop": 3.255,
                         "strikeZoneBottom": 1.643
                     },
-                    "first": {
-                        "id": 808571,
-                        "fullName": "D'Angelo Ortiz",
-                        "link": "/api/v1/people/808571",
-                        "firstName": "D'Angelo",
-                        "lastName": "Ortiz",
-                        "primaryNumber": "44",
-                        "birthDate": "2004-07-10",
-                        "currentAge": 21,
-                        "birthCity": "Miami",
-                        "birthStateProvince": "FL",
-                        "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 190,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "5",
-                            "name": "Third Base",
-                            "type": "Infielder",
-                            "abbreviation": "3B"
-                        },
-                        "useName": "D'Angelo",
-                        "useLastName": "Ortiz",
-                        "boxscoreName": "Ortiz",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "D'Angelo Ortiz",
-                        "nameSlug": "d-angelo-ortiz-808571",
-                        "firstLastName": "D'Angelo Ortiz",
-                        "lastFirstName": "Ortiz, D'Angelo",
-                        "lastInitName": "Ortiz, D",
-                        "initLastName": "D Ortiz",
-                        "fullFMLName": "D'Angelo Ortiz",
-                        "fullLFMName": "Ortiz, D'Angelo ",
-                        "strikeZoneTop": 3.255,
-                        "strikeZoneBottom": 1.643
-                    },
                     "pitcher": {
                         "id": 664918,
                         "fullName": "Kyle Keller",
@@ -673,7 +629,7 @@
                 },
                 "balls": 3,
                 "strikes": 1,
-                "outs": 1
+                "outs": 3
             },
             "venue": {
                 "id": 2534,
@@ -683,6 +639,7 @@
             "content": {
                 "link": "/api/v1/game/831602/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -2239,9 +2196,9 @@
             "linescore": {
                 "currentInning": 8,
                 "currentInningOrdinal": "8th",
-                "inningState": "Middle",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -2701,7 +2658,7 @@
                 },
                 "balls": 0,
                 "strikes": 0,
-                "outs": 3
+                "outs": 0
             },
             "venue": {
                 "id": 2862,
@@ -4515,54 +4472,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 809975,
-                        "fullName": "Kodey Shojinaga",
-                        "link": "/api/v1/people/809975",
-                        "firstName": "Kodey",
-                        "lastName": "Shojinaga",
-                        "primaryNumber": "90",
-                        "birthDate": "2003-02-22",
-                        "currentAge": 23,
-                        "birthCity": "Honolulu",
-                        "birthStateProvince": "HI",
-                        "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 190,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Kodey",
-                        "useLastName": "Shojinaga",
-                        "middleName": "Toshi",
-                        "boxscoreName": "Shojinaga",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Kodey Shojinaga",
-                        "nameSlug": "kodey-shojinaga-809975",
-                        "firstLastName": "Kodey Shojinaga",
-                        "lastFirstName": "Shojinaga, Kodey",
-                        "lastInitName": "Shojinaga, K",
-                        "initLastName": "K Shojinaga",
-                        "fullFMLName": "Kodey Shojinaga",
-                        "fullLFMName": "Shojinaga, Kodey ",
-                        "strikeZoneTop": 3.076,
-                        "strikeZoneBottom": 1.553
-                    },
-                    "onDeck": {
                         "id": 681082,
                         "fullName": "Bryson Stott",
                         "link": "/api/v1/people/681082",
@@ -4612,7 +4521,7 @@
                         "strikeZoneTop": 3.225,
                         "strikeZoneBottom": 1.628
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 669016,
                         "fullName": "Brandon Marsh",
                         "link": "/api/v1/people/669016",
@@ -4660,6 +4569,54 @@
                         "fullLFMName": "Marsh, Brandon Chase",
                         "strikeZoneTop": 3.312,
                         "strikeZoneBottom": 1.672
+                    },
+                    "inHole": {
+                        "id": 701811,
+                        "fullName": "John Spikerman",
+                        "link": "/api/v1/people/701811",
+                        "firstName": "John",
+                        "lastName": "Spikerman",
+                        "primaryNumber": "87",
+                        "birthDate": "2003-04-02",
+                        "currentAge": 22,
+                        "birthCity": "Houston",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 190,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "O",
+                            "name": "Outfield",
+                            "type": "Outfielder",
+                            "abbreviation": "OF"
+                        },
+                        "useName": "John",
+                        "useLastName": "Spikerman",
+                        "middleName": "Gregory",
+                        "boxscoreName": "Spikerman",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "John Spikerman",
+                        "nameSlug": "john-spikerman-701811",
+                        "firstLastName": "John Spikerman",
+                        "lastFirstName": "Spikerman, John",
+                        "lastInitName": "Spikerman, J",
+                        "initLastName": "J Spikerman",
+                        "fullFMLName": "John Gregory Spikerman",
+                        "fullLFMName": "Spikerman, John Gregory",
+                        "strikeZoneTop": 3.21,
+                        "strikeZoneBottom": 1.62
                     },
                     "pitcher": {
                         "id": 670950,
@@ -4710,16 +4667,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 6,
+                    "battingOrder": 7,
                     "team": {
                         "id": 143,
                         "name": "Philadelphia Phillies",
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
-                "outs": 0
+                "balls": 0,
+                "strikes": 0,
+                "outs": 1
             },
             "venue": {
                 "id": 2700,
@@ -6765,8 +6722,8 @@
                         "link": "/api/v1/teams/121"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
+                "balls": 2,
+                "strikes": 2,
                 "outs": 0
             },
             "venue": {
@@ -7417,7 +7374,7 @@
             "695003": "P",
             "829794": "IF",
             "681517": "P",
-            "700720": "CF",
+            "700720": "RF",
             "806191": "OF",
             "815104": "C",
             "668941": "P",
@@ -7429,7 +7386,7 @@
             "801187": "C",
             "692401": "P",
             "692369": "P",
-            "702331": "3B",
+            "702331": "LF",
             "701481": "C",
             "701800": "C",
             "592773": "P",
@@ -8644,54 +8601,6 @@
                         "strikeZoneTop": 3.247,
                         "strikeZoneBottom": 1.639
                     },
-                    "first": {
-                        "id": 803011,
-                        "fullName": "Sam Antonacci",
-                        "link": "/api/v1/people/803011",
-                        "firstName": "Samuel",
-                        "lastName": "Antonacci",
-                        "primaryNumber": "92",
-                        "birthDate": "2003-02-06",
-                        "currentAge": 23,
-                        "birthCity": "Springfield",
-                        "birthStateProvince": "IL",
-                        "birthCountry": "USA",
-                        "height": "5' 11\"",
-                        "weight": 193,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Sam",
-                        "useLastName": "Antonacci",
-                        "middleName": "Joseph",
-                        "boxscoreName": "Antonacci",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Sam Antonacci",
-                        "nameSlug": "sam-antonacci-803011",
-                        "firstLastName": "Sam Antonacci",
-                        "lastFirstName": "Antonacci, Sam",
-                        "lastInitName": "Antonacci, S",
-                        "initLastName": "S Antonacci",
-                        "fullFMLName": "Samuel Joseph Antonacci",
-                        "fullLFMName": "Antonacci, Samuel Joseph",
-                        "strikeZoneTop": 3.154,
-                        "strikeZoneBottom": 1.592
-                    },
                     "pitcher": {
                         "id": 681343,
                         "fullName": "Shane Smith",
@@ -8750,7 +8659,7 @@
                 },
                 "balls": 1,
                 "strikes": 2,
-                "outs": 0
+                "outs": 1
             },
             "venue": {
                 "id": 2500,
@@ -18881,16 +18790,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 113,
-                        "name": "Cincinnati Reds",
-                        "link": "/api/v1/teams/113"
+                        "id": 112,
+                        "name": "Chicago Cubs",
+                        "link": "/api/v1/teams/112"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 112,
-                        "name": "Chicago Cubs",
-                        "link": "/api/v1/teams/112"
+                        "id": 113,
+                        "name": "Cincinnati Reds",
+                        "link": "/api/v1/teams/113"
                     }
                 }
             },
@@ -19127,16 +19036,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 135,
-                        "name": "San Diego Padres",
-                        "link": "/api/v1/teams/135"
+                        "id": 119,
+                        "name": "Los Angeles Dodgers",
+                        "link": "/api/v1/teams/119"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 119,
-                        "name": "Los Angeles Dodgers",
-                        "link": "/api/v1/teams/119"
+                        "id": 135,
+                        "name": "San Diego Padres",
+                        "link": "/api/v1/teams/135"
                     }
                 }
             },
@@ -19372,16 +19281,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 136,
-                        "name": "Seattle Mariners",
-                        "link": "/api/v1/teams/136"
+                        "id": 114,
+                        "name": "Cleveland Guardians",
+                        "link": "/api/v1/teams/114"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 114,
-                        "name": "Cleveland Guardians",
-                        "link": "/api/v1/teams/114"
+                        "id": 136,
+                        "name": "Seattle Mariners",
+                        "link": "/api/v1/teams/136"
                     }
                 }
             },
@@ -20578,16 +20487,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 112,
-                        "name": "Chicago Cubs",
-                        "link": "/api/v1/teams/112"
+                        "id": 133,
+                        "name": "Athletics",
+                        "link": "/api/v1/teams/133"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 133,
-                        "name": "Athletics",
-                        "link": "/api/v1/teams/133"
+                        "id": 112,
+                        "name": "Chicago Cubs",
+                        "link": "/api/v1/teams/112"
                     }
                 }
             },
@@ -21695,16 +21604,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 158,
-                        "name": "Milwaukee Brewers",
-                        "link": "/api/v1/teams/158"
+                        "id": 109,
+                        "name": "Arizona Diamondbacks",
+                        "link": "/api/v1/teams/109"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 109,
-                        "name": "Arizona Diamondbacks",
-                        "link": "/api/v1/teams/109"
+                        "id": 158,
+                        "name": "Milwaukee Brewers",
+                        "link": "/api/v1/teams/158"
                     }
                 }
             },
