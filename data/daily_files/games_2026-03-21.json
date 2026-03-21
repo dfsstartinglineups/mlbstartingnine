@@ -10,9 +10,9 @@
             "officialDate": "2026-03-21",
             "status": {
                 "abstractGameState": "Final",
-                "codedGameState": "O",
-                "detailedState": "Game Over",
-                "statusCode": "O",
+                "codedGameState": "F",
+                "detailedState": "Final",
+                "statusCode": "F",
                 "startTimeTBD": false,
                 "abstractGameCode": "F"
             },
@@ -1833,11 +1833,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 8,
-                "currentInningOrdinal": "8th",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 9,
+                "currentInningOrdinal": "9th",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -1966,6 +1966,20 @@
                             "hits": 2,
                             "errors": 0,
                             "leftOnBase": 1
+                        }
+                    },
+                    {
+                        "num": 9,
+                        "ordinalNum": "9th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
                         }
                     }
                 ],
@@ -2290,7 +2304,7 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 10,
+                    "battingOrder": 1,
                     "team": {
                         "id": 141,
                         "name": "Toronto Blue Jays",
@@ -2298,8 +2312,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 3,
-                "outs": 3
+                "strikes": 2,
+                "outs": 0
             },
             "venue": {
                 "id": 2526,
@@ -6322,8 +6336,8 @@
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
+                "balls": 3,
+                "strikes": 2,
                 "outs": 2
             },
             "venue": {
@@ -14537,7 +14551,7 @@
                     }
                 },
                 "balls": 3,
-                "strikes": 0,
+                "strikes": 2,
                 "outs": 2
             },
             "venue": {
@@ -16012,55 +16026,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 672016,
-                        "fullName": "Denzel Clarke",
-                        "link": "/api/v1/people/672016",
-                        "firstName": "Denzel",
-                        "lastName": "Clarke",
-                        "primaryNumber": "1",
-                        "birthDate": "2000-05-01",
-                        "currentAge": 25,
-                        "birthCity": "Toronto",
-                        "birthStateProvince": "ON",
-                        "birthCountry": "Canada",
-                        "height": "6' 3\"",
-                        "weight": 220,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "8",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "CF"
-                        },
-                        "useName": "Denzel",
-                        "useLastName": "Clarke",
-                        "middleName": "Leslie",
-                        "boxscoreName": "Clarke",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "mlbDebutDate": "2025-05-23",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Denzel Clarke",
-                        "nameSlug": "denzel-clarke-672016",
-                        "firstLastName": "Denzel Clarke",
-                        "lastFirstName": "Clarke, Denzel",
-                        "lastInitName": "Clarke, D",
-                        "initLastName": "D Clarke",
-                        "fullFMLName": "Denzel Leslie Clarke",
-                        "fullLFMName": "Clarke, Denzel Leslie",
-                        "strikeZoneTop": 3.363,
-                        "strikeZoneBottom": 1.697
-                    },
-                    "onDeck": {
                         "id": 666126,
                         "fullName": "Carlos Cortes",
                         "link": "/api/v1/people/666126",
@@ -16109,7 +16074,7 @@
                         "strikeZoneTop": 2.99,
                         "strikeZoneBottom": 1.509
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 687231,
                         "fullName": "Darell Hernaiz",
                         "link": "/api/v1/people/687231",
@@ -16159,6 +16124,57 @@
                         "strikeZoneTop": 3.186,
                         "strikeZoneBottom": 1.608
                     },
+                    "inHole": {
+                        "id": 642851,
+                        "fullName": "Austin Wynns",
+                        "link": "/api/v1/people/642851",
+                        "firstName": "Robert",
+                        "lastName": "Wynns",
+                        "primaryNumber": "29",
+                        "birthDate": "1990-12-10",
+                        "currentAge": 35,
+                        "birthCity": "San Diego",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 190,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Austin",
+                        "useLastName": "Wynns",
+                        "middleName": "Austin",
+                        "boxscoreName": "Wynns, A",
+                        "nickName": "Winnie",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2013,
+                        "pronunciation": "Wins",
+                        "mlbDebutDate": "2018-06-05",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Austin Wynns",
+                        "nameSlug": "austin-wynns-642851",
+                        "firstLastName": "Austin Wynns",
+                        "lastFirstName": "Wynns, Austin",
+                        "lastInitName": "Wynns, A",
+                        "initLastName": "A Wynns",
+                        "fullFMLName": "Robert Austin Wynns",
+                        "fullLFMName": "Wynns, Robert Austin",
+                        "strikeZoneTop": 3.262,
+                        "strikeZoneBottom": 1.646
+                    },
                     "first": {
                         "id": 695720,
                         "fullName": "Tommy White",
@@ -16207,7 +16223,7 @@
                         "strikeZoneTop": 3.195,
                         "strikeZoneBottom": 1.612
                     },
-                    "second": {
+                    "third": {
                         "id": 815888,
                         "fullName": "Leo De Vries",
                         "link": "/api/v1/people/815888",
@@ -16303,7 +16319,7 @@
                         "strikeZoneTop": 3.344,
                         "strikeZoneBottom": 1.688
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 133,
                         "name": "Athletics",
@@ -16311,8 +16327,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 1,
-                "outs": 1
+                "strikes": 0,
+                "outs": 2
             },
             "venue": {
                 "id": 3809,
@@ -18431,7 +18447,7 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 0,
+                "strikes": 2,
                 "outs": 1
             },
             "venue": {
@@ -20153,55 +20169,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 682177,
-                        "fullName": "Daniel Schneemann",
-                        "link": "/api/v1/people/682177",
-                        "firstName": "Daniel",
-                        "lastName": "Schneemann",
-                        "primaryNumber": "10",
-                        "birthDate": "1997-01-23",
-                        "currentAge": 29,
-                        "birthCity": "San Diego",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 0\"",
-                        "weight": 185,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Daniel",
-                        "useLastName": "Schneemann",
-                        "boxscoreName": "Schneemann",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "draftYear": 2018,
-                        "pronunciation": "sh-KNEE-man",
-                        "mlbDebutDate": "2024-06-02",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Daniel Schneemann",
-                        "nameSlug": "daniel-schneemann-682177",
-                        "firstLastName": "Daniel Schneemann",
-                        "lastFirstName": "Schneemann, Daniel",
-                        "lastInitName": "Schneemann, D",
-                        "initLastName": "D Schneemann",
-                        "fullFMLName": "Daniel Schneemann",
-                        "fullLFMName": "Schneemann, Daniel ",
-                        "strikeZoneTop": 3.197,
-                        "strikeZoneBottom": 1.614
-                    },
-                    "onDeck": {
                         "id": 681807,
                         "fullName": "David Fry",
                         "link": "/api/v1/people/681807",
@@ -20249,7 +20216,7 @@
                         "strikeZoneTop": 3.243,
                         "strikeZoneBottom": 1.637
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 700932,
                         "fullName": "Kyle Manzardo",
                         "link": "/api/v1/people/700932",
@@ -20297,6 +20264,55 @@
                         "fullLFMName": "Manzardo, Kyle Thomas",
                         "strikeZoneTop": 3.188,
                         "strikeZoneBottom": 1.609
+                    },
+                    "inHole": {
+                        "id": 656413,
+                        "fullName": "Stuart Fairchild",
+                        "link": "/api/v1/people/656413",
+                        "firstName": "Stuart",
+                        "lastName": "Fairchild",
+                        "primaryNumber": "17",
+                        "birthDate": "1996-03-17",
+                        "currentAge": 30,
+                        "birthCity": "Seattle",
+                        "birthStateProvince": "WA",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 205,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Stuart",
+                        "useLastName": "Fairchild",
+                        "middleName": "Alexander",
+                        "boxscoreName": "Fairchild",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2017,
+                        "mlbDebutDate": "2021-07-06",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Stuart Fairchild",
+                        "nameSlug": "stuart-fairchild-656413",
+                        "firstLastName": "Stuart Fairchild",
+                        "lastFirstName": "Fairchild, Stuart",
+                        "lastInitName": "Fairchild, S",
+                        "initLastName": "S Fairchild",
+                        "fullFMLName": "Stuart Alexander Fairchild",
+                        "fullLFMName": "Fairchild, Stuart Alexander",
+                        "strikeZoneTop": 3.159,
+                        "strikeZoneBottom": 1.594
                     },
                     "pitcher": {
                         "id": 676440,
@@ -20348,16 +20364,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 114,
                         "name": "Cleveland Guardians",
                         "link": "/api/v1/teams/114"
                     }
                 },
-                "balls": 0,
-                "strikes": 2,
-                "outs": 1
+                "balls": 1,
+                "strikes": 0,
+                "outs": 2
             },
             "venue": {
                 "id": 2532,
@@ -25747,16 +25763,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 113,
-                        "name": "Cincinnati Reds",
-                        "link": "/api/v1/teams/113"
+                        "id": 145,
+                        "name": "Chicago White Sox",
+                        "link": "/api/v1/teams/145"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 145,
-                        "name": "Chicago White Sox",
-                        "link": "/api/v1/teams/145"
+                        "id": 113,
+                        "name": "Cincinnati Reds",
+                        "link": "/api/v1/teams/113"
                     }
                 }
             },
@@ -25784,8 +25800,7 @@
             "seriesDescription": "Spring Training",
             "recordSource": "S",
             "ifNecessary": "N",
-            "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "ifNecessaryDescription": "Normal Game"
         },
         "odds": {
             "id": "bd08d79bb60bdef71a68b10481e6fdae",
@@ -26144,16 +26159,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 136,
-                        "name": "Seattle Mariners",
-                        "link": "/api/v1/teams/136"
+                        "id": 112,
+                        "name": "Chicago Cubs",
+                        "link": "/api/v1/teams/112"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 112,
-                        "name": "Chicago Cubs",
-                        "link": "/api/v1/teams/112"
+                        "id": 136,
+                        "name": "Seattle Mariners",
+                        "link": "/api/v1/teams/136"
                     }
                 }
             },
@@ -26181,8 +26196,7 @@
             "seriesDescription": "Spring Training",
             "recordSource": "S",
             "ifNecessary": "N",
-            "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "ifNecessaryDescription": "Normal Game"
         },
         "odds": {
             "id": "fa523018a87745cf6dccac34f3a30043",
