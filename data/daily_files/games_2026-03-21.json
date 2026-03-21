@@ -1693,12 +1693,12 @@
             "gameDate": "2026-03-21T17:05:00Z",
             "officialDate": "2026-03-21",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -1709,10 +1709,11 @@
                     },
                     "leagueRecord": {
                         "wins": 11,
-                        "losses": 13,
-                        "pct": ".458"
+                        "losses": 14,
+                        "pct": ".440"
                     },
                     "score": 3,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 592332,
                         "fullName": "Kevin Gausman",
@@ -1774,11 +1775,12 @@
                         "link": "/api/v1/teams/134"
                     },
                     "leagueRecord": {
-                        "wins": 16,
+                        "wins": 17,
                         "losses": 11,
-                        "pct": ".593"
+                        "pct": ".607"
                     },
                     "score": 8,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 694973,
                         "fullName": "Paul Skenes",
@@ -1977,9 +1979,10 @@
                             "leftOnBase": 0
                         },
                         "away": {
+                            "runs": 0,
                             "hits": 1,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         }
                     }
                 ],
@@ -1994,7 +1997,7 @@
                         "runs": 3,
                         "hits": 7,
                         "errors": 2,
-                        "leftOnBase": 9
+                        "leftOnBase": 10
                     }
                 },
                 "defense": {
@@ -2059,9 +2062,9 @@
                         "link": "/api/v1/people/806986"
                     },
                     "second": {
-                        "id": 667663,
-                        "fullName": "Hunter Stovall",
-                        "link": "/api/v1/people/667663"
+                        "id": 664040,
+                        "fullName": "Brandon Lowe",
+                        "link": "/api/v1/people/664040"
                     },
                     "third": {
                         "id": 675961,
@@ -2079,9 +2082,9 @@
                         "link": "/api/v1/people/836075"
                     },
                     "center": {
-                        "id": 680713,
-                        "fullName": "P.J. Hilson",
-                        "link": "/api/v1/people/680713"
+                        "id": 665833,
+                        "fullName": "Oneil Cruz",
+                        "link": "/api/v1/people/665833"
                     },
                     "right": {
                         "id": 696145,
@@ -2254,54 +2257,6 @@
                         "strikeZoneTop": 3.157,
                         "strikeZoneBottom": 1.593
                     },
-                    "first": {
-                        "id": 701860,
-                        "fullName": "Carter Cunningham",
-                        "link": "/api/v1/people/701860",
-                        "firstName": "Carter",
-                        "lastName": "Cunningham",
-                        "primaryNumber": "10",
-                        "birthDate": "2000-11-06",
-                        "currentAge": 25,
-                        "birthCity": "Huntington Beach",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 4\"",
-                        "weight": 220,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "I",
-                            "name": "Infield",
-                            "type": "Infielder",
-                            "abbreviation": "IF"
-                        },
-                        "useName": "Carter",
-                        "useLastName": "Cunningham",
-                        "middleName": "Andrew",
-                        "boxscoreName": "Cunningham",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Carter Cunningham",
-                        "nameSlug": "carter-cunningham-701860",
-                        "firstLastName": "Carter Cunningham",
-                        "lastFirstName": "Cunningham, Carter",
-                        "lastInitName": "Cunningham, C",
-                        "initLastName": "C Cunningham",
-                        "fullFMLName": "Carter Andrew Cunningham",
-                        "fullLFMName": "Cunningham, Carter Andrew",
-                        "strikeZoneTop": 3.388,
-                        "strikeZoneBottom": 1.71
-                    },
                     "pitcher": {
                         "id": 676596,
                         "fullName": "Josh Fleming",
@@ -2359,8 +2314,8 @@
                     }
                 },
                 "balls": 2,
-                "strikes": 0,
-                "outs": 2
+                "strikes": 1,
+                "outs": 3
             },
             "venue": {
                 "id": 2526,
@@ -2370,6 +2325,7 @@
             "content": {
                 "link": "/api/v1/game/831553/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -6329,53 +6285,52 @@
                         "strikeZoneBottom": 1.525
                     },
                     "first": {
-                        "id": 665561,
-                        "fullName": "Rafael March\u00e1n",
-                        "link": "/api/v1/people/665561",
-                        "firstName": "Rafael",
-                        "lastName": "March\u00e1n",
-                        "primaryNumber": "13",
-                        "birthDate": "1999-02-25",
-                        "currentAge": 27,
-                        "birthCity": "San Cristobal",
-                        "birthCountry": "Venezuela",
-                        "height": "5' 9\"",
-                        "weight": 170,
+                        "id": 694310,
+                        "fullName": "Bryson Ware",
+                        "link": "/api/v1/people/694310",
+                        "firstName": "Bryson",
+                        "lastName": "Ware",
+                        "primaryNumber": "95",
+                        "birthDate": "2000-12-28",
+                        "currentAge": 25,
+                        "birthCity": "Jackson",
+                        "birthStateProvince": "MS",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 211,
                         "active": true,
                         "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
                         },
-                        "useName": "Rafael",
-                        "useLastName": "March\u00e1n",
-                        "middleName": "Alejandro",
-                        "boxscoreName": "March\u00e1n",
+                        "useName": "Bryson",
+                        "useLastName": "Ware",
+                        "middleName": "Tolar",
+                        "boxscoreName": "Ware",
                         "gender": "M",
-                        "nameMatrilineal": "Amado",
                         "isPlayer": true,
                         "isVerified": true,
-                        "pronunciation": "rah-fah-ELL mar-SHAHN",
-                        "mlbDebutDate": "2020-09-14",
+                        "draftYear": 2023,
                         "batSide": {
-                            "code": "S",
-                            "description": "Switch"
+                            "code": "R",
+                            "description": "Right"
                         },
                         "pitchHand": {
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Rafael March\u00e1n",
-                        "nameSlug": "rafael-marchan-665561",
-                        "firstLastName": "Rafael March\u00e1n",
-                        "lastFirstName": "March\u00e1n, Rafael",
-                        "lastInitName": "March\u00e1n, R",
-                        "initLastName": "R March\u00e1n",
-                        "fullFMLName": "Rafael Alejandro March\u00e1n",
-                        "fullLFMName": "March\u00e1n, Rafael Alejandro",
-                        "strikeZoneTop": 3.056,
-                        "strikeZoneBottom": 1.542
+                        "nameFirstLast": "Bryson Ware",
+                        "nameSlug": "bryson-ware-694310",
+                        "firstLastName": "Bryson Ware",
+                        "lastFirstName": "Ware, Bryson",
+                        "lastInitName": "Ware, B",
+                        "initLastName": "B Ware",
+                        "fullFMLName": "Bryson Tolar Ware",
+                        "fullLFMName": "Ware, Bryson Tolar",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
                     },
                     "second": {
                         "id": 689456,
@@ -6481,7 +6436,7 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 0,
+                "strikes": 1,
                 "outs": 2
             },
             "venue": {
@@ -7123,7 +7078,7 @@
             "669060": "P",
             "823804": "P",
             "679775": "P",
-            "694310": "2B",
+            "694310": "PR",
             "811780": "CF",
             "694551": "P",
             "702222": "CF",
@@ -15915,9 +15870,9 @@
             "linescore": {
                 "currentInning": 5,
                 "currentInningOrdinal": "5th",
-                "inningState": "Middle",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -16016,19 +15971,18 @@
                 },
                 "defense": {
                     "pitcher": {
-                        "id": 663687,
-                        "fullName": "Hogan Harris",
-                        "link": "/api/v1/people/663687",
-                        "firstName": "Hogan",
-                        "lastName": "Harris",
-                        "primaryNumber": "36",
-                        "birthDate": "1996-12-26",
-                        "currentAge": 29,
-                        "birthCity": "Lafayette",
-                        "birthStateProvince": "LA",
-                        "birthCountry": "USA",
-                        "height": "6' 3\"",
-                        "weight": 230,
+                        "id": 665622,
+                        "fullName": "Luis Medina",
+                        "link": "/api/v1/people/665622",
+                        "firstName": "Luis",
+                        "lastName": "Medina",
+                        "primaryNumber": "46",
+                        "birthDate": "1999-05-03",
+                        "currentAge": 26,
+                        "birthCity": "Nagua",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 1\"",
+                        "weight": 175,
                         "active": true,
                         "primaryPosition": {
                             "code": "1",
@@ -16036,33 +15990,33 @@
                             "type": "Pitcher",
                             "abbreviation": "P"
                         },
-                        "useName": "Hogan",
-                        "useLastName": "Harris",
-                        "middleName": "Anthony",
-                        "boxscoreName": "Harris, H",
+                        "useName": "Luis",
+                        "useLastName": "Medina",
+                        "middleName": "Angel",
+                        "boxscoreName": "Medina",
                         "gender": "M",
+                        "nameMatrilineal": "Bonilla",
                         "isPlayer": true,
                         "isVerified": true,
-                        "draftYear": 2018,
-                        "mlbDebutDate": "2023-04-14",
+                        "mlbDebutDate": "2023-04-26",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
                         },
                         "pitchHand": {
-                            "code": "L",
-                            "description": "Left"
+                            "code": "R",
+                            "description": "Right"
                         },
-                        "nameFirstLast": "Hogan Harris",
-                        "nameSlug": "hogan-harris-663687",
-                        "firstLastName": "Hogan Harris",
-                        "lastFirstName": "Harris, Hogan",
-                        "lastInitName": "Harris, H",
-                        "initLastName": "H Harris",
-                        "fullFMLName": "Hogan Anthony Harris",
-                        "fullLFMName": "Harris, Hogan Anthony",
-                        "strikeZoneTop": 3.344,
-                        "strikeZoneBottom": 1.688
+                        "nameFirstLast": "Luis Medina",
+                        "nameSlug": "luis-medina-665622",
+                        "firstLastName": "Luis Medina",
+                        "lastFirstName": "Medina, Luis",
+                        "lastInitName": "Medina, L",
+                        "initLastName": "L Medina",
+                        "fullFMLName": "Luis Angel Medina",
+                        "fullLFMName": "Medina, Luis Angel",
+                        "strikeZoneTop": 3.255,
+                        "strikeZoneBottom": 1.643
                     },
                     "catcher": {
                         "id": 642851,
@@ -16327,9 +16281,9 @@
                         "link": "/api/v1/teams/119"
                     }
                 },
-                "balls": 1,
+                "balls": 0,
                 "strikes": 0,
-                "outs": 3
+                "outs": 0
             },
             "venue": {
                 "id": 3809,
@@ -17914,9 +17868,9 @@
             "linescore": {
                 "currentInning": 3,
                 "currentInningOrdinal": "3rd",
-                "inningState": "Middle",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -18300,9 +18254,9 @@
                         "link": "/api/v1/teams/118"
                     }
                 },
-                "balls": 1,
-                "strikes": 3,
-                "outs": 3
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2603,
@@ -19883,7 +19837,7 @@
                         "num": 3,
                         "ordinalNum": "3rd",
                         "home": {
-                            "hits": 0,
+                            "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
                         },
@@ -19898,7 +19852,7 @@
                 "teams": {
                     "home": {
                         "runs": 0,
-                        "hits": 0,
+                        "hits": 1,
                         "errors": 0,
                         "leftOnBase": 0
                     },
@@ -20024,56 +19978,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 666931,
-                        "fullName": "Jared Oliva",
-                        "link": "/api/v1/people/666931",
-                        "firstName": "Jared",
-                        "lastName": "Oliva",
-                        "primaryNumber": "56",
-                        "birthDate": "1995-11-27",
-                        "currentAge": 30,
-                        "birthCity": "Santa Clarita",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 202,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "O",
-                            "name": "Outfield",
-                            "type": "Outfielder",
-                            "abbreviation": "OF"
-                        },
-                        "useName": "Jared",
-                        "useLastName": "Oliva",
-                        "middleName": "Cole",
-                        "boxscoreName": "Oliva",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2017,
-                        "pronunciation": "AH-lih-vuh",
-                        "mlbDebutDate": "2020-09-21",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Jared Oliva",
-                        "nameSlug": "jared-oliva-666931",
-                        "firstLastName": "Jared Oliva",
-                        "lastFirstName": "Oliva, Jared",
-                        "lastInitName": "Oliva, J",
-                        "initLastName": "J Oliva",
-                        "fullFMLName": "Jared Cole Oliva",
-                        "fullLFMName": "Oliva, Jared Cole",
-                        "strikeZoneTop": 3.31,
-                        "strikeZoneBottom": 1.67
-                    },
-                    "onDeck": {
                         "id": 666464,
                         "fullName": "Jerar Encarnacion",
                         "link": "/api/v1/people/666464",
@@ -20122,7 +20026,7 @@
                         "strikeZoneTop": 3.4,
                         "strikeZoneBottom": 1.72
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 808982,
                         "fullName": "Jung Hoo Lee",
                         "link": "/api/v1/people/808982",
@@ -20168,6 +20072,106 @@
                         "fullLFMName": "J.H. Lee",
                         "strikeZoneTop": 3.22,
                         "strikeZoneBottom": 1.63
+                    },
+                    "inHole": {
+                        "id": 656305,
+                        "fullName": "Matt Chapman",
+                        "link": "/api/v1/people/656305",
+                        "firstName": "Matt",
+                        "lastName": "Chapman",
+                        "primaryNumber": "26",
+                        "birthDate": "1993-04-28",
+                        "currentAge": 32,
+                        "birthCity": "Victorville",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Matt",
+                        "useLastName": "Chapman",
+                        "middleName": "James",
+                        "boxscoreName": "Chapman, M",
+                        "nickName": "Hurtado",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2014,
+                        "mlbDebutDate": "2017-06-15",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Matt Chapman",
+                        "nameSlug": "matt-chapman-656305",
+                        "firstLastName": "Matt Chapman",
+                        "lastFirstName": "Chapman, Matt",
+                        "lastInitName": "Chapman, M",
+                        "initLastName": "M Chapman",
+                        "fullFMLName": "Matt James Chapman",
+                        "fullLFMName": "Chapman, Matt James",
+                        "strikeZoneTop": 3.25,
+                        "strikeZoneBottom": 1.64
+                    },
+                    "first": {
+                        "id": 666931,
+                        "fullName": "Jared Oliva",
+                        "link": "/api/v1/people/666931",
+                        "firstName": "Jared",
+                        "lastName": "Oliva",
+                        "primaryNumber": "56",
+                        "birthDate": "1995-11-27",
+                        "currentAge": 30,
+                        "birthCity": "Santa Clarita",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 202,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "O",
+                            "name": "Outfield",
+                            "type": "Outfielder",
+                            "abbreviation": "OF"
+                        },
+                        "useName": "Jared",
+                        "useLastName": "Oliva",
+                        "middleName": "Cole",
+                        "boxscoreName": "Oliva",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2017,
+                        "pronunciation": "AH-lih-vuh",
+                        "mlbDebutDate": "2020-09-21",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jared Oliva",
+                        "nameSlug": "jared-oliva-666931",
+                        "firstLastName": "Jared Oliva",
+                        "lastFirstName": "Oliva, Jared",
+                        "lastInitName": "Oliva, J",
+                        "initLastName": "J Oliva",
+                        "fullFMLName": "Jared Cole Oliva",
+                        "fullLFMName": "Oliva, Jared Cole",
+                        "strikeZoneTop": 3.31,
+                        "strikeZoneBottom": 1.67
                     },
                     "pitcher": {
                         "id": 592662,
@@ -20219,7 +20223,7 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 8,
+                    "battingOrder": 9,
                     "team": {
                         "id": 137,
                         "name": "San Francisco Giants",
