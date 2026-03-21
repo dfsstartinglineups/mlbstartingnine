@@ -257,7 +257,7 @@ for game in nba_data:
             if random.randint(1, 100) <= 5:
                 tweet_text += f"\n\nFull matchups & odds: https://nbastartingfive.com/#game-{url_game_id}"
                 
-            tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #NBA #DFS #StartingFive"
+            tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
             
             try:
                 nba_client.create_tweet(text=tweet_text)
@@ -382,7 +382,7 @@ for game in games:
         if random.randint(1, 100) <= 5:
             tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-{game_pk}"
             
-        tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB #DFS #MLBOdds #StartingPitchers"
+        tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB"
         
         try:
             mlb_client.create_tweet(text=tweet_text)
