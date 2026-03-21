@@ -99,11 +99,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 1,
-                "currentInningOrdinal": "1st",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 2,
+                "currentInningOrdinal": "2nd",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -120,6 +120,20 @@
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 1
+                        }
+                    },
+                    {
+                        "num": 2,
+                        "ordinalNum": "2nd",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
                         }
                     }
                 ],
@@ -450,9 +464,9 @@
                         "link": "/api/v1/teams/121"
                     }
                 },
-                "balls": 1,
-                "strikes": 3,
-                "outs": 3
+                "balls": 2,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 5000,
@@ -1559,10 +1573,11 @@
             "officialDate": "2026-03-21",
             "status": {
                 "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "codedGameState": "M",
+                "detailedState": "Player challenge",
+                "statusCode": "MJ",
                 "startTimeTBD": false,
+                "reason": "Pitch Result",
                 "abstractGameCode": "L"
             },
             "teams": {
@@ -1851,6 +1866,152 @@
                 },
                 "offense": {
                     "batter": {
+                        "id": 542303,
+                        "fullName": "Marcell Ozuna",
+                        "link": "/api/v1/people/542303",
+                        "firstName": "Marcell",
+                        "lastName": "Ozuna",
+                        "primaryNumber": "24",
+                        "birthDate": "1990-11-12",
+                        "currentAge": 35,
+                        "birthCity": "Santo Domingo",
+                        "birthCountry": "Dominican Republic",
+                        "height": "6' 1\"",
+                        "weight": 251,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Marcell",
+                        "useLastName": "Ozuna",
+                        "boxscoreName": "Ozuna",
+                        "nickName": "The Big Bear",
+                        "gender": "M",
+                        "nameMatrilineal": "Idelfonso",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "oh-ZOO-nah",
+                        "mlbDebutDate": "2013-04-30",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Marcell Ozuna",
+                        "nameSlug": "marcell-ozuna-542303",
+                        "firstLastName": "Marcell Ozuna",
+                        "lastFirstName": "Ozuna, Marcell",
+                        "lastInitName": "Ozuna, M",
+                        "initLastName": "M Ozuna",
+                        "fullFMLName": "Marcell Ozuna",
+                        "fullLFMName": "Ozuna, Marcell",
+                        "strikeZoneTop": 3.256,
+                        "strikeZoneBottom": 1.643
+                    },
+                    "onDeck": {
+                        "id": 687462,
+                        "fullName": "Spencer Horwitz",
+                        "link": "/api/v1/people/687462",
+                        "firstName": "Spencer",
+                        "lastName": "Horwitz",
+                        "primaryNumber": "2",
+                        "birthDate": "1997-11-14",
+                        "currentAge": 28,
+                        "birthCity": "Timonium",
+                        "birthStateProvince": "MD",
+                        "birthCountry": "USA",
+                        "height": "5' 10\"",
+                        "weight": 204,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Spencer",
+                        "useLastName": "Horwitz",
+                        "middleName": "Elliott",
+                        "boxscoreName": "Horwitz",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "mlbDebutDate": "2023-06-18",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Spencer Horwitz",
+                        "nameSlug": "spencer-horwitz-687462",
+                        "firstLastName": "Spencer Horwitz",
+                        "lastFirstName": "Horwitz, Spencer",
+                        "lastInitName": "Horwitz, S",
+                        "initLastName": "S Horwitz",
+                        "fullFMLName": "Spencer Elliott Horwitz",
+                        "fullLFMName": "Horwitz, Spencer Elliott",
+                        "strikeZoneTop": 3.133,
+                        "strikeZoneBottom": 1.581
+                    },
+                    "inHole": {
+                        "id": 680779,
+                        "fullName": "Henry Davis",
+                        "link": "/api/v1/people/680779",
+                        "firstName": "Henry",
+                        "lastName": "Davis",
+                        "primaryNumber": "32",
+                        "birthDate": "1999-09-21",
+                        "currentAge": 26,
+                        "birthCity": "Bedford",
+                        "birthStateProvince": "NY",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 225,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Henry",
+                        "useLastName": "Davis",
+                        "boxscoreName": "Davis, H",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2023-06-19",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Henry Davis",
+                        "nameSlug": "henry-davis-680779",
+                        "firstLastName": "Henry Davis",
+                        "lastFirstName": "Davis, Henry",
+                        "lastInitName": "Davis, H",
+                        "initLastName": "H Davis",
+                        "fullFMLName": "Henry  Davis",
+                        "fullLFMName": "Davis, Henry",
+                        "strikeZoneTop": 3.188,
+                        "strikeZoneBottom": 1.609
+                    },
+                    "first": {
                         "id": 668804,
                         "fullName": "Bryan Reynolds",
                         "link": "/api/v1/people/668804",
@@ -1900,105 +2061,7 @@
                         "strikeZoneTop": 3.284,
                         "strikeZoneBottom": 1.657
                     },
-                    "onDeck": {
-                        "id": 542303,
-                        "fullName": "Marcell Ozuna",
-                        "link": "/api/v1/people/542303",
-                        "firstName": "Marcell",
-                        "lastName": "Ozuna",
-                        "primaryNumber": "24",
-                        "birthDate": "1990-11-12",
-                        "currentAge": 35,
-                        "birthCity": "Santo Domingo",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 1\"",
-                        "weight": 251,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "10",
-                            "name": "Designated Hitter",
-                            "type": "Hitter",
-                            "abbreviation": "DH"
-                        },
-                        "useName": "Marcell",
-                        "useLastName": "Ozuna",
-                        "boxscoreName": "Ozuna",
-                        "nickName": "The Big Bear",
-                        "gender": "M",
-                        "nameMatrilineal": "Idelfonso",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "oh-ZOO-nah",
-                        "mlbDebutDate": "2013-04-30",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Marcell Ozuna",
-                        "nameSlug": "marcell-ozuna-542303",
-                        "firstLastName": "Marcell Ozuna",
-                        "lastFirstName": "Ozuna, Marcell",
-                        "lastInitName": "Ozuna, M",
-                        "initLastName": "M Ozuna",
-                        "fullFMLName": "Marcell Ozuna",
-                        "fullLFMName": "Ozuna, Marcell",
-                        "strikeZoneTop": 3.256,
-                        "strikeZoneBottom": 1.643
-                    },
-                    "inHole": {
-                        "id": 687462,
-                        "fullName": "Spencer Horwitz",
-                        "link": "/api/v1/people/687462",
-                        "firstName": "Spencer",
-                        "lastName": "Horwitz",
-                        "primaryNumber": "2",
-                        "birthDate": "1997-11-14",
-                        "currentAge": 28,
-                        "birthCity": "Timonium",
-                        "birthStateProvince": "MD",
-                        "birthCountry": "USA",
-                        "height": "5' 10\"",
-                        "weight": 204,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Spencer",
-                        "useLastName": "Horwitz",
-                        "middleName": "Elliott",
-                        "boxscoreName": "Horwitz",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2019,
-                        "mlbDebutDate": "2023-06-18",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Spencer Horwitz",
-                        "nameSlug": "spencer-horwitz-687462",
-                        "firstLastName": "Spencer Horwitz",
-                        "lastFirstName": "Horwitz, Spencer",
-                        "lastInitName": "Horwitz, S",
-                        "initLastName": "S Horwitz",
-                        "fullFMLName": "Spencer Elliott Horwitz",
-                        "fullLFMName": "Horwitz, Spencer Elliott",
-                        "strikeZoneTop": 3.133,
-                        "strikeZoneBottom": 1.581
-                    },
-                    "first": {
+                    "second": {
                         "id": 664040,
                         "fullName": "Brandon Lowe",
                         "link": "/api/v1/people/664040",
@@ -2098,15 +2161,15 @@
                         "strikeZoneTop": 3.478,
                         "strikeZoneBottom": 1.755
                     },
-                    "battingOrder": 3,
+                    "battingOrder": 4,
                     "team": {
                         "id": 134,
                         "name": "Pittsburgh Pirates",
                         "link": "/api/v1/teams/134"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
+                "balls": 0,
+                "strikes": 1,
                 "outs": 1
             },
             "venue": {
@@ -4034,7 +4097,7 @@
                         "link": "/api/v1/teams/139"
                     }
                 },
-                "balls": 1,
+                "balls": 3,
                 "strikes": 2,
                 "outs": 1
             },
@@ -5725,55 +5788,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 683002,
-                        "fullName": "Gunnar Henderson",
-                        "link": "/api/v1/people/683002",
-                        "firstName": "Gunnar",
-                        "lastName": "Henderson",
-                        "primaryNumber": "2",
-                        "birthDate": "2001-06-29",
-                        "currentAge": 24,
-                        "birthCity": "Montgomery",
-                        "birthStateProvince": "AL",
-                        "birthCountry": "USA",
-                        "height": "6' 3\"",
-                        "weight": 220,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Gunnar",
-                        "useLastName": "Henderson",
-                        "middleName": "Randal",
-                        "boxscoreName": "Henderson",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2019,
-                        "mlbDebutDate": "2022-08-31",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Gunnar Henderson",
-                        "nameSlug": "gunnar-henderson-683002",
-                        "firstLastName": "Gunnar Henderson",
-                        "lastFirstName": "Henderson, Gunnar",
-                        "lastInitName": "Henderson, G",
-                        "initLastName": "G Henderson",
-                        "fullFMLName": "Gunnar Randal Henderson",
-                        "fullLFMName": "Henderson, Gunnar Randal",
-                        "strikeZoneTop": 3.329,
-                        "strikeZoneBottom": 1.68
-                    },
-                    "onDeck": {
                         "id": 624413,
                         "fullName": "Pete Alonso",
                         "link": "/api/v1/people/624413",
@@ -5823,7 +5837,7 @@
                         "strikeZoneTop": 3.324,
                         "strikeZoneBottom": 1.677
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 668939,
                         "fullName": "Adley Rutschman",
                         "link": "/api/v1/people/668939",
@@ -5871,6 +5885,55 @@
                         "fullLFMName": "Rutschman, Adley Stan",
                         "strikeZoneTop": 3.253,
                         "strikeZoneBottom": 1.642
+                    },
+                    "inHole": {
+                        "id": 641933,
+                        "fullName": "Tyler O'Neill",
+                        "link": "/api/v1/people/641933",
+                        "firstName": "Tyler",
+                        "lastName": "O'Neill",
+                        "primaryNumber": "9",
+                        "birthDate": "1995-06-22",
+                        "currentAge": 30,
+                        "birthCity": "Burnaby",
+                        "birthStateProvince": "BC",
+                        "birthCountry": "Canada",
+                        "height": "5' 9\"",
+                        "weight": 200,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Tyler",
+                        "useLastName": "O'Neill",
+                        "middleName": "Alan",
+                        "boxscoreName": "O'Neill",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2013,
+                        "mlbDebutDate": "2018-04-19",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Tyler O'Neill",
+                        "nameSlug": "tyler-o-neill-641933",
+                        "firstLastName": "Tyler O'Neill",
+                        "lastFirstName": "O'Neill, Tyler",
+                        "lastInitName": "O'Neill, T",
+                        "initLastName": "T O'Neill",
+                        "fullFMLName": "Tyler Alan O'Neill",
+                        "fullLFMName": "O'Neill, Tyler Alan",
+                        "strikeZoneTop": 3.097,
+                        "strikeZoneBottom": 1.563
                     },
                     "pitcher": {
                         "id": 694370,
@@ -5920,16 +5983,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 110,
                         "name": "Baltimore Orioles",
                         "link": "/api/v1/teams/110"
                     }
                 },
-                "balls": 2,
-                "strikes": 1,
-                "outs": 0
+                "balls": 0,
+                "strikes": 0,
+                "outs": 1
             },
             "venue": {
                 "id": 2508,
@@ -7493,11 +7556,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 1,
-                "currentInningOrdinal": "1st",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 2,
+                "currentInningOrdinal": "2nd",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -7511,6 +7574,20 @@
                         },
                         "away": {
                             "runs": 0,
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    },
+                    {
+                        "num": 2,
+                        "ordinalNum": "2nd",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -7851,9 +7928,9 @@
                         "link": "/api/v1/teams/144"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
-                "outs": 3
+                "balls": 1,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 4309,
@@ -9808,7 +9885,7 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 0,
+                "strikes": 1,
                 "outs": 0
             },
             "venue": {
@@ -13718,8 +13795,8 @@
                         "link": "/api/v1/teams/121"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
+                "balls": 1,
+                "strikes": 2,
                 "outs": 2
             },
             "venue": {
