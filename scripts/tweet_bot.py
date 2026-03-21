@@ -522,18 +522,21 @@ for target_date_str in futbol_dates_to_check:
         
         print(f"[{fixture_id}] Both lineups found for {h_name} vs {a_name} ({league_info['tag']}). Building tweet...")
 
-        # 1. Pick a random, clean title to beat spam filters
+        # 1. Pick a random emoji and a random clean title
+        EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
+        e = random.choice(EMOJIS)
+        
         TITLES = [
-            f"🚨 OFFICIAL STARTING XI: {league_info['name']}",
-            f"🚨 {h_name} vs {a_name} starting lineups are out!",
-            f"🚨 {h_name} and {a_name} have released their starting XI!",
-            f"🚨 Lineups confirmed! {h_name} takes on {a_name} in {league_info['name']}.",
-            f"🚨 The starting XI for {h_name} vs {a_name} is locked in.",
-            f"🚨 {league_info['name']} action incoming! Here are the lineups for {h_name} vs {a_name}.",
-            f"🚨 Lineup news is in for {h_name} vs {a_name}!",
-            f"🚨 Managers have named their starting XI for {h_name} vs {a_name}.",
-            f"🚨 Official lineups for today's {league_info['name']} clash between {h_name} and {a_name}.",
-            f"🚨 {h_name} vs {a_name} lineups are confirmed. {league_info['name']}"
+            f"{e} OFFICIAL STARTING XI: {league_info['name']}",
+            f"{e} {h_name} vs {a_name} starting lineups are out!",
+            f"{e} {h_name} and {a_name} have released their starting XI!",
+            f"{e} Lineups confirmed! {h_name} takes on {a_name} in {league_info['name']}.",
+            f"{e} The starting XI for {h_name} vs {a_name} is locked in.",
+            f"{e} {league_info['name']} action incoming! Here are the lineups for {h_name} vs {a_name}.",
+            f"{e} Team news is in for {h_name} vs {a_name}!",
+            f"{e} Managers have named their starting XI for {h_name} vs {a_name}.",
+            f"{e} Official lineups for today's {league_info['name']} clash between {h_name} and {a_name}.",
+            f"{e} {h_name} vs {a_name} lineups are confirmed. {league_info['name']}"
         ]
         chosen_title = random.choice(TITLES)
         
