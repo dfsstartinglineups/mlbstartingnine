@@ -5,7 +5,6 @@ import tweepy
 import zoneinfo
 from datetime import datetime, timezone, timedelta
 import time
-import os  # Make sure this is imported at the top!
 import random
 
 def save_memory_safely(memory_data):
@@ -532,7 +531,25 @@ for target_date_str in futbol_dates_to_check:
         
         print(f"[{fixture_id}] Both lineups found for {h_name} vs {a_name} ({league_info['tag']}). Building tweet...")
 
-        header = f"🚨 OFFICIAL STARTING XI: {league_info['name']}\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
+        # 1. Pick a random, clean title to beat spam filters
+        TITLES = [
+            f"🚨 OFFICIAL STARTING XI: {league_info['name']}",
+            f"🚨 {h_name} vs {a_name} starting lineups are out!",
+            f"🚨 {h_name} and {a_name} have released their starting XI!",
+            f"🚨 Lineups confirmed! {h_name} takes on {a_name} in {league_info['name']}.",
+            f"🚨 The starting XI for {h_name} vs {a_name} is locked in.",
+            f"🚨 {league_info['name']} action incoming! Here are the lineups for {h_name} vs {a_name}.",
+            f"🚨 Lineup news is in for {h_name} vs {a_name}!",
+            f"🚨 Managers have named their starting XI for {h_name} vs {a_name}.",
+            f"🚨 Official lineups for today's {league_info['name']} clash between {h_name} and {a_name}.",
+            f"🚨 {h_name} vs {a_name} lineups are confirmed. {league_info['name']}"
+        ]
+        chosen_title = random.choice(TITLES)
+        
+        # 2. Add the records/ranks neatly below the title
+        matchup_line = f"{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
+        header = f"{chosen_title}\n{matchup_line}"
+        
         h_pos = parse_futbol_lineup(home_startXI)
         a_pos = parse_futbol_lineup(away_startXI)
         h_form = home_lineup.get('formation', 'TBD')
@@ -555,8 +572,8 @@ for target_date_str in futbol_dates_to_check:
         h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
         a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
         
-        # Link uses target_date_str, NOT the global date_str
-        footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n{league_info['tag']} #{h_hash} #{h_hash}StartingXI #{a_hash} #{a_hash}StartingXI"
+        # 3. Clean Footer: Link + strictly 3 hashtags (League, Home, Away)
+        footer = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
         tweet_parts = [header, home_str, away_str, odds_str]
         if inj_str: tweet_parts.append(inj_str)
         tweet_parts.append(footer)
