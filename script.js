@@ -276,6 +276,7 @@ function createGameCard(data) {
         `;
     }
 
+    // --- PROJECTIONS AWARE PITCHER LOGIC ---
     let awayPitcherId = null;
     let awayPitcher = "TBD";
     let awayPitcherHand = 'R'; 
@@ -283,6 +284,10 @@ function createGameCard(data) {
         awayPitcherId = game.teams.away.probablePitcher.id;
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
         awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
+    } else if (data.projectedLineups && data.projectedLineups.away && data.projectedLineups.away.startingPitcher) {
+        let projSP = data.projectedLineups.away.startingPitcher;
+        awayPitcherId = projSP.id;
+        awayPitcher = projSP.name + " (Proj)";
     }
 
     let homePitcherId = null;
@@ -292,6 +297,10 @@ function createGameCard(data) {
         homePitcherId = game.teams.home.probablePitcher.id;
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
+    } else if (data.projectedLineups && data.projectedLineups.home && data.projectedLineups.home.startingPitcher) {
+        let projSP = data.projectedLineups.home.startingPitcher;
+        homePitcherId = projSP.id;
+        homePitcher = projSP.name + " (Proj)";
     }
 
     const buildPitcherToggle = (pId, pName) => {
@@ -299,7 +308,9 @@ function createGameCard(data) {
         
         let shortName = pName;
         const parts = pName.split(' ');
-        if (parts.length >= 3) shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
+        if (parts.length >= 3 && !pName.includes("(Proj)")) {
+            shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
+        }
 
         return `
             <div class="d-flex justify-content-center align-items-center player-toggle mt-1" style="cursor: pointer;" data-target="stats-${game.gamePk}-p-${pId}">
@@ -501,9 +512,10 @@ function createGameCard(data) {
         
         let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\nSP: ${teamPitcher}${teamOddsStr}\nvs ${oppPitcher}${oppOddsStr}\n\n`;
         const playerStrings = players.map((p, i) => {
+             const playerName = p.fullName || p.name;
              const hand = handDict[p.id] ? `(${handDict[p.id]})` : '';
              const pos = (data.gamePositions && data.gamePositions[p.id]) ? `(${data.gamePositions[p.id]})` : '';
-             return `${i+1}. ${p.fullName} ${pos} ${hand}`.replace(/  +/g, ' ').trim();
+             return `${i+1}. ${playerName} ${pos} ${hand}`.replace(/  +/g, ' ').trim();
         });
         text += playerStrings.join('\n'); 
         const teamHash = teamName.replace(/\s+/g, '');
@@ -514,8 +526,9 @@ function createGameCard(data) {
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         const listItems = playersArray.map((p, index) => {
-            let abbrName = p.fullName;
-            const nameParts = p.fullName.split(' ');
+            let playerName = p.fullName || p.name;
+            let abbrName = playerName;
+            const nameParts = playerName.split(' ');
             if (nameParts.length > 1) abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
             
             const batCode = handDict[p.id] || "";
@@ -549,7 +562,7 @@ function createGameCard(data) {
                 <li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
                     <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
                         <div class="text-truncate pe-1">
-                            <span class="text-muted fw-bold d-inline-block text-start" style="font-size: 0.7rem; width: 20px;">${prefixText}</span><span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${p.fullName}">${abbrName}</span>${handText}
+                            <span class="text-muted fw-bold d-inline-block text-start" style="font-size: 0.7rem; width: 20px;">${prefixText}</span><span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${playerName}">${abbrName}</span>${handText}
                         </div>
                         <div><span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span></div>
                     </div>
@@ -559,10 +572,37 @@ function createGameCard(data) {
         return `<ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul>`;
     };
 
-    const awayLineupHtml = buildLineupList(game.lineups?.awayPlayers, homePitcherHand);
-    const homeLineupHtml = buildLineupList(game.lineups?.homePlayers, awayPitcherHand);
+    // 1. Determine which players to use (Official fallback to Projected)
+    let awayPlayers = game.lineups?.awayPlayers?.length > 0 ? game.lineups.awayPlayers : (data.projectedLineups?.away?.battingOrder || []);
+    let homePlayers = game.lineups?.homePlayers?.length > 0 ? game.lineups.homePlayers : (data.projectedLineups?.home?.battingOrder || []);
+    
+    // 2. Check status
+    let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
+    let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
+
+    // 3. Create the NBA-Style Banners
+    const getStatusBanner = (isOfficial, hasPlayers) => {
+        if (!hasPlayers) return '';
+        if (isOfficial) {
+            return `<div class="text-center py-1 fw-bold text-white w-100 border-bottom" style="background-color: #198754; font-size: 0.75rem; letter-spacing: 0.5px;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align: -2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> OFFICIAL
+                    </div>`;
+        } else {
+            return `<div class="text-center py-1 fw-bold text-dark w-100 border-bottom" style="background-color: #ffecb5; font-size: 0.75rem; letter-spacing: 0.5px;">
+                        <span style="font-size: 0.7rem; vertical-align: 0px;">⚠️</span> PROJECTED
+                    </div>`;
+        }
+    };
+
+    const awayBanner = getStatusBanner(isAwayOfficial, awayPlayers.length > 0);
+    const homeBanner = getStatusBanner(isHomeOfficial, homePlayers.length > 0);
+
+    // 4. Build the HTML lists
+    const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand);
+    const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand);
 
     const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
+    
     let awayTweetBtn = '';
     if (game.lineups?.awayPlayers?.length > 0) {
         const awayTweetText = generateTweetText(awayName, awayPitcher, rawAwayOdds, homePitcher, rawHomeOdds, rawTotal, game.lineups.awayPlayers);
@@ -652,8 +692,14 @@ function createGameCard(data) {
             </div>
             
             <div class="row g-0 bg-white">
-                <div class="col-6 border-end">${awayLineupHtml}</div>
-                <div class="col-6">${homeLineupHtml}</div>
+                <div class="col-6 border-end">
+                    ${awayBanner}
+                    ${awayLineupHtml}
+                </div>
+                <div class="col-6">
+                    ${homeBanner}
+                    ${homeLineupHtml}
+                </div>
             </div>
 
             <div class="px-2 py-1 border-top border-bottom text-center text-truncate" style="background-color: #f8f9fa; font-size: 0.70rem; letter-spacing: 0.5px;">
