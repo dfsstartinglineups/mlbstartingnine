@@ -3,6 +3,8 @@ import json
 import os
 import time
 import zoneinfo
+import csv
+import io
 from datetime import datetime, timedelta
 
 # --- CONFIGURATION ---
@@ -16,8 +18,77 @@ os.makedirs(DAILY_FILES_DIR, exist_ok=True)
 
 # --- API TRACKING ---
 API_CALL_TRACKER = {
-    "schedule": 0, "odds": 0, "live_feed": 0, "bvp": 0, "splits": 0
+    "schedule": 0, "odds": 0, "live_feed": 0, "bvp": 0, "splits": 0, "bbm_csv": 0
 }
+
+# --- BBM TO MLB ID MAPPING ---
+BBM_TO_MLB_ID = {
+    'ARI': 109, 'ATL': 144, 'BAL': 110, 'BOS': 111, 'CHC': 112, 
+    'CHW': 145, 'CIN': 113, 'CLE': 114, 'COL': 115, 'DET': 116, 
+    'HOU': 117, 'KC': 118,  'LAA': 108, 'LAD': 119, 'MIA': 146, 
+    'MIL': 158, 'MIN': 142, 'NYM': 121, 'NYY': 147, 'OAK': 133, 
+    'PHI': 143, 'PIT': 134, 'SD': 135,  'SEA': 136, 'SF': 137, 
+    'STL': 138, 'TB': 139,  'TEX': 140, 'TOR': 141, 'WAS': 120
+}
+
+def get_bbm_projected_lineups(target_date):
+    global API_CALL_TRACKER
+    API_CALL_TRACKER["bbm_csv"] += 1
+    
+    session = requests.Session()
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    
+    # 1. Grab the session cookie
+    session.get("https://baseballmonster.com/lineups.aspx", headers=headers)
+    
+    # 2. Hit the CSV endpoint
+    csv_url = f"https://baseballmonster.com/Lineups.aspx?csv=1&d={target_date}"
+    response = session.get(csv_url, headers=headers)
+    
+    projections = {}
+    
+    if response.status_code == 200 and len(response.text) > 100:
+        csv_data = io.StringIO(response.text)
+        reader = csv.reader(csv_data)
+        next(reader, None) # Skip header row
+        
+        for row in reader:
+            if len(row) < 7: continue
+            
+            team_code = row[0].strip()
+            game_num = row[2].strip()
+            player_mlb_id = row[3].strip()
+            player_name = row[4].strip()
+            batting_order = row[5].strip()
+            confirmed = True if row[6].strip().upper() == 'Y' else False
+            
+            mlb_team_id = BBM_TO_MLB_ID.get(team_code)
+            if not mlb_team_id: continue 
+            
+            team_key = f"{mlb_team_id}_{game_num}"
+            
+            if team_key not in projections:
+                projections[team_key] = {
+                    "startingPitcher": None,
+                    "battingOrder": []
+                }
+                
+            player_obj = {
+                "id": int(player_mlb_id) if player_mlb_id.isdigit() else player_mlb_id,
+                "name": player_name,
+                "verified": confirmed
+            }
+            
+            if batting_order.isdigit() and 1 <= int(batting_order) <= 9:
+                player_obj["order"] = int(batting_order)
+                projections[team_key]["battingOrder"].append(player_obj)
+            else:
+                projections[team_key]["startingPitcher"] = player_obj
+                
+        for key in projections:
+            projections[key]["battingOrder"].sort(key=lambda x: x["order"])
+            
+    return projections
 
 def get_active_sport_ids():
     current_date = datetime.utcnow().date()
@@ -101,7 +172,9 @@ def main():
         
     today_est_str = current_est_time.strftime('%Y-%m-%d')
     start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
-    end_date = (current_est_time + timedelta(days=1)).strftime('%Y-%m-%d')
+    
+    # --- 📅 EXPANDED TO 7 DAYS ---
+    end_date = (current_est_time + timedelta(days=7)).strftime('%Y-%m-%d') 
     
     print(f"🚀 Building Master JSONs using the Daily File as Memory")
     
@@ -131,18 +204,67 @@ def main():
         date_str = date_item['date']
         master_dates[date_str] = []
         
-        # --- 📖 READ TODAY'S NEWSPAPER (THE DAILY FILE) ---
+        # --- 📖 READ THE DAILY FILE MEMORY ---
         daily_file_path = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
         daily_memory = {}
         if os.path.exists(daily_file_path):
             existing_games = load_json(daily_file_path, [])
             for g in existing_games:
                 daily_memory[str(g['gameRaw']['gamePk'])] = g
+                
+        # --- 🤖 BBM PROJECTIONS CACHE LOGIC ---
+        target_date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        days_away = (target_date_obj - current_est_time.date()).days
         
+        needs_bbm_fetch = True
+        bbm_projections_for_date = {}
+        
+        # 🛑 PRE-SEASON BOUNCER
+        has_real_games = False
+        for g in date_item.get('games', []):
+            if g.get('gameType') in ['R', 'F', 'D', 'L', 'W']:
+                has_real_games = True
+                break
+                
+        if not has_real_games:
+            needs_bbm_fetch = False
+            print(f"   [BBM] Skipping {date_str} - Only Spring Training/Exhibition games scheduled.")
+            
+        # Determine if we already fetched recently based on memory
+        if needs_bbm_fetch and daily_memory:
+            first_game = list(daily_memory.values())[0]
+            last_updated = first_game.get('projectedLineups', {}).get('lastUpdated', 0)
+            
+            # Threshold: 10 mins (600s) for Day 0, 24 hours (86400s) for Days 1-7
+            threshold_seconds = 600 if days_away == 0 else 86400
+            
+            if (current_est_time.timestamp() - last_updated) < threshold_seconds:
+                needs_bbm_fetch = False
+
+        # 🛑 THE KILL SWITCH: If it's Day 0, check if all MLB lineups are already official
+        if days_away == 0 and needs_bbm_fetch:
+            all_official = True
+            for g in date_item.get('games', []):
+                state = g.get('status', {}).get('abstractGameState', '')
+                if state not in ['Final', 'Postponed', 'Cancelled']:
+                    a_len = len(g.get('lineups', {}).get('awayPlayers', []))
+                    h_len = len(g.get('lineups', {}).get('homePlayers', []))
+                    if a_len == 0 or h_len == 0:
+                        all_official = False
+                        break
+            if all_official:
+                print(f"   [BBM] All lineups are official for {date_str}. Killing BBM fetch!")
+                needs_bbm_fetch = False
+
+        if needs_bbm_fetch:
+            print(f"   [BBM] Fetching fresh projected lineups for {date_str} (Days Away: {days_away})...")
+            bbm_projections_for_date = get_bbm_projected_lineups(date_str)
+            time.sleep(1) # Polite delay
+        
+        # --- PROCESS GAMES ---
         for game in date_item.get('games', []):
             game_pk = str(game['gamePk'])
             
-            # --- EXTRACT EVERYTHING WE ALREADY KNOW ABOUT THIS GAME ---
             existing_game_state = daily_memory.get(game_pk, {})
             game_deep_stats = existing_game_state.get('deepStats', {})
             game_positions = existing_game_state.get('gamePositions', {})
@@ -153,6 +275,9 @@ def main():
             teams = game.get('teams', {})
             away_team_name = teams.get('away', {}).get('team', {}).get('name', '')
             home_team_name = teams.get('home', {}).get('team', {}).get('name', '')
+            away_team_id = str(teams.get('away', {}).get('team', {}).get('id', ''))
+            home_team_id = str(teams.get('home', {}).get('team', {}).get('id', ''))
+            game_num = str(game.get('gameNumber', 1))
             
             # Match Odds
             game_odds = None
@@ -205,7 +330,6 @@ def main():
             game_state = game.get('status', {}).get('abstractGameState', '')
             needs_live_feed = False
             
-            # Only fetch if lineups are out AND it's not Final (or if it went final before we grabbed the ump)
             if date_str == today_est_str and (len(away_lineup) > 0 or len(home_lineup) > 0):
                 if game_state != 'Final': needs_live_feed = True
                 elif hp_umpire == "TBD" or not game_positions: needs_live_feed = True
@@ -230,9 +354,23 @@ def main():
                         elif p_val.get('position'): game_positions[pid] = p_val['position'].get('abbreviation')
                         if p_val.get('person', {}).get('batSide'): lineup_handedness[pid] = p_val['person']['batSide'].get('code')
                 except Exception: pass
+                
+            # --- INJECT BBM PROJECTIONS ---
+            if needs_bbm_fetch:
+                game_projected_lineups = {
+                    "lastUpdated": current_est_time.timestamp(),
+                    "away": bbm_projections_for_date.get(f"{away_team_id}_{game_num}"),
+                    "home": bbm_projections_for_date.get(f"{home_team_id}_{game_num}")
+                }
+            else:
+                # Retrieve from memory, but default to empty dict and preserve the timestamp if missing
+                game_projected_lineups = existing_game_state.get('projectedLineups', {})
+                if "lastUpdated" not in game_projected_lineups:
+                    game_projected_lineups["lastUpdated"] = current_est_time.timestamp()
 
             master_dates[date_str].append({
                 "gameRaw": game,
+                "projectedLineups": game_projected_lineups,
                 "odds": game_odds,
                 "lineupHandedness": lineup_handedness,
                 "gamePositions": game_positions,
