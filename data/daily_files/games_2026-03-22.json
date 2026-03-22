@@ -18209,12 +18209,12 @@
             "gameDate": "2026-03-22T20:10:00Z",
             "officialDate": "2026-03-22",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -18225,10 +18225,11 @@
                     },
                     "leagueRecord": {
                         "wins": 13,
-                        "losses": 15,
-                        "pct": ".464"
+                        "losses": 16,
+                        "pct": ".448"
                     },
                     "score": 5,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 605488,
                         "fullName": "Jeffrey Springs",
@@ -18288,11 +18289,12 @@
                         "link": "/api/v1/teams/115"
                     },
                     "leagueRecord": {
-                        "wins": 13,
+                        "wins": 14,
                         "losses": 14,
-                        "pct": ".481"
+                        "pct": ".500"
                     },
                     "score": 6,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 547179,
                         "fullName": "Michael Lorenzen",
@@ -18492,6 +18494,7 @@
                             "leftOnBase": 0
                         },
                         "away": {
+                            "runs": 0,
                             "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
@@ -18771,54 +18774,6 @@
                         "strikeZoneTop": 3.262,
                         "strikeZoneBottom": 1.646
                     },
-                    "first": {
-                        "id": 683021,
-                        "fullName": "Michael Stefanic",
-                        "link": "/api/v1/people/683021",
-                        "firstName": "Michael",
-                        "lastName": "Stefanic",
-                        "primaryNumber": "17",
-                        "birthDate": "1996-02-24",
-                        "currentAge": 30,
-                        "birthCity": "Boise",
-                        "birthStateProvince": "ID",
-                        "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 180,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Michael",
-                        "useLastName": "Stefanic",
-                        "boxscoreName": "Stefanic",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "stef-AH-nic",
-                        "mlbDebutDate": "2022-07-03",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Michael Stefanic",
-                        "nameSlug": "michael-stefanic-683021",
-                        "firstLastName": "Michael Stefanic",
-                        "lastFirstName": "Stefanic, Michael",
-                        "lastInitName": "Stefanic, M",
-                        "initLastName": "M Stefanic",
-                        "fullFMLName": "Michael  Stefanic",
-                        "fullLFMName": "Stefanic, Michael ",
-                        "strikeZoneTop": 3.082,
-                        "strikeZoneBottom": 1.556
-                    },
                     "pitcher": {
                         "id": 686857,
                         "fullName": "James Gonzalez",
@@ -18873,9 +18828,9 @@
                         "link": "/api/v1/teams/133"
                     }
                 },
-                "balls": 1,
+                "balls": 2,
                 "strikes": 0,
-                "outs": 1
+                "outs": 3
             },
             "venue": {
                 "id": 4249,
@@ -18885,6 +18840,7 @@
             "content": {
                 "link": "/api/v1/game/831945/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
