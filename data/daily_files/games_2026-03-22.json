@@ -9,12 +9,12 @@
             "gameDate": "2026-03-22T16:05:00Z",
             "officialDate": "2026-03-22",
             "status": {
-                "abstractGameState": "Preview",
+                "abstractGameState": "Live",
                 "codedGameState": "P",
-                "detailedState": "Pre-Game",
-                "statusCode": "P",
+                "detailedState": "Warmup",
+                "statusCode": "PW",
                 "startTimeTBD": false,
-                "abstractGameCode": "P"
+                "abstractGameCode": "L"
             },
             "teams": {
                 "away": {
@@ -5748,6 +5748,7 @@
                         "losses": 15,
                         "pct": ".400"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 605400,
                         "fullName": "Aaron Nola",
@@ -5813,6 +5814,7 @@
                         "losses": 11,
                         "pct": ".607"
                     },
+                    "score": 0,
                     "probablePitcher": {
                         "id": 701542,
                         "fullName": "Will Warren",
@@ -5867,26 +5869,369 @@
                 }
             },
             "linescore": {
+                "currentInning": 1,
+                "currentInningOrdinal": "1st",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
-                "innings": [],
+                "innings": [
+                    {
+                        "num": 1,
+                        "ordinalNum": "1st",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
+                    }
+                ],
                 "teams": {
-                    "home": {},
-                    "away": {}
+                    "home": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    },
+                    "away": {
+                        "runs": 0,
+                        "hits": 0,
+                        "errors": 0,
+                        "leftOnBase": 0
+                    }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 701542,
+                        "fullName": "Will Warren",
+                        "link": "/api/v1/people/701542",
+                        "firstName": "William",
+                        "lastName": "Warren",
+                        "primaryNumber": "98",
+                        "birthDate": "1999-06-16",
+                        "currentAge": 26,
+                        "birthCity": "Brandon",
+                        "birthStateProvince": "MS",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 200,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Will",
+                        "useLastName": "Warren",
+                        "middleName": "Harper",
+                        "boxscoreName": "Warren, W",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2021,
+                        "mlbDebutDate": "2024-07-30",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Will Warren",
+                        "nameSlug": "will-warren-701542",
+                        "firstLastName": "Will Warren",
+                        "lastFirstName": "Warren, Will",
+                        "lastInitName": "Warren, W",
+                        "initLastName": "W Warren",
+                        "fullFMLName": "William Harper Warren",
+                        "fullLFMName": "Warren, William Harper",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
+                    },
+                    "catcher": {
+                        "id": 641555,
+                        "fullName": "J.C. Escarra",
+                        "link": "/api/v1/people/641555"
+                    },
+                    "first": {
+                        "id": 700250,
+                        "fullName": "Ben Rice",
+                        "link": "/api/v1/people/700250"
+                    },
+                    "second": {
+                        "id": 665862,
+                        "fullName": "Jazz Chisholm Jr.",
+                        "link": "/api/v1/people/665862"
+                    },
+                    "third": {
+                        "id": 641857,
+                        "fullName": "Ryan McMahon",
+                        "link": "/api/v1/people/641857"
+                    },
+                    "shortstop": {
+                        "id": 676609,
+                        "fullName": "Jos\u00e9 Caballero",
+                        "link": "/api/v1/people/676609"
+                    },
+                    "left": {
+                        "id": 641355,
+                        "fullName": "Cody Bellinger",
+                        "link": "/api/v1/people/641355"
+                    },
+                    "center": {
+                        "id": 663757,
+                        "fullName": "Trent Grisham",
+                        "link": "/api/v1/people/663757"
+                    },
+                    "right": {
+                        "id": 592450,
+                        "fullName": "Aaron Judge",
+                        "link": "/api/v1/people/592450"
+                    },
+                    "batter": {
+                        "id": 663757,
+                        "fullName": "Trent Grisham",
+                        "link": "/api/v1/people/663757"
+                    },
+                    "onDeck": {
+                        "id": 592450,
+                        "fullName": "Aaron Judge",
+                        "link": "/api/v1/people/592450"
+                    },
+                    "inHole": {
+                        "id": 641355,
+                        "fullName": "Cody Bellinger",
+                        "link": "/api/v1/people/641355"
+                    },
+                    "battingOrder": 1,
+                    "team": {
+                        "id": 147,
+                        "name": "New York Yankees",
+                        "link": "/api/v1/teams/147"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 656941,
+                        "fullName": "Kyle Schwarber",
+                        "link": "/api/v1/people/656941",
+                        "firstName": "Kyle",
+                        "lastName": "Schwarber",
+                        "primaryNumber": "12",
+                        "birthDate": "1993-03-05",
+                        "currentAge": 33,
+                        "birthCity": "Middletown",
+                        "birthStateProvince": "OH",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 229,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Kyle",
+                        "useLastName": "Schwarber",
+                        "middleName": "Joseph",
+                        "boxscoreName": "Schwarber",
+                        "nickName": "Schwarbs",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2014,
+                        "pronunciation": "SHWAR-burr",
+                        "mlbDebutDate": "2015-06-16",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Kyle Schwarber",
+                        "nameSlug": "kyle-schwarber-656941",
+                        "firstLastName": "Kyle Schwarber",
+                        "lastFirstName": "Schwarber, Kyle",
+                        "lastInitName": "Schwarber, K",
+                        "initLastName": "K Schwarber",
+                        "fullFMLName": "Kyle Joseph Schwarber",
+                        "fullLFMName": "Schwarber, Kyle Joseph",
+                        "strikeZoneTop": 3.181,
+                        "strikeZoneBottom": 1.605
+                    },
+                    "onDeck": {
+                        "id": 592663,
+                        "fullName": "J.T. Realmuto",
+                        "link": "/api/v1/people/592663",
+                        "firstName": "Jacob",
+                        "lastName": "Realmuto",
+                        "primaryNumber": "10",
+                        "birthDate": "1991-03-18",
+                        "currentAge": 35,
+                        "birthCity": "Del City",
+                        "birthStateProvince": "OK",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 212,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "J.T.",
+                        "useLastName": "Realmuto",
+                        "middleName": "Tyler",
+                        "boxscoreName": "Realmuto",
+                        "nickName": "Real",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2010,
+                        "pronunciation": "reel-MYOO-toh",
+                        "mlbDebutDate": "2014-06-05",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "J.T. Realmuto",
+                        "nameSlug": "j-t-realmuto-592663",
+                        "firstLastName": "J.T. Realmuto",
+                        "lastFirstName": "Realmuto, J.T.",
+                        "lastInitName": "Realmuto, J",
+                        "initLastName": "J Realmuto",
+                        "fullFMLName": "Jacob Tyler Realmuto",
+                        "fullLFMName": "Realmuto, Jacob Tyler",
+                        "strikeZoneTop": 3.2,
+                        "strikeZoneBottom": 1.615
+                    },
+                    "inHole": {
+                        "id": 547180,
+                        "fullName": "Bryce Harper",
+                        "link": "/api/v1/people/547180",
+                        "firstName": "Bryce",
+                        "lastName": "Harper",
+                        "primaryNumber": "3",
+                        "birthDate": "1992-10-16",
+                        "currentAge": 33,
+                        "birthCity": "Las Vegas",
+                        "birthStateProvince": "NV",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 210,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Bryce",
+                        "useLastName": "Harper",
+                        "middleName": "Aron Max",
+                        "boxscoreName": "Harper, B",
+                        "nickName": "Harp",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2010,
+                        "pronunciation": "HARR-purr",
+                        "mlbDebutDate": "2012-04-28",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Bryce Harper",
+                        "nameSlug": "bryce-harper-547180",
+                        "firstLastName": "Bryce Harper",
+                        "lastFirstName": "Harper, Bryce",
+                        "lastInitName": "Harper, B",
+                        "initLastName": "B Harper",
+                        "fullFMLName": "Bryce Aron Max Harper",
+                        "fullLFMName": "Harper, Bryce Aron Max",
+                        "strikeZoneTop": 3.265,
+                        "strikeZoneBottom": 1.648
+                    },
+                    "pitcher": {
+                        "id": 605400,
+                        "fullName": "Aaron Nola",
+                        "link": "/api/v1/people/605400",
+                        "firstName": "Aaron",
+                        "lastName": "Nola",
+                        "primaryNumber": "27",
+                        "birthDate": "1993-06-04",
+                        "currentAge": 32,
+                        "birthCity": "Baton Rouge",
+                        "birthStateProvince": "LA",
+                        "birthCountry": "USA",
+                        "height": "6' 2\"",
+                        "weight": 200,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Aaron",
+                        "useLastName": "Nola",
+                        "middleName": "Michael",
+                        "boxscoreName": "Nola, A",
+                        "nickName": "Nols",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2014,
+                        "pronunciation": "NO-luh",
+                        "mlbDebutDate": "2015-07-21",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Aaron Nola",
+                        "nameSlug": "aaron-nola-605400",
+                        "firstLastName": "Aaron Nola",
+                        "lastFirstName": "Nola, Aaron",
+                        "lastInitName": "Nola, A",
+                        "initLastName": "A Nola",
+                        "fullFMLName": "Aaron Michael Nola",
+                        "fullLFMName": "Nola, Aaron Michael",
+                        "strikeZoneTop": 3.36,
+                        "strikeZoneBottom": 1.54
+                    },
+                    "battingOrder": 1,
                     "team": {
                         "id": 143,
                         "name": "Philadelphia Phillies",
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "offense": {
-                    "team": {
-                        "id": 147,
-                        "name": "New York Yankees",
-                        "link": "/api/v1/teams/147"
-                    }
-                }
+                "balls": 0,
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2523,
@@ -6040,6 +6385,134 @@
                             "abbreviation": "C"
                         },
                         "useName": "J.C."
+                    }
+                ],
+                "awayPlayers": [
+                    {
+                        "id": 656941,
+                        "fullName": "Kyle Schwarber",
+                        "link": "/api/v1/people/656941",
+                        "firstName": "Kyle",
+                        "lastName": "Schwarber",
+                        "primaryPosition": {
+                            "code": "10",
+                            "name": "Designated Hitter",
+                            "type": "Hitter",
+                            "abbreviation": "DH"
+                        },
+                        "useName": "Kyle"
+                    },
+                    {
+                        "id": 592663,
+                        "fullName": "J.T. Realmuto",
+                        "link": "/api/v1/people/592663",
+                        "firstName": "Jacob",
+                        "lastName": "Realmuto",
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "J.T."
+                    },
+                    {
+                        "id": 547180,
+                        "fullName": "Bryce Harper",
+                        "link": "/api/v1/people/547180",
+                        "firstName": "Bryce",
+                        "lastName": "Harper",
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Bryce"
+                    },
+                    {
+                        "id": 664761,
+                        "fullName": "Alec Bohm",
+                        "link": "/api/v1/people/664761",
+                        "firstName": "Alec",
+                        "lastName": "Bohm",
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Alec"
+                    },
+                    {
+                        "id": 666969,
+                        "fullName": "Adolis Garc\u00eda",
+                        "link": "/api/v1/people/666969",
+                        "firstName": "Jose",
+                        "lastName": "Garc\u00eda",
+                        "primaryPosition": {
+                            "code": "9",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "RF"
+                        },
+                        "useName": "Adolis"
+                    },
+                    {
+                        "id": 624641,
+                        "fullName": "Edmundo Sosa",
+                        "link": "/api/v1/people/624641",
+                        "firstName": "Edmundo",
+                        "lastName": "Sosa",
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Edmundo"
+                    },
+                    {
+                        "id": 702222,
+                        "fullName": "Justin Crawford",
+                        "link": "/api/v1/people/702222",
+                        "firstName": "Justin",
+                        "lastName": "Crawford",
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Justin"
+                    },
+                    {
+                        "id": 650559,
+                        "fullName": "Bryan De La Cruz",
+                        "link": "/api/v1/people/650559",
+                        "firstName": "Bryan",
+                        "lastName": "De La Cruz",
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Bryan"
+                    },
+                    {
+                        "id": 664238,
+                        "fullName": "Dylan Moore",
+                        "link": "/api/v1/people/664238",
+                        "firstName": "Dylan",
+                        "lastName": "Moore",
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Dylan"
                     }
                 ]
             }
@@ -6251,7 +6724,7 @@
             "699707": "P",
             "668761": "P",
             "694372": "P",
-            "650559": "OF",
+            "650559": "LF",
             "701831": "SS",
             "642016": "P",
             "686599": "P",
@@ -6261,7 +6734,7 @@
             "679702": "P",
             "802531": "2B",
             "699712": "RF",
-            "656941": "LF",
+            "656941": "DH",
             "805249": "1B",
             "670950": "P",
             "689456": "LF",
@@ -6281,7 +6754,7 @@
             "701811": "OF",
             "686651": "P",
             "835716": "OF",
-            "624641": "2B",
+            "624641": "SS",
             "687900": "P",
             "681003": "P",
             "679563": "SS",
@@ -6791,6 +7264,258 @@
                     "bb": 10,
                     "avg": ".186",
                     "ops": ".618"
+                }
+            },
+            "656941": {
+                "name": "Kyle Schwarber",
+                "bvp": {
+                    "ab": 4,
+                    "hits": 1,
+                    "hr": 1,
+                    "avg": ".250",
+                    "ops": "1.500"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 234,
+                    "hr": 23,
+                    "k": 77,
+                    "bb": 36,
+                    "avg": ".252",
+                    "ops": ".964"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 370,
+                    "hr": 33,
+                    "k": 120,
+                    "bb": 72,
+                    "avg": ".232",
+                    "ops": ".904"
+                }
+            },
+            "592663": {
+                "name": "J.T. Realmuto",
+                "bvp": {
+                    "ab": 2,
+                    "hits": 2,
+                    "hr": 0,
+                    "avg": "1.000",
+                    "ops": "2.000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 155,
+                    "hr": 3,
+                    "k": 43,
+                    "bb": 9,
+                    "avg": ".213",
+                    "ops": ".601"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 347,
+                    "hr": 9,
+                    "k": 86,
+                    "bb": 26,
+                    "avg": ".277",
+                    "ops": ".743"
+                }
+            },
+            "547180": {
+                "name": "Bryce Harper",
+                "bvp": {
+                    "ab": 3,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": ".000",
+                    "ops": ".000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 209,
+                    "hr": 10,
+                    "k": 50,
+                    "bb": 19,
+                    "avg": ".273",
+                    "ops": ".815"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 292,
+                    "hr": 17,
+                    "k": 71,
+                    "bb": 51,
+                    "avg": ".253",
+                    "ops": ".864"
+                }
+            },
+            "664761": {
+                "name": "Alec Bohm",
+                "bvp": {
+                    "ab": 3,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".333",
+                    "ops": "1.000"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 122,
+                    "hr": 4,
+                    "k": 20,
+                    "bb": 10,
+                    "avg": ".295",
+                    "ops": ".818"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 342,
+                    "hr": 7,
+                    "k": 62,
+                    "bb": 19,
+                    "avg": ".284",
+                    "ops": ".713"
+                }
+            },
+            "666969": {
+                "name": "Adolis Garc\u00eda",
+                "bvp": {
+                    "ab": 5,
+                    "hits": 1,
+                    "hr": 0,
+                    "avg": ".200",
+                    "ops": ".400"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 136,
+                    "hr": 5,
+                    "k": 44,
+                    "bb": 8,
+                    "avg": ".199",
+                    "ops": ".601"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 371,
+                    "hr": 14,
+                    "k": 91,
+                    "bb": 20,
+                    "avg": ".237",
+                    "ops": ".688"
+                }
+            },
+            "624641": {
+                "name": "Edmundo Sosa",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 107,
+                    "hr": 6,
+                    "k": 28,
+                    "bb": 6,
+                    "avg": ".318",
+                    "ops": ".895"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 136,
+                    "hr": 5,
+                    "k": 28,
+                    "bb": 4,
+                    "avg": ".243",
+                    "ops": ".682"
+                }
+            },
+            "702222": {
+                "name": "Justin Crawford",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 0,
+                    "hr": 0,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": "-",
+                    "ops": "-"
+                }
+            },
+            "650559": {
+                "name": "Bryan De La Cruz",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 13,
+                    "hr": 0,
+                    "k": 4,
+                    "bb": 0,
+                    "avg": ".154",
+                    "ops": ".385"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 34,
+                    "hr": 0,
+                    "k": 14,
+                    "bb": 3,
+                    "avg": ".206",
+                    "ops": ".476"
+                }
+            },
+            "664238": {
+                "name": "Dylan Moore",
+                "bvp": {
+                    "ab": 0,
+                    "hits": 0,
+                    "hr": 0,
+                    "avg": "-",
+                    "ops": "-"
+                },
+                "split_vL": {
+                    "split_type": "LHP",
+                    "ab": 20,
+                    "hr": 1,
+                    "k": 6,
+                    "bb": 1,
+                    "avg": ".250",
+                    "ops": ".704"
+                },
+                "split_vR": {
+                    "split_type": "RHP",
+                    "ab": 7,
+                    "hr": 1,
+                    "k": 0,
+                    "bb": 0,
+                    "avg": ".286",
+                    "ops": "1.000"
                 }
             }
         },
@@ -14579,8 +15304,7 @@
             "seriesDescription": "Spring Training",
             "recordSource": "S",
             "ifNecessary": "N",
-            "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "ifNecessaryDescription": "Normal Game"
         },
         "projectedLineups": {
             "lastUpdated": 1774187472.796903
@@ -16718,8 +17442,7 @@
             "seriesDescription": "Spring Training",
             "recordSource": "S",
             "ifNecessary": "N",
-            "ifNecessaryDescription": "Normal Game",
-            "lineups": {}
+            "ifNecessaryDescription": "Normal Game"
         },
         "projectedLineups": {
             "lastUpdated": 1774187472.796903
