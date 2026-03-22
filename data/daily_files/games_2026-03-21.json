@@ -259,13 +259,15 @@
                         "runs": 3,
                         "hits": 7,
                         "errors": 1,
-                        "leftOnBase": 5
+                        "leftOnBase": 5,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 1,
                         "hits": 5,
                         "errors": 0,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -1870,7 +1872,7 @@
                         "away": {
                             "runs": 0,
                             "hits": 0,
-                            "errors": 1,
+                            "errors": 0,
                             "leftOnBase": 0
                         }
                     },
@@ -1991,13 +1993,15 @@
                         "runs": 8,
                         "hits": 9,
                         "errors": 1,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 3,
                         "hits": 7,
-                        "errors": 2,
-                        "leftOnBase": 10
+                        "errors": 1,
+                        "leftOnBase": 10,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -2256,6 +2260,54 @@
                         "fullLFMName": "Harry, Jay ",
                         "strikeZoneTop": 3.157,
                         "strikeZoneBottom": 1.593
+                    },
+                    "second": {
+                        "id": 701860,
+                        "fullName": "Carter Cunningham",
+                        "link": "/api/v1/people/701860",
+                        "firstName": "Carter",
+                        "lastName": "Cunningham",
+                        "primaryNumber": "10",
+                        "birthDate": "2000-11-06",
+                        "currentAge": 25,
+                        "birthCity": "Huntington Beach",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "I",
+                            "name": "Infield",
+                            "type": "Infielder",
+                            "abbreviation": "IF"
+                        },
+                        "useName": "Carter",
+                        "useLastName": "Cunningham",
+                        "middleName": "Andrew",
+                        "boxscoreName": "Cunningham",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Carter Cunningham",
+                        "nameSlug": "carter-cunningham-701860",
+                        "firstLastName": "Carter Cunningham",
+                        "lastFirstName": "Cunningham, Carter",
+                        "lastInitName": "Cunningham, C",
+                        "initLastName": "C Cunningham",
+                        "fullFMLName": "Carter Andrew Cunningham",
+                        "fullLFMName": "Cunningham, Carter Andrew",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
                     },
                     "pitcher": {
                         "id": 676596,
@@ -25945,7 +25997,7 @@
                             "leftOnBase": 0
                         },
                         "away": {
-                            "hits": 0,
+                            "hits": 1,
                             "errors": 0,
                             "leftOnBase": 0
                         }
@@ -25960,7 +26012,7 @@
                     },
                     "away": {
                         "runs": 4,
-                        "hits": 4,
+                        "hits": 5,
                         "errors": 0,
                         "leftOnBase": 2
                     }
@@ -26079,56 +26131,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 805367,
-                        "fullName": "Chase Meidroth",
-                        "link": "/api/v1/people/805367",
-                        "firstName": "Chase",
-                        "lastName": "Meidroth",
-                        "primaryNumber": "10",
-                        "birthDate": "2001-07-23",
-                        "currentAge": 24,
-                        "birthCity": "Torrance",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "5' 9\"",
-                        "weight": 190,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Chase",
-                        "useLastName": "Meidroth",
-                        "middleName": "Gregory",
-                        "boxscoreName": "Meidroth",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2022,
-                        "pronunciation": "MY-drawth",
-                        "mlbDebutDate": "2025-04-11",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Chase Meidroth",
-                        "nameSlug": "chase-meidroth-805367",
-                        "firstLastName": "Chase Meidroth",
-                        "lastFirstName": "Meidroth, Chase",
-                        "lastInitName": "Meidroth, C",
-                        "initLastName": "C Meidroth",
-                        "fullFMLName": "Chase Gregory Meidroth",
-                        "fullLFMName": "Meidroth, Chase Gregory",
-                        "strikeZoneTop": 3.068,
-                        "strikeZoneBottom": 1.548
-                    },
-                    "onDeck": {
                         "id": 695657,
                         "fullName": "Colson Montgomery",
                         "link": "/api/v1/people/695657",
@@ -26177,7 +26179,7 @@
                         "strikeZoneTop": 3.34,
                         "strikeZoneBottom": 1.686
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 678246,
                         "fullName": "Miguel Vargas",
                         "link": "/api/v1/people/678246",
@@ -26224,6 +26226,101 @@
                         "fullLFMName": "Vargas, Miguel Antonio",
                         "strikeZoneTop": 3.29,
                         "strikeZoneBottom": 1.66
+                    },
+                    "inHole": {
+                        "id": 808959,
+                        "fullName": "Munetaka Murakami",
+                        "link": "/api/v1/people/808959",
+                        "firstName": "Munetaka",
+                        "lastName": "Murakami",
+                        "primaryNumber": "5",
+                        "birthDate": "2000-02-02",
+                        "currentAge": 26,
+                        "birthCity": "Kumamoto",
+                        "birthCountry": "Japan",
+                        "height": "6' 2\"",
+                        "weight": 213,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Munetaka",
+                        "useLastName": "Murakami",
+                        "boxscoreName": "Murakami",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Munetaka Murakami",
+                        "nameSlug": "munetaka-murakami-808959",
+                        "firstLastName": "Munetaka Murakami",
+                        "lastFirstName": "Murakami, Munetaka",
+                        "lastInitName": "Murakami, M",
+                        "initLastName": "M Murakami",
+                        "fullFMLName": "Munetaka Murakami",
+                        "fullLFMName": "Murakami, Munetaka ",
+                        "strikeZoneTop": 3.296,
+                        "strikeZoneBottom": 1.664
+                    },
+                    "second": {
+                        "id": 805367,
+                        "fullName": "Chase Meidroth",
+                        "link": "/api/v1/people/805367",
+                        "firstName": "Chase",
+                        "lastName": "Meidroth",
+                        "primaryNumber": "10",
+                        "birthDate": "2001-07-23",
+                        "currentAge": 24,
+                        "birthCity": "Torrance",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "5' 9\"",
+                        "weight": 190,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Chase",
+                        "useLastName": "Meidroth",
+                        "middleName": "Gregory",
+                        "boxscoreName": "Meidroth",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2022,
+                        "pronunciation": "MY-drawth",
+                        "mlbDebutDate": "2025-04-11",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Chase Meidroth",
+                        "nameSlug": "chase-meidroth-805367",
+                        "firstLastName": "Chase Meidroth",
+                        "lastFirstName": "Meidroth, Chase",
+                        "lastInitName": "Meidroth, C",
+                        "initLastName": "C Meidroth",
+                        "fullFMLName": "Chase Gregory Meidroth",
+                        "fullLFMName": "Meidroth, Chase Gregory",
+                        "strikeZoneTop": 3.068,
+                        "strikeZoneBottom": 1.548
                     },
                     "pitcher": {
                         "id": 656794,
@@ -26275,15 +26372,15 @@
                         "strikeZoneTop": 3.433,
                         "strikeZoneBottom": 1.733
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 145,
                         "name": "Chicago White Sox",
                         "link": "/api/v1/teams/145"
                     }
                 },
-                "balls": 2,
-                "strikes": 2,
+                "balls": 1,
+                "strikes": 0,
                 "outs": 0
             },
             "venue": {
