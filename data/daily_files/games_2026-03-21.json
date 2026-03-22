@@ -259,13 +259,15 @@
                         "runs": 3,
                         "hits": 7,
                         "errors": 1,
-                        "leftOnBase": 5
+                        "leftOnBase": 5,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 1,
                         "hits": 5,
                         "errors": 0,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -1870,7 +1872,7 @@
                         "away": {
                             "runs": 0,
                             "hits": 0,
-                            "errors": 1,
+                            "errors": 0,
                             "leftOnBase": 0
                         }
                     },
@@ -1991,13 +1993,15 @@
                         "runs": 8,
                         "hits": 9,
                         "errors": 1,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 3,
                         "hits": 7,
-                        "errors": 2,
-                        "leftOnBase": 10
+                        "errors": 1,
+                        "leftOnBase": 10,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -2256,6 +2260,54 @@
                         "fullLFMName": "Harry, Jay ",
                         "strikeZoneTop": 3.157,
                         "strikeZoneBottom": 1.593
+                    },
+                    "second": {
+                        "id": 701860,
+                        "fullName": "Carter Cunningham",
+                        "link": "/api/v1/people/701860",
+                        "firstName": "Carter",
+                        "lastName": "Cunningham",
+                        "primaryNumber": "10",
+                        "birthDate": "2000-11-06",
+                        "currentAge": 25,
+                        "birthCity": "Huntington Beach",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "I",
+                            "name": "Infield",
+                            "type": "Infielder",
+                            "abbreviation": "IF"
+                        },
+                        "useName": "Carter",
+                        "useLastName": "Cunningham",
+                        "middleName": "Andrew",
+                        "boxscoreName": "Cunningham",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Carter Cunningham",
+                        "nameSlug": "carter-cunningham-701860",
+                        "firstLastName": "Carter Cunningham",
+                        "lastFirstName": "Cunningham, Carter",
+                        "lastInitName": "Cunningham, C",
+                        "initLastName": "C Cunningham",
+                        "fullFMLName": "Carter Andrew Cunningham",
+                        "fullLFMName": "Cunningham, Carter Andrew",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
                     },
                     "pitcher": {
                         "id": 676596,
@@ -26366,8 +26418,8 @@
                         "link": "/api/v1/teams/145"
                     }
                 },
-                "balls": 0,
-                "strikes": 1,
+                "balls": 1,
+                "strikes": 2,
                 "outs": 2
             },
             "venue": {
@@ -28096,53 +28148,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 682634,
-                        "fullName": "Kevin Alc\u00e1ntara",
-                        "link": "/api/v1/people/682634",
-                        "firstName": "Kevin",
-                        "lastName": "Alcantara",
-                        "primaryNumber": "13",
-                        "birthDate": "2002-07-12",
-                        "currentAge": 23,
-                        "birthCity": "Santo Domingo",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 6\"",
-                        "weight": 188,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "9",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "RF"
-                        },
-                        "useName": "Kevin",
-                        "useLastName": "Alc\u00e1ntara",
-                        "boxscoreName": "Alc\u00e1ntara",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "pronunciation": "ahl-KAHN-tah-rah",
-                        "mlbDebutDate": "2024-09-25",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Kevin Alc\u00e1ntara",
-                        "nameSlug": "kevin-alcantara-682634",
-                        "firstLastName": "Kevin Alc\u00e1ntara",
-                        "lastFirstName": "Alc\u00e1ntara, Kevin",
-                        "lastInitName": "Alc\u00e1ntara, K",
-                        "initLastName": "K Alc\u00e1ntara",
-                        "fullFMLName": "Kevin Alc\u00e1ntara",
-                        "fullLFMName": "Alc\u00e1ntara, Kevin ",
-                        "strikeZoneTop": 3.458,
-                        "strikeZoneBottom": 1.745
-                    },
-                    "onDeck": {
                         "id": 666185,
                         "fullName": "Dylan Carlson",
                         "link": "/api/v1/people/666185",
@@ -28191,7 +28196,7 @@
                         "strikeZoneTop": 3.272,
                         "strikeZoneBottom": 1.651
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 675085,
                         "fullName": "Jonathon Long",
                         "link": "/api/v1/people/675085",
@@ -28238,6 +28243,55 @@
                         "fullLFMName": "Long, Jonathon Brian",
                         "strikeZoneTop": 3.198,
                         "strikeZoneBottom": 1.614
+                    },
+                    "inHole": {
+                        "id": 680911,
+                        "fullName": "Owen Miller",
+                        "link": "/api/v1/people/680911",
+                        "firstName": "Owen",
+                        "lastName": "Miller",
+                        "primaryNumber": "11",
+                        "birthDate": "1996-11-15",
+                        "currentAge": 29,
+                        "birthCity": "Mequon",
+                        "birthStateProvince": "WI",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 197,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Owen",
+                        "useLastName": "Miller",
+                        "middleName": "Robert",
+                        "boxscoreName": "Miller, O",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2018,
+                        "mlbDebutDate": "2021-05-23",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Owen Miller",
+                        "nameSlug": "owen-miller-680911",
+                        "firstLastName": "Owen Miller",
+                        "lastFirstName": "Miller, Owen",
+                        "lastInitName": "Miller, O",
+                        "initLastName": "O Miller",
+                        "fullFMLName": "Owen Robert Miller",
+                        "fullLFMName": "Miller, Owen Robert",
+                        "strikeZoneTop": 3.165,
+                        "strikeZoneBottom": 1.597
                     },
                     "pitcher": {
                         "id": 607067,
@@ -28289,16 +28343,16 @@
                         "strikeZoneTop": 3.433,
                         "strikeZoneBottom": 1.733
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 112,
                         "name": "Chicago Cubs",
                         "link": "/api/v1/teams/112"
                     }
                 },
-                "balls": 1,
-                "strikes": 1,
-                "outs": 0
+                "balls": 0,
+                "strikes": 0,
+                "outs": 1
             },
             "venue": {
                 "id": 2530,
