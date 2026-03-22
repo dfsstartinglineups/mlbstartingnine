@@ -259,13 +259,15 @@
                         "runs": 3,
                         "hits": 7,
                         "errors": 1,
-                        "leftOnBase": 5
+                        "leftOnBase": 5,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 1,
                         "hits": 5,
                         "errors": 0,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -1870,7 +1872,7 @@
                         "away": {
                             "runs": 0,
                             "hits": 0,
-                            "errors": 1,
+                            "errors": 0,
                             "leftOnBase": 0
                         }
                     },
@@ -1991,13 +1993,15 @@
                         "runs": 8,
                         "hits": 9,
                         "errors": 1,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 3,
                         "hits": 7,
-                        "errors": 2,
-                        "leftOnBase": 10
+                        "errors": 1,
+                        "leftOnBase": 10,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -2256,6 +2260,54 @@
                         "fullLFMName": "Harry, Jay ",
                         "strikeZoneTop": 3.157,
                         "strikeZoneBottom": 1.593
+                    },
+                    "second": {
+                        "id": 701860,
+                        "fullName": "Carter Cunningham",
+                        "link": "/api/v1/people/701860",
+                        "firstName": "Carter",
+                        "lastName": "Cunningham",
+                        "primaryNumber": "10",
+                        "birthDate": "2000-11-06",
+                        "currentAge": 25,
+                        "birthCity": "Huntington Beach",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "I",
+                            "name": "Infield",
+                            "type": "Infielder",
+                            "abbreviation": "IF"
+                        },
+                        "useName": "Carter",
+                        "useLastName": "Cunningham",
+                        "middleName": "Andrew",
+                        "boxscoreName": "Cunningham",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Carter Cunningham",
+                        "nameSlug": "carter-cunningham-701860",
+                        "firstLastName": "Carter Cunningham",
+                        "lastFirstName": "Cunningham, Carter",
+                        "lastInitName": "Cunningham, C",
+                        "initLastName": "C Cunningham",
+                        "fullFMLName": "Carter Andrew Cunningham",
+                        "fullLFMName": "Cunningham, Carter Andrew",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
                     },
                     "pitcher": {
                         "id": 676596,
@@ -26082,55 +26134,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 701398,
-                        "fullName": "Sal Stewart",
-                        "link": "/api/v1/people/701398",
-                        "firstName": "Sal",
-                        "lastName": "Stewart",
-                        "primaryNumber": "27",
-                        "birthDate": "2003-12-07",
-                        "currentAge": 22,
-                        "birthCity": "Miami",
-                        "birthStateProvince": "FL",
-                        "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 224,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "5",
-                            "name": "Third Base",
-                            "type": "Infielder",
-                            "abbreviation": "3B"
-                        },
-                        "useName": "Sal",
-                        "useLastName": "Stewart",
-                        "middleName": "Maxwell",
-                        "boxscoreName": "Stewart, S",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2022,
-                        "mlbDebutDate": "2025-09-01",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Sal Stewart",
-                        "nameSlug": "sal-stewart-701398",
-                        "firstLastName": "Sal Stewart",
-                        "lastFirstName": "Stewart, Sal",
-                        "lastInitName": "Stewart, S",
-                        "initLastName": "S Stewart",
-                        "fullFMLName": "Sal Maxwell Stewart",
-                        "fullLFMName": "Stewart, Sal Maxwell",
-                        "strikeZoneTop": 3.239,
-                        "strikeZoneBottom": 1.635
-                    },
-                    "onDeck": {
                         "id": 553993,
                         "fullName": "Eugenio Su\u00e1rez",
                         "link": "/api/v1/people/553993",
@@ -26179,7 +26182,7 @@
                         "strikeZoneTop": 3.171,
                         "strikeZoneBottom": 1.6
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 682622,
                         "fullName": "Noelvi Marte",
                         "link": "/api/v1/people/682622",
@@ -26226,53 +26229,104 @@
                         "strikeZoneTop": 3.298,
                         "strikeZoneBottom": 1.664
                     },
-                    "third": {
-                        "id": 682829,
-                        "fullName": "Elly De La Cruz",
-                        "link": "/api/v1/people/682829",
-                        "firstName": "Elly",
-                        "lastName": "De La Cruz",
-                        "primaryNumber": "44",
-                        "birthDate": "2002-01-11",
-                        "currentAge": 24,
-                        "birthCity": "Sabana Grande de Boya",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 6\"",
-                        "weight": 200,
+                    "inHole": {
+                        "id": 624431,
+                        "fullName": "Jose Trevino",
+                        "link": "/api/v1/people/624431",
+                        "firstName": "Jose",
+                        "lastName": "Trevino",
+                        "primaryNumber": "35",
+                        "birthDate": "1992-11-28",
+                        "currentAge": 33,
+                        "birthCity": "Corpus Christi",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "5' 9\"",
+                        "weight": 215,
                         "active": true,
                         "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
                         },
-                        "useName": "Elly",
-                        "useLastName": "De La Cruz",
-                        "middleName": "Antonio",
-                        "boxscoreName": "De La Cruz, E",
+                        "useName": "Jose",
+                        "useLastName": "Trevino",
+                        "boxscoreName": "Trevino",
+                        "nickName": "Trevi",
                         "gender": "M",
-                        "nameMatrilineal": "Sanchez",
                         "isPlayer": true,
                         "isVerified": false,
-                        "mlbDebutDate": "2023-06-06",
+                        "draftYear": 2014,
+                        "pronunciation": "Tre-vee-nyo",
+                        "mlbDebutDate": "2018-06-15",
                         "batSide": {
-                            "code": "S",
-                            "description": "Switch"
+                            "code": "R",
+                            "description": "Right"
                         },
                         "pitchHand": {
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Elly De La Cruz",
-                        "nameSlug": "elly-de-la-cruz-682829",
-                        "firstLastName": "Elly De La Cruz",
-                        "lastFirstName": "De La Cruz, Elly",
-                        "lastInitName": "De La Cruz, E",
-                        "initLastName": "E De La Cruz",
-                        "fullFMLName": "Elly Antonio De La Cruz",
-                        "fullLFMName": "De La Cruz, Elly Antonio",
-                        "strikeZoneTop": 3.46,
-                        "strikeZoneBottom": 1.746
+                        "nameFirstLast": "Jose Trevino",
+                        "nameSlug": "jose-trevino-624431",
+                        "firstLastName": "Jose Trevino",
+                        "lastFirstName": "Trevino, Jose",
+                        "lastInitName": "Trevino, J",
+                        "initLastName": "J Trevino",
+                        "fullFMLName": "Jose Trevino",
+                        "fullLFMName": "Trevino, Jose",
+                        "strikeZoneTop": 3.061,
+                        "strikeZoneBottom": 1.545
+                    },
+                    "third": {
+                        "id": 701398,
+                        "fullName": "Sal Stewart",
+                        "link": "/api/v1/people/701398",
+                        "firstName": "Sal",
+                        "lastName": "Stewart",
+                        "primaryNumber": "27",
+                        "birthDate": "2003-12-07",
+                        "currentAge": 22,
+                        "birthCity": "Miami",
+                        "birthStateProvince": "FL",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 224,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Sal",
+                        "useLastName": "Stewart",
+                        "middleName": "Maxwell",
+                        "boxscoreName": "Stewart, S",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2022,
+                        "mlbDebutDate": "2025-09-01",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Sal Stewart",
+                        "nameSlug": "sal-stewart-701398",
+                        "firstLastName": "Sal Stewart",
+                        "lastFirstName": "Stewart, Sal",
+                        "lastInitName": "Stewart, S",
+                        "initLastName": "S Stewart",
+                        "fullFMLName": "Sal Maxwell Stewart",
+                        "fullLFMName": "Stewart, Sal Maxwell",
+                        "strikeZoneTop": 3.239,
+                        "strikeZoneBottom": 1.635
                     },
                     "pitcher": {
                         "id": 671096,
@@ -26323,16 +26377,16 @@
                         "strikeZoneTop": 3.37,
                         "strikeZoneBottom": 1.54
                     },
-                    "battingOrder": 4,
+                    "battingOrder": 5,
                     "team": {
                         "id": 113,
                         "name": "Cincinnati Reds",
                         "link": "/api/v1/teams/113"
                     }
                 },
-                "balls": 2,
-                "strikes": 2,
-                "outs": 0
+                "balls": 0,
+                "strikes": 0,
+                "outs": 1
             },
             "venue": {
                 "id": 3834,
@@ -28077,54 +28131,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 680977,
-                        "fullName": "Brendan Donovan",
-                        "link": "/api/v1/people/680977",
-                        "firstName": "Brendan",
-                        "lastName": "Donovan",
-                        "primaryNumber": "33",
-                        "birthDate": "1997-01-16",
-                        "currentAge": 29,
-                        "birthCity": "Wurzberg",
-                        "birthCountry": "Germany",
-                        "height": "5' 11\"",
-                        "weight": 210,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Brendan",
-                        "useLastName": "Donovan",
-                        "middleName": "Michael",
-                        "boxscoreName": "Donovan",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2018,
-                        "mlbDebutDate": "2022-04-25",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Brendan Donovan",
-                        "nameSlug": "brendan-donovan-680977",
-                        "firstLastName": "Brendan Donovan",
-                        "lastFirstName": "Donovan, Brendan",
-                        "lastInitName": "Donovan, B",
-                        "initLastName": "B Donovan",
-                        "fullFMLName": "Brendan Michael Donovan",
-                        "fullLFMName": "Donovan, Brendan Michael",
-                        "strikeZoneTop": 3.159,
-                        "strikeZoneBottom": 1.594
-                    },
-                    "onDeck": {
                         "id": 663728,
                         "fullName": "Cal Raleigh",
                         "link": "/api/v1/people/663728",
@@ -28174,7 +28180,7 @@
                         "strikeZoneTop": 3.282,
                         "strikeZoneBottom": 1.656
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 677594,
                         "fullName": "Julio Rodr\u00edguez",
                         "link": "/api/v1/people/677594",
@@ -28221,6 +28227,56 @@
                         "fullLFMName": "Rodr\u00edguez, Julio Yamel",
                         "strikeZoneTop": 3.378,
                         "strikeZoneBottom": 1.705
+                    },
+                    "inHole": {
+                        "id": 647304,
+                        "fullName": "Josh Naylor",
+                        "link": "/api/v1/people/647304",
+                        "firstName": "Joshua-Douglas",
+                        "lastName": "Naylor",
+                        "primaryNumber": "12",
+                        "birthDate": "1997-06-22",
+                        "currentAge": 28,
+                        "birthCity": "Mississauga",
+                        "birthStateProvince": "ON",
+                        "birthCountry": "Canada",
+                        "height": "5' 10\"",
+                        "weight": 235,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Josh",
+                        "useLastName": "Naylor",
+                        "middleName": "James",
+                        "boxscoreName": "Naylor, J",
+                        "nickName": "Naylz",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "mlbDebutDate": "2019-05-24",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "nameFirstLast": "Josh Naylor",
+                        "nameSlug": "josh-naylor-647304",
+                        "firstLastName": "Josh Naylor",
+                        "lastFirstName": "Naylor, Josh",
+                        "lastInitName": "Naylor, J",
+                        "initLastName": "J Naylor",
+                        "fullFMLName": "Joshua-Douglas James Naylor",
+                        "fullLFMName": "Naylor, Joshua-Douglas James",
+                        "strikeZoneTop": 3.11,
+                        "strikeZoneBottom": 1.57
                     },
                     "pitcher": {
                         "id": 669923,
@@ -28271,16 +28327,16 @@
                         "strikeZoneTop": 3.388,
                         "strikeZoneBottom": 1.71
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 136,
                         "name": "Seattle Mariners",
                         "link": "/api/v1/teams/136"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
-                "outs": 1
+                "balls": 1,
+                "strikes": 0,
+                "outs": 2
             },
             "venue": {
                 "id": 2530,
