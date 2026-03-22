@@ -259,13 +259,15 @@
                         "runs": 3,
                         "hits": 7,
                         "errors": 1,
-                        "leftOnBase": 5
+                        "leftOnBase": 5,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 1,
                         "hits": 5,
                         "errors": 0,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -1870,7 +1872,7 @@
                         "away": {
                             "runs": 0,
                             "hits": 0,
-                            "errors": 1,
+                            "errors": 0,
                             "leftOnBase": 0
                         }
                     },
@@ -1991,13 +1993,15 @@
                         "runs": 8,
                         "hits": 9,
                         "errors": 1,
-                        "leftOnBase": 6
+                        "leftOnBase": 6,
+                        "isWinner": true
                     },
                     "away": {
                         "runs": 3,
                         "hits": 7,
-                        "errors": 2,
-                        "leftOnBase": 10
+                        "errors": 1,
+                        "leftOnBase": 10,
+                        "isWinner": false
                     }
                 },
                 "defense": {
@@ -2256,6 +2260,54 @@
                         "fullLFMName": "Harry, Jay ",
                         "strikeZoneTop": 3.157,
                         "strikeZoneBottom": 1.593
+                    },
+                    "second": {
+                        "id": 701860,
+                        "fullName": "Carter Cunningham",
+                        "link": "/api/v1/people/701860",
+                        "firstName": "Carter",
+                        "lastName": "Cunningham",
+                        "primaryNumber": "10",
+                        "birthDate": "2000-11-06",
+                        "currentAge": 25,
+                        "birthCity": "Huntington Beach",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "I",
+                            "name": "Infield",
+                            "type": "Infielder",
+                            "abbreviation": "IF"
+                        },
+                        "useName": "Carter",
+                        "useLastName": "Cunningham",
+                        "middleName": "Andrew",
+                        "boxscoreName": "Cunningham",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Carter Cunningham",
+                        "nameSlug": "carter-cunningham-701860",
+                        "firstLastName": "Carter Cunningham",
+                        "lastFirstName": "Cunningham, Carter",
+                        "lastInitName": "Cunningham, C",
+                        "initLastName": "C Cunningham",
+                        "fullFMLName": "Carter Andrew Cunningham",
+                        "fullLFMName": "Cunningham, Carter Andrew",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
                     },
                     "pitcher": {
                         "id": 676596,
@@ -25956,7 +26008,7 @@
                         "num": 6,
                         "ordinalNum": "6th",
                         "home": {
-                            "hits": 0,
+                            "hits": 1,
                             "errors": 1,
                             "leftOnBase": 0
                         },
@@ -25971,7 +26023,7 @@
                 "teams": {
                     "home": {
                         "runs": 7,
-                        "hits": 8,
+                        "hits": 9,
                         "errors": 2,
                         "leftOnBase": 4
                     },
@@ -26097,54 +26149,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 671155,
-                        "fullName": "Ivan Johnson",
-                        "link": "/api/v1/people/671155",
-                        "firstName": "Vincent",
-                        "lastName": "Johnson",
-                        "primaryNumber": "3",
-                        "birthDate": "1998-10-11",
-                        "currentAge": 27,
-                        "birthCity": "Atlanta",
-                        "birthStateProvince": "GA",
-                        "birthCountry": "USA",
-                        "height": "6' 0\"",
-                        "weight": 190,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Ivan",
-                        "useLastName": "Johnson",
-                        "middleName": "Ivan",
-                        "boxscoreName": "Johnson",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2019,
-                        "batSide": {
-                            "code": "S",
-                            "description": "Switch"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Ivan Johnson",
-                        "nameSlug": "ivan-johnson-671155",
-                        "firstLastName": "Ivan Johnson",
-                        "lastFirstName": "Johnson, Ivan",
-                        "lastInitName": "Johnson, I",
-                        "initLastName": "I Johnson",
-                        "fullFMLName": "Vincent Ivan Johnson",
-                        "fullLFMName": "Johnson, Vincent Ivan",
-                        "strikeZoneTop": 3.2,
-                        "strikeZoneBottom": 1.615
-                    },
-                    "onDeck": {
                         "id": 641658,
                         "fullName": "Garrett Hampson",
                         "link": "/api/v1/people/641658",
@@ -26194,7 +26198,7 @@
                         "strikeZoneTop": 3.119,
                         "strikeZoneBottom": 1.574
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 683061,
                         "fullName": "Alexander Vargas",
                         "link": "/api/v1/people/683061",
@@ -26240,7 +26244,104 @@
                         "strikeZoneTop": 3.172,
                         "strikeZoneBottom": 1.601
                     },
+                    "inHole": {
+                        "id": 663993,
+                        "fullName": "Nathaniel Lowe",
+                        "link": "/api/v1/people/663993",
+                        "firstName": "David",
+                        "lastName": "Lowe",
+                        "primaryNumber": "31",
+                        "birthDate": "1995-07-07",
+                        "currentAge": 30,
+                        "birthCity": "Norfolk",
+                        "birthStateProvince": "VA",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 220,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Nathaniel",
+                        "useLastName": "Lowe",
+                        "middleName": "Nathaniel",
+                        "boxscoreName": "Lowe, N",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2016,
+                        "mlbDebutDate": "2019-04-29",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Nathaniel Lowe",
+                        "nameSlug": "nathaniel-lowe-663993",
+                        "firstLastName": "Nathaniel Lowe",
+                        "lastFirstName": "Lowe, Nathaniel",
+                        "lastInitName": "Lowe, N",
+                        "initLastName": "N Lowe",
+                        "fullFMLName": "David Nathaniel Lowe",
+                        "fullLFMName": "Lowe, David Nathaniel",
+                        "strikeZoneTop": 3.367,
+                        "strikeZoneBottom": 1.699
+                    },
                     "first": {
+                        "id": 671155,
+                        "fullName": "Ivan Johnson",
+                        "link": "/api/v1/people/671155",
+                        "firstName": "Vincent",
+                        "lastName": "Johnson",
+                        "primaryNumber": "3",
+                        "birthDate": "1998-10-11",
+                        "currentAge": 27,
+                        "birthCity": "Atlanta",
+                        "birthStateProvince": "GA",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 190,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Ivan",
+                        "useLastName": "Johnson",
+                        "middleName": "Ivan",
+                        "boxscoreName": "Johnson",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Ivan Johnson",
+                        "nameSlug": "ivan-johnson-671155",
+                        "firstLastName": "Ivan Johnson",
+                        "lastFirstName": "Johnson, Ivan",
+                        "lastInitName": "Johnson, I",
+                        "initLastName": "I Johnson",
+                        "fullFMLName": "Vincent Ivan Johnson",
+                        "fullLFMName": "Johnson, Vincent Ivan",
+                        "strikeZoneTop": 3.2,
+                        "strikeZoneBottom": 1.615
+                    },
+                    "third": {
                         "id": 663647,
                         "fullName": "Ke'Bryan Hayes",
                         "link": "/api/v1/people/663647",
@@ -26340,7 +26441,7 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 1,
+                    "battingOrder": 2,
                     "team": {
                         "id": 113,
                         "name": "Cincinnati Reds",
@@ -27881,9 +27982,9 @@
             "linescore": {
                 "currentInning": 6,
                 "currentInningOrdinal": "6th",
-                "inningState": "Middle",
-                "inningHalf": "Top",
-                "isTopInning": true,
+                "inningState": "Bottom",
+                "inningHalf": "Bottom",
+                "isTopInning": false,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -27998,19 +28099,19 @@
                 },
                 "defense": {
                     "pitcher": {
-                        "id": 676092,
-                        "fullName": "Collin Snider",
-                        "link": "/api/v1/people/676092",
-                        "firstName": "Collin",
-                        "lastName": "Snider",
-                        "primaryNumber": "52",
-                        "birthDate": "1995-10-10",
+                        "id": 656686,
+                        "fullName": "Corbin Martin",
+                        "link": "/api/v1/people/656686",
+                        "firstName": "Corbin",
+                        "lastName": "Martin",
+                        "primaryNumber": "38",
+                        "birthDate": "1995-12-28",
                         "currentAge": 30,
-                        "birthCity": "Nashville",
-                        "birthStateProvince": "TN",
+                        "birthCity": "Hempstead",
+                        "birthStateProvince": "TX",
                         "birthCountry": "USA",
-                        "height": "6' 4\"",
-                        "weight": 195,
+                        "height": "6' 2\"",
+                        "weight": 225,
                         "active": true,
                         "primaryPosition": {
                             "code": "1",
@@ -28018,15 +28119,15 @@
                             "type": "Pitcher",
                             "abbreviation": "P"
                         },
-                        "useName": "Collin",
-                        "useLastName": "Snider",
-                        "middleName": "Kenneth",
-                        "boxscoreName": "Snider",
+                        "useName": "Corbin",
+                        "useLastName": "Martin",
+                        "middleName": "Montgomery",
+                        "boxscoreName": "Martin, C",
                         "gender": "M",
                         "isPlayer": true,
                         "isVerified": true,
                         "draftYear": 2017,
-                        "mlbDebutDate": "2022-04-09",
+                        "mlbDebutDate": "2019-05-12",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
@@ -28035,16 +28136,16 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Collin Snider",
-                        "nameSlug": "collin-snider-676092",
-                        "firstLastName": "Collin Snider",
-                        "lastFirstName": "Snider, Collin",
-                        "lastInitName": "Snider, C",
-                        "initLastName": "C Snider",
-                        "fullFMLName": "Collin Kenneth Snider",
-                        "fullLFMName": "Snider, Collin Kenneth",
-                        "strikeZoneTop": 3.388,
-                        "strikeZoneBottom": 1.71
+                        "nameFirstLast": "Corbin Martin",
+                        "nameSlug": "corbin-martin-656686",
+                        "firstLastName": "Corbin Martin",
+                        "lastFirstName": "Martin, Corbin",
+                        "lastInitName": "Martin, C",
+                        "initLastName": "C Martin",
+                        "fullFMLName": "Corbin Montgomery Martin",
+                        "fullLFMName": "Martin, Corbin Montgomery",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
                     },
                     "catcher": {
                         "id": 665804,
@@ -28072,9 +28173,9 @@
                         "link": "/api/v1/people/701496"
                     },
                     "left": {
-                        "id": 666185,
-                        "fullName": "Dylan Carlson",
-                        "link": "/api/v1/people/666185"
+                        "id": 696083,
+                        "fullName": "Leonel Espinoza",
+                        "link": "/api/v1/people/696083"
                     },
                     "center": {
                         "id": 682634,
@@ -28313,8 +28414,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 3,
-                "outs": 3
+                "strikes": 0,
+                "outs": 0
             },
             "venue": {
                 "id": 2530,
@@ -29044,7 +29145,7 @@
             "679645": "P",
             "805291": "P",
             "701565": "P",
-            "696083": "CF",
+            "696083": "LF",
             "815654": "OF",
             "682634": "CF",
             "681941": "OF",
