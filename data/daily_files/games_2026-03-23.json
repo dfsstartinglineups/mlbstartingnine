@@ -9,12 +9,12 @@
             "gameDate": "2026-03-23T16:05:00Z",
             "officialDate": "2026-03-23",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -24,11 +24,12 @@
                         "link": "/api/v1/teams/139"
                     },
                     "leagueRecord": {
-                        "wins": 10,
+                        "wins": 11,
                         "losses": 17,
-                        "pct": ".370"
+                        "pct": ".393"
                     },
                     "score": 7,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 571927,
                         "fullName": "Steven Matz",
@@ -91,10 +92,11 @@
                     },
                     "leagueRecord": {
                         "wins": 10,
-                        "losses": 16,
-                        "pct": ".385"
+                        "losses": 17,
+                        "pct": ".370"
                     },
                     "score": 0,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 666200,
                         "fullName": "Jes\u00fas Luzardo",
@@ -287,9 +289,10 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         },
                         "away": {
                             "runs": 0,
@@ -304,7 +307,7 @@
                         "runs": 0,
                         "hits": 5,
                         "errors": 0,
-                        "leftOnBase": 5
+                        "leftOnBase": 6
                     },
                     "away": {
                         "runs": 7,
@@ -426,55 +429,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 665561,
-                        "fullName": "Rafael March\u00e1n",
-                        "link": "/api/v1/people/665561",
-                        "firstName": "Rafael",
-                        "lastName": "March\u00e1n",
-                        "primaryNumber": "13",
-                        "birthDate": "1999-02-25",
-                        "currentAge": 27,
-                        "birthCity": "San Cristobal",
-                        "birthCountry": "Venezuela",
-                        "height": "5' 9\"",
-                        "weight": 170,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Rafael",
-                        "useLastName": "March\u00e1n",
-                        "middleName": "Alejandro",
-                        "boxscoreName": "March\u00e1n",
-                        "gender": "M",
-                        "nameMatrilineal": "Amado",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "pronunciation": "rah-fah-ELL mar-SHAHN",
-                        "mlbDebutDate": "2020-09-14",
-                        "batSide": {
-                            "code": "S",
-                            "description": "Switch"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Rafael March\u00e1n",
-                        "nameSlug": "rafael-marchan-665561",
-                        "firstLastName": "Rafael March\u00e1n",
-                        "lastFirstName": "March\u00e1n, Rafael",
-                        "lastInitName": "March\u00e1n, R",
-                        "initLastName": "R March\u00e1n",
-                        "fullFMLName": "Rafael Alejandro March\u00e1n",
-                        "fullLFMName": "March\u00e1n, Rafael Alejandro",
-                        "strikeZoneTop": 3.056,
-                        "strikeZoneBottom": 1.542
-                    },
-                    "onDeck": {
                         "id": 801537,
                         "fullName": "Nathan Humphreys",
                         "link": "/api/v1/people/801537",
@@ -522,7 +476,7 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 650559,
                         "fullName": "Bryan De La Cruz",
                         "link": "/api/v1/people/650559",
@@ -570,37 +524,36 @@
                         "strikeZoneTop": 3.228,
                         "strikeZoneBottom": 1.629
                     },
-                    "first": {
-                        "id": 664238,
-                        "fullName": "Dylan Moore",
-                        "link": "/api/v1/people/664238",
-                        "firstName": "Dylan",
-                        "lastName": "Moore",
-                        "primaryNumber": "25",
-                        "birthDate": "1992-08-02",
-                        "currentAge": 33,
-                        "birthCity": "Yorba Linda",
+                    "inHole": {
+                        "id": 686551,
+                        "fullName": "Christian Cairo",
+                        "link": "/api/v1/people/686551",
+                        "firstName": "Christian",
+                        "lastName": "Cairo",
+                        "primaryNumber": "70",
+                        "birthDate": "2001-06-11",
+                        "currentAge": 24,
+                        "birthCity": "Bakersfield",
                         "birthStateProvince": "CA",
                         "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 205,
+                        "height": "5' 8\"",
+                        "weight": 185,
                         "active": true,
                         "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
+                            "code": "6",
+                            "name": "Shortstop",
                             "type": "Infielder",
-                            "abbreviation": "2B"
+                            "abbreviation": "SS"
                         },
-                        "useName": "Dylan",
-                        "useLastName": "Moore",
-                        "middleName": "Scott",
-                        "boxscoreName": "Moore, D",
-                        "nickName": "D Mo",
+                        "useName": "Christian",
+                        "useLastName": "Cairo",
+                        "middleName": "Miguel",
+                        "boxscoreName": "Cairo",
                         "gender": "M",
                         "isPlayer": true,
                         "isVerified": true,
-                        "draftYear": 2015,
-                        "mlbDebutDate": "2019-03-20",
+                        "draftYear": 2019,
+                        "pronunciation": "KYE-row",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
@@ -609,16 +562,16 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Dylan Moore",
-                        "nameSlug": "dylan-moore-664238",
-                        "firstLastName": "Dylan Moore",
-                        "lastFirstName": "Moore, Dylan",
-                        "lastInitName": "Moore, D",
-                        "initLastName": "D Moore",
-                        "fullFMLName": "Dylan Scott Moore",
-                        "fullLFMName": "Moore, Dylan Scott",
-                        "strikeZoneTop": 3.238,
-                        "strikeZoneBottom": 1.634
+                        "nameFirstLast": "Christian Cairo",
+                        "nameSlug": "christian-cairo-686551",
+                        "firstLastName": "Christian Cairo",
+                        "lastFirstName": "Cairo, Christian",
+                        "lastInitName": "Cairo, C",
+                        "initLastName": "C Cairo",
+                        "fullFMLName": "Christian Miguel Cairo",
+                        "fullLFMName": "Cairo, Christian Miguel",
+                        "strikeZoneTop": 3.021,
+                        "strikeZoneBottom": 1.525
                     },
                     "pitcher": {
                         "id": 661395,
@@ -669,16 +622,16 @@
                         "strikeZoneTop": 3.433,
                         "strikeZoneBottom": 1.733
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 143,
                         "name": "Philadelphia Phillies",
                         "link": "/api/v1/teams/143"
                     }
                 },
-                "balls": 2,
-                "strikes": 2,
-                "outs": 1
+                "balls": 0,
+                "strikes": 3,
+                "outs": 3
             },
             "venue": {
                 "id": 2700,
@@ -688,6 +641,7 @@
             "content": {
                 "link": "/api/v1/game/831547/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -2175,11 +2129,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 6,
-                "currentInningOrdinal": "6th",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 7,
+                "currentInningOrdinal": "7th",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -2277,6 +2231,20 @@
                             "errors": 0,
                             "leftOnBase": 0
                         }
+                    },
+                    {
+                        "num": 7,
+                        "ordinalNum": "7th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        }
                     }
                 ],
                 "teams": {
@@ -2295,19 +2263,19 @@
                 },
                 "defense": {
                     "pitcher": {
-                        "id": 681402,
-                        "fullName": "Gus Varland",
-                        "link": "/api/v1/people/681402",
-                        "firstName": "Augustus",
-                        "lastName": "Varland",
-                        "primaryNumber": "76",
-                        "birthDate": "1996-11-06",
-                        "currentAge": 29,
-                        "birthCity": "Maplewood",
-                        "birthStateProvince": "MN",
+                        "id": 676026,
+                        "fullName": "Holden Powell",
+                        "link": "/api/v1/people/676026",
+                        "firstName": "Holden",
+                        "lastName": "Powell",
+                        "primaryNumber": "40",
+                        "birthDate": "1999-09-09",
+                        "currentAge": 26,
+                        "birthCity": "Visalia",
+                        "birthStateProvince": "CA",
                         "birthCountry": "USA",
-                        "height": "6' 1\"",
-                        "weight": 225,
+                        "height": "6' 0\"",
+                        "weight": 190,
                         "active": true,
                         "primaryPosition": {
                             "code": "1",
@@ -2315,33 +2283,32 @@
                             "type": "Pitcher",
                             "abbreviation": "P"
                         },
-                        "useName": "Gus",
-                        "useLastName": "Varland",
-                        "middleName": "James",
-                        "boxscoreName": "Varland, G",
+                        "useName": "Holden",
+                        "useLastName": "Powell",
+                        "middleName": "William",
+                        "boxscoreName": "Powell",
                         "gender": "M",
                         "isPlayer": true,
                         "isVerified": true,
-                        "draftYear": 2018,
-                        "mlbDebutDate": "2023-03-30",
+                        "draftYear": 2020,
                         "batSide": {
-                            "code": "L",
-                            "description": "Left"
+                            "code": "R",
+                            "description": "Right"
                         },
                         "pitchHand": {
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Gus Varland",
-                        "nameSlug": "gus-varland-681402",
-                        "firstLastName": "Gus Varland",
-                        "lastFirstName": "Varland, Gus",
-                        "lastInitName": "Varland, G",
-                        "initLastName": "G Varland",
-                        "fullFMLName": "Augustus James Varland",
-                        "fullLFMName": "Varland, Augustus James",
-                        "strikeZoneTop": 3.255,
-                        "strikeZoneBottom": 1.643
+                        "nameFirstLast": "Holden Powell",
+                        "nameSlug": "holden-powell-676026",
+                        "firstLastName": "Holden Powell",
+                        "lastFirstName": "Powell, Holden",
+                        "lastInitName": "Powell, H",
+                        "initLastName": "H Powell",
+                        "fullFMLName": "Holden William Powell",
+                        "fullLFMName": "Powell, Holden William",
+                        "strikeZoneTop": 3.21,
+                        "strikeZoneBottom": 1.62
                     },
                     "catcher": {
                         "id": 660688,
@@ -2359,19 +2326,19 @@
                         "link": "/api/v1/people/683083"
                     },
                     "third": {
-                        "id": 678391,
-                        "fullName": "Jorbit Vivas",
-                        "link": "/api/v1/people/678391"
+                        "id": 691781,
+                        "fullName": "Brady House",
+                        "link": "/api/v1/people/691781"
                     },
                     "shortstop": {
-                        "id": 682928,
-                        "fullName": "CJ Abrams",
-                        "link": "/api/v1/people/682928"
+                        "id": 691183,
+                        "fullName": "Kevin Made",
+                        "link": "/api/v1/people/691183"
                     },
                     "left": {
-                        "id": 695734,
-                        "fullName": "Daylen Lile",
-                        "link": "/api/v1/people/695734"
+                        "id": 686894,
+                        "fullName": "Joey Wiemer",
+                        "link": "/api/v1/people/686894"
                     },
                     "center": {
                         "id": 696285,
@@ -2384,9 +2351,9 @@
                         "link": "/api/v1/people/695578"
                     },
                     "batter": {
-                        "id": 695734,
-                        "fullName": "Daylen Lile",
-                        "link": "/api/v1/people/695734"
+                        "id": 686894,
+                        "fullName": "Joey Wiemer",
+                        "link": "/api/v1/people/686894"
                     },
                     "onDeck": {
                         "id": 660688,
@@ -2610,9 +2577,9 @@
                         "link": "/api/v1/teams/110"
                     }
                 },
-                "balls": 3,
-                "strikes": 2,
-                "outs": 3
+                "balls": 1,
+                "strikes": 1,
+                "outs": 0
             },
             "venue": {
                 "id": 3309,
@@ -4147,18 +4114,19 @@
                 },
                 "defense": {
                     "pitcher": {
-                        "id": 670912,
-                        "fullName": "Johan Oviedo",
-                        "link": "/api/v1/people/670912",
-                        "firstName": "Johan",
-                        "lastName": "Oviedo",
-                        "primaryNumber": "29",
-                        "birthDate": "1998-03-02",
+                        "id": 686580,
+                        "fullName": "Justin Slaten",
+                        "link": "/api/v1/people/686580",
+                        "firstName": "Justin",
+                        "lastName": "Slaten",
+                        "primaryNumber": "63",
+                        "birthDate": "1997-09-15",
                         "currentAge": 28,
-                        "birthCity": "Havana",
-                        "birthCountry": "Cuba",
-                        "height": "6' 6\"",
-                        "weight": 275,
+                        "birthCity": "Longview",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 222,
                         "active": true,
                         "primaryPosition": {
                             "code": "1",
@@ -4166,15 +4134,16 @@
                             "type": "Pitcher",
                             "abbreviation": "P"
                         },
-                        "useName": "Johan",
-                        "useLastName": "Oviedo",
-                        "boxscoreName": "Oviedo",
+                        "useName": "Justin",
+                        "useLastName": "Slaten",
+                        "middleName": "Michael",
+                        "boxscoreName": "Slaten",
                         "gender": "M",
-                        "nameMatrilineal": "Puig",
                         "isPlayer": true,
-                        "isVerified": false,
-                        "pronunciation": "YO-hahn oh-vee-YAY-doh",
-                        "mlbDebutDate": "2020-08-19",
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "pronunciation": "SLATE-in",
+                        "mlbDebutDate": "2024-03-30",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
@@ -4183,16 +4152,16 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Johan Oviedo",
-                        "nameSlug": "johan-oviedo-670912",
-                        "firstLastName": "Johan Oviedo",
-                        "lastFirstName": "Oviedo, Johan",
-                        "lastInitName": "Oviedo, J",
-                        "initLastName": "J Oviedo",
-                        "fullFMLName": "Johan Oviedo",
-                        "fullLFMName": "Oviedo, Johan",
-                        "strikeZoneTop": 3.478,
-                        "strikeZoneBottom": 1.755
+                        "nameFirstLast": "Justin Slaten",
+                        "nameSlug": "justin-slaten-686580",
+                        "firstLastName": "Justin Slaten",
+                        "lastFirstName": "Slaten, Justin",
+                        "lastInitName": "Slaten, J",
+                        "initLastName": "J Slaten",
+                        "fullFMLName": "Justin Michael Slaten",
+                        "fullLFMName": "Slaten, Justin Michael",
+                        "strikeZoneTop": 3.388,
+                        "strikeZoneBottom": 1.71
                     },
                     "catcher": {
                         "id": 657136,
@@ -4258,54 +4227,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 681546,
-                        "fullName": "James Outman",
-                        "link": "/api/v1/people/681546",
-                        "firstName": "James",
-                        "lastName": "Outman",
-                        "primaryNumber": "30",
-                        "birthDate": "1997-05-14",
-                        "currentAge": 28,
-                        "birthCity": "Redwood City",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 215,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "8",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "CF"
-                        },
-                        "useName": "James",
-                        "useLastName": "Outman",
-                        "boxscoreName": "Outman",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "draftYear": 2018,
-                        "mlbDebutDate": "2022-07-31",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "James Outman",
-                        "nameSlug": "james-outman-681546",
-                        "firstLastName": "James Outman",
-                        "lastFirstName": "Outman, James",
-                        "lastInitName": "Outman, J",
-                        "initLastName": "J Outman",
-                        "fullFMLName": "James  Outman",
-                        "fullLFMName": "Outman, James",
-                        "strikeZoneTop": 3.293,
-                        "strikeZoneBottom": 1.662
-                    },
-                    "onDeck": {
                         "id": 668904,
                         "fullName": "Royce Lewis",
                         "link": "/api/v1/people/668904",
@@ -4354,7 +4275,7 @@
                         "strikeZoneTop": 3.205,
                         "strikeZoneBottom": 1.618
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 668885,
                         "fullName": "Austin Martin",
                         "link": "/api/v1/people/668885",
@@ -4402,6 +4323,55 @@
                         "fullLFMName": "Martin, Christopher Austin",
                         "strikeZoneTop": 3.13,
                         "strikeZoneBottom": 1.579
+                    },
+                    "inHole": {
+                        "id": 656484,
+                        "fullName": "Tristan Gray",
+                        "link": "/api/v1/people/656484",
+                        "firstName": "Tristan",
+                        "lastName": "Gray",
+                        "primaryNumber": "4",
+                        "birthDate": "1996-03-22",
+                        "currentAge": 30,
+                        "birthCity": "Houston",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 215,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Tristan",
+                        "useLastName": "Gray",
+                        "middleName": "Colby",
+                        "boxscoreName": "Gray, T",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2017,
+                        "mlbDebutDate": "2023-09-16",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Tristan Gray",
+                        "nameSlug": "tristan-gray-656484",
+                        "firstLastName": "Tristan Gray",
+                        "lastFirstName": "Gray, Tristan",
+                        "lastInitName": "Gray, T",
+                        "initLastName": "T Gray",
+                        "fullFMLName": "Tristan Colby Gray",
+                        "fullLFMName": "Gray, Tristan Colby",
+                        "strikeZoneTop": 3.259,
+                        "strikeZoneBottom": 1.645
                     },
                     "first": {
                         "id": 681546,
@@ -4502,15 +4472,15 @@
                         "strikeZoneTop": 3.611,
                         "strikeZoneBottom": 1.823
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 142,
                         "name": "Minnesota Twins",
                         "link": "/api/v1/teams/142"
                     }
                 },
-                "balls": 4,
-                "strikes": 1,
+                "balls": 0,
+                "strikes": 0,
                 "outs": 0
             },
             "venue": {
@@ -8128,56 +8098,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 682668,
-                        "fullName": "Luisangel Acu\u00f1a",
-                        "link": "/api/v1/people/682668",
-                        "firstName": "Luisangel",
-                        "lastName": "Acu\u00f1a",
-                        "primaryNumber": "0",
-                        "birthDate": "2002-03-12",
-                        "currentAge": 24,
-                        "birthCity": "Caracas",
-                        "birthCountry": "Venezuela",
-                        "height": "5' 7\"",
-                        "weight": 181,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Luisangel",
-                        "useLastName": "Acu\u00f1a",
-                        "middleName": "Jose",
-                        "boxscoreName": "Acu\u00f1a",
-                        "nickName": "Jose",
-                        "gender": "M",
-                        "nameMatrilineal": "Cartaya",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "pronunciation": "Loo-EESE-ahn-hel",
-                        "mlbDebutDate": "2024-09-14",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Luisangel Acu\u00f1a",
-                        "nameSlug": "luisangel-acuna-682668",
-                        "firstLastName": "Luisangel Acu\u00f1a",
-                        "lastFirstName": "Acu\u00f1a, Luisangel",
-                        "lastInitName": "Acu\u00f1a, L",
-                        "initLastName": "L Acu\u00f1a",
-                        "fullFMLName": "Luisangel Jose Acu\u00f1a",
-                        "fullLFMName": "Acu\u00f1a, Luisangel Jose",
-                        "strikeZoneTop": 3.008,
-                        "strikeZoneBottom": 1.518
-                    },
-                    "onDeck": {
                         "id": 805367,
                         "fullName": "Chase Meidroth",
                         "link": "/api/v1/people/805367",
@@ -8227,7 +8147,7 @@
                         "strikeZoneTop": 3.068,
                         "strikeZoneBottom": 1.548
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 695657,
                         "fullName": "Colson Montgomery",
                         "link": "/api/v1/people/695657",
@@ -8275,6 +8195,54 @@
                         "fullLFMName": "Montgomery, Colson Kade",
                         "strikeZoneTop": 3.34,
                         "strikeZoneBottom": 1.686
+                    },
+                    "inHole": {
+                        "id": 678246,
+                        "fullName": "Miguel Vargas",
+                        "link": "/api/v1/people/678246",
+                        "firstName": "Miguel",
+                        "lastName": "Vargas",
+                        "primaryNumber": "20",
+                        "birthDate": "1999-11-17",
+                        "currentAge": 26,
+                        "birthCity": "Havana",
+                        "birthCountry": "Cuba",
+                        "height": "6' 2\"",
+                        "weight": 225,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "5",
+                            "name": "Third Base",
+                            "type": "Infielder",
+                            "abbreviation": "3B"
+                        },
+                        "useName": "Miguel",
+                        "useLastName": "Vargas",
+                        "middleName": "Antonio",
+                        "boxscoreName": "Vargas, M",
+                        "gender": "M",
+                        "nameMatrilineal": "Echarry",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "mlbDebutDate": "2022-08-03",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Miguel Vargas",
+                        "nameSlug": "miguel-vargas-678246",
+                        "firstLastName": "Miguel Vargas",
+                        "lastFirstName": "Vargas, Miguel",
+                        "lastInitName": "Vargas, M",
+                        "initLastName": "M Vargas",
+                        "fullFMLName": "Miguel Antonio Vargas",
+                        "fullLFMName": "Vargas, Miguel Antonio",
+                        "strikeZoneTop": 3.29,
+                        "strikeZoneBottom": 1.66
                     },
                     "pitcher": {
                         "id": 641743,
@@ -8325,16 +8293,16 @@
                         "strikeZoneTop": 3.21,
                         "strikeZoneBottom": 1.62
                     },
-                    "battingOrder": 9,
+                    "battingOrder": 1,
                     "team": {
                         "id": 145,
                         "name": "Chicago White Sox",
                         "link": "/api/v1/teams/145"
                     }
                 },
-                "balls": 1,
+                "balls": 0,
                 "strikes": 2,
-                "outs": 0
+                "outs": 2
             },
             "venue": {
                 "id": 2507,
@@ -13793,16 +13761,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 158,
-                        "name": "Milwaukee Brewers",
-                        "link": "/api/v1/teams/158"
+                        "id": 113,
+                        "name": "Cincinnati Reds",
+                        "link": "/api/v1/teams/113"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 113,
-                        "name": "Cincinnati Reds",
-                        "link": "/api/v1/teams/113"
+                        "id": 158,
+                        "name": "Milwaukee Brewers",
+                        "link": "/api/v1/teams/158"
                     }
                 }
             },
@@ -15223,16 +15191,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 117,
-                        "name": "Houston Astros",
-                        "link": "/api/v1/teams/117"
+                        "id": 5434,
+                        "name": "Sugar Land Space Cowboys",
+                        "link": "/api/v1/teams/5434"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 5434,
-                        "name": "Sugar Land Space Cowboys",
-                        "link": "/api/v1/teams/5434"
+                        "id": 117,
+                        "name": "Houston Astros",
+                        "link": "/api/v1/teams/117"
                     }
                 }
             },
@@ -15408,16 +15376,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 115,
-                        "name": "Colorado Rockies",
-                        "link": "/api/v1/teams/115"
+                        "id": 116,
+                        "name": "Detroit Tigers",
+                        "link": "/api/v1/teams/116"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 116,
-                        "name": "Detroit Tigers",
-                        "link": "/api/v1/teams/116"
+                        "id": 115,
+                        "name": "Colorado Rockies",
+                        "link": "/api/v1/teams/115"
                     }
                 }
             },
@@ -15810,16 +15778,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 119,
-                        "name": "Los Angeles Dodgers",
-                        "link": "/api/v1/teams/119"
+                        "id": 108,
+                        "name": "Los Angeles Angels",
+                        "link": "/api/v1/teams/108"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 108,
-                        "name": "Los Angeles Angels",
-                        "link": "/api/v1/teams/108"
+                        "id": 119,
+                        "name": "Los Angeles Dodgers",
+                        "link": "/api/v1/teams/119"
                     }
                 }
             },
@@ -16245,16 +16213,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 109,
-                        "name": "Arizona Diamondbacks",
-                        "link": "/api/v1/teams/109"
+                        "id": 114,
+                        "name": "Cleveland Guardians",
+                        "link": "/api/v1/teams/114"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 114,
-                        "name": "Cleveland Guardians",
-                        "link": "/api/v1/teams/114"
+                        "id": 109,
+                        "name": "Arizona Diamondbacks",
+                        "link": "/api/v1/teams/109"
                     }
                 }
             },
@@ -16581,16 +16549,16 @@
                 },
                 "defense": {
                     "team": {
-                        "id": 137,
-                        "name": "San Francisco Giants",
-                        "link": "/api/v1/teams/137"
+                        "id": 562,
+                        "name": "Sultanes de Monterrey",
+                        "link": "/api/v1/teams/562"
                     }
                 },
                 "offense": {
                     "team": {
-                        "id": 562,
-                        "name": "Sultanes de Monterrey",
-                        "link": "/api/v1/teams/562"
+                        "id": 137,
+                        "name": "San Francisco Giants",
+                        "link": "/api/v1/teams/137"
                     }
                 }
             },
@@ -16619,7 +16587,8 @@
             "seriesDescription": "Exhibition Game",
             "recordSource": "S",
             "ifNecessary": "N",
-            "ifNecessaryDescription": "Normal Game"
+            "ifNecessaryDescription": "Normal Game",
+            "lineups": {}
         },
         "projectedLineups": {
             "lastUpdated": 1774187472.796903
