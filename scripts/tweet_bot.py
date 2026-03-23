@@ -254,7 +254,7 @@ for game in nba_data:
             team_hash = team_name.replace(" ", "")
             
             # 5% Chance to add the link
-            if random.randint(1, 100) <= 5:
+            if random.randint(1, 100) <= 50:
                 tweet_text += f"\n\nFull matchups & odds: https://nbastartingfive.com/#game-{url_game_id}"
                 
             tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
@@ -379,7 +379,7 @@ for game in games:
         team_hash = team_short.replace(" ", "")
         
         # 5% Chance to add the link
-        if random.randint(1, 100) <= 5:
+        if random.randint(1, 100) <= 50:
             tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-{game_pk}"
             
         tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB"
@@ -568,7 +568,7 @@ for target_date_str in futbol_dates_to_check:
         
         # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
         footer_text = ""
-        if random.randint(1, 100) <= 5:
+        if random.randint(1, 100) <= 50:
             footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
             
         footer = f"{footer_text}{league_info['tag']} #{h_hash} #{a_hash}"
@@ -833,7 +833,7 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{blurb}\n\n"
             
             # 5% Chance to add the link
-            if random.randint(1, 100) <= 5:
+            if random.randint(1, 100) <= 50:
                 tweet_text += f"{cta}\n⬇️\n{link}\n\n"
                 
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
@@ -885,7 +885,7 @@ for target_date_str in futbol_dates_to_check:
                 link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
                 
                 # 5% Chance to add the link
-                if random.randint(1, 100) <= 5:
+                if random.randint(1, 100) <= 50:
                     disallowed_tweet += f"\n\nLive match center:\n⬇️\n{link}"
                     
                 disallowed_tweet += f"\n\n{league_info['tag']} #{h_hash} #{a_hash}"
