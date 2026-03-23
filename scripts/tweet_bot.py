@@ -254,7 +254,7 @@ for game in nba_data:
             team_hash = team_name.replace(" ", "")
             
             # 5% Chance to add the link
-            if random.randint(1, 100) <= 50:
+            if random.randint(1, 100) <= 100:
                 tweet_text += f"\n\nFull matchups & odds: https://nbastartingfive.com/#game-{url_game_id}"
                 
             tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
@@ -379,7 +379,7 @@ for game in games:
         team_hash = team_short.replace(" ", "")
         
         # 5% Chance to add the link
-        if random.randint(1, 100) <= 50:
+        if random.randint(1, 100) <= 100:
             tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-{game_pk}"
             
         tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB"
@@ -424,18 +424,18 @@ FUTBOL_LEAGUES = {
     253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"}
    # 3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
    # 13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
-   # 16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
-   # 71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
-   # 128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
+    16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
+    71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
+    128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
    # 848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
    # 307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
-   # 88:  { "name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
-   # 262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
+    88:  { "name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
+    262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
    # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
-   # 94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-   # 239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
-   # 203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
-   # 144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
+    94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
+    239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
+    203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
+    144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
    # 179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership", "url_slug": "scotland"},
    # 188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
    # 119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"},
@@ -568,7 +568,7 @@ for target_date_str in futbol_dates_to_check:
         
         # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
         footer_text = ""
-        if random.randint(1, 100) <= 50:
+        if random.randint(1, 100) <= 33:
             footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
             
         footer = f"{footer_text}{league_info['tag']} #{h_hash} #{a_hash}"
@@ -833,7 +833,7 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{blurb}\n\n"
             
             # 5% Chance to add the link
-            if random.randint(1, 100) <= 50:
+            if random.randint(1, 100) <= 33:
                 tweet_text += f"{cta}\n⬇️\n{link}\n\n"
                 
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
@@ -885,7 +885,7 @@ for target_date_str in futbol_dates_to_check:
                 link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
                 
                 # 5% Chance to add the link
-                if random.randint(1, 100) <= 50:
+                if random.randint(1, 100) <= 33:
                     disallowed_tweet += f"\n\nLive match center:\n⬇️\n{link}"
                     
                 disallowed_tweet += f"\n\n{league_info['tag']} #{h_hash} #{a_hash}"
