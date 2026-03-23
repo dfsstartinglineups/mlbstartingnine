@@ -421,7 +421,7 @@ FUTBOL_LEAGUES = {
     40:  {"name": "CHAMPIONSHIP 🇬🇧", "tag": "#Championship", "url_slug": "championship"},
     78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga"},
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
-    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"}
+    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"},
    # 3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
    # 13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
     16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
@@ -433,12 +433,12 @@ FUTBOL_LEAGUES = {
     262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
    # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
     94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-    239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
-    203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
-    144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
+    239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"}
+   # 203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
+   # 144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
    # 179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership", "url_slug": "scotland"},
    # 188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
-   # 119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"},
+   # 119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"}
    # 292: {"name": "K LEAGUE 1 🇰🇷", "tag": "#KLeague #KLeague1 #SouthKorea", "url_slug": "k1"},
    # 11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
    # 143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
