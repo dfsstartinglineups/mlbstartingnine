@@ -7893,12 +7893,12 @@
             "gameDate": "2026-03-23T18:05:00Z",
             "officialDate": "2026-03-23",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "F",
+                "detailedState": "Final",
+                "statusCode": "F",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -7909,10 +7909,11 @@
                     },
                     "leagueRecord": {
                         "wins": 15,
-                        "losses": 15,
-                        "pct": ".500"
+                        "losses": 16,
+                        "pct": ".484"
                     },
                     "score": 9,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 641743,
                         "fullName": "Anthony Kay",
@@ -7972,11 +7973,12 @@
                         "link": "/api/v1/teams/133"
                     },
                     "leagueRecord": {
-                        "wins": 13,
+                        "wins": 14,
                         "losses": 16,
-                        "pct": ".448"
+                        "pct": ".467"
                     },
                     "score": 10,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 806960,
                         "fullName": "Luis Morales",
@@ -8177,7 +8179,7 @@
                             "runs": 1,
                             "hits": 1,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 2
                         }
                     }
                 ],
@@ -8192,7 +8194,7 @@
                         "runs": 9,
                         "hits": 11,
                         "errors": 0,
-                        "leftOnBase": 10
+                        "leftOnBase": 12
                     }
                 },
                 "defense": {
@@ -8454,103 +8456,6 @@
                         "strikeZoneTop": 3.154,
                         "strikeZoneBottom": 1.592
                     },
-                    "first": {
-                        "id": 671117,
-                        "fullName": "Darren Baker",
-                        "link": "/api/v1/people/671117",
-                        "firstName": "Darren",
-                        "lastName": "Baker",
-                        "primaryNumber": "85",
-                        "birthDate": "1999-02-11",
-                        "currentAge": 27,
-                        "birthCity": "Redwood City",
-                        "birthStateProvince": "CA",
-                        "birthCountry": "USA",
-                        "height": "5' 10\"",
-                        "weight": 167,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "4",
-                            "name": "Second Base",
-                            "type": "Infielder",
-                            "abbreviation": "2B"
-                        },
-                        "useName": "Darren",
-                        "useLastName": "Baker",
-                        "middleName": "John",
-                        "boxscoreName": "Baker, Da",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "mlbDebutDate": "2024-09-01",
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Darren Baker",
-                        "nameSlug": "darren-baker-671117",
-                        "firstLastName": "Darren Baker",
-                        "lastFirstName": "Baker, Darren",
-                        "lastInitName": "Baker, D",
-                        "initLastName": "D Baker",
-                        "fullFMLName": "Darren John Baker",
-                        "fullLFMName": "Baker, Darren John",
-                        "strikeZoneTop": 3.12,
-                        "strikeZoneBottom": 1.57
-                    },
-                    "third": {
-                        "id": 814453,
-                        "fullName": "Nathan Archer",
-                        "link": "/api/v1/people/814453",
-                        "firstName": "Nathan",
-                        "lastName": "Archer",
-                        "primaryNumber": "86",
-                        "birthDate": "2003-03-14",
-                        "currentAge": 23,
-                        "birthCity": "Elyria",
-                        "birthStateProvince": "OH",
-                        "birthCountry": "USA",
-                        "height": "6' 0\"",
-                        "weight": 175,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "O",
-                            "name": "Outfield",
-                            "type": "Outfielder",
-                            "abbreviation": "OF"
-                        },
-                        "useName": "Nathan",
-                        "useLastName": "Archer",
-                        "middleName": "Lee",
-                        "boxscoreName": "Archer",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Nathan Archer",
-                        "nameSlug": "nathan-archer-814453",
-                        "firstLastName": "Nathan Archer",
-                        "lastFirstName": "Archer, Nathan",
-                        "lastInitName": "Archer, N",
-                        "initLastName": "N Archer",
-                        "fullFMLName": "Nathan Archer",
-                        "fullLFMName": "Archer, Nathan ",
-                        "strikeZoneTop": 3.21,
-                        "strikeZoneBottom": 1.62
-                    },
                     "pitcher": {
                         "id": 691799,
                         "fullName": "Grant Taylor",
@@ -8608,8 +8513,8 @@
                     }
                 },
                 "balls": 1,
-                "strikes": 2,
-                "outs": 2
+                "strikes": 3,
+                "outs": 3
             },
             "venue": {
                 "id": 2507,
@@ -8619,6 +8524,7 @@
             "content": {
                 "link": "/api/v1/game/831915/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -10408,53 +10314,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 800391,
-                        "fullName": "Darlyn De Leon",
-                        "link": "/api/v1/people/800391",
-                        "firstName": "Darlyn",
-                        "lastName": "De Leon",
-                        "primaryNumber": "12",
-                        "birthDate": "2005-02-11",
-                        "currentAge": 21,
-                        "birthCity": "Santo Domingo",
-                        "birthCountry": "Dominican Republic",
-                        "height": "5' 9\"",
-                        "weight": 150,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "8",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "CF"
-                        },
-                        "useName": "Darlyn",
-                        "useLastName": "De Leon",
-                        "middleName": "Jael",
-                        "boxscoreName": "De Leon, D",
-                        "gender": "M",
-                        "nameMatrilineal": "Marte",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Darlyn De Leon",
-                        "nameSlug": "darlyn-de-leon-800391",
-                        "firstLastName": "Darlyn De Leon",
-                        "lastFirstName": "De Leon, Darlyn",
-                        "lastInitName": "De Leon, D",
-                        "initLastName": "D De Leon",
-                        "fullFMLName": "Darlyn Jael De Leon",
-                        "fullLFMName": "De Leon, Darlyn Jael",
-                        "strikeZoneTop": 3.073,
-                        "strikeZoneBottom": 1.551
-                    },
-                    "onDeck": {
                         "id": 694208,
                         "fullName": "Mois\u00e9s Ballesteros",
                         "link": "/api/v1/people/694208",
@@ -10503,7 +10362,7 @@
                         "strikeZoneTop": 3.04,
                         "strikeZoneBottom": 1.534
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 624424,
                         "fullName": "Michael Conforto",
                         "link": "/api/v1/people/624424",
@@ -10552,6 +10411,53 @@
                         "fullLFMName": "Conforto, Michael Thomas",
                         "strikeZoneTop": 3.181,
                         "strikeZoneBottom": 1.606
+                    },
+                    "inHole": {
+                        "id": 823702,
+                        "fullName": "Alex Madera",
+                        "link": "/api/v1/people/823702",
+                        "firstName": "Alexander",
+                        "lastName": "Madera",
+                        "primaryNumber": "8",
+                        "birthDate": "2000-10-27",
+                        "currentAge": 25,
+                        "birthCity": "Philadelphia",
+                        "birthStateProvince": "PA",
+                        "birthCountry": "USA",
+                        "height": "5' 10\"",
+                        "weight": 179,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Alex",
+                        "useLastName": "Madera",
+                        "middleName": "Louis",
+                        "boxscoreName": "Madera",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Alex Madera",
+                        "nameSlug": "alex-madera-823702",
+                        "firstLastName": "Alex Madera",
+                        "lastFirstName": "Madera, Alex",
+                        "lastInitName": "Madera, A",
+                        "initLastName": "A Madera",
+                        "fullFMLName": "Alexander Louis Madera",
+                        "fullLFMName": "Madera, Alexander Louis",
+                        "strikeZoneTop": 3.121,
+                        "strikeZoneBottom": 1.575
                     },
                     "pitcher": {
                         "id": 664208,
@@ -10606,16 +10512,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 4,
+                    "battingOrder": 5,
                     "team": {
                         "id": 112,
                         "name": "Chicago Cubs",
                         "link": "/api/v1/teams/112"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
-                "outs": 1
+                "balls": 1,
+                "strikes": 2,
+                "outs": 2
             },
             "venue": {
                 "id": 4629,
@@ -12415,101 +12321,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 806495,
-                        "fullName": "Kale Fountain",
-                        "link": "/api/v1/people/806495",
-                        "firstName": "Kale",
-                        "lastName": "Fountain",
-                        "primaryNumber": "33",
-                        "birthDate": "2005-08-14",
-                        "currentAge": 20,
-                        "birthCity": "Sioux Falls",
-                        "birthStateProvince": "SD",
-                        "birthCountry": "USA",
-                        "height": "6' 4\"",
-                        "weight": 225,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Kale",
-                        "useLastName": "Fountain",
-                        "middleName": "Michael",
-                        "boxscoreName": "Fountain",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2024,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Kale Fountain",
-                        "nameSlug": "kale-fountain-806495",
-                        "firstLastName": "Kale Fountain",
-                        "lastFirstName": "Fountain, Kale",
-                        "lastInitName": "Fountain, K",
-                        "initLastName": "K Fountain",
-                        "fullFMLName": "Kale Fountain",
-                        "fullLFMName": "Fountain, Kale",
-                        "strikeZoneTop": 3.396,
-                        "strikeZoneBottom": 1.714
-                    },
-                    "onDeck": {
-                        "id": 698916,
-                        "fullName": "Rosman Verdugo",
-                        "link": "/api/v1/people/698916",
-                        "firstName": "Rosman",
-                        "lastName": "Verdugo",
-                        "primaryNumber": "74",
-                        "birthDate": "2005-02-02",
-                        "currentAge": 21,
-                        "birthCity": "Ensenada",
-                        "birthStateProvince": "BC",
-                        "birthCountry": "Mexico",
-                        "height": "5' 11\"",
-                        "weight": 180,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Rosman",
-                        "useLastName": "Verdugo",
-                        "boxscoreName": "Verdugo, R",
-                        "gender": "M",
-                        "nameMatrilineal": "Rojas",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Rosman Verdugo",
-                        "nameSlug": "rosman-verdugo-698916",
-                        "firstLastName": "Rosman Verdugo",
-                        "lastFirstName": "Verdugo, Rosman",
-                        "lastInitName": "Verdugo, R",
-                        "initLastName": "R Verdugo",
-                        "fullFMLName": "Rosman Verdugo",
-                        "fullLFMName": "Verdugo, Rosman",
-                        "strikeZoneTop": 3.15,
-                        "strikeZoneBottom": 1.59
-                    },
-                    "inHole": {
                         "id": 687867,
                         "fullName": "Clay Dungan",
                         "link": "/api/v1/people/687867",
@@ -12557,6 +12368,198 @@
                         "fullLFMName": "Dungan, Anthony Clay",
                         "strikeZoneTop": 3.189,
                         "strikeZoneBottom": 1.61
+                    },
+                    "onDeck": {
+                        "id": 810838,
+                        "fullName": "Ryan Jackson",
+                        "link": "/api/v1/people/810838",
+                        "firstName": "Ryan",
+                        "lastName": "Jackson",
+                        "primaryNumber": "2",
+                        "birthDate": "2001-11-27",
+                        "currentAge": 24,
+                        "birthCity": "Walnut Creek",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "5' 8\"",
+                        "weight": 180,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Ryan",
+                        "useLastName": "Jackson",
+                        "middleName": "George",
+                        "boxscoreName": "Jackson",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Ryan Jackson",
+                        "nameSlug": "ryan-jackson-810838",
+                        "firstLastName": "Ryan Jackson",
+                        "lastFirstName": "Jackson, Ryan",
+                        "lastInitName": "Jackson, R",
+                        "initLastName": "R Jackson",
+                        "fullFMLName": "Ryan Jackson",
+                        "fullLFMName": "Jackson, Ryan ",
+                        "strikeZoneTop": 3.046,
+                        "strikeZoneBottom": 1.537
+                    },
+                    "inHole": {
+                        "id": 669369,
+                        "fullName": "Bryce Johnson",
+                        "link": "/api/v1/people/669369",
+                        "firstName": "Bryce",
+                        "lastName": "Johnson",
+                        "primaryNumber": "29",
+                        "birthDate": "1995-10-27",
+                        "currentAge": 30,
+                        "birthCity": "Cypress",
+                        "birthStateProvince": "TX",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 190,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Bryce",
+                        "useLastName": "Johnson",
+                        "middleName": "Christopher",
+                        "boxscoreName": "Johnson, B",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": false,
+                        "draftYear": 2017,
+                        "mlbDebutDate": "2022-08-03",
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Bryce Johnson",
+                        "nameSlug": "bryce-johnson-669369",
+                        "firstLastName": "Bryce Johnson",
+                        "lastFirstName": "Johnson, Bryce",
+                        "lastInitName": "Johnson, B",
+                        "initLastName": "B Johnson",
+                        "fullFMLName": "Bryce Christopher Johnson",
+                        "fullLFMName": "Johnson, Bryce Christopher",
+                        "strikeZoneTop": 3.186,
+                        "strikeZoneBottom": 1.608
+                    },
+                    "first": {
+                        "id": 698916,
+                        "fullName": "Rosman Verdugo",
+                        "link": "/api/v1/people/698916",
+                        "firstName": "Rosman",
+                        "lastName": "Verdugo",
+                        "primaryNumber": "74",
+                        "birthDate": "2005-02-02",
+                        "currentAge": 21,
+                        "birthCity": "Ensenada",
+                        "birthStateProvince": "BC",
+                        "birthCountry": "Mexico",
+                        "height": "5' 11\"",
+                        "weight": 180,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "6",
+                            "name": "Shortstop",
+                            "type": "Infielder",
+                            "abbreviation": "SS"
+                        },
+                        "useName": "Rosman",
+                        "useLastName": "Verdugo",
+                        "boxscoreName": "Verdugo, R",
+                        "gender": "M",
+                        "nameMatrilineal": "Rojas",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Rosman Verdugo",
+                        "nameSlug": "rosman-verdugo-698916",
+                        "firstLastName": "Rosman Verdugo",
+                        "lastFirstName": "Verdugo, Rosman",
+                        "lastInitName": "Verdugo, R",
+                        "initLastName": "R Verdugo",
+                        "fullFMLName": "Rosman Verdugo",
+                        "fullLFMName": "Verdugo, Rosman",
+                        "strikeZoneTop": 3.15,
+                        "strikeZoneBottom": 1.59
+                    },
+                    "second": {
+                        "id": 806495,
+                        "fullName": "Kale Fountain",
+                        "link": "/api/v1/people/806495",
+                        "firstName": "Kale",
+                        "lastName": "Fountain",
+                        "primaryNumber": "33",
+                        "birthDate": "2005-08-14",
+                        "currentAge": 20,
+                        "birthCity": "Sioux Falls",
+                        "birthStateProvince": "SD",
+                        "birthCountry": "USA",
+                        "height": "6' 4\"",
+                        "weight": 225,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Kale",
+                        "useLastName": "Fountain",
+                        "middleName": "Michael",
+                        "boxscoreName": "Fountain",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Kale Fountain",
+                        "nameSlug": "kale-fountain-806495",
+                        "firstLastName": "Kale Fountain",
+                        "lastFirstName": "Fountain, Kale",
+                        "lastInitName": "Fountain, K",
+                        "initLastName": "K Fountain",
+                        "fullFMLName": "Kale Fountain",
+                        "fullLFMName": "Fountain, Kale",
+                        "strikeZoneTop": 3.396,
+                        "strikeZoneBottom": 1.714
                     },
                     "pitcher": {
                         "id": 699134,
@@ -12607,15 +12610,15 @@
                         "strikeZoneTop": 3.255,
                         "strikeZoneBottom": 1.643
                     },
-                    "battingOrder": 3,
+                    "battingOrder": 5,
                     "team": {
                         "id": 135,
                         "name": "San Diego Padres",
                         "link": "/api/v1/teams/135"
                     }
                 },
-                "balls": 1,
-                "strikes": 2,
+                "balls": 0,
+                "strikes": 0,
                 "outs": 0
             },
             "venue": {
