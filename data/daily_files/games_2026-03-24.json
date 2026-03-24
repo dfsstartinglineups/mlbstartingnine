@@ -12214,12 +12214,12 @@
             "gameDate": "2026-03-24T21:10:00Z",
             "officialDate": "2026-03-24",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -12230,10 +12230,11 @@
                     },
                     "leagueRecord": {
                         "wins": 14,
-                        "losses": 16,
-                        "pct": ".467"
+                        "losses": 17,
+                        "pct": ".452"
                     },
                     "score": 1,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 695505,
                         "fullName": "Chase Burns",
@@ -12292,11 +12293,12 @@
                         "link": "/api/v1/teams/158"
                     },
                     "leagueRecord": {
-                        "wins": 13,
+                        "wins": 14,
                         "losses": 16,
-                        "pct": ".448"
+                        "pct": ".467"
                     },
                     "score": 4,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 687075,
                         "fullName": "Brandon Sproat",
@@ -12496,9 +12498,10 @@
                             "leftOnBase": 0
                         },
                         "away": {
+                            "runs": 0,
                             "hits": 1,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         }
                     }
                 ],
@@ -12513,7 +12516,7 @@
                         "runs": 1,
                         "hits": 8,
                         "errors": 2,
-                        "leftOnBase": 8
+                        "leftOnBase": 9
                     }
                 },
                 "defense": {
@@ -12774,55 +12777,6 @@
                         "strikeZoneTop": 3.119,
                         "strikeZoneBottom": 1.574
                     },
-                    "first": {
-                        "id": 664731,
-                        "fullName": "P.J. Higgins",
-                        "link": "/api/v1/people/664731",
-                        "firstName": "Patrick",
-                        "lastName": "Higgins",
-                        "primaryNumber": "65",
-                        "birthDate": "1993-05-10",
-                        "currentAge": 32,
-                        "birthCity": "Bridgeport",
-                        "birthStateProvince": "CT",
-                        "birthCountry": "USA",
-                        "height": "5' 10\"",
-                        "weight": 195,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "P.J.",
-                        "useLastName": "Higgins",
-                        "middleName": "James",
-                        "boxscoreName": "Higgins, P",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2015,
-                        "mlbDebutDate": "2021-05-19",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "P.J. Higgins",
-                        "nameSlug": "p-j-higgins-664731",
-                        "firstLastName": "P.J. Higgins",
-                        "lastFirstName": "Higgins, P.J.",
-                        "lastInitName": "Higgins, P",
-                        "initLastName": "P Higgins",
-                        "fullFMLName": "Patrick James Higgins",
-                        "fullLFMName": "Higgins, Patrick James",
-                        "strikeZoneTop": 3.138,
-                        "strikeZoneBottom": 1.584
-                    },
                     "pitcher": {
                         "id": 695076,
                         "fullName": "Rhett Lowder",
@@ -12881,7 +12835,7 @@
                 },
                 "balls": 1,
                 "strikes": 2,
-                "outs": 2
+                "outs": 3
             },
             "venue": {
                 "id": 32,
@@ -12891,6 +12845,7 @@
             "content": {
                 "link": "/api/v1/game/832077/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
