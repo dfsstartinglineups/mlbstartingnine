@@ -8125,12 +8125,12 @@
             "gameDate": "2026-03-24T19:10:00Z",
             "officialDate": "2026-03-24",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -8140,11 +8140,12 @@
                         "link": "/api/v1/teams/116"
                     },
                     "leagueRecord": {
-                        "wins": 8,
+                        "wins": 9,
                         "losses": 13,
-                        "pct": ".381"
+                        "pct": ".409"
                     },
                     "score": 11,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 434378,
                         "fullName": "Justin Verlander",
@@ -8206,10 +8207,11 @@
                     },
                     "leagueRecord": {
                         "wins": 15,
-                        "losses": 14,
-                        "pct": ".517"
+                        "losses": 15,
+                        "pct": ".500"
                     },
                     "score": 8,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 608372,
                         "fullName": "Tomoyuki Sugano",
@@ -8542,53 +8544,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 682276,
-                        "fullName": "Jose Cordova",
-                        "link": "/api/v1/people/682276",
-                        "firstName": "Jose",
-                        "lastName": "Cordova",
-                        "primaryNumber": "79",
-                        "birthDate": "2000-01-11",
-                        "currentAge": 26,
-                        "birthCity": "Guayana",
-                        "birthCountry": "Venezuela",
-                        "height": "6' 0\"",
-                        "weight": 180,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "2",
-                            "name": "Catcher",
-                            "type": "Catcher",
-                            "abbreviation": "C"
-                        },
-                        "useName": "Jose",
-                        "useLastName": "Cordova",
-                        "middleName": "Maria",
-                        "boxscoreName": "Cordova",
-                        "gender": "M",
-                        "nameMatrilineal": "Ruiz",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Jose Cordova",
-                        "nameSlug": "jose-cordova-682276",
-                        "firstLastName": "Jose Cordova",
-                        "lastFirstName": "Cordova, Jose",
-                        "lastInitName": "Cordova, J",
-                        "initLastName": "J Cordova",
-                        "fullFMLName": "Jose Maria Cordova",
-                        "fullLFMName": "Cordova, Jose Maria",
-                        "strikeZoneTop": 3.21,
-                        "strikeZoneBottom": 1.62
-                    },
-                    "onDeck": {
                         "id": 677338,
                         "fullName": "GJ Hill",
                         "link": "/api/v1/people/677338",
@@ -8637,7 +8592,7 @@
                         "strikeZoneTop": 3.076,
                         "strikeZoneBottom": 1.553
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 694808,
                         "fullName": "Zach Kokoska",
                         "link": "/api/v1/people/694808",
@@ -8684,6 +8639,54 @@
                         "fullLFMName": "Kokoska, Zachary Scott",
                         "strikeZoneTop": 3.21,
                         "strikeZoneBottom": 1.62
+                    },
+                    "inHole": {
+                        "id": 809101,
+                        "fullName": "Tommy Hopfe",
+                        "link": "/api/v1/people/809101",
+                        "firstName": "Tommy",
+                        "lastName": "Hopfe",
+                        "primaryNumber": "85",
+                        "birthDate": "2002-10-11",
+                        "currentAge": 23,
+                        "birthCity": "Bakersfield",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 0\"",
+                        "weight": 210,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Tommy",
+                        "useLastName": "Hopfe",
+                        "middleName": "Allen",
+                        "boxscoreName": "Hopfe",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2024,
+                        "batSide": {
+                            "code": "S",
+                            "description": "Switch"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Tommy Hopfe",
+                        "nameSlug": "tommy-hopfe-809101",
+                        "firstLastName": "Tommy Hopfe",
+                        "lastFirstName": "Hopfe, Tommy",
+                        "lastInitName": "Hopfe, T",
+                        "initLastName": "T Hopfe",
+                        "fullFMLName": "Tommy Hopfe",
+                        "fullLFMName": "Hopfe, Tommy ",
+                        "strikeZoneTop": 3.194,
+                        "strikeZoneBottom": 1.612
                     },
                     "pitcher": {
                         "id": 801842,
@@ -8733,16 +8736,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 5,
+                    "battingOrder": 6,
                     "team": {
                         "id": 115,
                         "name": "Colorado Rockies",
                         "link": "/api/v1/teams/115"
                     }
                 },
-                "balls": 2,
-                "strikes": 2,
-                "outs": 2
+                "balls": 0,
+                "strikes": 0,
+                "outs": 3
             },
             "venue": {
                 "id": 4249,
@@ -8752,6 +8755,7 @@
             "content": {
                 "link": "/api/v1/game/831856/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -10840,8 +10844,8 @@
                         "link": "/api/v1/teams/114"
                     }
                 },
-                "balls": 1,
-                "strikes": 0,
+                "balls": 2,
+                "strikes": 2,
                 "outs": 2
             },
             "venue": {
@@ -12422,11 +12426,11 @@
                 }
             },
             "linescore": {
-                "currentInning": 3,
-                "currentInningOrdinal": "3rd",
-                "inningState": "End",
-                "inningHalf": "Bottom",
-                "isTopInning": false,
+                "currentInning": 4,
+                "currentInningOrdinal": "4th",
+                "inningState": "Top",
+                "inningHalf": "Top",
+                "isTopInning": true,
                 "scheduledInnings": 9,
                 "innings": [
                     {
@@ -12475,6 +12479,20 @@
                             "hits": 1,
                             "errors": 0,
                             "leftOnBase": 1
+                        }
+                    },
+                    {
+                        "num": 4,
+                        "ordinalNum": "4th",
+                        "home": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
+                        },
+                        "away": {
+                            "hits": 0,
+                            "errors": 0,
+                            "leftOnBase": 0
                         }
                     }
                 ],
@@ -12607,54 +12625,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 682829,
-                        "fullName": "Elly De La Cruz",
-                        "link": "/api/v1/people/682829",
-                        "firstName": "Elly",
-                        "lastName": "De La Cruz",
-                        "primaryNumber": "44",
-                        "birthDate": "2002-01-11",
-                        "currentAge": 24,
-                        "birthCity": "Sabana Grande de Boya",
-                        "birthCountry": "Dominican Republic",
-                        "height": "6' 6\"",
-                        "weight": 200,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Elly",
-                        "useLastName": "De La Cruz",
-                        "middleName": "Antonio",
-                        "boxscoreName": "De La Cruz, E",
-                        "gender": "M",
-                        "nameMatrilineal": "Sanchez",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "mlbDebutDate": "2023-06-06",
-                        "batSide": {
-                            "code": "S",
-                            "description": "Switch"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Elly De La Cruz",
-                        "nameSlug": "elly-de-la-cruz-682829",
-                        "firstLastName": "Elly De La Cruz",
-                        "lastFirstName": "De La Cruz, Elly",
-                        "lastInitName": "De La Cruz, E",
-                        "initLastName": "E De La Cruz",
-                        "fullFMLName": "Elly Antonio De La Cruz",
-                        "fullLFMName": "De La Cruz, Elly Antonio",
-                        "strikeZoneTop": 3.46,
-                        "strikeZoneBottom": 1.746
-                    },
-                    "onDeck": {
                         "id": 701398,
                         "fullName": "Sal Stewart",
                         "link": "/api/v1/people/701398",
@@ -12703,7 +12673,7 @@
                         "strikeZoneTop": 3.239,
                         "strikeZoneBottom": 1.635
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 553993,
                         "fullName": "Eugenio Su\u00e1rez",
                         "link": "/api/v1/people/553993",
@@ -12751,6 +12721,55 @@
                         "fullLFMName": "Su\u00e1rez, Eugenio Alejandro",
                         "strikeZoneTop": 3.171,
                         "strikeZoneBottom": 1.6
+                    },
+                    "inHole": {
+                        "id": 668715,
+                        "fullName": "Spencer Steer",
+                        "link": "/api/v1/people/668715",
+                        "firstName": "Spencer",
+                        "lastName": "Steer",
+                        "primaryNumber": "7",
+                        "birthDate": "1997-12-07",
+                        "currentAge": 28,
+                        "birthCity": "Long Beach",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "5' 9\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "3",
+                            "name": "First Base",
+                            "type": "Infielder",
+                            "abbreviation": "1B"
+                        },
+                        "useName": "Spencer",
+                        "useLastName": "Steer",
+                        "middleName": "Gordon",
+                        "boxscoreName": "Steer",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "mlbDebutDate": "2022-09-02",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Spencer Steer",
+                        "nameSlug": "spencer-steer-668715",
+                        "firstLastName": "Spencer Steer",
+                        "lastFirstName": "Steer, Spencer",
+                        "lastInitName": "Steer, S",
+                        "initLastName": "S Steer",
+                        "fullFMLName": "Spencer Gordon Steer",
+                        "fullLFMName": "Steer, Spencer Gordon",
+                        "strikeZoneTop": 3.096,
+                        "strikeZoneBottom": 1.563
                     },
                     "pitcher": {
                         "id": 695505,
@@ -12800,7 +12819,7 @@
                         "strikeZoneTop": 3.55,
                         "strikeZoneBottom": 1.63
                     },
-                    "battingOrder": 3,
+                    "battingOrder": 4,
                     "team": {
                         "id": 113,
                         "name": "Cincinnati Reds",
@@ -12809,7 +12828,7 @@
                 },
                 "balls": 0,
                 "strikes": 0,
-                "outs": 3
+                "outs": 1
             },
             "venue": {
                 "id": 32,
