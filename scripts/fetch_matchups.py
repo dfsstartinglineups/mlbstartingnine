@@ -510,7 +510,58 @@ def main():
             if potential_odds:
                 game_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
 
+            away_starter = teams.get('away', {}).get('probablePitcher')
+            home_starter = teams.get('home', {}).get('probablePitcher')
+            away_starter_id = str(away_starter.get('id')) if away_starter else None
+            home_starter_id = str(home_starter.get('id')) if home_starter else None
+            
+            for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
+                if p_id and p_id not in game_deep_stats:
+                    print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
+                    game_deep_stats[p_id] = {
+                        "name": p_data['fullName'], "is_pitcher": True,
+                        "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
+                        "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
+                    }
+
+            # --- CRITICAL FIX: BULK FETCH HANDEDNESS FOR ALL PLAYERS ---
+            lineups = game.get('lineups', {})
+            away_lineup = lineups.get('awayPlayers', [])
+            home_lineup = lineups.get('homePlayers', [])
+            
+            # Collect all known player IDs for this game (Official + Projected)
+            all_pids = set()
+            for p in away_lineup + home_lineup:
+                all_pids.add(str(p['id']))
+            
+            if needs_bbm_fetch:
+                away_proj = bbm_projections_for_date.get(f"{away_team_id}_{game_num}", {}).get('battingOrder', [])
+                home_proj = bbm_projections_for_date.get(f"{home_team_id}_{game_num}", {}).get('battingOrder', [])
+                for p in away_proj + home_proj:
+                    if 'id' in p: all_pids.add(str(p['id']))
+            
+            # Bulk fetch the missing handedness from MLB People API
+            if all_pids:
+                try:
+                    people_data = session.get(f"https://statsapi.mlb.com/api/v1/people?personIds={','.join(all_pids)}", timeout=5).json()
+                    for person in people_data.get('people', []):
+                        pid = str(person['id'])
+                        bat_side = person.get('batSide', {}).get('code')
+                        if bat_side:
+                            lineup_handedness[pid] = bat_side
+                except Exception:
+                    pass
+
+            # Ensure Pitchers get their handedness assigned too
+            if away_starter and away_starter.get('pitchHand'):
+                lineup_handedness[str(away_starter['id'])] = away_starter['pitchHand'].get('code')
+            if home_starter and home_starter.get('pitchHand'):
+                lineup_handedness[str(home_starter['id'])] = home_starter['pitchHand'].get('code')
+            # -------------------------------------------------------------------------------------
+
             for batter in away_lineup:
+                batter_id = str(batter['id'])
+                if batter_id not in game_deep_stats:
                     game_deep_stats[batter_id] = {
                         "name": batter['fullName'], 
                         "bvp": fetch_bvp(session, batter_id, home_starter_id) if home_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
