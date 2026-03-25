@@ -10,6 +10,21 @@ let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'tr
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
+// --- CSS INJECTIONS FOR LEADERBOARD ---
+const style = document.createElement('style');
+style.innerHTML = `
+    .leaderboard-tab {
+        font-size: 0.7rem; font-weight: 700; color: #adb5bd; cursor: pointer;
+        padding: 8px 0; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;
+        border-bottom: 2px solid transparent; transition: all 0.2s ease;
+    }
+    .leaderboard-tab.active { color: #0d6efd; border-bottom: 2px solid #0d6efd; }
+    .leaderboard-tab:hover:not(.active) { color: #495057; }
+    .list-view::-webkit-scrollbar { width: 4px; }
+    .list-view::-webkit-scrollbar-thumb { background-color: #dee2e6; border-radius: 4px; }
+`;
+document.head.appendChild(style);
+
 // ==========================================
 // 1. DEEP LINK SCROLLING
 // ==========================================
@@ -50,6 +65,37 @@ function handleHashNavigation() {
 // ==========================================
 // 2. DATA FETCHING & SLATE HELPERS
 // ==========================================
+function ensureDFSControls() {
+    if (!document.getElementById('dfs-controls-row')) {
+        const container = document.getElementById('games-container');
+        if (container) {
+            const controlsHtml = `
+                <div id="dfs-controls-row" class="row mb-3 mx-0 px-1 w-100">
+                    <div class="col-12 d-flex flex-wrap justify-content-center align-items-center gap-3 p-3 bg-white rounded border shadow-sm" style="border-color: #dee2e6 !important;">
+                        <div class="btn-group shadow-sm" role="group">
+                            <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
+                            <label class="btn btn-outline-primary fw-bold px-4" for="btn-fd" style="font-size: 0.85rem;">FanDuel</label>
+                            
+                            <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
+                            <label class="btn btn-outline-primary fw-bold px-4" for="btn-dk" style="font-size: 0.85rem;">DraftKings</label>
+                        </div>
+                        <select id="slate-selector" class="form-select fw-bold border-primary text-primary shadow-sm" style="max-width: 280px; cursor: pointer; font-size: 0.85rem;">
+                            <option value="all">All Slates</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforebegin', controlsHtml);
+            
+            document.querySelectorAll('.dfs-toggle').forEach(radio => radio.addEventListener('change', () => {
+                populateSlates();
+                renderGames();
+            }));
+            document.getElementById('slate-selector').addEventListener('change', renderGames);
+        }
+    }
+}
+
 function populateSlates() {
     const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
     const platform = platformNode ? platformNode.value : 'fd';
@@ -77,7 +123,6 @@ function populateSlates() {
             const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
             const containsADay = days.some(day => upperName.includes(day));
             
-            // Ensure the slate belongs to the currently viewed day
             if (upperName.includes(dayOfWeek) || !containsADay) {
                 const opt = document.createElement('option');
                 opt.value = slate.id;
@@ -96,6 +141,7 @@ function hasSlatePlayers(game, platform, selectedSlate) {
     const checkRoster = (players) => {
         if (!players) return false;
         return players.some(p => {
+            if (!p) return false;
             const slatesDict = platform === 'dk' ? (p.dk_slates || {}) : (p.fd_slates || {});
             return !!slatesDict[selectedSlate];
         });
@@ -138,10 +184,7 @@ async function init(dateToFetch) {
     
     try {
         const response = await fetch(`data/daily_files/games_${dateToFetch}.json?v=` + new Date().getTime());
-        
-        if (!response.ok) {
-            throw new Error("Local JSON not found");
-        }
+        if (!response.ok) throw new Error("Local JSON not found");
         
         const rawData = await response.json();
 
@@ -153,36 +196,27 @@ async function init(dateToFetch) {
             GLOBAL_SLATES = rawData.slates || { fanduel: [], draftkings: [] };
         }
 
+        ensureDFSControls();
         populateSlates();
 
     } catch (error) {
-        console.log(`No local file for ${dateToFetch}. Falling back to live MLB API...`);
-        
+        console.log(`No local file for ${dateToFetch}. Falling back to live API...`);
         try {
             const [year, month, day] = dateToFetch.split('-');
             const mlbApiDate = `${month}/${day}/${year}`;
-            
             const mlbRes = await fetch(`https://statsapi.mlb.com/api/v1/schedule?sportId=1&date=${mlbApiDate}&hydrate=probablePitcher,lineups`);
-            
             if (!mlbRes.ok) throw new Error("MLB API Failed");
             
             const mlbData = await mlbRes.json();
-            
             if (mlbData.dates && mlbData.dates.length > 0) {
                 ALL_GAMES_DATA = mlbData.dates[0].games.map(game => {
-                    return {
-                        gameRaw: game,
-                        lineupHandedness: {},
-                        deepStats: {},
-                        parkStats: null,
-                        hpUmpire: "TBD",
-                        umpStats: null
-                    };
+                    return { gameRaw: game, lineupHandedness: {}, deepStats: {}, parkStats: null, hpUmpire: "TBD", umpStats: null };
                 });
             }
+            ensureDFSControls();
+            populateSlates();
         } catch (fallbackError) {
-            console.error("Fallback failed:", fallbackError);
-            container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
+            if (container) container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
             return;
         }
     }
@@ -197,10 +231,147 @@ async function init(dateToFetch) {
 }
 
 // ==========================================
-// 3. RENDERING ENGINE
+// 3. LEADERBOARD BUILDERS
+// ==========================================
+window.setTopPlaysTab = function(el, tab) {
+    document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    window.updateTopPlaysView();
+};
+
+window.updateTopPlaysView = function() {
+    const type = document.getElementById('top-plays-type').value;
+    const tabEl = document.querySelector('.leaderboard-tab.active');
+    const tab = tabEl ? tabEl.getAttribute('data-tab') : 'value';
+    
+    document.querySelectorAll('.list-view').forEach(el => el.classList.add('d-none'));
+    const target = document.getElementById(`view-top-${tab}-${type}`);
+    if(target) target.classList.remove('d-none');
+};
+
+function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
+    let allHitters = [];
+    let allPitchers = [];
+    
+    filteredGames.forEach(game => {
+        const pl = game.gameRaw?.teams || {}; 
+        const awayAbbr = pl.away?.team?.abbreviation || pl.away?.team?.name?.substring(0,3).toUpperCase();
+        const homeAbbr = pl.home?.team?.abbreviation || pl.home?.team?.name?.substring(0,3).toUpperCase();
+        const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.away?.team?.id}.svg`;
+        const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.home?.team?.id}.svg`;
+        
+        const extract = (roster, teamAbbr, teamLogo, isPitcher) => {
+            if (!roster) return;
+            let arr = Array.isArray(roster) ? roster : [roster];
+            arr.forEach(p => {
+                if (!p) return;
+                let sal = 0, proj = 0, val = 0;
+                const slatesDict = platform === 'dk' ? (p.dk_slates || {}) : (p.fd_slates || {});
+                
+                if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
+                    sal = slatesDict[selectedSlate].salary; proj = slatesDict[selectedSlate].proj; val = slatesDict[selectedSlate].value;
+                } else if (selectedSlate === 'all') {
+                    sal = platform === 'dk' ? (p.dk_salary || 0) : (p.salary || 0); 
+                    proj = platform === 'dk' ? (p.dk_proj || 0) : (p.proj || 0); 
+                    val = platform === 'dk' ? (p.dk_value || 0) : (p.value || 0);
+                }
+                
+                if (sal > 0 || proj > 0) {
+                    let name = p.name || p.fullName || 'Unknown';
+                    let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
+                    let listToPush = isPitcher ? allPitchers : allHitters;
+                    let pos = isPitcher ? 'P' : (p.order ? p.order : 'B');
+                    listToPush.push({ id: p.id || name, name, pos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
+                }
+            });
+        };
+        
+        const line = game.projectedLineups || {};
+        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true);
+        extract(line.away?.battingOrder, awayAbbr, awayLogo, false);
+        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true);
+        extract(line.home?.battingOrder, homeAbbr, homeLogo, false);
+    });
+
+    if (allHitters.length === 0 && allPitchers.length === 0) return '';
+    
+    // Deduplicate
+    allHitters = Array.from(new Map(allHitters.map(p => [p.id, p])).values());
+    allPitchers = Array.from(new Map(allPitchers.map(p => [p.id, p])).values());
+
+    const topHittersVal = [...allHitters].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
+    const topHittersProj = [...allHitters].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
+    const topPitchersVal = [...allPitchers].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
+    const topPitchersProj = [...allPitchers].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
+
+    const buildList = (players, isValue) => {
+        if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found.</div>`;
+        return players.map((p, index) => {
+            const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
+            const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
+            const highlightMetric = isValue ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
+            const salFmt = p.salary > 0 ? '$' + (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+            
+            let shortName = p.name;
+            if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
+
+            return `
+            <div class="d-flex align-items-center justify-content-between py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
+                <div class="d-flex align-items-center overflow-hidden">
+                    <div class="fw-bold text-muted me-2 text-end" style="font-size: 0.85rem; width: 22px;">${index + 1}.</div>
+                    <div class="me-3 position-relative flex-shrink-0">
+                        ${photoHtml}
+                        ${teamBadge}
+                    </div>
+                    <div class="d-flex flex-column justify-content-center overflow-hidden pe-1">
+                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.95rem; max-width: 180px;" title="${p.name}">${shortName}</span>
+                        <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 240px;">
+                            ${p.pos} • ${p.teamAbbrev} • ${salFmt} • ${parseFloat(p.proj || 0).toFixed(1)} pts
+                        </span>
+                    </div>
+                </div>
+                <div class="text-end ms-1 flex-shrink-0">
+                    <div class="fw-bold" style="font-size: 1.2rem;">${highlightMetric}</div>
+                </div>
+            </div>`;
+        }).join('');
+    };
+
+    return `
+    <div class="col-md-6 col-lg-6 col-xl-4 px-1 mb-3">
+        <div class="card shadow-sm border overflow-hidden h-100" style="background-color: #fff; border-radius: 6px; border-color: #dee2e6 !important;">
+            <div class="card-header bg-dark text-white py-2 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">⭐ Top Plays</h6>
+                    <select id="top-plays-type" class="form-select form-select-sm bg-dark text-white border-secondary fw-bold" style="font-size:0.7rem; padding: 2px 20px 2px 6px; width: auto; cursor: pointer;" onchange="window.updateTopPlaysView()">
+                        <option value="hitters">Batters</option>
+                        <option value="pitchers">Pitchers</option>
+                    </select>
+                </div>
+                <span class="badge bg-secondary" style="font-size: 0.6rem;">${platform === 'dk' ? 'DraftKings' : 'FanDuel'}</span>
+            </div>
+            <div class="bg-light border-bottom d-flex justify-content-center align-items-center px-2 py-0">
+                <div class="d-flex w-100">
+                    <div class="leaderboard-tab active w-50" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">TOP VALUE</div>
+                    <div class="leaderboard-tab w-50" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">TOP PROJ</div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersVal, true)}</div>
+                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersProj, false)}</div>
+                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersVal, true)}</div>
+                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersProj, false)}</div>
+            </div>
+        </div>
+    </div>`;
+}
+
+// ==========================================
+// 4. RENDERING ENGINE
 // ==========================================
 function renderGames() {
     const container = document.getElementById('games-container');
+    if (!container) return;
     container.innerHTML = '';
 
     const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
@@ -225,13 +396,17 @@ function renderGames() {
         return;
     }
 
+    // Insert Leaderboard if no search
+    if (!searchText) {
+        const topPlaysHtml = buildTopPlaysCard(filteredGames, platform, selectedSlate);
+        if (topPlaysHtml) container.insertAdjacentHTML('beforeend', topPlaysHtml);
+    }
+
     let sortedGames = [...filteredGames].sort((a, b) => {
         const isFinalA = a.gameRaw.status.abstractGameState === 'Final';
         const isFinalB = b.gameRaw.status.abstractGameState === 'Final';
-
         if (isFinalA && !isFinalB) return 1; 
         if (!isFinalA && isFinalB) return -1; 
-        
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
@@ -243,13 +418,12 @@ function createGameCard(data, platform, selectedSlate) {
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
     const parkStats = data.parkStats; 
-    
     const hpUmpire = data.hpUmpire || "TBD"; 
     const umpStats = data.umpStats;
 
     const gameCard = document.createElement('div');
-    // INCREASED WIDTH: Replaced col-xl-4 with col-lg-6 col-xl-6 to make cards take up 50% width on large screens
-    gameCard.className = 'col-12 col-lg-6 col-xl-6 mb-3 px-2';
+    // Keeping 3 cards per row, but removed horizontal margins for maximum width
+    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 px-1 mb-3';
 
     const awayNameFull = game.teams.away.team.name;
     const homeNameFull = game.teams.home.team.name;
@@ -267,18 +441,6 @@ function createGameCard(data, platform, selectedSlate) {
     if (homeNameFull.includes('Blue Jays')) homeName = 'Blue Jays';
     if (homeName === 'Diamondbacks') homeName = 'Dbacks';
 
-    const wbcOverrides = {
-        'Dominican Republic': 'Dom Rep', 'United States': 'USA', 
-        'Puerto Rico': 'Puerto Rico', 'South Korea': 'South Korea', 
-        'Great Britain': 'Gr Britain', 'Chinese Taipei': 'Chinese Taipei', 
-        'Czech Republic': 'Czechia', 'Netherlands': 'Netherlands', 'Venezuela': 'Venezuela', 'Mexico': 'Mexico'
-    };
-
-    Object.keys(wbcOverrides).forEach(country => {
-        if (awayNameFull.includes(country)) awayName = wbcOverrides[country];
-        if (homeNameFull.includes(country)) homeName = wbcOverrides[country];
-    });
-
     const awayId = game.teams.away.team.id;
     const homeId = game.teams.home.team.id;
     const venueName = game.venue.name;
@@ -289,24 +451,11 @@ function createGameCard(data, platform, selectedSlate) {
     const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${awayId}.svg`;
     const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${homeId}.svg`;
 
-    const venueShortNames = {
-        "Oriole Park at Camden Yards": "Oriole Park at Camden Yards",
-        "Guaranteed Rate Field": "Guaranteed Rate",
-        "American Family Field": "AmFam Field",
-        "Great American Ball Park": "Great American",
-        "Chase Field": "Chase Field",
-        "Citizens Bank Park": "Citizens Bank",
-        "Globe Life Field": "Globe Life Field",
-        "Minute Maid Park": "Minute Maid Park",
-        "loanDepot park": "loanDepot Park"
-    };
-    const displayVenueName = venueShortNames[venueName] || venueName;
-
+    const displayVenueName = venueName;
     let rightSideHtml = '';
     
     if (parkStats) {
         const uSize = "0.70rem"; 
-
         const getParkBadge = (factor) => {
             const diff = factor - 100;
             const absDiff = Math.abs(diff);
@@ -318,54 +467,26 @@ function createGameCard(data, platform, selectedSlate) {
 
         const labelStyle = `font-family:sans-serif; font-size:${uSize}; font-weight:normal; color:#495057; display: inline-block; width: 42px; text-align: right; padding-right: 4px;`;
         const sepStyle = `font-family:sans-serif; font-size:0.65rem; font-weight:normal; color:#adb5bd; margin:0 3px;`; 
-        
-        const sBlock = (val, lbl) => `
-            <div class="d-flex align-items-baseline">
-                ${val}<span style="font-size:0.65rem; font-family:sans-serif; font-weight:normal; color:#6c757d; margin-left:1px;">${lbl}</span>
-            </div>`;
+        const sBlock = (val, lbl) => `<div class="d-flex align-items-baseline">${val}<span style="font-size:0.65rem; font-family:sans-serif; font-weight:normal; color:#6c757d; margin-left:1px;">${lbl}</span></div>`;
 
-        let parkString = `
-            <div class="d-flex flex-column justify-content-center border-start ps-2 ms-2" style="font-family:sans-serif; line-height:1.2;">
-                <div class="d-flex align-items-baseline w-100 mb-1">
-                    <span style="${labelStyle}">R:</span>
-                    ${getParkBadge(parkStats.runs)}
-                </div>
-                <div class="d-flex align-items-baseline w-100 mb-1">
-                    <span style="${labelStyle}">HR:</span>
-                    ${sBlock(getParkBadge(parkStats.hr_l), 'L')}
-                    <span style="${sepStyle}">/</span>
-                    ${sBlock(getParkBadge(parkStats.hr_r), 'R')}
-                </div>
-                <div class="d-flex align-items-baseline w-100">
-                    <span style="${labelStyle}">wOBA:</span>
-                    ${sBlock(getParkBadge(parkStats.woba_l), 'L')}
-                    <span style="${sepStyle}">/</span>
-                    ${sBlock(getParkBadge(parkStats.woba_r), 'R')}
-                </div>
-            </div>`;
-            
         rightSideHtml = `
             <div class="d-flex align-items-center ms-auto">
                 <div class="text-muted fw-bold text-uppercase text-end" style="font-size: 0.70rem; letter-spacing: 0.5px; max-width: 85px; white-space: normal; line-height: 1.1;">
                     ${displayVenueName}
                 </div>
-                ${parkString}
-            </div>
-        `;
+                <div class="d-flex flex-column justify-content-center border-start ps-2 ms-2" style="font-family:sans-serif; line-height:1.2;">
+                    <div class="d-flex align-items-baseline w-100 mb-1"><span style="${labelStyle}">R:</span>${getParkBadge(parkStats.runs)}</div>
+                    <div class="d-flex align-items-baseline w-100 mb-1"><span style="${labelStyle}">HR:</span>${sBlock(getParkBadge(parkStats.hr_l), 'L')}<span style="${sepStyle}">/</span>${sBlock(getParkBadge(parkStats.hr_r), 'R')}</div>
+                    <div class="d-flex align-items-baseline w-100"><span style="${labelStyle}">wOBA:</span>${sBlock(getParkBadge(parkStats.woba_l), 'L')}<span style="${sepStyle}">/</span>${sBlock(getParkBadge(parkStats.woba_r), 'R')}</div>
+                </div>
+            </div>`;
     } else {
-        rightSideHtml = `
-            <div class="text-muted fw-bold text-uppercase text-end ms-auto" style="font-size: 0.70rem; letter-spacing: 0.5px; line-height: 1.1;">
-                ${displayVenueName}
-            </div>
-        `;
+        rightSideHtml = `<div class="text-muted fw-bold text-uppercase text-end ms-auto" style="font-size: 0.70rem; letter-spacing: 0.5px; line-height: 1.1;">${displayVenueName}</div>`;
     }
 
     // --- PITCHER LOGIC ---
-    let awayPitcherId = null;
-    let awayPitcher = "TBD";
-    let awayPitcherHand = 'R'; 
+    let awayPitcherId = null, awayPitcher = "TBD", awayPitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
-
     if (game.teams.away.probablePitcher) {
         awayPitcherId = game.teams.away.probablePitcher.id;
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
@@ -375,11 +496,8 @@ function createGameCard(data, platform, selectedSlate) {
         awayPitcher = awayPitcherObj.name + " (Proj)";
     }
 
-    let homePitcherId = null;
-    let homePitcher = "TBD";
-    let homePitcherHand = 'R'; 
+    let homePitcherId = null, homePitcher = "TBD", homePitcherHand = 'R'; 
     let homePitcherObj = data.projectedLineups?.home?.startingPitcher;
-
     if (game.teams.home.probablePitcher) {
         homePitcherId = game.teams.home.probablePitcher.id;
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
@@ -392,113 +510,79 @@ function createGameCard(data, platform, selectedSlate) {
     const buildPitcherToggle = (pId, pName, pitcherObj) => {
         if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
         
-        let shortName = pName;
-        const parts = pName.split(' ');
-        if (parts.length >= 3 && !pName.includes("(Proj)")) {
-            shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
-        }
+        let shortName = pName.includes(' ') && !pName.includes("(Proj)") ? `${pName.split(' ')[0].charAt(0)}. ${pName.split(' ').slice(1).join(' ')}` : pName;
 
-        // Add Pitcher DFS Stats underneath their name
-        let showStats = false, salFmt = '-', projFmt = '-';
+        let showStats = false, salFmt = '-', projFmt = '-', valFmt = '-';
         if (pitcherObj) {
             const slatesDict = platform === 'dk' ? (pitcherObj.dk_slates || {}) : (pitcherObj.fd_slates || {});
-            let sal = 0, proj = 0;
-            
+            let sal = 0, proj = 0, val = 0;
             if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
-                sal = slatesDict[selectedSlate].salary; 
-                proj = slatesDict[selectedSlate].proj; 
+                sal = slatesDict[selectedSlate].salary; proj = slatesDict[selectedSlate].proj; val = slatesDict[selectedSlate].value;
                 showStats = true;
             } else if (selectedSlate === 'all') {
-                sal = platform === 'dk' ? pitcherObj.dk_salary : pitcherObj.salary; 
-                proj = platform === 'dk' ? pitcherObj.dk_proj : pitcherObj.proj; 
+                sal = platform === 'dk' ? (pitcherObj.dk_salary || 0) : (pitcherObj.salary || 0); 
+                proj = platform === 'dk' ? (pitcherObj.dk_proj || 0) : (pitcherObj.proj || 0); 
+                val = platform === 'dk' ? (pitcherObj.dk_value || 0) : (pitcherObj.value || 0);
                 if (sal > 0 || proj > 0) showStats = true;
             }
-            
             if (showStats) {
                 salFmt = sal > 0 ? '$' + (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
-                projFmt = proj > 0 ? proj : '-';
+                projFmt = proj > 0 ? proj.toFixed(1) : '-';
+                valFmt = val > 0 ? val.toFixed(2) : '-';
             }
         }
 
         let dfsHtml = showStats ? `
-            <div class="d-flex justify-content-center align-items-center w-100 mt-1" style="font-size: 0.65rem; letter-spacing: -0.2px;">
+            <div class="d-flex justify-content-center align-items-center w-100 mt-1" style="font-size: 0.65rem; letter-spacing: -0.4px;">
                 <span class="text-muted fw-bold me-2">${salFmt}</span>
-                <span class="text-primary fw-bold">${projFmt}</span>
+                <span class="text-primary fw-bold me-2">${projFmt}</span>
+                <span class="text-success fw-bold">${valFmt}</span>
             </div>` : '';
 
-        // Entire block becomes clickable to expand matchup stats
         return `
             <div class="d-flex flex-column justify-content-center align-items-center player-toggle mt-1 w-100 rounded" style="cursor: pointer; padding: 2px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-p-${pId}">
                 <div class="d-flex align-items-center justify-content-center w-100">
                     <span class="text-dark fw-bold text-truncate" style="font-size: 0.75rem; max-width: 110px;" title="${pName}">${shortName}</span>
                 </div>
                 ${dfsHtml}
-            </div>
-        `;
+            </div>`;
     };
 
     const buildPitcherStats = (pId) => {
         if (!pId) return `<div id="stats-${game.gamePk}-p-null" class="stats-collapse d-none w-100"></div>`;
-        
         let statsHtml = `<div class="mt-1 p-1 rounded text-center text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
-        
         const pStats = deepStats[pId];
         if (pStats && pStats.split_vL && pStats.split_vR) {
-            const vL = pStats.split_vL;
-            const vR = pStats.split_vR;
-            
             const formatRow = (split, label) => {
                 if (split.ab > 0) {
                     const avgStr = split.avg.length > 4 ? split.avg.substring(0, 4) : split.avg;
                     const opsStr = split.ops.length > 4 ? split.ops.substring(0, 4) : split.ops;
-
                     return `
                     <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
                         <span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span>
-                        
                         <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
-                            <span style="display: inline-block; width: 24px;">${avgStr}</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span style="display: inline-block; width: 24px;">${opsStr}</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span style="display: inline-block; width: 24px;">${split.hr}HR</span>
-                            <span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                            <span style="display: inline-block; width: 24px;">${avgStr}</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                            <span style="display: inline-block; width: 24px;">${opsStr}</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                            <span style="display: inline-block; width: 24px;">${split.hr}HR</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
                             <span>${split.k}K</span>
                         </div>
                     </div>`;
                 }
-                return `
-                    <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
-                        <span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span>
-                        <span class="text-muted fst-italic">No History</span>
-                    </div>`;
+                return `<div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;"><span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span><span class="text-muted fst-italic">No History</span></div>`;
             };
-
-            statsHtml = `
-                <div class="mt-1 p-1 rounded w-100 mx-auto" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
-                    ${formatRow(vL, 'vL')}
-                    ${formatRow(vR, 'vR')}
-                </div>
-            `;
+            statsHtml = `<div class="mt-1 p-1 rounded w-100 mx-auto" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">${formatRow(pStats.split_vL, 'vL')}${formatRow(pStats.split_vR, 'vR')}</div>`;
         }
-
-        return `
-            <div id="stats-${game.gamePk}-p-${pId}" class="stats-collapse d-none w-100">
-                ${statsHtml}
-            </div>
-        `;
+        return `<div id="stats-${game.gamePk}-p-${pId}" class="stats-collapse d-none w-100">${statsHtml}</div>`;
     };
 
     const awayPitcherToggle = buildPitcherToggle(awayPitcherId, awayPitcher, awayPitcherObj);
     const awayPitcherStats = buildPitcherStats(awayPitcherId);
-    
     const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher, homePitcherObj);
     const homePitcherStats = buildPitcherStats(homePitcherId);
 
-    // --- ODDS & LIVE SCOREBOARD ENGINE ---
+    // --- ODDS & SCOREBOARD ENGINE ---
     const oddsData = data.odds; 
-    let mlAway = '';
-    let mlHome = '';
+    let mlAway = '', mlHome = '';
     let rawAwayOdds = "TBD", rawHomeOdds = "TBD", rawTotal = "TBD";
 
     if (oddsData && oddsData.bookmakers && oddsData.bookmakers.length > 0) {
@@ -508,29 +592,22 @@ function createGameCard(data, platform, selectedSlate) {
             if (!totalsMarket) totalsMarket = bookie.markets.find(m => m.key === 'totals');
             if (h2hMarket && totalsMarket) break; 
         }
-        
         if (h2hMarket) {
             const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
             const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeNameFull);
             if (awayOutcome && awayOutcome.price) {
-                const price = awayOutcome.price > 0 ? `+${awayOutcome.price}` : awayOutcome.price;
-                mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
-                rawAwayOdds = price; 
+                mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${awayOutcome.price > 0 ? '+'+awayOutcome.price : awayOutcome.price}</span>`;
+                rawAwayOdds = awayOutcome.price > 0 ? '+'+awayOutcome.price : awayOutcome.price; 
             }
             if (homeOutcome && homeOutcome.price) {
-                const price = homeOutcome.price > 0 ? `+${homeOutcome.price}` : homeOutcome.price;
-                mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${price}</span>`;
-                rawHomeOdds = price; 
+                mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${homeOutcome.price > 0 ? '+'+homeOutcome.price : homeOutcome.price}</span>`;
+                rawHomeOdds = homeOutcome.price > 0 ? '+'+homeOutcome.price : homeOutcome.price; 
             }
         }
-        
-        if (totalsMarket && totalsMarket.outcomes.length > 0) {
-            rawTotal = totalsMarket.outcomes[0].point; 
-        }
+        if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
     let middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100"><div class="text-muted small fw-bold mb-0 lh-1">@</div></div>`;
-
     const gameState = game.status.abstractGameState; 
     const detailedState = game.status.detailedState; 
 
@@ -544,110 +621,48 @@ function createGameCard(data, platform, selectedSlate) {
     } else if (gameState === 'Live' || gameState === 'Final') {
         const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
         const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
-        
-        let topBadgeHtml = '';
-        let extraLiveInfo = '';
+        let topBadgeHtml = '', extraLiveInfo = '';
         let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
 
         if (gameState === 'Live') {
             const inning = game.linescore?.currentInning || '';
             let half = game.linescore?.inningHalf || ''; 
-            let halfLetter = '';
-            if (half === 'Top') halfLetter = 'T';
-            if (half === 'Bottom') halfLetter = 'B';
-            let inningStr = (halfLetter && inning) ? `${halfLetter}${inning}` : (detailedState || 'Live');
-
+            let inningStr = ((half === 'Top' ? 'T' : (half === 'Bottom' ? 'B' : '')) + inning) || (detailedState || 'Live');
             topBadgeHtml = `
                 <div class="badge bg-primary text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
-                    <span style="white-space: nowrap;">${inningStr}</span>
-                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
-                    <span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
+                    <span style="white-space: nowrap;">${inningStr}</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
-
-            const balls = game.linescore?.balls || 0;
-            const strikes = game.linescore?.strikes || 0;
-            const outs = game.linescore?.outs || 0;
             const offense = game.linescore?.offense || {};
-            const onFirst = !!offense.first;
-            const onSecond = !!offense.second;
-            const onThird = !!offense.third;
-
-            const baseSvg = `
-                <svg width="22" height="22" viewBox="0 0 100 100" class="mx-auto mt-1" style="display: block;">
-                   <polygon points="50,15 65,30 50,45 35,30" fill="${onSecond ? '#0d6efd' : 'transparent'}" stroke="${onSecond ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
-                   <polygon points="75,40 90,55 75,70 60,55" fill="${onFirst ? '#0d6efd' : 'transparent'}" stroke="${onFirst ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
-                   <polygon points="25,40 40,55 25,70 10,55" fill="${onThird ? '#0d6efd' : 'transparent'}" stroke="${onThird ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
-                </svg>
-            `;
-
+            const baseSvg = `<svg width="22" height="22" viewBox="0 0 100 100" class="mx-auto mt-1" style="display: block;">
+                   <polygon points="50,15 65,30 50,45 35,30" fill="${!!offense.second ? '#0d6efd' : 'transparent'}" stroke="${!!offense.second ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
+                   <polygon points="75,40 90,55 75,70 60,55" fill="${!!offense.first ? '#0d6efd' : 'transparent'}" stroke="${!!offense.first ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
+                   <polygon points="25,40 40,55 25,70 10,55" fill="${!!offense.third ? '#0d6efd' : 'transparent'}" stroke="${!!offense.third ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
+                </svg>`;
+            const outs = game.linescore?.outs || 0;
             const getCircle = (isFilled) => `<circle cx="5" cy="5" r="4.5" fill="${isFilled ? '#0d6efd' : 'transparent'}" stroke="${isFilled ? '#0d6efd' : '#adb5bd'}" stroke-width="1.5"/>`;
-            const outsHtml = `
-                <div class="d-flex align-items-center ms-1 pb-0">
-                    <svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs >= 1)}</svg>
-                    <svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs >= 2)}</svg>
-                    <svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs >= 3)}</svg>
-                </div>
-            `;
-
-            extraLiveInfo = `
-                ${baseSvg}
-                <div class="d-flex justify-content-center align-items-center w-100" style="margin-top: 2px; margin-bottom: 2px;">
-                    <span class="text-dark fw-bold" style="font-size: 0.70rem; font-family: monospace; letter-spacing: -0.5px; white-space: nowrap;">${balls}-${strikes}</span>
-                    ${outsHtml}
-                </div>
-            `;
+            const outsHtml = `<div class="d-flex align-items-center ms-1 pb-0"><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=1)}</svg><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=2)}</svg><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=3)}</svg></div>`;
+            extraLiveInfo = `${baseSvg}<div class="d-flex justify-content-center align-items-center w-100" style="margin-top: 2px; margin-bottom: 2px;"><span class="text-dark fw-bold" style="font-size: 0.70rem; font-family: monospace; letter-spacing: -0.5px; white-space: nowrap;">${game.linescore?.balls||0}-${game.linescore?.strikes||0}</span>${outsHtml}</div>`;
         } else {
             topBadgeHtml = `
                 <div class="badge bg-dark text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
-                    <span style="white-space: nowrap;">Final</span>
-                    <span style="margin: 0 5px; color:#ffffff99;">|</span>
-                    <span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
+                    <span style="white-space: nowrap;">Final</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
         }
-
+        middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center w-100 px-0 pt-1">${topBadgeHtml}${extraLiveInfo}${ouHtml}</div>`;
+    } else if (rawTotal !== "TBD") {
         middleSectionHtml = `
-            <div class="d-flex flex-column justify-content-center align-items-center w-100 px-0 pt-1">
-                ${topBadgeHtml}
-                ${extraLiveInfo}
-                ${ouHtml}
-            </div>
-        `;
-    } else {
-        if (rawTotal !== "TBD") {
-            middleSectionHtml = `
-                <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-0">
-                    <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-                    <div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>
-                </div>`;
-        }
+            <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-0">
+                <div class="text-muted small fw-bold mb-0 lh-1">@</div>
+                <div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>
+            </div>`;
     }
-
-    const generateTweetText = (teamName, teamPitcher, teamOdds, oppPitcher, oppOdds, total, players) => {
-        let totalString = total !== 'TBD' ? ` • O/U ${total}` : '';
-        let teamOddsStr = teamOdds !== 'TBD' ? ` [${teamOdds}]` : '';
-        let oppOddsStr = oppOdds !== 'TBD' ? ` [${oppOdds}]` : '';
-        
-        let text = `⚾ ${gameDateShort} ${teamName} Lineup${totalString}\nSP: ${teamPitcher}${teamOddsStr}\nvs ${oppPitcher}${oppOddsStr}\n\n`;
-        const playerStrings = players.map((p, i) => {
-             const playerName = p.fullName || p.name;
-             const hand = handDict[p.id] ? `(${handDict[p.id]})` : '';
-             const pos = (data.gamePositions && data.gamePositions[p.id]) ? `(${data.gamePositions[p.id]})` : '';
-             return `${i+1}. ${playerName} ${pos} ${hand}`.replace(/  +/g, ' ').trim();
-        });
-        text += playerStrings.join('\n'); 
-        const teamHash = teamName.replace(/\s+/g, '');
-        text += `\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-${game.gamePk}\n\n#${teamHash} #${teamHash}Lineup #MLB #DFS #StartingPitchers`;
-        return text;
-    };
 
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         
         const listItems = playersArray.map((p, index) => {
             let playerName = p.fullName || p.name;
-            let abbrName = playerName;
-            const nameParts = playerName.split(' ');
-            if (nameParts.length > 1) abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
+            let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
             
             const batCode = handDict[p.id] || "";
             const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem; margin-left: 2px;">(${batCode})</span>` : "";
@@ -661,29 +676,24 @@ function createGameCard(data, platform, selectedSlate) {
             let sal = 0, proj = 0, val = 0;
             
             if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
-                sal = slatesDict[selectedSlate].salary; 
-                proj = slatesDict[selectedSlate].proj; 
-                val = slatesDict[selectedSlate].value;
-                showStats = true;
+                sal = slatesDict[selectedSlate].salary; proj = slatesDict[selectedSlate].proj; val = slatesDict[selectedSlate].value; showStats = true;
             } else if (selectedSlate === 'all') {
-                sal = platform === 'dk' ? p.dk_salary : p.salary; 
-                proj = platform === 'dk' ? p.dk_proj : p.proj; 
-                val = platform === 'dk' ? p.dk_value : p.value;
+                sal = platform === 'dk' ? (p.dk_salary || 0) : (p.salary || 0); proj = platform === 'dk' ? (p.dk_proj || 0) : (p.proj || 0); val = platform === 'dk' ? (p.dk_value || 0) : (p.value || 0);
                 if (sal > 0 || proj > 0) showStats = true;
             }
             
             if (showStats) {
                 salFmt = sal > 0 ? '$' + (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
-                projFmt = proj > 0 ? proj : '-';
-                valFmt = val > 0 ? val : '-';
+                projFmt = proj > 0 ? proj.toFixed(1) : '-';
+                valFmt = val > 0 ? val.toFixed(2) : '-';
             }
 
             const dfsHtml = showStats ? `
-                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0" style="width: 48%; font-size: 0.65rem; letter-spacing: -0.4px;">
-                    <span class="text-end fw-bold" style="width: 32%;">${salFmt}</span>
-                    <span class="text-center text-primary fw-bold" style="width: 36%;">${projFmt}</span>
-                    <span class="text-start text-success fw-bold" style="width: 32%;">${valFmt}</span>
-                </div>` : `<div style="width: 48%;"></div>`;
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0" style="width: 52%; font-size: 0.65rem; letter-spacing: -0.4px;">
+                    <span class="text-end fw-bold" style="width: 33%;">${salFmt}</span>
+                    <span class="text-center text-primary fw-bold" style="width: 33%;">${projFmt}</span>
+                    <span class="text-end text-success fw-bold pe-1" style="width: 34%;">${valFmt}</span>
+                </div>` : `<div style="width: 52%;"></div>`;
 
             // --- BvP & SPLITS ---
             let statsHtml = '';
@@ -691,10 +701,8 @@ function createGameCard(data, platform, selectedSlate) {
             if (pStats && pStats.bvp) {
                 const bvp = pStats.bvp;
                 const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
-                
                 let bvpText = "No History", bvpClass = "text-muted"; 
                 if (bvp.ab > 0) { bvpText = `${bvp.hits}-${bvp.ab}•${bvp.hr}HR•${bvp.ops}OPS`; bvpClass = "text-dark"; }
-
                 let splitText = "No History", splitClass = "text-muted";
                 if (split && split.ab > 0) { splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`; splitClass = "text-dark"; }
 
@@ -707,11 +715,10 @@ function createGameCard(data, platform, selectedSlate) {
                 statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
-            // Entire Row acts as the toggle trigger, Squeezed pos and name to the left
             return `
                 <li class="d-flex flex-column w-100 px-2 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
                     <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="d-flex align-items-center text-truncate" style="width: 52%;">
+                        <div class="d-flex align-items-center text-truncate" style="width: 48%;">
                             <span class="text-muted fw-bold text-center me-1 flex-shrink-0" style="font-size: 0.65rem; width: 14px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
                             ${handText}
@@ -725,15 +732,11 @@ function createGameCard(data, platform, selectedSlate) {
         return `<div class="w-100 m-0 p-0"><ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul></div>`;
     };
 
-    // 1. Determine which players to use (Official fallback to Projected)
     let awayPlayers = game.lineups?.awayPlayers?.length > 0 ? game.lineups.awayPlayers : (data.projectedLineups?.away?.battingOrder || []);
     let homePlayers = game.lineups?.homePlayers?.length > 0 ? game.lineups.homePlayers : (data.projectedLineups?.home?.battingOrder || []);
-    
-    // 2. Check status
     let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
     let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
 
-    // 3. Create the Banners
     const getStatusBanner = (isOfficial, hasPlayers) => {
         if (!hasPlayers) return '';
         if (isOfficial) {
@@ -749,8 +752,6 @@ function createGameCard(data, platform, selectedSlate) {
 
     const awayBanner = getStatusBanner(isAwayOfficial, awayPlayers.length > 0);
     const homeBanner = getStatusBanner(isHomeOfficial, homePlayers.length > 0);
-
-    // 4. Build the HTML lists
     const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand);
     const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand);
 
@@ -767,53 +768,29 @@ function createGameCard(data, platform, selectedSlate) {
     }
 
     const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
-    
-    let awayTweetBtn = '';
-    if (game.lineups?.awayPlayers?.length > 0) {
-        const awayTweetText = generateTweetText(awayName, awayPitcher, rawAwayOdds, homePitcher, rawHomeOdds, rawTotal, game.lineups.awayPlayers);
-        awayTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(awayTweetText)}">${X_ICON_SVG}</button>`;
-    }
-    let homeTweetBtn = '';
-    if (game.lineups?.homePlayers?.length > 0) {
-        const homeTweetText = generateTweetText(homeName, homePitcher, rawHomeOdds, awayPitcher, rawAwayOdds, rawTotal, game.lineups.homePlayers);
-        homeTweetBtn = `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(homeTweetText)}">${X_ICON_SVG}</button>`;
-    }
+    const generateTweetText = (teamName, tPitcher, tOdds, oPitcher, oOdds, total, players) => {
+        let text = `⚾ ${gameDateShort} ${teamName} Lineup${total !== 'TBD' ? ` • O/U ${total}` : ''}\nSP: ${tPitcher}${tOdds !== 'TBD' ? ` [${tOdds}]` : ''}\nvs ${oPitcher}${oOdds !== 'TBD' ? ` [${oOdds}]` : ''}\n\n`;
+        text += players.map((p, i) => `${i+1}. ${p.fullName || p.name} ${(data.gamePositions && data.gamePositions[p.id]) ? `(${data.gamePositions[p.id]})` : ''} ${handDict[p.id] ? `(${handDict[p.id]})` : ''}`.replace(/  +/g, ' ').trim()).join('\n'); 
+        return text + `\n\n#${teamName.replace(/\s+/g, '')}Lineup #MLB #DFS`;
+    };
 
-    let displayUmpire = hpUmpire;
-    if (hpUmpire !== "TBD") {
-        const umpParts = hpUmpire.split(' ');
-        if (umpParts.length > 1) {
-            displayUmpire = `${umpParts[0].charAt(0)}. ${umpParts.slice(1).join(' ')}`;
-        }
-    }
+    let awayTweetBtn = game.lineups?.awayPlayers?.length > 0 ? `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(generateTweetText(awayName, awayPitcher, rawAwayOdds, homePitcher, rawHomeOdds, rawTotal, game.lineups.awayPlayers))}">${X_ICON_SVG}</button>` : '';
+    let homeTweetBtn = game.lineups?.homePlayers?.length > 0 ? `<button class="x-btn tweet-trigger" data-tweet="${encodeURIComponent(generateTweetText(homeName, homePitcher, rawHomeOdds, awayPitcher, rawAwayOdds, rawTotal, game.lineups.homePlayers))}">${X_ICON_SVG}</button>` : '';
 
+    let displayUmpire = hpUmpire !== "TBD" && hpUmpire.includes(' ') ? `${hpUmpire.split(' ')[0].charAt(0)}. ${hpUmpire.split(' ').slice(1).join(' ')}` : hpUmpire;
     let umpString = `<span class="text-dark fw-bold">${displayUmpire}</span>`;
     if (umpStats) {
-        const kNum = parseFloat(umpStats.k_rate);
-        const bbNum = parseFloat(umpStats.bb_rate);
-        const rpgNum = parseFloat(umpStats.rpg);
-
-        let kColor = "text-dark";
-        if (kNum >= 23.0) kColor = "text-danger"; 
-        else if (kNum <= 21.0) kColor = "text-success"; 
-
-        let bbColor = "text-dark";
-        if (bbNum >= 9.0) bbColor = "text-success"; 
-        else if (bbNum <= 7.5) bbColor = "text-danger"; 
-
-        let rpgColor = "text-dark";
-        if (rpgNum >= 9.5) rpgColor = "text-success"; 
-        else if (rpgNum <= 8.0) rpgColor = "text-danger"; 
-
-        const umpDot = `<span class="text-muted" style="margin: 0 3px;">•</span>`;
-        umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span>${umpDot}K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span>${umpDot}BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span>${umpDot}Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
+        let kColor = parseFloat(umpStats.k_rate) >= 23.0 ? "text-danger" : (parseFloat(umpStats.k_rate) <= 21.0 ? "text-success" : "text-dark");
+        let bbColor = parseFloat(umpStats.bb_rate) >= 9.0 ? "text-success" : (parseFloat(umpStats.bb_rate) <= 7.5 ? "text-danger" : "text-dark");
+        let rpgColor = parseFloat(umpStats.rpg) >= 9.5 ? "text-success" : (parseFloat(umpStats.rpg) <= 8.0 ? "text-danger" : "text-dark");
+        umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span><span class="text-muted" style="margin: 0 3px;">•</span>K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
     const homeRank = game.teams.home.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.home.team.rank}]</span> ` : '';
     const awayRank = game.teams.away.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.away.team.rank}]</span> ` : '';
 
     gameCard.innerHTML = `
-        <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden" style="margin-bottom: 8px;" id="game-${game.gamePk}">
+        <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
                 <div class="d-flex align-items-center mb-2 w-100 pb-1 border-bottom border-white">
@@ -900,7 +877,7 @@ function openTweetModal(text) {
 }
 
 // ==========================================
-// 4. LISTENERS & ACCORDION LOGIC
+// 5. EVENT LISTENERS & ACCORDION
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
@@ -915,15 +892,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.value) { e.target.blur(); init(e.target.value); }
         });
     }
-
-    // Connect DFS Platform Radios to refresh the view
-    document.querySelectorAll('.dfs-toggle').forEach(radio => radio.addEventListener('change', () => {
-        populateSlates();
-        renderGames();
-    }));
-    
-    // Connect Slate Dropdown to filter the view
-    document.getElementById('slate-selector')?.addEventListener('change', renderGames);
 
     const copyBtn = document.getElementById('copy-tweet-btn');
     if(copyBtn) {
@@ -943,16 +911,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', (e) => {
-        // Expand/Collapse individual player matchup rows
         if (e.target.closest('.player-toggle')) {
             const row = e.target.closest('.player-toggle');
             const div = document.getElementById(row.getAttribute('data-target'));
-            if (div) {
-                div.classList.toggle('d-none');
-            }
+            if (div) div.classList.toggle('d-none');
         }
         
-        // Expand/Collapse entire card
         if (e.target.closest('.card-toggle-btn')) {
             const btn = e.target.closest('.card-toggle-btn');
             const card = btn.closest('.lineup-card');
@@ -961,7 +925,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = isExp ? '[-] Collapse Matchups' : '[+] Expand Matchups';
         }
         
-        // Expand/Collapse ALL cards globally
         if (e.target.closest('#global-toggle-btn')) {
             const btn = e.target.closest('#global-toggle-btn');
             const isExp = btn.textContent.includes('+');
