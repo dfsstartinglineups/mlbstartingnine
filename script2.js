@@ -517,7 +517,7 @@ function createGameCard(data, platform, selectedSlate) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
-    // --- PITCHER LOGIC FOR TWEET GENERATOR ---
+    // --- PITCHER LOGIC FOR TWEET GENERATOR AND LINEUPS ---
     let awayPitcher = "TBD", homePitcher = "TBD"; 
     let awayPitcherHand = 'R', homePitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
@@ -527,14 +527,13 @@ function createGameCard(data, platform, selectedSlate) {
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
         awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
         
-        // Convert API Probable Pitcher to Lineup Object format so it blends into the new table smoothly
-        if(!awayPitcherObj) {
-            awayPitcherObj = { 
-                id: game.teams.away.probablePitcher.id, 
-                name: game.teams.away.probablePitcher.fullName, 
-                order: "P" 
-            };
-        }
+        // Merge the DFS stats from memory onto the official pitcher so they don't disappear!
+        awayPitcherObj = { 
+            ...(awayPitcherObj || {}), 
+            id: game.teams.away.probablePitcher.id, 
+            name: game.teams.away.probablePitcher.fullName, 
+            order: "P" 
+        };
     } else if (awayPitcherObj) {
         awayPitcher = awayPitcherObj.name + " (Proj)";
     }
@@ -543,26 +542,32 @@ function createGameCard(data, platform, selectedSlate) {
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
         
-        // Convert API Probable Pitcher to Lineup Object format
-        if(!homePitcherObj) {
-            homePitcherObj = { 
-                id: game.teams.home.probablePitcher.id, 
-                name: game.teams.home.probablePitcher.fullName, 
-                order: "P" 
-            };
-        }
+        // Merge the DFS stats from memory onto the official pitcher so they don't disappear!
+        homePitcherObj = { 
+            ...(homePitcherObj || {}),
+            id: game.teams.home.probablePitcher.id, 
+            name: game.teams.home.probablePitcher.fullName, 
+            order: "P" 
+        };
     } else if (homePitcherObj) {
         homePitcher = homePitcherObj.name + " (Proj)";
     }
 
+    // --- O/U HTML for the top row ---
+    let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.75rem;">O/U ${rawTotal}</span>` : '';
+
     // NEW SLEEK HEADER (Replaces the large image header)
     const newHeaderHtml = `
-        <div class="d-flex justify-content-center align-items-center mb-1 w-100 mt-2" style="font-size: 1.1rem; font-weight: bold; letter-spacing: -0.3px;">
-            <img src="${awayLogo}" alt="${awayName}" style="height: 35px; width: 35px; margin-right: 6px;">
-            <span>${awayName} ${mlAway}</span>
-            <span class="mx-3 text-muted fw-bold" style="font-size: 0.9rem;">@</span>
-            <img src="${homeLogo}" alt="${homeName}" style="height: 35px; width: 35px; margin-right: 6px;">
-            <span>${homeName} ${mlHome}</span>
+        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 1.1rem; font-weight: bold; letter-spacing: -0.3px;">
+            <div class="d-flex align-items-center text-start text-truncate" style="width: 45%;">
+                <img src="${awayLogo}" alt="${awayName}" style="height: 35px; width: 35px; margin-right: 6px; flex-shrink: 0;">
+                <span class="text-truncate">${awayName} ${mlAway}</span>
+            </div>
+            <div class="text-muted fw-bold text-center" style="font-size: 0.9rem; width: 10%;">@</div>
+            <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 45%;">
+                <span class="text-truncate">${homeName} ${mlHome}</span>
+                <img src="${homeLogo}" alt="${homeName}" style="height: 35px; width: 35px; margin-left: 6px; flex-shrink: 0;">
+            </div>
         </div>
     `;
 
@@ -571,17 +576,14 @@ function createGameCard(data, platform, selectedSlate) {
     const detailedState = game.status.detailedState; 
 
     if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
-        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 ms-2 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
         middleSectionHtml = `
             <div class="d-flex justify-content-center align-items-center pb-2 w-100 px-1 border-bottom">
-                <div class="badge bg-danger text-white mt-1 d-inline-block text-wrap" style="font-size: 0.65rem; padding: 0.35em 0.6em;">${detailedState}</div>
-                ${ouHtml}
+                <div class="badge bg-danger text-white mt-1 d-inline-block text-wrap" style="font-size: 0.75rem; padding: 0.35em 0.6em;">${detailedState}</div>
             </div>`;
     } else if (gameState === 'Live' || gameState === 'Final') {
         const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
         const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
         let topBadgeHtml = '', extraLiveInfo = '';
-        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 ms-2 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
 
         if (gameState === 'Live') {
             const inning = game.linescore?.currentInning || '';
@@ -607,15 +609,13 @@ function createGameCard(data, platform, selectedSlate) {
                     <span style="white-space: nowrap;">Final</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
         }
-        middleSectionHtml = `<div class="d-flex justify-content-center align-items-center w-100 pb-2 border-bottom px-0 pt-1">${topBadgeHtml}${extraLiveInfo}${ouHtml}</div>`;
-    } else if (rawTotal !== "TBD") {
-        middleSectionHtml = `
-            <div class="d-flex justify-content-center align-items-center pb-2 w-100 px-0 border-bottom">
-                <div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>
-            </div>`;
+        middleSectionHtml = `<div class="d-flex justify-content-center align-items-center w-100 pb-2 border-bottom px-0 pt-1">${topBadgeHtml}${extraLiveInfo}</div>`;
+    } else {
+        // Just empty border-bottom if nothing else
+        middleSectionHtml = `<div class="border-bottom pb-2"></div>`;
     }
 
-    const buildLineupList = (playersArray, opposingPitcherHand, startingPitcherObj) => {
+    const buildLineupList = (playersArray, opposingPitcherHand, startingPitcherObj, ownPitcherHand) => {
         // Clone the array so we don't mutate the original state
         let displayArray = playersArray ? [...playersArray] : [];
         
@@ -633,7 +633,8 @@ function createGameCard(data, platform, selectedSlate) {
             let playerName = p.fullName || p.name;
             let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
             
-            const batCode = handDict[p.id] || "";
+            // Use their own pitching hand if they are the pitcher, otherwise check the batCode dictionary
+            let batCode = p.order === "P" ? ownPitcherHand : (handDict[p.id] || "");
             const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem; margin-left: 2px;">(${batCode})</span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
@@ -754,9 +755,9 @@ function createGameCard(data, platform, selectedSlate) {
     const awayBanner = getStatusBanner(isAwayOfficial, awayPlayers.length > 0);
     const homeBanner = getStatusBanner(isHomeOfficial, homePlayers.length > 0);
     
-    // Inject the pitcher objects into the lineup build function
-    const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand, awayPitcherObj);
-    const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand, homePitcherObj);
+    // Inject the pitcher objects and their handedness into the lineup build function
+    const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand, awayPitcherObj, awayPitcherHand);
+    const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand, homePitcherObj, homePitcherHand);
 
     const hasAnySlatePlayer = hasAnyDfsSalaries(data, platform);
     let missingSlateHtml = '';
@@ -793,11 +794,11 @@ function createGameCard(data, platform, selectedSlate) {
         <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
-                <div class="d-flex align-items-center mb-0 w-100 pb-1 border-bottom border-white">
-                    <div style="flex: 0 0 auto;" class="pe-2">
+                <div class="d-flex justify-content-between align-items-center mb-0 w-100 pb-1 border-bottom border-white">
+                    <div class="d-flex align-items-center flex-shrink-0">
                         <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
+                        ${ouHtml}
                     </div>
-
                     ${rightSideHtml}
                 </div>
                 
