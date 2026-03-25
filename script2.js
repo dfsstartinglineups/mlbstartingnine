@@ -454,7 +454,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 <div class="d-flex w-100">
                     <div class="leaderboard-tab active w-100" style="width: 33.33%;" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">VALUE</div>
                     <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">PROJ</div>
-                    <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="bvp" onclick="window.setTopPlaysTab(this, 'bvp')">TOP BVP</div>
+                    <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="bvp" onclick="window.setTopPlaysTab(this, 'bvp')">BVP</div>
                 </div>
             </div>
             <div class="card-body p-0">
