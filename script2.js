@@ -167,16 +167,16 @@ function hasAnyDfsSalaries(game, platform) {
            checkRoster([pl.home?.startingPitcher]) || checkRoster(pl.home?.battingOrder);
 }
 
-async function init(dateToFetch) {
-    if (window.updateSEO) window.updateSEO(dateToFetch); 
+async function init(dateToFetch, isSilentRefresh = false) {
+    if (window.updateSEO && !isSilentRefresh) window.updateSEO(dateToFetch); 
     
     const container = document.getElementById('games-container');
     const datePicker = document.getElementById('date-picker');
     
-    ALL_GAMES_DATA = [];
-    if (datePicker) datePicker.value = dateToFetch;
+    if (datePicker && !isSilentRefresh) datePicker.value = dateToFetch;
 
-    if (container) {
+    // Only show the loading spinner if this is a manual/initial load, NOT a background refresh
+    if (container && !isSilentRefresh) {
         container.innerHTML = `
             <div class="col-12 text-center mt-5 pt-5">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -192,14 +192,16 @@ async function init(dateToFetch) {
 
         if (Array.isArray(rawData)) {
             ALL_GAMES_DATA = rawData;
-            GLOBAL_SLATES = { fanduel: [], draftkings: [] };
+            if(!isSilentRefresh) GLOBAL_SLATES = { fanduel: [], draftkings: [] };
         } else {
             ALL_GAMES_DATA = rawData.games || [];
-            GLOBAL_SLATES = rawData.slates || { fanduel: [], draftkings: [] };
+            if(!isSilentRefresh) GLOBAL_SLATES = rawData.slates || { fanduel: [], draftkings: [] };
         }
 
-        ensureDFSControls();
-        populateSlates();
+        if(!isSilentRefresh) {
+            ensureDFSControls();
+            populateSlates();
+        }
 
     } catch (error) {
         console.log(`No local file for ${dateToFetch}. Falling back to live API...`);
@@ -215,21 +217,23 @@ async function init(dateToFetch) {
                     return { gameRaw: game, lineupHandedness: {}, deepStats: {}, parkStats: null, hpUmpire: "TBD", umpStats: null };
                 });
             }
-            ensureDFSControls();
-            populateSlates();
+            if(!isSilentRefresh) {
+                ensureDFSControls();
+                populateSlates();
+            }
         } catch (fallbackError) {
-            if (container) container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
+            if (container && !isSilentRefresh) container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
             return;
         }
     }
 
-    if (ALL_GAMES_DATA.length === 0) {
+    if (ALL_GAMES_DATA.length === 0 && !isSilentRefresh) {
         container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">No games scheduled for ${dateToFetch}</h5></div></div>`;
         return;
     }
 
     renderGames();
-    handleHashNavigation();
+    if (!isSilentRefresh) handleHashNavigation();
 }
 
 // ==========================================
@@ -987,6 +991,15 @@ function openTweetModal(text) {
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
 
+    // --- 30 SECOND LIVE AUTO-REFRESH ---
+    setInterval(() => {
+        const datePicker = document.getElementById('date-picker');
+        const currentDate = datePicker ? datePicker.value : DEFAULT_DATE;
+        // Pass "true" so it updates data silently in the background without flashing the loading spinner
+        init(currentDate, true); 
+    }, 30000); 
+    // -----------------------------------
+
     const searchInput = document.getElementById('team-search');
     if (searchInput) searchInput.addEventListener('input', renderGames);
 
@@ -994,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (datePicker) {
         datePicker.value = DEFAULT_DATE;
         datePicker.addEventListener('change', (e) => {
-            if (e.target.value) { e.target.blur(); init(e.target.value); }
+            if (e.target.value) { e.target.blur(); init(e.target.value); } // Normal load with spinner
         });
     }
 
