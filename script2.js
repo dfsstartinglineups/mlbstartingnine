@@ -655,14 +655,17 @@ function createGameCard(data, platform, selectedSlate) {
             let playerName = p.fullName || p.name;
             let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
             
+            // Explicitly force ID to string for dictionary lookup
+            const pidStr = String(p.id);
+
             // Use their own pitching hand if they are the pitcher, otherwise check the batCode dictionary
-            let batCode = p.order === "P" ? ownPitcherHand : (handDict[p.id] || "");
-            const handText = batCode ? `(${batCode}) ` : "";
+            let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
+            const handText = batCode ? `<span class="text-muted fw-normal">(${batCode}) </span>` : "";
             
-            const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
+            const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
             
             // Logic for the prefix (Number for Batter, "P" for Pitcher)
-            const prefixText = p.order === "P" ? "P." : (gamePos ? gamePos : `${p.order || index}.`);
+            const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
             const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
             const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
             
@@ -693,7 +696,7 @@ function createGameCard(data, platform, selectedSlate) {
 
             // --- BvP & SPLITS ---
             let statsHtml = '';
-            const pStats = deepStats[p.id];
+            const pStats = deepStats[pidStr];
             
             if (p.order === "P") {
                 // RENDER PITCHER STATS (vs LHB / vs RHB)
@@ -740,15 +743,15 @@ function createGameCard(data, platform, selectedSlate) {
             }
 
             return `
-                <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
+                <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${pidStr}">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
-                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 22px; margin-right: 2px;">${prefixText}</span>
+                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 14px; margin-right: 2px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.70rem;" title="${playerName}">${handText}${abbrName}</span>
                         </div>
                         ${dfsHtml}
                     </div>
-                    <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100 mt-1 px-1">${statsHtml}</div>
+                    <div id="stats-${game.gamePk}-${pidStr}" class="stats-collapse d-none w-100 mt-1 px-1">${statsHtml}</div>
                 </li>`;
         }).join('');
         
