@@ -74,7 +74,7 @@ function ensureDFSControls() {
         const container = document.getElementById('games-container');
         if (container && container.parentNode) {
             const controlsHtml = `
-                <div id="dfs-controls-row" class="w-100 d-flex align-items-center px-1 mb-2 gap-2">
+                <div id="dfs-controls-row" class="w-100 d-flex align-items-center mb-3 gap-2 px-2">
                     <div class="btn-group shadow-sm flex-shrink-0" role="group">
                         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
                         <label class="btn btn-outline-primary fw-bold px-3 py-1" for="btn-fd" style="font-size: 0.85rem;">FD</label>
@@ -312,8 +312,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
             const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
             const highlightMetric = isValue ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
-            
-            // NO dollar sign
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
             let shortName = p.name;
@@ -534,7 +532,6 @@ function createGameCard(data, platform, selectedSlate) {
                 if (sal > 0 || proj > 0) showStats = true;
             }
             if (showStats) {
-                // NO dollar sign
                 salFmt = sal > 0 ? (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
                 projFmt = proj > 0 ? proj.toFixed(1) : '-';
                 valFmt = val > 0 ? val.toFixed(2) : '-';
@@ -697,12 +694,13 @@ function createGameCard(data, platform, selectedSlate) {
                 valFmt = val > 0 ? val.toFixed(2) : '-';
             }
 
+            // PREVENT CRASHING: Hardcoded spacing padding (pe-2) on the right-aligned stats so they never touch
             const dfsHtml = showStats ? `
-                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 42%; font-size: 0.65rem; letter-spacing: -0.5px;">
-                    <span class="text-end fw-bold" style="width: 33%;">${salFmt}</span>
-                    <span class="text-center text-primary fw-bold" style="width: 33%;">${projFmt}</span>
-                    <span class="text-end text-success fw-bold" style="width: 34%;">${valFmt}</span>
-                </div>` : `<div style="width: 42%;"></div>`;
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.65rem; letter-spacing: -0.4px;">
+                    <span class="text-end fw-bold pe-2" style="width: 36%;">${salFmt}</span>
+                    <span class="text-end text-primary fw-bold pe-2" style="width: 32%;">${projFmt}</span>
+                    <span class="text-end text-success fw-bold" style="width: 32%;">${valFmt}</span>
+                </div>` : `<div style="width: 45%;"></div>`;
 
             // --- BvP & SPLITS ---
             let statsHtml = '';
@@ -728,8 +726,8 @@ function createGameCard(data, platform, selectedSlate) {
             return `
                 <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
                     <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="d-flex align-items-center text-truncate ps-1" style="width: 58%;">
-                            <span class="text-muted fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 12px; margin-right: 2px;">${prefixText}</span>
+                        <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
+                            <span class="text-muted fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 14px; margin-right: 2px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
                             ${handText}
                         </div>
