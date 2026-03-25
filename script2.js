@@ -232,7 +232,8 @@ async function init(dateToFetch, isSilentRefresh = false) {
         return;
     }
 
-    renderGames();
+    // PASS THE FLAG HERE
+    renderGames(isSilentRefresh); 
     if (!isSilentRefresh) handleHashNavigation();
 }
 
@@ -476,10 +477,40 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 // ==========================================
 // 4. RENDERING ENGINE
 // ==========================================
-function renderGames() {
+function renderGames(isSilentRefresh = false) {
     const container = document.getElementById('games-container');
     if (!container) return;
     
+    // --- 1. CAPTURE STATE (Only if silently refreshing) ---
+    let scrollY = 0;
+    let topPlaysType = 'hitters';
+    let activeTopPlaysTab = 'value';
+    let openStatsIds = [];
+    let expandedCardIds = [];
+
+    if (isSilentRefresh) {
+        scrollY = window.scrollY;
+        
+        // Capture Top Plays State
+        topPlaysType = document.getElementById('top-plays-type')?.value || 'hitters';
+        const activeTabEl = document.querySelector('.leaderboard-tab.active');
+        if (activeTabEl) activeTopPlaysTab = activeTabEl.getAttribute('data-tab');
+
+        // Capture Individual Expanded Players
+        document.querySelectorAll('.stats-collapse:not(.d-none)').forEach(el => {
+            if (el.id) openStatsIds.push(el.id);
+        });
+
+        // Capture Fully Expanded Cards (Card toggle buttons)
+        document.querySelectorAll('.card-toggle-btn').forEach(btn => {
+            if (btn.textContent.includes('[-]')) {
+                const card = btn.closest('.lineup-card');
+                if (card && card.id) expandedCardIds.push(card.id);
+            }
+        });
+    }
+    // ------------------------------------------------------
+
     // Keep controls intact, clear out the games & leaderboard underneath
     container.innerHTML = '';
 
@@ -520,6 +551,40 @@ function renderGames() {
     });
 
     sortedGames.forEach(item => container.appendChild(createGameCard(item, platform, selectedSlate)));
+
+    // --- 2. RESTORE STATE (Only if silently refreshing) ---
+    if (isSilentRefresh) {
+        // Restore Top Plays Select and Tab
+        const newTopPlaysType = document.getElementById('top-plays-type');
+        if (newTopPlaysType) {
+            newTopPlaysType.value = topPlaysType;
+            const newActiveTab = document.querySelector(`.leaderboard-tab[data-tab="${activeTopPlaysTab}"]`);
+            if (newActiveTab) {
+                window.setTopPlaysTab(newActiveTab, activeTopPlaysTab);
+            } else {
+                window.updateTopPlaysView();
+            }
+        }
+
+        // Restore Expanded Players
+        openStatsIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('d-none');
+        });
+
+        // Restore "Collapse Matchups" Button Text
+        expandedCardIds.forEach(id => {
+            const card = document.getElementById(id);
+            if (card) {
+                const btn = card.querySelector('.card-toggle-btn');
+                if (btn) btn.textContent = '[-] Collapse Matchups';
+            }
+        });
+
+        // Restore Scroll Position seamlessly
+        window.scrollTo(0, scrollY);
+    }
+    // ------------------------------------------------------
 }
 
 function createGameCard(data, platform, selectedSlate) {
