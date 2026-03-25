@@ -586,8 +586,8 @@ function createGameCard(data, platform, selectedSlate) {
             </div>
             <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
             <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
-                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-left: 6px; flex-shrink: 0;">
             </div>
         </div>
     `;
