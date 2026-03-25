@@ -559,12 +559,12 @@ function createGameCard(data, platform, selectedSlate) {
     // NEW SLEEK HEADER (Replaces the large image header)
     const newHeaderHtml = `
         <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 1.1rem; font-weight: bold; letter-spacing: -0.3px;">
-            <div class="d-flex align-items-center text-start text-truncate" style="width: 45%;">
+            <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
                 <img src="${awayLogo}" alt="${awayName}" style="height: 35px; width: 35px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${awayName} ${mlAway}</span>
             </div>
-            <div class="text-muted fw-bold text-center" style="font-size: 0.9rem; width: 10%;">@</div>
-            <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 45%;">
+            <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.9rem; width: 4%;">@</div>
+            <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
                 <img src="${homeLogo}" alt="${homeName}" style="height: 35px; width: 35px; margin-left: 6px; flex-shrink: 0;">
             </div>
@@ -640,7 +640,7 @@ function createGameCard(data, platform, selectedSlate) {
             const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
             
             // Logic for the prefix (Number for Batter, "P" for Pitcher)
-            const prefixText = p.order === "P" ? "P." : (gamePos ? gamePos : `${p.order || index}.`);
+            const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
             const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
             const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
             
@@ -721,7 +721,7 @@ function createGameCard(data, platform, selectedSlate) {
                 <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
-                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 14px; margin-right: 2px;">${prefixText}</span>
+                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
                             ${handText}
                         </div>
@@ -734,10 +734,33 @@ function createGameCard(data, platform, selectedSlate) {
         return `<div class="w-100 m-0 p-0"><ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul></div>`;
     };
 
-    let awayPlayers = game.lineups?.awayPlayers?.length > 0 ? game.lineups.awayPlayers : (data.projectedLineups?.away?.battingOrder || []);
-    let homePlayers = game.lineups?.homePlayers?.length > 0 ? game.lineups.homePlayers : (data.projectedLineups?.home?.battingOrder || []);
+    // --- MERGE DFS DATA FOR OFFICIAL LINEUPS ---
+    let awayProjected = data.projectedLineups?.away?.battingOrder || [];
+    let homeProjected = data.projectedLineups?.home?.battingOrder || [];
+
+    let awayPlayers = game.lineups?.awayPlayers?.length > 0 ? game.lineups.awayPlayers : awayProjected;
+    let homePlayers = game.lineups?.homePlayers?.length > 0 ? game.lineups.homePlayers : homeProjected;
+    
     let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
     let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
+
+    if (isAwayOfficial && awayProjected.length > 0) {
+        const projMap = {};
+        awayProjected.forEach(p => { if (p && p.id) projMap[String(p.id)] = p; });
+        awayPlayers = awayPlayers.map(p => {
+            const pid = String(p.id);
+            return projMap[pid] ? { ...projMap[pid], ...p } : p;
+        });
+    }
+
+    if (isHomeOfficial && homeProjected.length > 0) {
+        const projMap = {};
+        homeProjected.forEach(p => { if (p && p.id) projMap[String(p.id)] = p; });
+        homePlayers = homePlayers.map(p => {
+            const pid = String(p.id);
+            return projMap[pid] ? { ...projMap[pid], ...p } : p;
+        });
+    }
 
     const getStatusBanner = (isOfficial, hasPlayers) => {
         if (!hasPlayers) return '';
