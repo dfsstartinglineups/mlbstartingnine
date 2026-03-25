@@ -70,19 +70,17 @@ function ensureDFSControls() {
         const container = document.getElementById('games-container');
         if (container) {
             const controlsHtml = `
-                <div id="dfs-controls-row" class="row mb-3 mx-0 px-1 w-100">
-                    <div class="col-12 d-flex flex-wrap justify-content-center align-items-center gap-3 p-3 bg-white rounded border shadow-sm" style="border-color: #dee2e6 !important;">
-                        <div class="btn-group shadow-sm" role="group">
-                            <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
-                            <label class="btn btn-outline-primary fw-bold px-4" for="btn-fd" style="font-size: 0.85rem;">FanDuel</label>
-                            
-                            <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
-                            <label class="btn btn-outline-primary fw-bold px-4" for="btn-dk" style="font-size: 0.85rem;">DraftKings</label>
-                        </div>
-                        <select id="slate-selector" class="form-select fw-bold border-primary text-primary shadow-sm" style="max-width: 280px; cursor: pointer; font-size: 0.85rem;">
-                            <option value="all">All Slates</option>
-                        </select>
+                <div id="dfs-controls-row" class="w-100 d-flex align-items-center px-1 mb-2 gap-2">
+                    <div class="btn-group shadow-sm" role="group">
+                        <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
+                        <label class="btn btn-outline-primary fw-bold px-3 py-1" for="btn-fd" style="font-size: 0.85rem;">FD</label>
+                        
+                        <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
+                        <label class="btn btn-outline-success fw-bold px-3 py-1" for="btn-dk" style="font-size: 0.85rem; --bs-btn-active-bg: #6c9d2f; --bs-btn-active-border-color: #6c9d2f; --bs-btn-color: #6c9d2f; --bs-btn-border-color: #6c9d2f; --bs-btn-hover-bg: #6c9d2f; --bs-btn-hover-border-color: #6c9d2f;">DK</label>
                     </div>
+                    <select id="slate-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 160px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;">
+                        <option value="all">All Slates</option>
+                    </select>
                 </div>
             `;
             container.insertAdjacentHTML('beforebegin', controlsHtml);
@@ -310,8 +308,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
             const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
             const highlightMetric = isValue ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
-            
-            // Clean K format, NO dollar sign
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
             let shortName = p.name;
@@ -377,6 +373,9 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 function renderGames() {
     const container = document.getElementById('games-container');
     if (!container) return;
+    
+    // Check if the controls row exists, if not, wait for it (it gets injected before the container)
+    // To cleanly wipe games but NOT wipe the controls, we just empty the container itself.
     container.innerHTML = '';
 
     const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
@@ -427,7 +426,7 @@ function createGameCard(data, platform, selectedSlate) {
     const umpStats = data.umpStats;
 
     const gameCard = document.createElement('div');
-    // Reverted back to 3-columns but removed px padding so the internal elements stretch wider
+    // Keeping 3 columns wide on desktop
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 px-1 mb-3';
 
     const awayNameFull = game.teams.away.team.name;
@@ -531,7 +530,6 @@ function createGameCard(data, platform, selectedSlate) {
                 if (sal > 0 || proj > 0) showStats = true;
             }
             if (showStats) {
-                // NO dollar sign
                 salFmt = sal > 0 ? (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
                 projFmt = proj > 0 ? proj.toFixed(1) : '-';
                 valFmt = val > 0 ? val.toFixed(2) : '-';
