@@ -500,9 +500,15 @@ def main():
             
             game_odds = None
             game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000
+            
+            def parse_odds_time(date_str):
+                if date_str.endswith('Z'): date_str = date_str[:-1]
+                if len(date_str.split(':')) == 2: date_str += ":00"
+                return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").timestamp() * 1000
+                
             potential_odds = [o for o in odds_data if o['home_team'] == home_team_name and o['away_team'] == away_team_name]
             if potential_odds:
-                game_odds = sorted(potential_odds, key=lambda o: abs(datetime.strptime(o['commence_time'], "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000 - game_time_ms))[0]
+                game_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
 
             away_starter = teams.get('away', {}).get('probablePitcher')
             home_starter = teams.get('home', {}).get('probablePitcher')
