@@ -517,14 +517,14 @@ function createGameCard(data, platform, selectedSlate) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
-    // --- PITCHER LOGIC FOR TWEET GENERATOR AND LINEUPS ---
+    // --- MERGE DFS DATA FOR PITCHERS ---
     let awayPitcher = "TBD", homePitcher = "TBD"; 
     let awayPitcherHand = 'R', homePitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
-    if (awayPitcherObj) awayPitcherObj = { ...awayPitcherObj }; // Clone safely
+    if (awayPitcherObj) awayPitcherObj = { ...awayPitcherObj }; 
     
     let homePitcherObj = data.projectedLineups?.home?.startingPitcher;
-    if (homePitcherObj) homePitcherObj = { ...homePitcherObj }; // Clone safely
+    if (homePitcherObj) homePitcherObj = { ...homePitcherObj }; 
     
     if (game.teams.away.probablePitcher) {
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
@@ -539,12 +539,11 @@ function createGameCard(data, platform, selectedSlate) {
         }
 
         if (matchesProj) {
-            // Keep DFS stats but update ID/Name to Official MLB values
-            awayPitcherObj.id = game.teams.away.probablePitcher.id;
+            awayPitcherObj.id = offId;
             awayPitcherObj.name = game.teams.away.probablePitcher.fullName;
             awayPitcherObj.order = "P";
         } else {
-            awayPitcherObj = { id: game.teams.away.probablePitcher.id, name: game.teams.away.probablePitcher.fullName, order: "P" };
+            awayPitcherObj = { id: offId, name: game.teams.away.probablePitcher.fullName, order: "P" };
         }
         awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
     } else if (awayPitcherObj) {
@@ -564,11 +563,11 @@ function createGameCard(data, platform, selectedSlate) {
         }
 
         if (matchesProj) {
-            homePitcherObj.id = game.teams.home.probablePitcher.id;
+            homePitcherObj.id = offId;
             homePitcherObj.name = game.teams.home.probablePitcher.fullName;
             homePitcherObj.order = "P";
         } else {
-            homePitcherObj = { id: game.teams.home.probablePitcher.id, name: game.teams.home.probablePitcher.fullName, order: "P" };
+            homePitcherObj = { id: offId, name: game.teams.home.probablePitcher.fullName, order: "P" };
         }
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     } else if (homePitcherObj) {
@@ -587,8 +586,8 @@ function createGameCard(data, platform, selectedSlate) {
             </div>
             <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
             <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
-                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-left: 6px; flex-shrink: 0;">
             </div>
         </div>
     `;
@@ -633,12 +632,10 @@ function createGameCard(data, platform, selectedSlate) {
         }
         middleSectionHtml = `<div class="d-flex justify-content-center align-items-center w-100 pb-2 border-bottom px-0 pt-1">${topBadgeHtml}${extraLiveInfo}</div>`;
     } else {
-        // Just empty border-bottom if nothing else
         middleSectionHtml = `<div class="border-bottom pb-2"></div>`;
     }
 
     const buildLineupList = (playersArray, opposingPitcherHand, startingPitcherObj, ownPitcherHand) => {
-        // Clone the array so we don't mutate the original state
         let displayArray = playersArray ? [...playersArray] : [];
         
         // INJECT PITCHER AT THE TOP
@@ -655,16 +652,15 @@ function createGameCard(data, platform, selectedSlate) {
             let playerName = p.fullName || p.name;
             let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
             
-            // Explicitly force ID to string for dictionary lookup
             const pidStr = String(p.id);
 
-            // Use their own pitching hand if they are the pitcher, otherwise check the batCode dictionary
+            // Fetch handedness (Fall back to the pitcher's own hand if they are the pitcher)
             let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
-            const handText = batCode ? `<span class="text-muted fw-normal">(${batCode}) </span>` : "";
+            const handText = batCode ? `<span class="text-muted fw-bold">(${batCode}) </span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
             
-            // Logic for the prefix (Number for Batter, "P" for Pitcher)
+            // Render "P" instead of order number for the pitcher
             const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
             const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
             const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
@@ -699,7 +695,6 @@ function createGameCard(data, platform, selectedSlate) {
             const pStats = deepStats[pidStr];
             
             if (p.order === "P") {
-                // RENDER PITCHER STATS (vs LHB / vs RHB)
                 if (pStats && pStats.split_vL && pStats.split_vR) {
                     const formatRow = (split, label) => {
                         if (split.ab > 0) {
@@ -723,7 +718,6 @@ function createGameCard(data, platform, selectedSlate) {
                     statsHtml = `<div class="mt-1 p-1 rounded text-center text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef;">Pitching data pending...</div>`;
                 }
             } else {
-                // RENDER BATTER STATS (BvP / Hitting Splits)
                 if (pStats && pStats.bvp) {
                     const bvp = pStats.bvp;
                     const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
@@ -746,7 +740,7 @@ function createGameCard(data, platform, selectedSlate) {
                 <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${pidStr}">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
-                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 14px; margin-right: 2px;">${prefixText}</span>
+                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 16px; margin-right: 4px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.70rem;" title="${playerName}">${handText}${abbrName}</span>
                         </div>
                         ${dfsHtml}
