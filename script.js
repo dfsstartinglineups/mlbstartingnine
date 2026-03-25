@@ -517,7 +517,7 @@ function createGameCard(data, platform, selectedSlate) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
-    // --- MERGE DFS DATA FOR PITCHERS ---
+    // --- PITCHER LOGIC FOR TWEET GENERATOR AND LINEUPS ---
     let awayPitcher = "TBD", homePitcher = "TBD"; 
     let awayPitcherHand = 'R', homePitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
@@ -574,66 +574,42 @@ function createGameCard(data, platform, selectedSlate) {
         homePitcher = homePitcherObj.name + " (Proj)";
     }
 
-    // --- O/U HTML for the top row ---
+    // --- GAME STATUS LOGIC (Replaces the Time Badge) ---
+    const gameState = game.status.abstractGameState; 
+    const detailedState = game.status.detailedState; 
+    let timeBadgeHtml = `<span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${gameTime}</span>`;
+
+    if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
+        timeBadgeHtml = `<span class="badge bg-danger text-white shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${detailedState}</span>`;
+    } else if (gameState === 'Live') {
+        const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
+        const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
+        const inning = game.linescore?.currentInning || '';
+        let half = game.linescore?.inningHalf || ''; 
+        let inningStr = ((half === 'Top' ? 'T' : (half === 'Bottom' ? 'B' : '')) + inning) || 'Live';
+        timeBadgeHtml = `<span class="badge bg-primary text-white shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${inningStr} ${awayScore}-${homeScore}</span>`;
+    } else if (gameState === 'Final') {
+        const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
+        const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
+        timeBadgeHtml = `<span class="badge bg-dark text-white shadow-sm border px-2 py-1" style="font-size: 0.70rem;">F ${awayScore}-${homeScore}</span>`;
+    }
+
     let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
 
-    // NEW SLEEK HEADER (Replaces the large image header)
+    // NEW SLEEK HEADER (Replaces the large image header and the middle section bloat)
     const newHeaderHtml = `
-        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
+        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1 pb-2 border-bottom" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
             <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
                 <img src="${awayLogo}" alt="${awayName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${awayName} ${mlAway}</span>
             </div>
             <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
             <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
-                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-left: 6px; flex-shrink: 0;">
             </div>
         </div>
     `;
-
-    let middleSectionHtml = '';
-    const gameState = game.status.abstractGameState; 
-    const detailedState = game.status.detailedState; 
-
-    if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
-        middleSectionHtml = `
-            <div class="d-flex justify-content-center align-items-center pb-2 w-100 px-1 border-bottom">
-                <div class="badge bg-danger text-white mt-1 d-inline-block text-wrap" style="font-size: 0.75rem; padding: 0.35em 0.6em;">${detailedState}</div>
-            </div>`;
-    } else if (gameState === 'Live' || gameState === 'Final') {
-        const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
-        const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
-        let topBadgeHtml = '', extraLiveInfo = '';
-
-        if (gameState === 'Live') {
-            const inning = game.linescore?.currentInning || '';
-            let half = game.linescore?.inningHalf || ''; 
-            let inningStr = ((half === 'Top' ? 'T' : (half === 'Bottom' ? 'B' : '')) + inning) || (detailedState || 'Live');
-            topBadgeHtml = `
-                <div class="badge bg-primary text-white mb-1 me-2 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
-                    <span style="white-space: nowrap;">${inningStr}</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
-                </div>`;
-            const offense = game.linescore?.offense || {};
-            const baseSvg = `<svg width="18" height="18" viewBox="0 0 100 100" class="mx-auto" style="display: block;">
-                   <polygon points="50,15 65,30 50,45 35,30" fill="${!!offense.second ? '#0d6efd' : 'transparent'}" stroke="${!!offense.second ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
-                   <polygon points="75,40 90,55 75,70 60,55" fill="${!!offense.first ? '#0d6efd' : 'transparent'}" stroke="${!!offense.first ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
-                   <polygon points="25,40 40,55 25,70 10,55" fill="${!!offense.third ? '#0d6efd' : 'transparent'}" stroke="${!!offense.third ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
-                </svg>`;
-            const outs = game.linescore?.outs || 0;
-            const getCircle = (isFilled) => `<circle cx="5" cy="5" r="4.5" fill="${isFilled ? '#0d6efd' : 'transparent'}" stroke="${isFilled ? '#0d6efd' : '#adb5bd'}" stroke-width="1.5"/>`;
-            const outsHtml = `<div class="d-flex align-items-center ms-1 pb-0"><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=1)}</svg><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=2)}</svg><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=3)}</svg></div>`;
-            extraLiveInfo = `<div class="d-flex justify-content-center align-items-center">${baseSvg}<span class="text-dark fw-bold ms-1" style="font-size: 0.70rem; font-family: monospace; letter-spacing: -0.5px; white-space: nowrap;">${game.linescore?.balls||0}-${game.linescore?.strikes||0}</span>${outsHtml}</div>`;
-        } else {
-            topBadgeHtml = `
-                <div class="badge bg-dark text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
-                    <span style="white-space: nowrap;">Final</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
-                </div>`;
-        }
-        middleSectionHtml = `<div class="d-flex justify-content-center align-items-center w-100 pb-2 border-bottom px-0 pt-1">${topBadgeHtml}${extraLiveInfo}</div>`;
-    } else {
-        middleSectionHtml = `<div class="border-bottom pb-2"></div>`;
-    }
 
     const buildLineupList = (playersArray, opposingPitcherHand, startingPitcherObj, ownPitcherHand) => {
         let displayArray = playersArray ? [...playersArray] : [];
@@ -656,7 +632,7 @@ function createGameCard(data, platform, selectedSlate) {
 
             // Fetch handedness (Fall back to the pitcher's own hand if they are the pitcher)
             let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
-            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem;">(${batCode}) </span>` : "";
+            const handText = batCode ? `<span class="text-muted fw-normal">(${batCode}) </span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
             
@@ -683,7 +659,6 @@ function createGameCard(data, platform, selectedSlate) {
                 valFmt = val > 0 ? val.toFixed(2) : '-';
             }
 
-            // Decreased DFS container width to 40%, decreased font size to 0.55rem, removed bolding
             const dfsHtml = showStats ? `
                 <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 40%; font-size: 0.55rem; letter-spacing: -0.4px;">
                     <span class="text-end fw-normal pe-2" style="width: 40%;">${salFmt}</span>
@@ -737,7 +712,6 @@ function createGameCard(data, platform, selectedSlate) {
                 }
             }
 
-            // Increased width of player name section to 60%, unbolded prefix and handText
             return `
                 <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${pidStr}">
                     <div class="d-flex justify-content-between align-items-center w-100">
@@ -848,16 +822,15 @@ function createGameCard(data, platform, selectedSlate) {
         <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
-                <div class="d-flex justify-content-between align-items-center mb-0 w-100 pb-1 border-bottom border-white">
+                <div class="d-flex justify-content-between align-items-center mb-0 w-100 pb-1 border-white">
                     <div class="d-flex align-items-center flex-shrink-0">
-                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${gameTime}</span>
+                        ${timeBadgeHtml}
                         ${ouHtml}
                     </div>
                     ${rightSideHtml}
                 </div>
                 
                 ${newHeaderHtml}
-                ${middleSectionHtml}
 
             </div>
             
