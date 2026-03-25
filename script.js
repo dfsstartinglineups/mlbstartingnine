@@ -381,10 +381,10 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 </div>
             </div>
             <div class="card-body p-0">
-                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersVal, true)}</div>
-                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersProj, false)}</div>
-                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersVal, true)}</div>
-                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersProj, false)}</div>
+                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topHittersVal, true)}</div>
+                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topHittersProj, false)}</div>
+                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topPitchersVal, true)}</div>
+                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topPitchersProj, false)}</div>
             </div>
         </div>
     </div>`;
@@ -615,17 +615,17 @@ function createGameCard(data, platform, selectedSlate) {
 
     let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
 
-    // NEW SLEEK HEADER (Replaces the large image header and the middle section bloat)
+    // NEW SLEEK HEADER (Replaces the large image header)
     const newHeaderHtml = `
-        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1 pb-2 border-bottom" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
+        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
             <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
                 <img src="${awayLogo}" alt="${awayName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${awayName} ${mlAway}</span>
             </div>
             <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
             <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
-                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-left: 6px; flex-shrink: 0;">
             </div>
         </div>
     `;
