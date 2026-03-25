@@ -262,6 +262,22 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.away?.team?.id}.svg`;
         const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.home?.team?.id}.svg`;
         
+        // Map official field positions dynamically
+        let posMap = {};
+        if (game.gamePositions) {
+            Object.assign(posMap, game.gamePositions);
+        }
+        if (game.gameRaw?.lineups?.awayPlayers) {
+            game.gameRaw.lineups.awayPlayers.forEach(p => {
+                if (p.primaryPosition?.abbreviation) posMap[p.id] = p.primaryPosition.abbreviation;
+            });
+        }
+        if (game.gameRaw?.lineups?.homePlayers) {
+            game.gameRaw.lineups.homePlayers.forEach(p => {
+                if (p.primaryPosition?.abbreviation) posMap[p.id] = p.primaryPosition.abbreviation;
+            });
+        }
+
         const extract = (roster, teamAbbr, teamLogo, isPitcher) => {
             if (!roster) return;
             let arr = Array.isArray(roster) ? roster : [roster];
@@ -282,8 +298,11 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     let name = p.name || p.fullName || 'Unknown';
                     let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
                     let listToPush = isPitcher ? allPitchers : allHitters;
-                    let pos = isPitcher ? 'P' : (p.order ? p.order : 'B');
-                    listToPush.push({ id: p.id || name, name, pos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
+                    
+                    // Display specific field position for batters, P for Pitchers
+                    let fieldPos = isPitcher ? 'P' : (posMap[p.id] || 'B');
+                    
+                    listToPush.push({ id: p.id || name, name, pos: fieldPos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
                 }
             });
         };
@@ -331,7 +350,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     <div class="d-flex flex-column justify-content-center overflow-hidden pe-1">
                         <span class="fw-bold text-dark text-truncate" style="font-size: 0.95rem; max-width: 180px;" title="${p.name}">${shortName}</span>
                         <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 240px;">
-                            ${p.pos} • ${p.teamAbbrev} • ${salFmt} • ${subMetric}
+                            ${p.pos} • ${salFmt} • ${subMetric}
                         </span>
                     </div>
                 </div>
@@ -517,7 +536,7 @@ function createGameCard(data, platform, selectedSlate) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
-    // --- PITCHER LOGIC FOR TWEET GENERATOR AND LINEUPS ---
+    // --- MERGE DFS DATA FOR PITCHERS ---
     let awayPitcher = "TBD", homePitcher = "TBD"; 
     let awayPitcherHand = 'R', homePitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
@@ -596,17 +615,17 @@ function createGameCard(data, platform, selectedSlate) {
 
     let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
 
-    // NEW SLEEK HEADER (Replaces the large image header)
+    // NEW SLEEK HEADER (Replaces the large image header and the middle section bloat)
     const newHeaderHtml = `
-        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
+        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1 pb-2 border-bottom" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
             <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
                 <img src="${awayLogo}" alt="${awayName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${awayName} ${mlAway}</span>
             </div>
             <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
             <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
-                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-left: 6px; flex-shrink: 0;">
             </div>
         </div>
     `;
