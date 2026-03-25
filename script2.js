@@ -381,10 +381,10 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 </div>
             </div>
             <div class="card-body p-0">
-                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersVal, true)}</div>
-                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersProj, false)}</div>
-                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersVal, true)}</div>
-                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersProj, false)}</div>
+                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 450px; overflow-y: auto;">${buildList(topHittersVal, true)}</div>
+                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 450px; overflow-y: auto;">${buildList(topHittersProj, false)}</div>
+                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 450px; overflow-y: auto;">${buildList(topPitchersVal, true)}</div>
+                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 450px; overflow-y: auto;">${buildList(topPitchersProj, false)}</div>
             </div>
         </div>
     </div>`;
