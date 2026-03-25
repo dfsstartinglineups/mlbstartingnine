@@ -401,7 +401,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
                 }
 
-                subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} AVG • ${p.bvp.hr} HR`;
+                subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
                 rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
             } else {
                 // Standard DFS Display Logic
