@@ -487,6 +487,7 @@ function renderGames(isSilentRefresh = false) {
     let activeTopPlaysTab = 'value';
     let openStatsIds = [];
     let expandedCardIds = [];
+    let listViewScrollPositions = {}; // <-- NEW: Track Top Plays scroll states
 
     if (isSilentRefresh) {
         scrollY = window.scrollY;
@@ -495,6 +496,11 @@ function renderGames(isSilentRefresh = false) {
         topPlaysType = document.getElementById('top-plays-type')?.value || 'hitters';
         const activeTabEl = document.querySelector('.leaderboard-tab.active');
         if (activeTabEl) activeTopPlaysTab = activeTabEl.getAttribute('data-tab');
+
+        // Capture inner scroll positions of the Top Plays lists
+        document.querySelectorAll('.list-view').forEach(el => {
+            if (el.id) listViewScrollPositions[el.id] = el.scrollTop;
+        });
 
         // Capture Individual Expanded Players
         document.querySelectorAll('.stats-collapse:not(.d-none)').forEach(el => {
@@ -566,6 +572,12 @@ function renderGames(isSilentRefresh = false) {
             }
         }
 
+        // Restore inner scroll positions for Top Plays lists
+        Object.keys(listViewScrollPositions).forEach(id => {
+            const listEl = document.getElementById(id);
+            if (listEl) listEl.scrollTop = listViewScrollPositions[id];
+        });
+
         // Restore Expanded Players
         openStatsIds.forEach(id => {
             const el = document.getElementById(id);
@@ -581,7 +593,7 @@ function renderGames(isSilentRefresh = false) {
             }
         });
 
-        // Restore Scroll Position seamlessly
+        // Restore main window Scroll Position seamlessly
         window.scrollTo(0, scrollY);
     }
     // ------------------------------------------------------
