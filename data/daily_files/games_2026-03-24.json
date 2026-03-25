@@ -16299,12 +16299,12 @@
             "gameDate": "2026-03-25T00:10:00Z",
             "officialDate": "2026-03-24",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -16315,10 +16315,11 @@
                     },
                     "leagueRecord": {
                         "wins": 0,
-                        "losses": 1,
+                        "losses": 2,
                         "pct": ".000"
                     },
                     "score": 5,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 699044,
                         "fullName": "Miguel Ullola",
@@ -16376,11 +16377,12 @@
                         "link": "/api/v1/teams/117"
                     },
                     "leagueRecord": {
-                        "wins": 2,
+                        "wins": 3,
                         "losses": 0,
                         "pct": "1.000"
                     },
                     "score": 6,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 621121,
                         "fullName": "Lance McCullers Jr.",
@@ -16581,6 +16583,7 @@
                             "leftOnBase": 0
                         },
                         "away": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -16913,8 +16916,8 @@
                     }
                 },
                 "balls": 2,
-                "strikes": 1,
-                "outs": 2
+                "strikes": 3,
+                "outs": 3
             },
             "venue": {
                 "id": 2392,
@@ -16924,6 +16927,7 @@
             "content": {
                 "link": "/api/v1/game/831441/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -18082,7 +18086,7 @@
             "linescore": {
                 "currentInning": 5,
                 "currentInningOrdinal": "5th",
-                "inningState": "Top",
+                "inningState": "Middle",
                 "inningHalf": "Top",
                 "isTopInning": true,
                 "scheduledInnings": 9,
@@ -18163,7 +18167,7 @@
                             "runs": 2,
                             "hits": 2,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         }
                     }
                 ],
@@ -18178,10 +18182,266 @@
                         "runs": 2,
                         "hits": 3,
                         "errors": 0,
-                        "leftOnBase": 2
+                        "leftOnBase": 3
                     }
                 },
                 "defense": {
+                    "pitcher": {
+                        "id": 700063,
+                        "fullName": "Alexis Vera",
+                        "link": "/api/v1/people/700063",
+                        "firstName": "Alexis",
+                        "lastName": "Vera",
+                        "birthDate": "2000-03-19",
+                        "currentAge": 26,
+                        "birthCity": "Ocotlan",
+                        "birthStateProvince": "Jalisco",
+                        "birthCountry": "Mexico",
+                        "height": "6' 2\"",
+                        "weight": 188,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "1",
+                            "name": "Pitcher",
+                            "type": "Pitcher",
+                            "abbreviation": "P"
+                        },
+                        "useName": "Alexis",
+                        "useLastName": "Vera",
+                        "middleName": "Otoniel",
+                        "boxscoreName": "Vera",
+                        "gender": "M",
+                        "nameMatrilineal": "Lopez",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Alexis Vera",
+                        "nameSlug": "alexis-vera-700063",
+                        "firstLastName": "Alexis Vera",
+                        "lastFirstName": "Vera, Alexis",
+                        "lastInitName": "Vera, A",
+                        "initLastName": "A Vera",
+                        "fullFMLName": "Alexis Otoniel Vera",
+                        "fullLFMName": "Vera, Alexis Otoniel",
+                        "strikeZoneTop": 3.299,
+                        "strikeZoneBottom": 1.665
+                    },
+                    "catcher": {
+                        "id": 665648,
+                        "fullName": "Ricardo Genov\u00e9s",
+                        "link": "/api/v1/people/665648"
+                    },
+                    "first": {
+                        "id": 628013,
+                        "fullName": "Victor Mendoza",
+                        "link": "/api/v1/people/628013"
+                    },
+                    "second": {
+                        "id": 676021,
+                        "fullName": "Luis Santos",
+                        "link": "/api/v1/people/676021"
+                    },
+                    "third": {
+                        "id": 623507,
+                        "fullName": "Josh Lester",
+                        "link": "/api/v1/people/623507"
+                    },
+                    "shortstop": {
+                        "id": 665745,
+                        "fullName": "Javier Salazar",
+                        "link": "/api/v1/people/665745"
+                    },
+                    "left": {
+                        "id": 696535,
+                        "fullName": "Brayan Mendoza",
+                        "link": "/api/v1/people/696535"
+                    },
+                    "center": {
+                        "id": 672882,
+                        "fullName": "Ismael Alcantara",
+                        "link": "/api/v1/people/672882"
+                    },
+                    "right": {
+                        "id": 593647,
+                        "fullName": "S\u00f3crates Brito",
+                        "link": "/api/v1/people/593647"
+                    },
+                    "batter": {
+                        "id": 628013,
+                        "fullName": "Victor Mendoza",
+                        "link": "/api/v1/people/628013"
+                    },
+                    "onDeck": {
+                        "id": 623507,
+                        "fullName": "Josh Lester",
+                        "link": "/api/v1/people/623507"
+                    },
+                    "inHole": {
+                        "id": 600902,
+                        "fullName": "Wilson Garcia",
+                        "link": "/api/v1/people/600902"
+                    },
+                    "battingOrder": 3,
+                    "team": {
+                        "id": 562,
+                        "name": "Sultanes de Monterrey",
+                        "link": "/api/v1/teams/562"
+                    }
+                },
+                "offense": {
+                    "batter": {
+                        "id": 683766,
+                        "fullName": "Christian Koss",
+                        "link": "/api/v1/people/683766",
+                        "firstName": "Christian",
+                        "lastName": "Koss",
+                        "primaryNumber": "50",
+                        "birthDate": "1998-01-27",
+                        "currentAge": 28,
+                        "birthCity": "Riverside",
+                        "birthStateProvince": "CA",
+                        "birthCountry": "USA",
+                        "height": "6' 1\"",
+                        "weight": 185,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "4",
+                            "name": "Second Base",
+                            "type": "Infielder",
+                            "abbreviation": "2B"
+                        },
+                        "useName": "Christian",
+                        "useLastName": "Koss",
+                        "boxscoreName": "Koss",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2019,
+                        "mlbDebutDate": "2025-04-01",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Christian Koss",
+                        "nameSlug": "christian-koss-683766",
+                        "firstLastName": "Christian Koss",
+                        "lastFirstName": "Koss, Christian",
+                        "lastInitName": "Koss, C",
+                        "initLastName": "C Koss",
+                        "fullFMLName": "Christian Koss",
+                        "fullLFMName": "Koss, Christian ",
+                        "strikeZoneTop": 3.25,
+                        "strikeZoneBottom": 1.64
+                    },
+                    "onDeck": {
+                        "id": 683679,
+                        "fullName": "Jesus Rodriguez",
+                        "link": "/api/v1/people/683679",
+                        "firstName": "Jesus",
+                        "lastName": "Rodriguez",
+                        "primaryNumber": "79",
+                        "birthDate": "2002-04-23",
+                        "currentAge": 23,
+                        "birthCity": "La Victoria",
+                        "birthCountry": "Venezuela",
+                        "height": "5' 10\"",
+                        "weight": 201,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "2",
+                            "name": "Catcher",
+                            "type": "Catcher",
+                            "abbreviation": "C"
+                        },
+                        "useName": "Jesus",
+                        "useLastName": "Rodriguez",
+                        "middleName": "Eduardo",
+                        "boxscoreName": "Rodriguez, J",
+                        "gender": "M",
+                        "nameMatrilineal": "Paez",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jesus Rodriguez",
+                        "nameSlug": "jesus-rodriguez-683679",
+                        "firstLastName": "Jesus Rodriguez",
+                        "lastFirstName": "Rodriguez, Jesus",
+                        "lastInitName": "Rodriguez, J",
+                        "initLastName": "J Rodriguez",
+                        "fullFMLName": "Jesus Eduardo Rodriguez",
+                        "fullLFMName": "Rodriguez, Jesus Eduardo",
+                        "strikeZoneTop": 3.12,
+                        "strikeZoneBottom": 1.57
+                    },
+                    "inHole": {
+                        "id": 664056,
+                        "fullName": "Harrison Bader",
+                        "link": "/api/v1/people/664056",
+                        "firstName": "Harrison",
+                        "lastName": "Bader",
+                        "primaryNumber": "9",
+                        "birthDate": "1994-06-03",
+                        "currentAge": 31,
+                        "birthCity": "Bronxville",
+                        "birthStateProvince": "NY",
+                        "birthCountry": "USA",
+                        "height": "5' 11\"",
+                        "weight": 219,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "7",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "LF"
+                        },
+                        "useName": "Harrison",
+                        "useLastName": "Bader",
+                        "middleName": "Joseph",
+                        "boxscoreName": "Bader",
+                        "nickName": "Tots",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "draftYear": 2015,
+                        "pronunciation": "BAY-der",
+                        "mlbDebutDate": "2017-07-25",
+                        "batSide": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Harrison Bader",
+                        "nameSlug": "harrison-bader-664056",
+                        "firstLastName": "Harrison Bader",
+                        "lastFirstName": "Bader, Harrison",
+                        "lastInitName": "Bader, H",
+                        "initLastName": "H Bader",
+                        "fullFMLName": "Harrison Joseph Bader",
+                        "fullLFMName": "Bader, Harrison Joseph",
+                        "strikeZoneTop": 3.16,
+                        "strikeZoneBottom": 1.6
+                    },
                     "pitcher": {
                         "id": 694738,
                         "fullName": "Landen Roupp",
@@ -18232,61 +18492,6 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "catcher": {
-                        "id": 691740,
-                        "fullName": "Daniel Susac",
-                        "link": "/api/v1/people/691740"
-                    },
-                    "first": {
-                        "id": 669477,
-                        "fullName": "Casey Schmitt",
-                        "link": "/api/v1/people/669477"
-                    },
-                    "second": {
-                        "id": 683679,
-                        "fullName": "Jesus Rodriguez",
-                        "link": "/api/v1/people/683679"
-                    },
-                    "third": {
-                        "id": 683766,
-                        "fullName": "Christian Koss",
-                        "link": "/api/v1/people/683766"
-                    },
-                    "shortstop": {
-                        "id": 666149,
-                        "fullName": "Tyler Fitzgerald",
-                        "link": "/api/v1/people/666149"
-                    },
-                    "left": {
-                        "id": 666464,
-                        "fullName": "Jerar Encarnacion",
-                        "link": "/api/v1/people/666464"
-                    },
-                    "center": {
-                        "id": 664056,
-                        "fullName": "Harrison Bader",
-                        "link": "/api/v1/people/664056"
-                    },
-                    "right": {
-                        "id": 682674,
-                        "fullName": "Victor Bericoto",
-                        "link": "/api/v1/people/682674"
-                    },
-                    "batter": {
-                        "id": 683766,
-                        "fullName": "Christian Koss",
-                        "link": "/api/v1/people/683766"
-                    },
-                    "onDeck": {
-                        "id": 683679,
-                        "fullName": "Jesus Rodriguez",
-                        "link": "/api/v1/people/683679"
-                    },
-                    "inHole": {
-                        "id": 664056,
-                        "fullName": "Harrison Bader",
-                        "link": "/api/v1/people/664056"
-                    },
                     "battingOrder": 9,
                     "team": {
                         "id": 137,
@@ -18294,251 +18499,9 @@
                         "link": "/api/v1/teams/137"
                     }
                 },
-                "offense": {
-                    "batter": {
-                        "id": 665745,
-                        "fullName": "Javier Salazar",
-                        "link": "/api/v1/people/665745",
-                        "firstName": "Javier",
-                        "lastName": "Salazar",
-                        "birthDate": "1996-10-28",
-                        "currentAge": 29,
-                        "birthCity": "Monterrey",
-                        "birthStateProvince": "Nuevo Leon",
-                        "birthCountry": "Mexico",
-                        "height": "6' 1\"",
-                        "weight": 205,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "I",
-                            "name": "Infield",
-                            "type": "Infielder",
-                            "abbreviation": "IF"
-                        },
-                        "useName": "Javier",
-                        "useLastName": "Salazar",
-                        "middleName": "Alejandro",
-                        "boxscoreName": "Salazar, J",
-                        "gender": "M",
-                        "nameMatrilineal": "Cordova",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Javier Salazar",
-                        "nameSlug": "javier-salazar-665745",
-                        "firstLastName": "Javier Salazar",
-                        "lastFirstName": "Salazar, Javier",
-                        "lastInitName": "Salazar, J",
-                        "initLastName": "J Salazar",
-                        "fullFMLName": "Javier Alejandro Salazar",
-                        "fullLFMName": "Salazar, Javier Alejandro",
-                        "strikeZoneTop": 3.255,
-                        "strikeZoneBottom": 1.643
-                    },
-                    "onDeck": {
-                        "id": 676021,
-                        "fullName": "Luis Santos",
-                        "link": "/api/v1/people/676021",
-                        "firstName": "Luis",
-                        "lastName": "Santos",
-                        "birthDate": "2000-01-04",
-                        "currentAge": 26,
-                        "birthCity": "Paso de la Boca",
-                        "birthStateProvince": "Veracruz",
-                        "birthCountry": "Mexico",
-                        "height": "5' 6\"",
-                        "weight": 160,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "6",
-                            "name": "Shortstop",
-                            "type": "Infielder",
-                            "abbreviation": "SS"
-                        },
-                        "useName": "Luis",
-                        "useLastName": "Santos",
-                        "middleName": "Angel",
-                        "boxscoreName": "Santos, L",
-                        "gender": "M",
-                        "nameMatrilineal": "Lopez",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Luis Santos",
-                        "nameSlug": "luis-santos-676021",
-                        "firstLastName": "Luis Santos",
-                        "lastFirstName": "Santos, Luis",
-                        "lastInitName": "Santos, L",
-                        "initLastName": "L Santos",
-                        "fullFMLName": "Luis Angel Santos",
-                        "fullLFMName": "Santos, Luis Angel",
-                        "strikeZoneTop": 2.943,
-                        "strikeZoneBottom": 1.485
-                    },
-                    "inHole": {
-                        "id": 628013,
-                        "fullName": "Victor Mendoza",
-                        "link": "/api/v1/people/628013",
-                        "firstName": "Victor",
-                        "lastName": "Mendoza",
-                        "birthDate": "1990-11-30",
-                        "currentAge": 35,
-                        "birthCity": "Obregon, Sonora",
-                        "birthCountry": "Mexico",
-                        "height": "6' 2\"",
-                        "weight": 205,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "3",
-                            "name": "First Base",
-                            "type": "Infielder",
-                            "abbreviation": "1B"
-                        },
-                        "useName": "Victor",
-                        "useLastName": "Mendoza",
-                        "middleName": "Hugo",
-                        "boxscoreName": "Mendoza, V",
-                        "gender": "M",
-                        "nameMatrilineal": "Archuleta",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "nameFirstLast": "Victor Mendoza",
-                        "nameSlug": "victor-mendoza-628013",
-                        "firstLastName": "Victor Mendoza",
-                        "lastFirstName": "Mendoza, Victor",
-                        "lastInitName": "Mendoza, V",
-                        "initLastName": "V Mendoza",
-                        "fullFMLName": "Victor Hugo Mendoza",
-                        "fullLFMName": "Mendoza, Victor Hugo",
-                        "strikeZoneTop": 3.299,
-                        "strikeZoneBottom": 1.665
-                    },
-                    "second": {
-                        "id": 696535,
-                        "fullName": "Brayan Mendoza",
-                        "link": "/api/v1/people/696535",
-                        "firstName": "Brayan",
-                        "lastName": "Mendoza",
-                        "birthDate": "2001-05-30",
-                        "currentAge": 24,
-                        "birthCity": "Los Mochis",
-                        "birthStateProvince": "SI",
-                        "birthCountry": "Mexico",
-                        "height": "6' 1\"",
-                        "weight": 163,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "O",
-                            "name": "Outfield",
-                            "type": "Outfielder",
-                            "abbreviation": "OF"
-                        },
-                        "useName": "Brayan",
-                        "useLastName": "Mendoza",
-                        "middleName": "Guadalupe",
-                        "boxscoreName": "Mendoza, B",
-                        "gender": "M",
-                        "nameMatrilineal": "Espinoza",
-                        "isPlayer": true,
-                        "isVerified": false,
-                        "batSide": {
-                            "code": "L",
-                            "description": "Left"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Brayan Mendoza",
-                        "nameSlug": "brayan-mendoza-696535",
-                        "firstLastName": "Brayan Mendoza",
-                        "lastFirstName": "Mendoza, Brayan",
-                        "lastInitName": "Mendoza, B",
-                        "initLastName": "B Mendoza",
-                        "fullFMLName": "Brayan Guadalupe Mendoza",
-                        "fullLFMName": "Mendoza, Brayan Guadalupe",
-                        "strikeZoneTop": 3.255,
-                        "strikeZoneBottom": 1.643
-                    },
-                    "pitcher": {
-                        "id": 700063,
-                        "fullName": "Alexis Vera",
-                        "link": "/api/v1/people/700063",
-                        "firstName": "Alexis",
-                        "lastName": "Vera",
-                        "birthDate": "2000-03-19",
-                        "currentAge": 26,
-                        "birthCity": "Ocotlan",
-                        "birthStateProvince": "Jalisco",
-                        "birthCountry": "Mexico",
-                        "height": "6' 2\"",
-                        "weight": 188,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "1",
-                            "name": "Pitcher",
-                            "type": "Pitcher",
-                            "abbreviation": "P"
-                        },
-                        "useName": "Alexis",
-                        "useLastName": "Vera",
-                        "middleName": "Otoniel",
-                        "boxscoreName": "Vera",
-                        "gender": "M",
-                        "nameMatrilineal": "Lopez",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Alexis Vera",
-                        "nameSlug": "alexis-vera-700063",
-                        "firstLastName": "Alexis Vera",
-                        "lastFirstName": "Vera, Alexis",
-                        "lastInitName": "Vera, A",
-                        "initLastName": "A Vera",
-                        "fullFMLName": "Alexis Otoniel Vera",
-                        "fullLFMName": "Vera, Alexis Otoniel",
-                        "strikeZoneTop": 3.299,
-                        "strikeZoneBottom": 1.665
-                    },
-                    "battingOrder": 1,
-                    "team": {
-                        "id": 562,
-                        "name": "Sultanes de Monterrey",
-                        "link": "/api/v1/teams/562"
-                    }
-                },
-                "balls": 0,
-                "strikes": 2,
-                "outs": 1
+                "balls": 1,
+                "strikes": 0,
+                "outs": 3
             },
             "venue": {
                 "id": 2395,
