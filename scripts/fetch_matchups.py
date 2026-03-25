@@ -524,10 +524,25 @@ def main():
                         "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
                     }
 
+            # --- CRITICAL FIX: EXTRACT HANDEDNESS FROM HYDRATED SCHEDULE (NO LIVE FEED NEEDED) ---
             lineups = game.get('lineups', {})
             away_lineup = lineups.get('awayPlayers', [])
             home_lineup = lineups.get('homePlayers', [])
             
+            # Extract Batter Handedness
+            for p in away_lineup + home_lineup:
+                pid = str(p.get('id'))
+                bat_side = p.get('batSide', {}).get('code')
+                if bat_side:
+                    lineup_handedness[pid] = bat_side
+                    
+            # Extract Pitcher Handedness 
+            if away_starter and away_starter.get('pitchHand'):
+                lineup_handedness[str(away_starter['id'])] = away_starter['pitchHand'].get('code')
+            if home_starter and home_starter.get('pitchHand'):
+                lineup_handedness[str(home_starter['id'])] = home_starter['pitchHand'].get('code')
+            # -------------------------------------------------------------------------------------
+
             for batter in away_lineup:
                 batter_id = str(batter['id'])
                 if batter_id not in game_deep_stats:
