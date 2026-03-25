@@ -490,103 +490,7 @@ function createGameCard(data, platform, selectedSlate) {
         rightSideHtml = `<div class="text-muted fw-bold text-uppercase text-end ms-auto" style="font-size: 0.70rem; letter-spacing: 0.5px; line-height: 1.1;">${displayVenueName}</div>`;
     }
 
-    // --- PITCHER LOGIC ---
-    let awayPitcherId = null, awayPitcher = "TBD", awayPitcherHand = 'R'; 
-    let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
-    if (game.teams.away.probablePitcher) {
-        awayPitcherId = game.teams.away.probablePitcher.id;
-        awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
-        awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
-    } else if (awayPitcherObj) {
-        awayPitcherId = awayPitcherObj.id;
-        awayPitcher = awayPitcherObj.name + " (Proj)";
-    }
-
-    let homePitcherId = null, homePitcher = "TBD", homePitcherHand = 'R'; 
-    let homePitcherObj = data.projectedLineups?.home?.startingPitcher;
-    if (game.teams.home.probablePitcher) {
-        homePitcherId = game.teams.home.probablePitcher.id;
-        homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
-        homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
-    } else if (homePitcherObj) {
-        homePitcherId = homePitcherObj.id;
-        homePitcher = homePitcherObj.name + " (Proj)";
-    }
-
-    const buildPitcherToggle = (pId, pName, pitcherObj) => {
-        if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
-        
-        let shortName = pName.includes(' ') && !pName.includes("(Proj)") ? `${pName.split(' ')[0].charAt(0)}. ${pName.split(' ').slice(1).join(' ')}` : pName;
-
-        let showStats = false, salFmt = '-', projFmt = '-', valFmt = '-';
-        if (pitcherObj) {
-            const slatesDict = platform === 'dk' ? (pitcherObj.dk_slates || {}) : (pitcherObj.fd_slates || {});
-            let sal = 0, proj = 0, val = 0;
-            if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
-                sal = slatesDict[selectedSlate].salary; proj = slatesDict[selectedSlate].proj; val = slatesDict[selectedSlate].value;
-                showStats = true;
-            } else if (selectedSlate === 'all') {
-                sal = platform === 'dk' ? (pitcherObj.dk_salary || 0) : (pitcherObj.salary || 0); 
-                proj = platform === 'dk' ? (pitcherObj.dk_proj || 0) : (pitcherObj.proj || 0); 
-                val = platform === 'dk' ? (pitcherObj.dk_value || 0) : (pitcherObj.value || 0);
-                if (sal > 0 || proj > 0) showStats = true;
-            }
-            if (showStats) {
-                salFmt = sal > 0 ? (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
-                projFmt = proj > 0 ? proj.toFixed(1) : '-';
-                valFmt = val > 0 ? val.toFixed(2) : '-';
-            }
-        }
-
-        let dfsHtml = showStats ? `
-            <div class="d-flex justify-content-center align-items-center w-100 mt-1" style="font-size: 0.65rem; letter-spacing: -0.4px;">
-                <span class="text-muted fw-bold me-2">${salFmt}</span>
-                <span class="text-primary fw-bold me-2">${projFmt}</span>
-                <span class="text-success fw-bold">${valFmt}</span>
-            </div>` : '';
-
-        return `
-            <div class="d-flex flex-column justify-content-center align-items-center player-toggle mt-1 w-100 rounded" style="cursor: pointer; padding: 2px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-p-${pId}">
-                <div class="d-flex align-items-center justify-content-center w-100">
-                    <span class="text-dark fw-bold text-truncate" style="font-size: 0.75rem; max-width: 110px;" title="${pName}">${shortName}</span>
-                </div>
-                ${dfsHtml}
-            </div>`;
-    };
-
-    const buildPitcherStats = (pId) => {
-        if (!pId) return `<div id="stats-${game.gamePk}-p-null" class="stats-collapse d-none w-100"></div>`;
-        let statsHtml = `<div class="mt-1 p-1 rounded text-center text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
-        const pStats = deepStats[pId];
-        if (pStats && pStats.split_vL && pStats.split_vR) {
-            const formatRow = (split, label) => {
-                if (split.ab > 0) {
-                    const avgStr = split.avg.length > 4 ? split.avg.substring(0, 4) : split.avg;
-                    const opsStr = split.ops.length > 4 ? split.ops.substring(0, 4) : split.ops;
-                    return `
-                    <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
-                        <span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span>
-                        <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
-                            <span style="display: inline-block; width: 24px;">${avgStr}</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span style="display: inline-block; width: 24px;">${opsStr}</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span style="display: inline-block; width: 24px;">${split.hr}HR</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
-                            <span>${split.k}K</span>
-                        </div>
-                    </div>`;
-                }
-                return `<div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;"><span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span><span class="text-muted fst-italic">No History</span></div>`;
-            };
-            statsHtml = `<div class="mt-1 p-1 rounded w-100 mx-auto" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">${formatRow(pStats.split_vL, 'vL')}${formatRow(pStats.split_vR, 'vR')}</div>`;
-        }
-        return `<div id="stats-${game.gamePk}-p-${pId}" class="stats-collapse d-none w-100">${statsHtml}</div>`;
-    };
-
-    const awayPitcherToggle = buildPitcherToggle(awayPitcherId, awayPitcher, awayPitcherObj);
-    const awayPitcherStats = buildPitcherStats(awayPitcherId);
-    const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher, homePitcherObj);
-    const homePitcherStats = buildPitcherStats(homePitcherId);
-
-    // --- ODDS & SCOREBOARD ENGINE ---
+    // --- ODDS ENGINE ---
     const oddsData = data.odds; 
     let mlAway = '', mlHome = '';
     let rawAwayOdds = "TBD", rawHomeOdds = "TBD", rawTotal = "TBD";
@@ -613,33 +517,105 @@ function createGameCard(data, platform, selectedSlate) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
-    let middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100"><div class="text-muted small fw-bold mb-0 lh-1">@</div></div>`;
+    // --- MERGE DFS DATA FOR PITCHERS ---
+    let awayPitcher = "TBD", homePitcher = "TBD"; 
+    let awayPitcherHand = 'R', homePitcherHand = 'R'; 
+    let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
+    if (awayPitcherObj) awayPitcherObj = { ...awayPitcherObj }; 
+    
+    let homePitcherObj = data.projectedLineups?.home?.startingPitcher;
+    if (homePitcherObj) homePitcherObj = { ...homePitcherObj }; 
+    
+    if (game.teams.away.probablePitcher) {
+        awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
+        let offId = String(game.teams.away.probablePitcher.id);
+        let offName = game.teams.away.probablePitcher.fullName.toLowerCase().replace(/[^a-z]/g, '');
+        
+        let matchesProj = false;
+        if (awayPitcherObj) {
+            let projId = String(awayPitcherObj.id);
+            let projName = (awayPitcherObj.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            if (projId === offId || projName === offName) matchesProj = true;
+        }
+
+        if (matchesProj) {
+            awayPitcherObj.id = offId;
+            awayPitcherObj.name = game.teams.away.probablePitcher.fullName;
+            awayPitcherObj.order = "P";
+        } else {
+            awayPitcherObj = { id: offId, name: game.teams.away.probablePitcher.fullName, order: "P" };
+        }
+        awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
+    } else if (awayPitcherObj) {
+        awayPitcher = awayPitcherObj.name + " (Proj)";
+    }
+
+    if (game.teams.home.probablePitcher) {
+        homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
+        let offId = String(game.teams.home.probablePitcher.id);
+        let offName = game.teams.home.probablePitcher.fullName.toLowerCase().replace(/[^a-z]/g, '');
+        
+        let matchesProj = false;
+        if (homePitcherObj) {
+            let projId = String(homePitcherObj.id);
+            let projName = (homePitcherObj.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            if (projId === offId || projName === offName) matchesProj = true;
+        }
+
+        if (matchesProj) {
+            homePitcherObj.id = offId;
+            homePitcherObj.name = game.teams.home.probablePitcher.fullName;
+            homePitcherObj.order = "P";
+        } else {
+            homePitcherObj = { id: offId, name: game.teams.home.probablePitcher.fullName, order: "P" };
+        }
+        homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
+    } else if (homePitcherObj) {
+        homePitcher = homePitcherObj.name + " (Proj)";
+    }
+
+    // --- O/U HTML for the top row ---
+    let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
+
+    // NEW SLEEK HEADER (Replaces the large image header)
+    const newHeaderHtml = `
+        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
+            <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
+                <img src="${awayLogo}" alt="${awayName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
+                <span class="text-truncate">${awayName} ${mlAway}</span>
+            </div>
+            <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
+            <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
+                <span class="text-truncate">${homeName} ${mlHome}</span>
+            </div>
+        </div>
+    `;
+
+    let middleSectionHtml = '';
     const gameState = game.status.abstractGameState; 
     const detailedState = game.status.detailedState; 
 
     if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(detailedState)) {
-        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
         middleSectionHtml = `
-            <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-1">
-                <div class="badge bg-danger text-white mt-1 d-inline-block text-wrap" style="font-size: 0.65rem; padding: 0.35em 0.6em;">${detailedState}</div>
-                ${ouHtml}
+            <div class="d-flex justify-content-center align-items-center pb-2 w-100 px-1 border-bottom">
+                <div class="badge bg-danger text-white mt-1 d-inline-block text-wrap" style="font-size: 0.75rem; padding: 0.35em 0.6em;">${detailedState}</div>
             </div>`;
     } else if (gameState === 'Live' || gameState === 'Final') {
         const awayScore = game.linescore?.teams?.away?.runs ?? game.teams.away.score ?? 0;
         const homeScore = game.linescore?.teams?.home?.runs ?? game.teams.home.score ?? 0;
         let topBadgeHtml = '', extraLiveInfo = '';
-        let ouHtml = rawTotal !== "TBD" ? `<div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>` : '';
 
         if (gameState === 'Live') {
             const inning = game.linescore?.currentInning || '';
             let half = game.linescore?.inningHalf || ''; 
             let inningStr = ((half === 'Top' ? 'T' : (half === 'Bottom' ? 'B' : '')) + inning) || (detailedState || 'Live');
             topBadgeHtml = `
-                <div class="badge bg-primary text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
+                <div class="badge bg-primary text-white mb-1 me-2 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
                     <span style="white-space: nowrap;">${inningStr}</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
             const offense = game.linescore?.offense || {};
-            const baseSvg = `<svg width="22" height="22" viewBox="0 0 100 100" class="mx-auto mt-1" style="display: block;">
+            const baseSvg = `<svg width="18" height="18" viewBox="0 0 100 100" class="mx-auto" style="display: block;">
                    <polygon points="50,15 65,30 50,45 35,30" fill="${!!offense.second ? '#0d6efd' : 'transparent'}" stroke="${!!offense.second ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
                    <polygon points="75,40 90,55 75,70 60,55" fill="${!!offense.first ? '#0d6efd' : 'transparent'}" stroke="${!!offense.first ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
                    <polygon points="25,40 40,55 25,70 10,55" fill="${!!offense.third ? '#0d6efd' : 'transparent'}" stroke="${!!offense.third ? '#0d6efd' : '#adb5bd'}" stroke-width="6"/>
@@ -647,34 +623,47 @@ function createGameCard(data, platform, selectedSlate) {
             const outs = game.linescore?.outs || 0;
             const getCircle = (isFilled) => `<circle cx="5" cy="5" r="4.5" fill="${isFilled ? '#0d6efd' : 'transparent'}" stroke="${isFilled ? '#0d6efd' : '#adb5bd'}" stroke-width="1.5"/>`;
             const outsHtml = `<div class="d-flex align-items-center ms-1 pb-0"><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=1)}</svg><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=2)}</svg><svg width="8" height="8" viewBox="0 0 10 10" style="margin: 0 1px;">${getCircle(outs>=3)}</svg></div>`;
-            extraLiveInfo = `${baseSvg}<div class="d-flex justify-content-center align-items-center w-100" style="margin-top: 2px; margin-bottom: 2px;"><span class="text-dark fw-bold" style="font-size: 0.70rem; font-family: monospace; letter-spacing: -0.5px; white-space: nowrap;">${game.linescore?.balls||0}-${game.linescore?.strikes||0}</span>${outsHtml}</div>`;
+            extraLiveInfo = `<div class="d-flex justify-content-center align-items-center">${baseSvg}<span class="text-dark fw-bold ms-1" style="font-size: 0.70rem; font-family: monospace; letter-spacing: -0.5px; white-space: nowrap;">${game.linescore?.balls||0}-${game.linescore?.strikes||0}</span>${outsHtml}</div>`;
         } else {
             topBadgeHtml = `
                 <div class="badge bg-dark text-white mb-1 d-inline-flex justify-content-center align-items-center shadow-sm" style="font-size: 0.75rem; padding: 0.35em 0.6em;">
                     <span style="white-space: nowrap;">Final</span><span style="margin: 0 5px; color:#ffffff99;">|</span><span style="white-space: nowrap; letter-spacing: 0.5px;">${awayScore} - ${homeScore}</span>
                 </div>`;
         }
-        middleSectionHtml = `<div class="d-flex flex-column justify-content-center align-items-center w-100 px-0 pt-1">${topBadgeHtml}${extraLiveInfo}${ouHtml}</div>`;
-    } else if (rawTotal !== "TBD") {
-        middleSectionHtml = `
-            <div class="d-flex flex-column justify-content-center align-items-center pt-1 w-100 px-0">
-                <div class="text-muted small fw-bold mb-0 lh-1">@</div>
-                <div class="badge bg-secondary text-white mt-1 d-inline-block" style="font-size: 0.65rem; letter-spacing: 0.5px; padding: 0.35em 0.6em; white-space: nowrap;">O/U ${rawTotal}</div>
-            </div>`;
+        middleSectionHtml = `<div class="d-flex justify-content-center align-items-center w-100 pb-2 border-bottom px-0 pt-1">${topBadgeHtml}${extraLiveInfo}</div>`;
+    } else {
+        middleSectionHtml = `<div class="border-bottom pb-2"></div>`;
     }
 
-    const buildLineupList = (playersArray, opposingPitcherHand) => {
-        if (!playersArray || playersArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
+    const buildLineupList = (playersArray, opposingPitcherHand, startingPitcherObj, ownPitcherHand) => {
+        let displayArray = playersArray ? [...playersArray] : [];
         
-        const listItems = playersArray.map((p, index) => {
+        // INJECT PITCHER AT THE TOP
+        if (startingPitcherObj) {
+            const pitcherWithOrder = { ...startingPitcherObj, order: "P" };
+            if (displayArray.length === 0 || displayArray[0].order !== "P") {
+                displayArray.unshift(pitcherWithOrder);
+            }
+        }
+        
+        if (displayArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
+        
+        const listItems = displayArray.map((p, index) => {
             let playerName = p.fullName || p.name;
             let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
             
-            const batCode = handDict[p.id] || "";
-            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem; margin-left: 2px;">(${batCode})</span>` : "";
+            const pidStr = String(p.id);
+
+            // Fetch handedness (Fall back to the pitcher's own hand if they are the pitcher)
+            let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
+            const handText = batCode ? `<span class="text-muted fw-bold">(${batCode}) </span>` : "";
             
-            const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
-            const prefixText = gamePos ? gamePos : `${index + 1}.`;
+            const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
+            
+            // Render "P" instead of order number for the pitcher
+            const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
+            const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
+            const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
             
             // --- DFS STATS ---
             let showStats = false, salFmt = '-', projFmt = '-', valFmt = '-';
@@ -694,9 +683,8 @@ function createGameCard(data, platform, selectedSlate) {
                 valFmt = val > 0 ? val.toFixed(2) : '-';
             }
 
-            // PREVENT CRASHING: Hardcoded spacing padding (pe-2) on the right-aligned stats so they never touch
             const dfsHtml = showStats ? `
-                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.65rem; letter-spacing: -0.4px;">
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.60rem; letter-spacing: -0.4px;">
                     <span class="text-end fw-bold pe-2" style="width: 40%;">${salFmt}</span>
                     <span class="text-end text-primary fw-bold pe-2" style="width: 30%;">${projFmt}</span>
                     <span class="text-end text-success fw-bold" style="width: 30%;">${valFmt}</span>
@@ -704,46 +692,102 @@ function createGameCard(data, platform, selectedSlate) {
 
             // --- BvP & SPLITS ---
             let statsHtml = '';
-            const pStats = deepStats[p.id];
-            if (pStats && pStats.bvp) {
-                const bvp = pStats.bvp;
-                const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
-                let bvpText = "No History", bvpClass = "text-muted"; 
-                if (bvp.ab > 0) { bvpText = `${bvp.hits}-${bvp.ab}•${bvp.hr}HR•${bvp.ops}OPS`; bvpClass = "text-dark"; }
-                let splitText = "No History", splitClass = "text-muted";
-                if (split && split.ab > 0) { splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`; splitClass = "text-dark"; }
-
-                statsHtml = `
-                    <div class="mt-1 p-1 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.3;">
-                        <div class="d-flex mb-1 align-items-center"><span class="text-muted fw-bold" style="min-width: 20px;">vP:</span><span class="${bvpClass} text-truncate">${bvpText}</span></div>
-                        <div class="d-flex align-items-center"><span class="text-muted fw-bold" style="min-width: 20px;">v${opposingPitcherHand}:</span><span class="${splitClass} text-truncate">${splitText}</span></div>
-                    </div>`;
+            const pStats = deepStats[pidStr];
+            
+            if (p.order === "P") {
+                if (pStats && pStats.split_vL && pStats.split_vR) {
+                    const formatRow = (split, label) => {
+                        if (split.ab > 0) {
+                            const avgStr = split.avg.length > 4 ? split.avg.substring(0, 4) : split.avg;
+                            const opsStr = split.ops.length > 4 ? split.ops.substring(0, 4) : split.ops;
+                            return `
+                            <div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;">
+                                <span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span>
+                                <div class="d-flex align-items-center text-dark" style="font-family: SFMono-Regular, Consolas, monospace; letter-spacing: -0.5px;">
+                                    <span style="display: inline-block; width: 24px;">${avgStr}</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                                    <span style="display: inline-block; width: 24px;">${opsStr}</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                                    <span style="display: inline-block; width: 24px;">${split.hr}HR</span><span class="text-muted" style="font-size: 0.45rem; margin: 0 1px;">•</span>
+                                    <span>${split.k}K</span>
+                                </div>
+                            </div>`;
+                        }
+                        return `<div class="d-flex align-items-center justify-content-start" style="font-size: 0.65rem; line-height: 1.5;"><span class="text-muted fw-bold" style="display: inline-block; width: 18px;">${label}:</span><span class="text-muted fst-italic">No History</span></div>`;
+                    };
+                    statsHtml = `<div class="mt-1 p-1 rounded w-100 mx-auto" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">${formatRow(pStats.split_vL, 'vL')}${formatRow(pStats.split_vR, 'vR')}</div>`;
+                } else {
+                    statsHtml = `<div class="mt-1 p-1 rounded text-center text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.60rem; border: 1px solid #e9ecef;">Pitching data pending...</div>`;
+                }
             } else {
-                statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
+                if (pStats && pStats.bvp) {
+                    const bvp = pStats.bvp;
+                    const split = opposingPitcherHand === 'L' ? pStats.split_vL : pStats.split_vR;
+                    let bvpText = "No History", bvpClass = "text-muted"; 
+                    if (bvp.ab > 0) { bvpText = `${bvp.hits}-${bvp.ab}•${bvp.hr}HR•${bvp.ops}OPS`; bvpClass = "text-dark"; }
+                    let splitText = "No History", splitClass = "text-muted";
+                    if (split && split.ab > 0) { splitText = `${split.avg}•${split.hr}HR•${split.ops}OPS`; splitClass = "text-dark"; }
+
+                    statsHtml = `
+                        <div class="mt-1 p-1 rounded text-start w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef; line-height: 1.3;">
+                            <div class="d-flex mb-1 align-items-center"><span class="text-muted fw-bold" style="min-width: 20px;">vP:</span><span class="${bvpClass} text-truncate">${bvpText}</span></div>
+                            <div class="d-flex align-items-center"><span class="text-muted fw-bold" style="min-width: 20px;">v${opposingPitcherHand}:</span><span class="${splitClass} text-truncate">${splitText}</span></div>
+                        </div>`;
+                } else {
+                    statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
+                }
             }
 
-            // Squeezed padding and pushed text to the start edge (ps-1, px-0)
             return `
-                <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
+                <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${pidStr}">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
-                            <span class="text-muted fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 14px; margin-right: 2px;">${prefixText}</span>
-                            <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
-                            ${handText}
+                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 16px; margin-right: 4px;">${prefixText}</span>
+                            <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.70rem;" title="${playerName}">${handText}${abbrName}</span>
                         </div>
                         ${dfsHtml}
                     </div>
-                    <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100 mt-1 px-1">${statsHtml}</div>
+                    <div id="stats-${game.gamePk}-${pidStr}" class="stats-collapse d-none w-100 mt-1 px-1">${statsHtml}</div>
                 </li>`;
         }).join('');
         
         return `<div class="w-100 m-0 p-0"><ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul></div>`;
     };
 
-    let awayPlayers = game.lineups?.awayPlayers?.length > 0 ? game.lineups.awayPlayers : (data.projectedLineups?.away?.battingOrder || []);
-    let homePlayers = game.lineups?.homePlayers?.length > 0 ? game.lineups.homePlayers : (data.projectedLineups?.home?.battingOrder || []);
+    // --- MERGE DFS DATA FOR OFFICIAL LINEUPS ---
+    let awayProjected = data.projectedLineups?.away?.battingOrder || [];
+    let homeProjected = data.projectedLineups?.home?.battingOrder || [];
+
+    let awayPlayers = game.lineups?.awayPlayers?.length > 0 ? game.lineups.awayPlayers : awayProjected;
+    let homePlayers = game.lineups?.homePlayers?.length > 0 ? game.lineups.homePlayers : homeProjected;
+    
     let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
     let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
+
+    // Smart Match: ID first, fallback to clean name string
+    if (isAwayOfficial && awayProjected.length > 0) {
+        const projMap = {};
+        awayProjected.forEach(p => { 
+            if (p && p.id) projMap[String(p.id)] = p; 
+            if (p && p.name) projMap[p.name.toLowerCase().replace(/[^a-z]/g, '')] = p;
+        });
+        awayPlayers = awayPlayers.map(p => {
+            const pid = String(p.id);
+            const pname = (p.fullName || p.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            return projMap[pid] ? { ...projMap[pid], ...p } : (projMap[pname] ? { ...projMap[pname], ...p } : p);
+        });
+    }
+
+    if (isHomeOfficial && homeProjected.length > 0) {
+        const projMap = {};
+        homeProjected.forEach(p => { 
+            if (p && p.id) projMap[String(p.id)] = p; 
+            if (p && p.name) projMap[p.name.toLowerCase().replace(/[^a-z]/g, '')] = p;
+        });
+        homePlayers = homePlayers.map(p => {
+            const pid = String(p.id);
+            const pname = (p.fullName || p.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            return projMap[pid] ? { ...projMap[pid], ...p } : (projMap[pname] ? { ...projMap[pname], ...p } : p);
+        });
+    }
 
     const getStatusBanner = (isOfficial, hasPlayers) => {
         if (!hasPlayers) return '';
@@ -760,8 +804,10 @@ function createGameCard(data, platform, selectedSlate) {
 
     const awayBanner = getStatusBanner(isAwayOfficial, awayPlayers.length > 0);
     const homeBanner = getStatusBanner(isHomeOfficial, homePlayers.length > 0);
-    const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand);
-    const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand);
+    
+    // Inject the pitcher objects and their handedness into the lineup build function
+    const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand, awayPitcherObj, awayPitcherHand);
+    const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand, homePitcherObj, homePitcherHand);
 
     const hasAnySlatePlayer = hasAnyDfsSalaries(data, platform);
     let missingSlateHtml = '';
@@ -794,45 +840,21 @@ function createGameCard(data, platform, selectedSlate) {
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span><span class="text-muted" style="margin: 0 3px;">•</span>K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
-    const homeRank = game.teams.home.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.home.team.rank}]</span> ` : '';
-    const awayRank = game.teams.away.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.away.team.rank}]</span> ` : '';
-
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
-                <div class="d-flex align-items-center mb-2 w-100 pb-1 border-bottom border-white">
-                    <div style="flex: 0 0 auto;" class="pe-2">
-                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
+                <div class="d-flex justify-content-between align-items-center mb-0 w-100 pb-1 border-bottom border-white">
+                    <div class="d-flex align-items-center flex-shrink-0">
+                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${gameTime}</span>
+                        ${ouHtml}
                     </div>
-
                     ${rightSideHtml}
                 </div>
                 
-                <div class="d-flex justify-content-between align-items-start px-1 pt-1">
-                    <div class="text-center" style="width: 40%;"> 
-                        <img src="${awayLogo}" alt="${awayName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${awayRank}${awayName} ${mlAway}</div>
-                        ${awayPitcherToggle}
-                    </div>
-                    <div class="text-center d-flex align-items-start justify-content-center px-1" style="width: 20%;">
-                        ${middleSectionHtml}
-                    </div>
-                    <div class="text-center" style="width: 40%;"> 
-                        <img src="${homeLogo}" alt="${homeName}" class="team-logo mb-1" style="width: 45px; height: 45px;" onerror="this.style.display='none'">
-                        <div class="fw-bold lh-1 text-dark d-flex justify-content-center align-items-center flex-wrap" style="font-size: 0.9rem; letter-spacing: -0.2px;">${homeRank}${homeName} ${mlHome}</div>
-                        ${homePitcherToggle}
-                    </div>
-                </div>
-                
-                <div class="row g-0 w-100 px-1">
-                    <div class="col-6 pe-1 d-flex justify-content-center">
-                        ${awayPitcherStats}
-                    </div>
-                    <div class="col-6 ps-1 d-flex justify-content-center">
-                        ${homePitcherStats}
-                    </div>
-                </div>
+                ${newHeaderHtml}
+                ${middleSectionHtml}
+
             </div>
             
             ${missingSlateHtml}
