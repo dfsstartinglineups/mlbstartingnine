@@ -14252,12 +14252,12 @@
             "gameDate": "2026-03-25T00:10:00Z",
             "officialDate": "2026-03-24",
             "status": {
-                "abstractGameState": "Live",
-                "codedGameState": "I",
-                "detailedState": "In Progress",
-                "statusCode": "I",
+                "abstractGameState": "Final",
+                "codedGameState": "O",
+                "detailedState": "Game Over",
+                "statusCode": "O",
                 "startTimeTBD": false,
-                "abstractGameCode": "L"
+                "abstractGameCode": "F"
             },
             "teams": {
                 "away": {
@@ -14267,11 +14267,12 @@
                         "link": "/api/v1/teams/108"
                     },
                     "leagueRecord": {
-                        "wins": 16,
+                        "wins": 17,
                         "losses": 15,
-                        "pct": ".516"
+                        "pct": ".531"
                     },
                     "score": 3,
+                    "isWinner": true,
                     "probablePitcher": {
                         "id": 686799,
                         "fullName": "Jack Kochanowicz",
@@ -14333,10 +14334,11 @@
                     },
                     "leagueRecord": {
                         "wins": 20,
-                        "losses": 8,
-                        "pct": ".714"
+                        "losses": 9,
+                        "pct": ".690"
                     },
                     "score": 0,
+                    "isWinner": false,
                     "probablePitcher": {
                         "id": 660271,
                         "fullName": "Shohei Ohtani",
@@ -14529,6 +14531,7 @@
                         "num": 9,
                         "ordinalNum": "9th",
                         "home": {
+                            "runs": 0,
                             "hits": 0,
                             "errors": 0,
                             "leftOnBase": 0
@@ -14874,8 +14877,8 @@
                     }
                 },
                 "balls": 0,
-                "strikes": 1,
-                "outs": 2
+                "strikes": 2,
+                "outs": 3
             },
             "venue": {
                 "id": 22,
@@ -14885,6 +14888,7 @@
             "content": {
                 "link": "/api/v1/game/831820/content"
             },
+            "isTie": false,
             "gameNumber": 1,
             "publicFacing": true,
             "doubleHeader": "N",
@@ -16583,19 +16587,19 @@
                 },
                 "defense": {
                     "pitcher": {
-                        "id": 681293,
-                        "fullName": "Spencer Arrighetti",
-                        "link": "/api/v1/people/681293",
-                        "firstName": "Spencer",
-                        "lastName": "Arrighetti",
-                        "primaryNumber": "41",
-                        "birthDate": "2000-01-02",
-                        "currentAge": 26,
-                        "birthCity": "Albuquerque",
-                        "birthStateProvince": "NM",
+                        "id": 641585,
+                        "fullName": "J.P. France",
+                        "link": "/api/v1/people/641585",
+                        "firstName": "Jonathan",
+                        "lastName": "France",
+                        "primaryNumber": "68",
+                        "birthDate": "1995-04-04",
+                        "currentAge": 30,
+                        "birthCity": "New Orleans",
+                        "birthStateProvince": "LA",
                         "birthCountry": "USA",
-                        "height": "6' 2\"",
-                        "weight": 186,
+                        "height": "6' 0\"",
+                        "weight": 198,
                         "active": true,
                         "primaryPosition": {
                             "code": "1",
@@ -16603,16 +16607,15 @@
                             "type": "Pitcher",
                             "abbreviation": "P"
                         },
-                        "useName": "Spencer",
-                        "useLastName": "Arrighetti",
-                        "middleName": "Zane",
-                        "boxscoreName": "Arrighetti",
+                        "useName": "J.P.",
+                        "useLastName": "France",
+                        "middleName": "Patrick",
+                        "boxscoreName": "France, J",
                         "gender": "M",
                         "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2021,
-                        "pronunciation": "air-uh-get-ee",
-                        "mlbDebutDate": "2024-04-10",
+                        "isVerified": false,
+                        "draftYear": 2018,
+                        "mlbDebutDate": "2023-05-06",
                         "batSide": {
                             "code": "R",
                             "description": "Right"
@@ -16621,16 +16624,16 @@
                             "code": "R",
                             "description": "Right"
                         },
-                        "nameFirstLast": "Spencer Arrighetti",
-                        "nameSlug": "spencer-arrighetti-681293",
-                        "firstLastName": "Spencer Arrighetti",
-                        "lastFirstName": "Arrighetti, Spencer",
-                        "lastInitName": "Arrighetti, S",
-                        "initLastName": "S Arrighetti",
-                        "fullFMLName": "Spencer Zane Arrighetti",
-                        "fullLFMName": "Arrighetti, Spencer Zane",
-                        "strikeZoneTop": 3.299,
-                        "strikeZoneBottom": 1.665
+                        "nameFirstLast": "J.P. France",
+                        "nameSlug": "j-p-france-641585",
+                        "firstLastName": "J.P. France",
+                        "lastFirstName": "France, J.P.",
+                        "lastInitName": "France, J",
+                        "initLastName": "J France",
+                        "fullFMLName": "Jonathan Patrick France",
+                        "fullLFMName": "France, Jonathan Patrick",
+                        "strikeZoneTop": 3.21,
+                        "strikeZoneBottom": 1.62
                     },
                     "catcher": {
                         "id": 801039,
@@ -16991,7 +16994,7 @@
                         "link": "/api/v1/teams/5434"
                     }
                 },
-                "balls": 0,
+                "balls": 1,
                 "strikes": 0,
                 "outs": 2
             },
@@ -18357,57 +18360,6 @@
                 },
                 "offense": {
                     "batter": {
-                        "id": 664056,
-                        "fullName": "Harrison Bader",
-                        "link": "/api/v1/people/664056",
-                        "firstName": "Harrison",
-                        "lastName": "Bader",
-                        "primaryNumber": "9",
-                        "birthDate": "1994-06-03",
-                        "currentAge": 31,
-                        "birthCity": "Bronxville",
-                        "birthStateProvince": "NY",
-                        "birthCountry": "USA",
-                        "height": "5' 11\"",
-                        "weight": 219,
-                        "active": true,
-                        "primaryPosition": {
-                            "code": "7",
-                            "name": "Outfielder",
-                            "type": "Outfielder",
-                            "abbreviation": "LF"
-                        },
-                        "useName": "Harrison",
-                        "useLastName": "Bader",
-                        "middleName": "Joseph",
-                        "boxscoreName": "Bader",
-                        "nickName": "Tots",
-                        "gender": "M",
-                        "isPlayer": true,
-                        "isVerified": true,
-                        "draftYear": 2015,
-                        "pronunciation": "BAY-der",
-                        "mlbDebutDate": "2017-07-25",
-                        "batSide": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "pitchHand": {
-                            "code": "R",
-                            "description": "Right"
-                        },
-                        "nameFirstLast": "Harrison Bader",
-                        "nameSlug": "harrison-bader-664056",
-                        "firstLastName": "Harrison Bader",
-                        "lastFirstName": "Bader, Harrison",
-                        "lastInitName": "Bader, H",
-                        "initLastName": "H Bader",
-                        "fullFMLName": "Harrison Joseph Bader",
-                        "fullLFMName": "Bader, Harrison Joseph",
-                        "strikeZoneTop": 3.16,
-                        "strikeZoneBottom": 1.6
-                    },
-                    "onDeck": {
                         "id": 646240,
                         "fullName": "Rafael Devers",
                         "link": "/api/v1/people/646240",
@@ -18456,7 +18408,7 @@
                         "strikeZoneTop": 3.217,
                         "strikeZoneBottom": 1.624
                     },
-                    "inHole": {
+                    "onDeck": {
                         "id": 642715,
                         "fullName": "Willy Adames",
                         "link": "/api/v1/people/642715",
@@ -18503,6 +18455,53 @@
                         "initLastName": "W Adames",
                         "fullFMLName": "Willy Rafael Adames",
                         "fullLFMName": "Adames, Willy Rafael",
+                        "strikeZoneTop": 3.22,
+                        "strikeZoneBottom": 1.63
+                    },
+                    "inHole": {
+                        "id": 808982,
+                        "fullName": "Jung Hoo Lee",
+                        "link": "/api/v1/people/808982",
+                        "firstName": "Jung Hoo",
+                        "lastName": "Lee",
+                        "primaryNumber": "51",
+                        "birthDate": "1998-08-20",
+                        "currentAge": 27,
+                        "birthCity": "Seoul",
+                        "birthCountry": "Republic of Korea",
+                        "height": "6' 0\"",
+                        "weight": 196,
+                        "active": true,
+                        "primaryPosition": {
+                            "code": "8",
+                            "name": "Outfielder",
+                            "type": "Outfielder",
+                            "abbreviation": "CF"
+                        },
+                        "useName": "Jung Hoo",
+                        "useLastName": "Lee",
+                        "boxscoreName": "Lee, J",
+                        "gender": "M",
+                        "isPlayer": true,
+                        "isVerified": true,
+                        "pronunciation": "jung who",
+                        "mlbDebutDate": "2024-03-28",
+                        "batSide": {
+                            "code": "L",
+                            "description": "Left"
+                        },
+                        "pitchHand": {
+                            "code": "R",
+                            "description": "Right"
+                        },
+                        "nameFirstLast": "Jung Hoo Lee",
+                        "nameSlug": "jung-hoo-lee-808982",
+                        "firstLastName": "Jung Hoo Lee",
+                        "lastFirstName": "Lee, Jung Hoo",
+                        "lastInitName": "Lee, J",
+                        "initLastName": "J Lee",
+                        "fullFMLName": "J.H. Lee",
+                        "fullLFMName": "J.H. Lee",
                         "strikeZoneTop": 3.22,
                         "strikeZoneBottom": 1.63
                     },
@@ -18556,16 +18555,16 @@
                         "strikeZoneTop": 3.299,
                         "strikeZoneBottom": 1.665
                     },
-                    "battingOrder": 2,
+                    "battingOrder": 3,
                     "team": {
                         "id": 137,
                         "name": "San Francisco Giants",
                         "link": "/api/v1/teams/137"
                     }
                 },
-                "balls": 0,
-                "strikes": 0,
-                "outs": 0
+                "balls": 2,
+                "strikes": 1,
+                "outs": 1
             },
             "venue": {
                 "id": 2395,
