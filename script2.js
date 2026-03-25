@@ -656,7 +656,7 @@ function createGameCard(data, platform, selectedSlate) {
 
             // Fetch handedness (Fall back to the pitcher's own hand if they are the pitcher)
             let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
-            const handText = batCode ? `<span class="text-muted fw-bold">(${batCode}) </span>` : "";
+            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem;">(${batCode}) </span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
             
@@ -683,12 +683,13 @@ function createGameCard(data, platform, selectedSlate) {
                 valFmt = val > 0 ? val.toFixed(2) : '-';
             }
 
+            // Decreased DFS container width to 40%, decreased font size to 0.55rem, removed bolding
             const dfsHtml = showStats ? `
-                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.60rem; letter-spacing: -0.4px;">
-                    <span class="text-end fw-bold pe-2" style="width: 40%;">${salFmt}</span>
-                    <span class="text-end text-primary fw-bold pe-2" style="width: 30%;">${projFmt}</span>
-                    <span class="text-end text-success fw-bold" style="width: 30%;">${valFmt}</span>
-                </div>` : `<div style="width: 45%;"></div>`;
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 40%; font-size: 0.55rem; letter-spacing: -0.4px;">
+                    <span class="text-end fw-normal pe-2" style="width: 40%;">${salFmt}</span>
+                    <span class="text-end text-primary fw-normal pe-2" style="width: 30%;">${projFmt}</span>
+                    <span class="text-end text-success fw-normal" style="width: 30%;">${valFmt}</span>
+                </div>` : `<div style="width: 40%;"></div>`;
 
             // --- BvP & SPLITS ---
             let statsHtml = '';
@@ -736,12 +737,15 @@ function createGameCard(data, platform, selectedSlate) {
                 }
             }
 
+            // Increased width of player name section to 60%, unbolded prefix and handText
             return `
                 <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${pidStr}">
                     <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
-                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 16px; margin-right: 4px;">${prefixText}</span>
-                            <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.70rem;" title="${playerName}">${handText}${abbrName}</span>
+                        <div class="d-flex align-items-center text-truncate ps-1" style="width: 60%;">
+                            <span class="${prefixColor} fw-normal text-start flex-shrink-0" style="font-size: 0.60rem; width: 16px; margin-right: 4px;">${prefixText}</span>
+                            <span class="text-truncate" style="font-size: 0.70rem;" title="${playerName}">
+                                ${handText}<span class="batter-name fw-bold text-dark">${abbrName}</span>
+                            </span>
                         </div>
                         ${dfsHtml}
                     </div>
