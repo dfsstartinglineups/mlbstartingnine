@@ -697,9 +697,9 @@ function createGameCard(data, platform, selectedSlate) {
             // PREVENT CRASHING: Hardcoded spacing padding (pe-2) on the right-aligned stats so they never touch
             const dfsHtml = showStats ? `
                 <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.65rem; letter-spacing: -0.4px;">
-                    <span class="text-end fw-bold pe-2" style="width: 38%;">${salFmt}</span>
-                    <span class="text-end text-primary fw-bold pe-2" style="width: 31%;">${projFmt}</span>
-                    <span class="text-end text-success fw-bold" style="width: 31%;">${valFmt}</span>
+                    <span class="text-end fw-bold pe-2" style="width: 40%;">${salFmt}</span>
+                    <span class="text-end text-primary fw-bold pe-2" style="width: 30%;">${projFmt}</span>
+                    <span class="text-end text-success fw-bold" style="width: 30%;">${valFmt}</span>
                 </div>` : `<div style="width: 45%;"></div>`;
 
             // --- BvP & SPLITS ---
