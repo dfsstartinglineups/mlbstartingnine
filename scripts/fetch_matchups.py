@@ -510,42 +510,7 @@ def main():
             if potential_odds:
                 game_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
 
-            away_starter = teams.get('away', {}).get('probablePitcher')
-            home_starter = teams.get('home', {}).get('probablePitcher')
-            away_starter_id = str(away_starter.get('id')) if away_starter else None
-            home_starter_id = str(home_starter.get('id')) if home_starter else None
-            
-            for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
-                if p_id and p_id not in game_deep_stats:
-                    print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
-                    game_deep_stats[p_id] = {
-                        "name": p_data['fullName'], "is_pitcher": True,
-                        "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
-                        "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
-                    }
-
-            # --- CRITICAL FIX: EXTRACT HANDEDNESS FROM HYDRATED SCHEDULE (NO LIVE FEED NEEDED) ---
-            lineups = game.get('lineups', {})
-            away_lineup = lineups.get('awayPlayers', [])
-            home_lineup = lineups.get('homePlayers', [])
-            
-            # Extract Batter Handedness
-            for p in away_lineup + home_lineup:
-                pid = str(p.get('id'))
-                bat_side = p.get('batSide', {}).get('code')
-                if bat_side:
-                    lineup_handedness[pid] = bat_side
-                    
-            # Extract Pitcher Handedness 
-            if away_starter and away_starter.get('pitchHand'):
-                lineup_handedness[str(away_starter['id'])] = away_starter['pitchHand'].get('code')
-            if home_starter and home_starter.get('pitchHand'):
-                lineup_handedness[str(home_starter['id'])] = home_starter['pitchHand'].get('code')
-            # -------------------------------------------------------------------------------------
-
             for batter in away_lineup:
-                batter_id = str(batter['id'])
-                if batter_id not in game_deep_stats:
                     game_deep_stats[batter_id] = {
                         "name": batter['fullName'], 
                         "bvp": fetch_bvp(session, batter_id, home_starter_id) if home_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
