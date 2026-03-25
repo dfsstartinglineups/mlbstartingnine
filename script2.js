@@ -521,52 +521,74 @@ function createGameCard(data, platform, selectedSlate) {
     let awayPitcher = "TBD", homePitcher = "TBD"; 
     let awayPitcherHand = 'R', homePitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
+    if (awayPitcherObj) awayPitcherObj = { ...awayPitcherObj }; // Clone safely
+    
     let homePitcherObj = data.projectedLineups?.home?.startingPitcher;
+    if (homePitcherObj) homePitcherObj = { ...homePitcherObj }; // Clone safely
     
     if (game.teams.away.probablePitcher) {
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
-        awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
+        let offId = String(game.teams.away.probablePitcher.id);
+        let offName = game.teams.away.probablePitcher.fullName.toLowerCase().replace(/[^a-z]/g, '');
         
-        // Merge the DFS stats from memory onto the official pitcher so they don't disappear!
-        awayPitcherObj = { 
-            ...(awayPitcherObj || {}), 
-            id: game.teams.away.probablePitcher.id, 
-            name: game.teams.away.probablePitcher.fullName, 
-            order: "P" 
-        };
+        let matchesProj = false;
+        if (awayPitcherObj) {
+            let projId = String(awayPitcherObj.id);
+            let projName = (awayPitcherObj.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            if (projId === offId || projName === offName) matchesProj = true;
+        }
+
+        if (matchesProj) {
+            // Keep DFS stats but update ID/Name to Official MLB values
+            awayPitcherObj.id = game.teams.away.probablePitcher.id;
+            awayPitcherObj.name = game.teams.away.probablePitcher.fullName;
+            awayPitcherObj.order = "P";
+        } else {
+            awayPitcherObj = { id: game.teams.away.probablePitcher.id, name: game.teams.away.probablePitcher.fullName, order: "P" };
+        }
+        awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
     } else if (awayPitcherObj) {
         awayPitcher = awayPitcherObj.name + " (Proj)";
     }
 
     if (game.teams.home.probablePitcher) {
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
-        homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
+        let offId = String(game.teams.home.probablePitcher.id);
+        let offName = game.teams.home.probablePitcher.fullName.toLowerCase().replace(/[^a-z]/g, '');
         
-        // Merge the DFS stats from memory onto the official pitcher so they don't disappear!
-        homePitcherObj = { 
-            ...(homePitcherObj || {}),
-            id: game.teams.home.probablePitcher.id, 
-            name: game.teams.home.probablePitcher.fullName, 
-            order: "P" 
-        };
+        let matchesProj = false;
+        if (homePitcherObj) {
+            let projId = String(homePitcherObj.id);
+            let projName = (homePitcherObj.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            if (projId === offId || projName === offName) matchesProj = true;
+        }
+
+        if (matchesProj) {
+            homePitcherObj.id = game.teams.home.probablePitcher.id;
+            homePitcherObj.name = game.teams.home.probablePitcher.fullName;
+            homePitcherObj.order = "P";
+        } else {
+            homePitcherObj = { id: game.teams.home.probablePitcher.id, name: game.teams.home.probablePitcher.fullName, order: "P" };
+        }
+        homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
     } else if (homePitcherObj) {
         homePitcher = homePitcherObj.name + " (Proj)";
     }
 
     // --- O/U HTML for the top row ---
-    let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.75rem;">O/U ${rawTotal}</span>` : '';
+    let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
 
     // NEW SLEEK HEADER (Replaces the large image header)
     const newHeaderHtml = `
-        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 1.1rem; font-weight: bold; letter-spacing: -0.3px;">
+        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
             <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
-                <img src="${awayLogo}" alt="${awayName}" style="height: 35px; width: 35px; margin-right: 6px; flex-shrink: 0;">
+                <img src="${awayLogo}" alt="${awayName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${awayName} ${mlAway}</span>
             </div>
-            <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.9rem; width: 4%;">@</div>
+            <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
             <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
+                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
                 <span class="text-truncate">${homeName} ${mlHome}</span>
-                <img src="${homeLogo}" alt="${homeName}" style="height: 35px; width: 35px; margin-left: 6px; flex-shrink: 0;">
             </div>
         </div>
     `;
@@ -635,12 +657,12 @@ function createGameCard(data, platform, selectedSlate) {
             
             // Use their own pitching hand if they are the pitcher, otherwise check the batCode dictionary
             let batCode = p.order === "P" ? ownPitcherHand : (handDict[p.id] || "");
-            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem; margin-left: 2px;">(${batCode})</span>` : "";
+            const handText = batCode ? `(${batCode}) ` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
             
             // Logic for the prefix (Number for Batter, "P" for Pitcher)
-            const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
+            const prefixText = p.order === "P" ? "P." : (gamePos ? gamePos : `${p.order || index}.`);
             const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
             const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
             
@@ -663,7 +685,7 @@ function createGameCard(data, platform, selectedSlate) {
             }
 
             const dfsHtml = showStats ? `
-                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.65rem; letter-spacing: -0.4px;">
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 45%; font-size: 0.60rem; letter-spacing: -0.4px;">
                     <span class="text-end fw-bold pe-2" style="width: 40%;">${salFmt}</span>
                     <span class="text-end text-primary fw-bold pe-2" style="width: 30%;">${projFmt}</span>
                     <span class="text-end text-success fw-bold" style="width: 30%;">${valFmt}</span>
@@ -721,9 +743,8 @@ function createGameCard(data, platform, selectedSlate) {
                 <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s; ${rowHighlight}" onmouseover="this.style.backgroundColor='#f0f4f8'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center text-truncate ps-1" style="width: 55%;">
-                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
-                            <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
-                            ${handText}
+                            <span class="${prefixColor} fw-bold text-start flex-shrink-0" style="font-size: 0.60rem; width: 22px; margin-right: 2px;">${prefixText}</span>
+                            <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.70rem;" title="${playerName}">${handText}${abbrName}</span>
                         </div>
                         ${dfsHtml}
                     </div>
@@ -744,21 +765,30 @@ function createGameCard(data, platform, selectedSlate) {
     let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
     let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
 
+    // Smart Match: ID first, fallback to clean name string
     if (isAwayOfficial && awayProjected.length > 0) {
         const projMap = {};
-        awayProjected.forEach(p => { if (p && p.id) projMap[String(p.id)] = p; });
+        awayProjected.forEach(p => { 
+            if (p && p.id) projMap[String(p.id)] = p; 
+            if (p && p.name) projMap[p.name.toLowerCase().replace(/[^a-z]/g, '')] = p;
+        });
         awayPlayers = awayPlayers.map(p => {
             const pid = String(p.id);
-            return projMap[pid] ? { ...projMap[pid], ...p } : p;
+            const pname = (p.fullName || p.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            return projMap[pid] ? { ...projMap[pid], ...p } : (projMap[pname] ? { ...projMap[pname], ...p } : p);
         });
     }
 
     if (isHomeOfficial && homeProjected.length > 0) {
         const projMap = {};
-        homeProjected.forEach(p => { if (p && p.id) projMap[String(p.id)] = p; });
+        homeProjected.forEach(p => { 
+            if (p && p.id) projMap[String(p.id)] = p; 
+            if (p && p.name) projMap[p.name.toLowerCase().replace(/[^a-z]/g, '')] = p;
+        });
         homePlayers = homePlayers.map(p => {
             const pid = String(p.id);
-            return projMap[pid] ? { ...projMap[pid], ...p } : p;
+            const pname = (p.fullName || p.name || "").toLowerCase().replace(/[^a-z]/g, '');
+            return projMap[pid] ? { ...projMap[pid], ...p } : (projMap[pname] ? { ...projMap[pname], ...p } : p);
         });
     }
 
@@ -819,7 +849,7 @@ function createGameCard(data, platform, selectedSlate) {
                 
                 <div class="d-flex justify-content-between align-items-center mb-0 w-100 pb-1 border-bottom border-white">
                     <div class="d-flex align-items-center flex-shrink-0">
-                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.75rem;">${gameTime}</span>
+                        <span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${gameTime}</span>
                         ${ouHtml}
                     </div>
                     ${rightSideHtml}
