@@ -310,10 +310,15 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
             const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
             const highlightMetric = isValue ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
-            const salFmt = p.salary > 0 ? '$' + (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+            
+            // Clean K format, NO dollar sign
+            const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
             let shortName = p.name;
             if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
+
+            // Switch the sub-metric to whatever is NOT the highlighted main number
+            const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
 
             return `
             <div class="d-flex align-items-center justify-content-between py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
@@ -326,7 +331,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     <div class="d-flex flex-column justify-content-center overflow-hidden pe-1">
                         <span class="fw-bold text-dark text-truncate" style="font-size: 0.95rem; max-width: 180px;" title="${p.name}">${shortName}</span>
                         <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 240px;">
-                            ${p.pos} • ${p.teamAbbrev} • ${salFmt} • ${parseFloat(p.proj || 0).toFixed(1)} pts
+                            ${p.pos} • ${p.teamAbbrev} • ${salFmt} • ${subMetric}
                         </span>
                     </div>
                 </div>
@@ -422,7 +427,7 @@ function createGameCard(data, platform, selectedSlate) {
     const umpStats = data.umpStats;
 
     const gameCard = document.createElement('div');
-    // Keeping 3 cards per row, but removed horizontal margins for maximum width
+    // Reverted back to 3-columns but removed px padding so the internal elements stretch wider
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 px-1 mb-3';
 
     const awayNameFull = game.teams.away.team.name;
@@ -526,7 +531,8 @@ function createGameCard(data, platform, selectedSlate) {
                 if (sal > 0 || proj > 0) showStats = true;
             }
             if (showStats) {
-                salFmt = sal > 0 ? '$' + (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+                // NO dollar sign
+                salFmt = sal > 0 ? (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
                 projFmt = proj > 0 ? proj.toFixed(1) : '-';
                 valFmt = val > 0 ? val.toFixed(2) : '-';
             }
@@ -683,7 +689,7 @@ function createGameCard(data, platform, selectedSlate) {
             }
             
             if (showStats) {
-                salFmt = sal > 0 ? '$' + (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+                salFmt = sal > 0 ? (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
                 projFmt = proj > 0 ? proj.toFixed(1) : '-';
                 valFmt = val > 0 ? val.toFixed(2) : '-';
             }
@@ -715,11 +721,12 @@ function createGameCard(data, platform, selectedSlate) {
                 statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
+            // Squeezed padding and pushed text to the start edge
             return `
-                <li class="d-flex flex-column w-100 px-2 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
+                <li class="d-flex flex-column w-100 px-1 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
                     <div class="d-flex justify-content-between align-items-center w-100">
                         <div class="d-flex align-items-center text-truncate" style="width: 48%;">
-                            <span class="text-muted fw-bold text-center me-1 flex-shrink-0" style="font-size: 0.65rem; width: 14px;">${prefixText}</span>
+                            <span class="text-muted fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; min-width: 14px; margin-right: 2px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
                             ${handText}
                         </div>
