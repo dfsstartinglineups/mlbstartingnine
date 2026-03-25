@@ -5,7 +5,17 @@ import time
 import zoneinfo
 import csv
 import io
+import re
+import unicodedata
 from datetime import datetime, timedelta
+from bs4 import BeautifulSoup
+
+# --- SELENIUM IMPORTS ---
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
 
 # --- CONFIGURATION ---
 DATA_DIR = 'data'
@@ -21,6 +31,8 @@ API_CALL_TRACKER = {
     "schedule": 0, "odds": 0, "live_feed": 0, "bvp": 0, "splits": 0, "bbm_csv": 0
 }
 
+GLOBAL_SLATES = {'fanduel': {}, 'draftkings': {}}
+
 # --- BBM TO MLB ID MAPPING ---
 BBM_TO_MLB_ID = {
     'ARI': 109, 'ATL': 144, 'BAL': 110, 'BOS': 111, 'CHC': 112, 
@@ -31,72 +43,36 @@ BBM_TO_MLB_ID = {
     'STL': 138, 'TB': 139,  'TEX': 140, 'TOR': 141, 'WAS': 120
 }
 
-def get_bbm_projected_lineups(target_date):
-    global API_CALL_TRACKER
-    API_CALL_TRACKER["bbm_csv"] += 1
-    
-    session = requests.Session()
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    
-    # 1. Grab the session cookie
-    session.get("https://baseballmonster.com/lineups.aspx", headers=headers)
-    
-    # 2. Hit the CSV endpoint
-    csv_url = f"https://baseballmonster.com/Lineups.aspx?csv=1&d={target_date}"
-    response = session.get(csv_url, headers=headers)
-    
-    projections = {}
-    
-    if response.status_code == 200 and len(response.text) > 100:
-        csv_data = io.StringIO(response.text)
-        reader = csv.reader(csv_data)
-        next(reader, None) # Skip header row
-        
-        for row in reader:
-            if len(row) < 7: continue
-            
-            team_code = row[0].strip()
-            game_num = row[2].strip()
-            player_mlb_id = row[3].strip()
-            player_name = row[4].strip()
-            batting_order = row[5].strip()
-            confirmed = True if row[6].strip().upper() == 'Y' else False
-            
-            mlb_team_id = BBM_TO_MLB_ID.get(team_code)
-            if not mlb_team_id: continue 
-            
-            team_key = f"{mlb_team_id}_{game_num}"
-            
-            if team_key not in projections:
-                projections[team_key] = {
-                    "startingPitcher": None,
-                    "battingOrder": []
-                }
-                
-            player_obj = {
-                "id": int(player_mlb_id) if player_mlb_id.isdigit() else player_mlb_id,
-                "name": player_name,
-                "verified": confirmed
-            }
-            
-            if batting_order.isdigit() and 1 <= int(batting_order) <= 9:
-                player_obj["order"] = int(batting_order)
-                projections[team_key]["battingOrder"].append(player_obj)
-            else:
-                projections[team_key]["startingPitcher"] = player_obj
-                
-        for key in projections:
-            projections[key]["battingOrder"].sort(key=lambda x: x["order"])
-            
-    return projections
+# ==========================================
+# --- HELPER FUNCTIONS ---
+# ==========================================
+def clean_player_name(name):
+    if not name or name == '-': return ""
+    name = str(name).lower().strip()
+    # Strip (h) and (p) just in case it sneaks through
+    name = re.sub(r'\s*\([hp]\)', '', name)
+    # Strip punctuation and convert hyphens to spaces
+    name = name.replace('.', '').replace("'", "").replace("-", " ")
+    # Strip accents (e.g. Acuña -> Acuna)
+    name = ''.join(c for c in unicodedata.normalize('NFD', name) if unicodedata.category(c) != 'Mn')
+    # Strip suffixes
+    for suffix in [' jr', ' sr', ' ii', ' iii', ' iv']:
+        if name.endswith(suffix):
+            name = name[:-len(suffix)]
+    return name.strip()
 
-def get_active_sport_ids():
-    current_date = datetime.utcnow().date()
-    wbc_start = datetime(2026, 3, 4).date()
-    wbc_end = datetime(2026, 3, 17).date()
-    if wbc_start <= current_date <= wbc_end:
-        return "1,51"
-    return "1"
+def get_dff_team_abbr(team_name):
+    map_ = {
+        "Diamondbacks": "ARI", "Braves": "ATL", "Orioles": "BAL", "Red Sox": "BOS", "Cubs": "CHC",
+        "White Sox": "CWS", "Reds": "CIN", "Guardians": "CLE", "Rockies": "COL", "Tigers": "DET",
+        "Astros": "HOU", "Royals": "KC", "Angels": "LAA", "Dodgers": "LAD", "Marlins": "MIA",
+        "Brewers": "MIL", "Twins": "MIN", "Mets": "NYM", "Yankees": "NYY", "Athletics": "OAK",
+        "Phillies": "PHI", "Pirates": "PIT", "Padres": "SD", "Giants": "SF", "Mariners": "SEA",
+        "Cardinals": "STL", "Rays": "TB", "Rangers": "TEX", "Blue Jays": "TOR", "Nationals": "WAS"
+    }
+    for k, v in map_.items():
+        if k in team_name: return v
+    return team_name[:3].upper()
 
 def load_json(path, default_val):
     if os.path.exists(path):
@@ -108,6 +84,221 @@ def load_json(path, default_val):
 def save_json(path, data):
     with open(path, 'w') as f:
         json.dump(data, f, indent=4)
+
+def get_active_sport_ids():
+    current_date = datetime.utcnow().date()
+    wbc_start = datetime(2026, 3, 4).date()
+    wbc_end = datetime(2026, 3, 17).date()
+    if wbc_start <= current_date <= wbc_end:
+        return "1,51"
+    return "1"
+
+# ==========================================
+# --- DATA FETCHERS ---
+# ==========================================
+def get_bbm_projected_lineups(target_date):
+    global API_CALL_TRACKER
+    API_CALL_TRACKER["bbm_csv"] += 1
+    
+    session = requests.Session()
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    session.get("https://baseballmonster.com/lineups.aspx", headers=headers)
+    
+    csv_url = f"https://baseballmonster.com/Lineups.aspx?csv=1&d={target_date}"
+    response = session.get(csv_url, headers=headers)
+    projections = {}
+    
+    if response.status_code == 200 and len(response.text) > 100:
+        csv_data = io.StringIO(response.text)
+        reader = csv.reader(csv_data)
+        next(reader, None) 
+        
+        for row in reader:
+            if len(row) < 7: continue
+            
+            team_code = row[0].strip()
+            game_num = row[2].strip()
+            player_mlb_id = row[3].strip()
+            
+            # CRITICAL FIX: Strip (H) and (P) out of the raw display name for Ohtani
+            raw_name = row[4].strip()
+            player_name = re.sub(r'\s*\([HP]\)', '', raw_name, flags=re.IGNORECASE).strip()
+            
+            batting_order = row[5].strip()
+            confirmed = True if row[6].strip().upper() == 'Y' else False
+            mlb_team_id = BBM_TO_MLB_ID.get(team_code)
+            if not mlb_team_id: continue 
+            
+            team_key = f"{mlb_team_id}_{game_num}"
+            if team_key not in projections:
+                projections[team_key] = {"startingPitcher": None, "battingOrder": []}
+                
+            player_obj = {
+                "id": int(player_mlb_id) if player_mlb_id.isdigit() else player_mlb_id,
+                "name": player_name,
+                "verified": confirmed
+            }
+            if batting_order.isdigit() and 1 <= int(batting_order) <= 9:
+                player_obj["order"] = int(batting_order)
+                projections[team_key]["battingOrder"].append(player_obj)
+            else:
+                projections[team_key]["startingPitcher"] = player_obj
+                
+        for key in projections:
+            projections[key]["battingOrder"].sort(key=lambda x: x["order"])
+            
+    return projections
+
+def scrape_dff_projections(target_date_str):
+    print(f"\n--- BROWSER BOT STARTING FOR: {target_date_str} ---")
+    dff_data = {}
+    platforms = ['fanduel', 'draftkings']
+    
+    chrome_options = Options()
+    chrome_options.add_argument("--headless") 
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+    
+    try:
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=chrome_options)
+    except Exception as e:
+        print(f"Failed to launch browser bot: {e}")
+        return dff_data
+
+    for platform in platforms:
+        base_url = f"https://www.dailyfantasyfuel.com/mlb/projections/{platform}/{target_date_str}"
+        slate_ids = set()
+        
+        try:
+            print(f"Loading {platform.upper()} Base URL: {base_url}")
+            driver.get(base_url)
+            time.sleep(3) 
+            
+            try:
+                toggles = driver.find_elements(By.XPATH, "//*[contains(translate(text(), 'SLATE', 'slate'), 'slate') or contains(translate(text(), 'MAIN', 'main'), 'main') or contains(@class, 'slate')]")
+                for t in toggles:
+                    try:
+                        if not t.get_attribute("href"):
+                            driver.execute_script("arguments[0].click();", t)
+                    except: pass
+                time.sleep(1) 
+            except: pass
+
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            
+            def add_slate_name(sid, name):
+                if not sid or not re.match(r'^[a-zA-Z0-9]{5}$', str(sid)): return
+                slate_ids.add(sid)
+                name = str(name).strip()
+                if name and len(name) > 2:
+                    bad_names = ["projections", "matchups", "odds", "starting lineups", "players", "lineups", "optimizer"]
+                    if name.lower() not in bad_names:
+                        if sid not in GLOBAL_SLATES[platform] or GLOBAL_SLATES[platform][sid].startswith("Slate "):
+                            clean_name = re.sub(r'^(FD|DK)\s+', '', name, flags=re.IGNORECASE).strip()
+                            if clean_name:
+                                GLOBAL_SLATES[platform][sid] = clean_name
+
+            active_sid = None
+            for opt in soup.find_all('option'):
+                val = opt.get('value', '')
+                if opt.has_attr('selected'): active_sid = val
+                add_slate_name(val, opt.get_text(separator=" ", strip=True))
+                
+            for el in soup.find_all(attrs={"data-slate": True}):
+                add_slate_name(el.get("data-slate", ""), el.get_text(separator=" ", strip=True))
+                
+            for a in soup.find_all('a', href=True):
+                match = re.search(r'slate=([a-zA-Z0-9]{5})', a['href'])
+                if match:
+                    add_slate_name(match.group(1), a.get_text(separator=" ", strip=True))
+
+            html_text = driver.page_source
+            matches = re.findall(r'slate=["\']?([a-zA-Z0-9]{5})', html_text)
+            for m in matches:
+                slate_ids.add(m)
+                if m not in GLOBAL_SLATES[platform]:
+                    GLOBAL_SLATES[platform][m] = f"Slate {m}"
+                
+            print(f"Browser found slates: {slate_ids}")
+            
+            def parse_row(row, plt, sid):
+                team_raw = row.get('data-team')
+                if not team_raw: return
+                team = team_raw.upper()
+                if team == 'CHW': team = 'CWS'
+                
+                raw_name = row.get('data-name', '')
+                clean_name = clean_player_name(raw_name)
+                
+                try:
+                    sal = float(row.get('data-salary', '0') or '0')
+                    proj = float(row.get('data-ppg_proj') or row.get('data-fpts_proj') or '0')
+                    val = float(row.get('data-value_proj', '0') or '0')
+                except:
+                    sal, proj, val = 0, 0, 0
+                    
+                p_key = f"{team}_{clean_name}"
+                if p_key not in dff_data:
+                    dff_data[p_key] = {
+                        "salary": 0, "proj": 0.0, "value": 0.0,
+                        "dk_salary": 0, "dk_proj": 0.0, "dk_value": 0.0,
+                        "fd_slates": {}, "dk_slates": {}
+                    }
+                
+                if plt == 'fanduel' and sal > 0:
+                    if sid:
+                        dff_data[p_key]["fd_slates"][sid] = {"salary": int(sal), "proj": round(proj, 1), "value": round(val, 2)}
+                elif plt == 'draftkings' and sal > 0:
+                    if sid:
+                        dff_data[p_key]["dk_slates"][sid] = {"salary": int(sal), "proj": round(proj, 1), "value": round(val, 2)}
+
+            if active_sid:
+                for row in soup.find_all('tr', class_='projections-listing'):
+                    parse_row(row, platform, active_sid)
+            
+            for sid in slate_ids:
+                if sid == active_sid: continue
+                try:
+                    headers = {'User-Agent': 'Mozilla/5.0', 'X-Requested-With': 'XMLHttpRequest'}
+                    res = requests.get(f"{base_url}?slate={sid}", headers=headers, timeout=5)
+                    if res.status_code == 200:
+                        sub_soup = BeautifulSoup(res.text, 'html.parser')
+                        for row in sub_soup.find_all('tr', class_='projections-listing'):
+                            parse_row(row, platform, sid)
+                except: pass
+                
+        except Exception as e:
+            print(f"Error scraping DFF ({platform}): {e}")
+            
+    print("Applying Waterfall Logic for Default DFS Stats...")
+    def get_slate_priority(slate_name):
+        name_lower = slate_name.lower()
+        if "all day" in name_lower: return 1
+        elif "main" in name_lower: return 2
+        elif any(x in name_lower for x in ["showdown", "single game", "captain", "mvp", "@"]): return 4
+        else: return 3 
+        
+    for p_key, p_data in dff_data.items():
+        best_fd_sid, best_fd_pri = None, 99
+        for sid, stats in p_data["fd_slates"].items():
+            pri = get_slate_priority(GLOBAL_SLATES['fanduel'].get(sid, ""))
+            if pri < best_fd_pri or (pri == best_fd_pri and stats["proj"] > p_data["fd_slates"].get(best_fd_sid, {}).get("proj", 0)):
+                best_fd_pri, best_fd_sid = pri, sid
+        if best_fd_sid:
+            p_data["salary"], p_data["proj"], p_data["value"] = p_data["fd_slates"][best_fd_sid]["salary"], p_data["fd_slates"][best_fd_sid]["proj"], p_data["fd_slates"][best_fd_sid]["value"]
+            
+        best_dk_sid, best_dk_pri = None, 99
+        for sid, stats in p_data["dk_slates"].items():
+            pri = get_slate_priority(GLOBAL_SLATES['draftkings'].get(sid, ""))
+            if pri < best_dk_pri or (pri == best_dk_pri and stats["proj"] > p_data["dk_slates"].get(best_dk_sid, {}).get("proj", 0)):
+                best_dk_pri, best_dk_sid = pri, sid
+        if best_dk_sid:
+            p_data["dk_salary"], p_data["dk_proj"], p_data["dk_value"] = p_data["dk_slates"][best_dk_sid]["salary"], p_data["dk_slates"][best_dk_sid]["proj"], p_data["dk_slates"][best_dk_sid]["value"]
+
+    driver.quit() 
+    return dff_data
 
 def fetch_bvp(session, batter_id, pitcher_id):
     global API_CALL_TRACKER
@@ -160,8 +351,11 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
     split_label = "LHP" if hand_code == 'vl' else "RHP" if group_type == "hitting" else "LHB" if hand_code == 'vl' else "RHB"
     return {"split_type": split_label, "ab": ab, "hr": hr, "k": k, "bb": bb, "avg": avg_str, "ops": ops_str}
 
+# ==========================================
+# --- MAIN SCRIPT LOGIC ---
+# ==========================================
 def main():
-    global API_CALL_TRACKER
+    global API_CALL_TRACKER, GLOBAL_SLATES
     est_tz = zoneinfo.ZoneInfo("America/New_York")
     current_est_time = datetime.now(est_tz)
     
@@ -172,8 +366,6 @@ def main():
         
     today_est_str = current_est_time.strftime('%Y-%m-%d')
     start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
-    
-    # --- 📅 EXPANDED TO 7 DAYS ---
     end_date = (current_est_time + timedelta(days=7)).strftime('%Y-%m-%d') 
     
     print(f"🚀 Building Master JSONs using the Daily File as Memory")
@@ -184,12 +376,10 @@ def main():
     ump_cache = load_json(UMPIRES_FILE, {}).get('umpires', {})
     park_cache = load_json(PARKS_FILE, {}).get('parks', {})
     
-    # Fetch Odds
     API_CALL_TRACKER["odds"] += 1
     try: odds_data = requests.get("https://weathermlb.com/data/odds.json", timeout=10).json().get('odds', [])
     except Exception: odds_data = []
 
-    # Fetch Schedule
     API_CALL_TRACKER["schedule"] += 1
     sport_ids = get_active_sport_ids()
     schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person"
@@ -204,22 +394,26 @@ def main():
         date_str = date_item['date']
         master_dates[date_str] = []
         
-        # --- 📖 READ THE DAILY FILE MEMORY ---
+        # CLEAR SLATES PER DATE
+        GLOBAL_SLATES = {'fanduel': {}, 'draftkings': {}}
+        
+        # --- 📖 READ THE DAILY FILE MEMORY (Updated for Dictionary structure) ---
         daily_file_path = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
         daily_memory = {}
         if os.path.exists(daily_file_path):
-            existing_games = load_json(daily_file_path, [])
+            existing_data = load_json(daily_file_path, {})
+            # Gracefully handle both old Array structures and new Object structures
+            existing_games = existing_data.get('games', []) if isinstance(existing_data, dict) else existing_data
             for g in existing_games:
                 daily_memory[str(g['gameRaw']['gamePk'])] = g
                 
-        # --- 🤖 BBM PROJECTIONS CACHE LOGIC ---
+        # --- 🤖 TIME GATES FOR BBM & DFF ---
         target_date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
         days_away = (target_date_obj - current_est_time.date()).days
         
+        # BBM LOGIC
         needs_bbm_fetch = True
         bbm_projections_for_date = {}
-        
-        # 🛑 PRE-SEASON BOUNCER
         has_real_games = False
         for g in date_item.get('games', []):
             if g.get('gameType') in ['R', 'F', 'D', 'L', 'W']:
@@ -230,18 +424,13 @@ def main():
             needs_bbm_fetch = False
             print(f"   [BBM] Skipping {date_str} - Only Spring Training/Exhibition games scheduled.")
             
-        # Determine if we already fetched recently based on memory
         if needs_bbm_fetch and daily_memory:
             first_game = list(daily_memory.values())[0]
             last_updated = first_game.get('projectedLineups', {}).get('lastUpdated', 0)
-            
-            # Threshold: 10 mins (600s) for Day 0, 24 hours (86400s) for Days 1-7
             threshold_seconds = 600 if days_away == 0 else 86400
-            
             if (current_est_time.timestamp() - last_updated) < threshold_seconds:
                 needs_bbm_fetch = False
 
-        # 🛑 THE KILL SWITCH: If it's Day 0, check if all MLB lineups are already official
         if days_away == 0 and needs_bbm_fetch:
             all_official = True
             for g in date_item.get('games', []):
@@ -252,15 +441,45 @@ def main():
                     if a_len == 0 or h_len == 0:
                         all_official = False
                         break
-            if all_official:
-                print(f"   [BBM] All lineups are official for {date_str}. Killing BBM fetch!")
-                needs_bbm_fetch = False
+            if all_official: needs_bbm_fetch = False
 
         if needs_bbm_fetch:
             print(f"   [BBM] Fetching fresh projected lineups for {date_str} (Days Away: {days_away})...")
             bbm_projections_for_date = get_bbm_projected_lineups(date_str)
-            time.sleep(1) # Polite delay
-        
+            time.sleep(1) 
+
+        # DFF LOGIC
+        needs_dff_fetch = False
+        if days_away == 0: needs_dff_fetch = True 
+        elif days_away == 1 and current_est_time.hour >= 23: needs_dff_fetch = True 
+            
+        dff_projections = {}
+        has_valid_dfs = False
+        if needs_dff_fetch:
+            dff_projections = scrape_dff_projections(date_str)
+            has_valid_dfs = len(dff_projections) > 0
+            if not has_valid_dfs:
+                print(f"⚠️ Safety Valve Triggered: DFF scrape for {date_str} failed or was empty. Skipping injection.")
+                
+        def inject_dfs(player_obj, team_abbr):
+            if not player_obj: return
+            clean_name = clean_player_name(player_obj['name'])
+            p_key = f"{team_abbr}_{clean_name}"
+            dff_p = dff_projections.get(p_key)
+            
+            if not dff_p:
+                parts = clean_name.split()
+                if len(parts) >= 2:
+                    for d_key, d_val in dff_projections.items():
+                        if d_key.startswith(f"{team_abbr}_") and parts[-1] in d_key and d_key.split('_')[1].startswith(parts[0][0]):
+                            dff_p = d_val
+                            break
+            
+            if dff_p and (dff_p.get('salary', 0) > 0 or dff_p.get('dk_salary', 0) > 0):
+                player_obj['salary'], player_obj['proj'], player_obj['value'] = dff_p.get('salary', 0), dff_p.get('proj', 0), dff_p.get('value', 0)
+                player_obj['dk_salary'], player_obj['dk_proj'], player_obj['dk_value'] = dff_p.get('dk_salary', 0), dff_p.get('dk_proj', 0), dff_p.get('dk_value', 0)
+                player_obj['fd_slates'], player_obj['dk_slates'] = dff_p.get('fd_slates', {}), dff_p.get('dk_slates', {})
+
         # --- PROCESS GAMES ---
         for game in date_item.get('games', []):
             game_pk = str(game['gamePk'])
@@ -279,20 +498,17 @@ def main():
             home_team_id = str(teams.get('home', {}).get('team', {}).get('id', ''))
             game_num = str(game.get('gameNumber', 1))
             
-            # Match Odds
             game_odds = None
             game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000
             potential_odds = [o for o in odds_data if o['home_team'] == home_team_name and o['away_team'] == away_team_name]
             if potential_odds:
                 game_odds = sorted(potential_odds, key=lambda o: abs(datetime.strptime(o['commence_time'], "%Y-%m-%dT%H:%M:%SZ").timestamp() * 1000 - game_time_ms))[0]
 
-            # Probable Pitchers
             away_starter = teams.get('away', {}).get('probablePitcher')
             home_starter = teams.get('home', {}).get('probablePitcher')
             away_starter_id = str(away_starter.get('id')) if away_starter else None
             home_starter_id = str(home_starter.get('id')) if home_starter else None
             
-            # --- FETCH STATS ONLY IF MISSING FROM TODAY'S FILE ---
             for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
                 if p_id and p_id not in game_deep_stats:
                     print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
@@ -326,7 +542,6 @@ def main():
                         "split_vR": fetch_combined_splits(session, batter_id, 'vr')
                     }
 
-            # --- 🛑 LIVE FEED OPTIMIZATION (USING DAILY MEMORY) ---
             game_state = game.get('status', {}).get('abstractGameState', '')
             needs_live_feed = False
             
@@ -355,7 +570,6 @@ def main():
                         if p_val.get('person', {}).get('batSide'): lineup_handedness[pid] = p_val['person']['batSide'].get('code')
                 except Exception: pass
                 
-            # --- INJECT BBM PROJECTIONS ---
             if needs_bbm_fetch:
                 game_projected_lineups = {
                     "lastUpdated": current_est_time.timestamp(),
@@ -363,10 +577,20 @@ def main():
                     "home": bbm_projections_for_date.get(f"{home_team_id}_{game_num}")
                 }
             else:
-                # Retrieve from memory, but default to empty dict and preserve the timestamp if missing
                 game_projected_lineups = existing_game_state.get('projectedLineups', {})
                 if "lastUpdated" not in game_projected_lineups:
                     game_projected_lineups["lastUpdated"] = current_est_time.timestamp()
+
+            # INJECT DFS STATS
+            if has_valid_dfs:
+                away_abbr = get_dff_team_abbr(away_team_name)
+                home_abbr = get_dff_team_abbr(home_team_name)
+                if game_projected_lineups.get("away"):
+                    inject_dfs(game_projected_lineups["away"].get("startingPitcher"), away_abbr)
+                    for batter in game_projected_lineups["away"].get("battingOrder", []): inject_dfs(batter, away_abbr)
+                if game_projected_lineups.get("home"):
+                    inject_dfs(game_projected_lineups["home"].get("startingPitcher"), home_abbr)
+                    for batter in game_projected_lineups["home"].get("battingOrder", []): inject_dfs(batter, home_abbr)
 
             master_dates[date_str].append({
                 "gameRaw": game,
@@ -380,11 +604,22 @@ def main():
                 "parkStats": park_cache.get(game.get('venue', {}).get('name'))
             })
 
-    # Write the Daily JSON Files!
-    for date_str, games_list in master_dates.items():
+        # Save Daily File
+        formatted_slates = {
+            "fanduel": [{"id": k, "name": v} for k, v in GLOBAL_SLATES['fanduel'].items()],
+            "draftkings": [{"id": k, "name": v} for k, v in GLOBAL_SLATES['draftkings'].items()]
+        }
+
+        # ALWAYS save as the new Object structure to standardize the Frontend
+        final_output = {
+            "last_updated": current_est_time.strftime("%b %d, %I:%M %p ET"),
+            "slates": formatted_slates if has_valid_dfs else {"fanduel": [], "draftkings": []},
+            "games": master_dates[date_str]
+        }
+
         daily_file = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
-        save_json(daily_file, games_list)
-        print(f"✅ Created/Updated {daily_file} with {len(games_list)} games.")
+        save_json(daily_file, final_output)
+        print(f"✅ Created/Updated {daily_file} with {len(master_dates[date_str])} games.")
 
     # --- PRINT API METRICS ---
     total_calls = sum(API_CALL_TRACKER.values())
