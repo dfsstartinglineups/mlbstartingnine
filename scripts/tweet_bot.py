@@ -345,19 +345,41 @@ for game in games:
     home_pitcher_str = f"{home_p_name} ({home_p_hand})" if home_p_name != "TBD" else "TBD"
 
     raw_away_odds, raw_home_odds, raw_total = "TBD", "TBD", "TBD"
-    for o in odds_data:
-        if o['home_team'] == home_full and o['away_team'] == away_full:
-            for bookie in o.get('bookmakers', []):
-                h2h = next((m for m in bookie['markets'] if m['key'] == 'h2h'), None)
-                totals = next((m for m in bookie['markets'] if m['key'] == 'totals'), None)
-                if h2h:
-                    for outcome in h2h['outcomes']:
-                        if outcome['name'] == away_full: raw_away_odds = outcome['price']
-                        if outcome['name'] == home_full: raw_home_odds = outcome['price']
-                if totals and totals['outcomes']:
-                    raw_total = totals['outcomes'][0]['point']
-                if raw_away_odds != "TBD": break
-            break
+    
+    def parse_odds_time(date_str):
+        if date_str.endswith('Z'): date_str = date_str[:-1]
+        if len(date_str.split(':')) == 2: date_str += ":00"
+        try:
+            return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
+        except Exception:
+            return 0
+            
+    try:
+        game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() * 1000
+    except Exception:
+        game_time_ms = 0
+
+    # 1. Filter for the correct matchup
+    potential_odds = [o for o in odds_data if o['home_team'] == home_full and o['away_team'] == away_full]
+    
+    # 2. Sort by the closest timestamp (Solves Doubleheaders and Consecutive Days!)
+    if potential_odds and game_time_ms > 0:
+        closest_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
+        
+        for bookie in closest_odds.get('bookmakers', []):
+            h2h = next((m for m in bookie['markets'] if m['key'] == 'h2h'), None)
+            totals = next((m for m in bookie['markets'] if m['key'] == 'totals'), None)
+            
+            if h2h:
+                for outcome in h2h['outcomes']:
+                    if outcome['name'] == away_full: raw_away_odds = outcome['price']
+                    if outcome['name'] == home_full: raw_home_odds = outcome['price']
+                    
+            if totals and totals['outcomes']:
+                raw_total = totals['outcomes'][0]['point']
+                
+            if raw_away_odds != "TBD": 
+                break
 
     total_string = f" • O/U {raw_total}" if raw_total != "TBD" else ""
     away_odds_str = format_odds(raw_away_odds)
