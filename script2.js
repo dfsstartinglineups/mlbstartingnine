@@ -10,7 +10,7 @@ let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'tr
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
-// --- CSS INJECTIONS FOR LEADERBOARD ---
+// --- CSS INJECTIONS FOR LEADERBOARD & CONTROLS ---
 const style = document.createElement('style');
 style.innerHTML = `
     .leaderboard-tab {
@@ -22,6 +22,10 @@ style.innerHTML = `
     .leaderboard-tab:hover:not(.active) { color: #495057; }
     .list-view::-webkit-scrollbar { width: 4px; }
     .list-view::-webkit-scrollbar-thumb { background-color: #dee2e6; border-radius: 4px; }
+    
+    .dk-btn-label { color: #6c9d2f; border-color: #6c9d2f; background-color: #fff; }
+    .dk-btn-label:hover { color: #fff; background-color: #6c9d2f; border-color: #6c9d2f; }
+    .btn-check:checked + .dk-btn-label { background-color: #6c9d2f !important; border-color: #6c9d2f !important; color: #fff !important; }
 `;
 document.head.appendChild(style);
 
@@ -68,17 +72,17 @@ function handleHashNavigation() {
 function ensureDFSControls() {
     if (!document.getElementById('dfs-controls-row')) {
         const container = document.getElementById('games-container');
-        if (container) {
+        if (container && container.parentNode) {
             const controlsHtml = `
                 <div id="dfs-controls-row" class="w-100 d-flex align-items-center px-1 mb-2 gap-2">
-                    <div class="btn-group shadow-sm" role="group">
+                    <div class="btn-group shadow-sm flex-shrink-0" role="group">
                         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
                         <label class="btn btn-outline-primary fw-bold px-3 py-1" for="btn-fd" style="font-size: 0.85rem;">FD</label>
                         
                         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
-                        <label class="btn btn-outline-success fw-bold px-3 py-1" for="btn-dk" style="font-size: 0.85rem; --bs-btn-active-bg: #6c9d2f; --bs-btn-active-border-color: #6c9d2f; --bs-btn-color: #6c9d2f; --bs-btn-border-color: #6c9d2f; --bs-btn-hover-bg: #6c9d2f; --bs-btn-hover-border-color: #6c9d2f;">DK</label>
+                        <label class="btn fw-bold px-3 py-1 dk-btn-label" for="btn-dk" style="font-size: 0.85rem;">DK</label>
                     </div>
-                    <select id="slate-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 160px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;">
+                    <select id="slate-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 180px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;">
                         <option value="all">All Slates</option>
                     </select>
                 </div>
@@ -303,11 +307,13 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     const topPitchersProj = [...allPitchers].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
 
     const buildList = (players, isValue) => {
-        if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found.</div>`;
+        if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found for this selection.</div>`;
         return players.map((p, index) => {
             const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
             const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
             const highlightMetric = isValue ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
+            
+            // NO dollar sign
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
             let shortName = p.name;
@@ -374,8 +380,7 @@ function renderGames() {
     const container = document.getElementById('games-container');
     if (!container) return;
     
-    // Check if the controls row exists, if not, wait for it (it gets injected before the container)
-    // To cleanly wipe games but NOT wipe the controls, we just empty the container itself.
+    // Keep controls intact, clear out the games & leaderboard underneath
     container.innerHTML = '';
 
     const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
@@ -426,7 +431,6 @@ function createGameCard(data, platform, selectedSlate) {
     const umpStats = data.umpStats;
 
     const gameCard = document.createElement('div');
-    // Keeping 3 columns wide on desktop
     gameCard.className = 'col-md-6 col-lg-6 col-xl-4 px-1 mb-3';
 
     const awayNameFull = game.teams.away.team.name;
@@ -530,6 +534,7 @@ function createGameCard(data, platform, selectedSlate) {
                 if (sal > 0 || proj > 0) showStats = true;
             }
             if (showStats) {
+                // NO dollar sign
                 salFmt = sal > 0 ? (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
                 projFmt = proj > 0 ? proj.toFixed(1) : '-';
                 valFmt = val > 0 ? val.toFixed(2) : '-';
@@ -693,11 +698,11 @@ function createGameCard(data, platform, selectedSlate) {
             }
 
             const dfsHtml = showStats ? `
-                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0" style="width: 52%; font-size: 0.65rem; letter-spacing: -0.4px;">
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0 pe-1" style="width: 42%; font-size: 0.65rem; letter-spacing: -0.5px;">
                     <span class="text-end fw-bold" style="width: 33%;">${salFmt}</span>
                     <span class="text-center text-primary fw-bold" style="width: 33%;">${projFmt}</span>
-                    <span class="text-end text-success fw-bold pe-1" style="width: 34%;">${valFmt}</span>
-                </div>` : `<div style="width: 52%;"></div>`;
+                    <span class="text-end text-success fw-bold" style="width: 34%;">${valFmt}</span>
+                </div>` : `<div style="width: 42%;"></div>`;
 
             // --- BvP & SPLITS ---
             let statsHtml = '';
@@ -719,18 +724,18 @@ function createGameCard(data, platform, selectedSlate) {
                 statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
-            // Squeezed padding and pushed text to the start edge
+            // Squeezed padding and pushed text to the start edge (ps-1, px-0)
             return `
-                <li class="d-flex flex-column w-100 px-1 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
+                <li class="d-flex flex-column w-100 px-0 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
                     <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="d-flex align-items-center text-truncate" style="width: 48%;">
-                            <span class="text-muted fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; min-width: 14px; margin-right: 2px;">${prefixText}</span>
+                        <div class="d-flex align-items-center text-truncate ps-1" style="width: 58%;">
+                            <span class="text-muted fw-bold text-start flex-shrink-0" style="font-size: 0.65rem; width: 12px; margin-right: 2px;">${prefixText}</span>
                             <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
                             ${handText}
                         </div>
                         ${dfsHtml}
                     </div>
-                    <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100 mt-1">${statsHtml}</div>
+                    <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100 mt-1 px-1">${statsHtml}</div>
                 </li>`;
         }).join('');
         
