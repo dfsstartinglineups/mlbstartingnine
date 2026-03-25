@@ -3,9 +3,10 @@
 // ==========================================
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
+let GLOBAL_SLATES = { fanduel: [], draftkings: [] }; 
 
 let savedLineupState = localStorage.getItem('futbolLineupsExpanded');
-let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'true' : true; 
+let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'true' : true;
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
@@ -47,8 +48,77 @@ function handleHashNavigation() {
 }
 
 // ==========================================
-// 2. DATA FETCHING (WITH LIVE API FALLBACK)
+// 2. DATA FETCHING & SLATE HELPERS
 // ==========================================
+function populateSlates() {
+    const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
+    const platform = platformNode ? platformNode.value : 'fd';
+    const platKey = platform === 'dk' ? 'draftkings' : 'fanduel';
+    
+    const selector = document.getElementById('slate-selector');
+    if (!selector) return;
+    
+    const currentVal = selector.value;
+    selector.innerHTML = '<option value="all">All Slates</option>';
+    
+    const datePicker = document.getElementById('date-picker');
+    const dateToFetch = datePicker ? datePicker.value : DEFAULT_DATE;
+    
+    let dateObj = new Date();
+    if (dateToFetch && dateToFetch.includes('-')) {
+        const [y, m, d] = dateToFetch.split('-');
+        dateObj = new Date(y, m - 1, d);
+    }
+    const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+
+    if (GLOBAL_SLATES[platKey] && Array.isArray(GLOBAL_SLATES[platKey])) {
+        GLOBAL_SLATES[platKey].forEach(slate => {
+            const upperName = slate.name.toUpperCase();
+            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+            const containsADay = days.some(day => upperName.includes(day));
+            
+            // Ensure the slate belongs to the currently viewed day
+            if (upperName.includes(dayOfWeek) || !containsADay) {
+                const opt = document.createElement('option');
+                opt.value = slate.id;
+                opt.textContent = slate.name;
+                selector.appendChild(opt);
+            }
+        });
+    }
+    
+    if(Array.from(selector.options).some(opt => opt.value === currentVal)) selector.value = currentVal;
+    else selector.value = 'all';
+}
+
+function hasSlatePlayers(game, platform, selectedSlate) {
+    if (selectedSlate === 'all') return true; 
+    const checkRoster = (players) => {
+        if (!players) return false;
+        return players.some(p => {
+            const slatesDict = platform === 'dk' ? (p.dk_slates || {}) : (p.fd_slates || {});
+            return !!slatesDict[selectedSlate];
+        });
+    };
+    
+    const pl = game.projectedLineups || {};
+    return checkRoster([pl.away?.startingPitcher]) || checkRoster(pl.away?.battingOrder) || 
+           checkRoster([pl.home?.startingPitcher]) || checkRoster(pl.home?.battingOrder);
+}
+
+function hasAnyDfsSalaries(game, platform) {
+    const checkRoster = (players) => {
+        if (!players) return false;
+        return players.some(p => {
+            if (!p) return false;
+            return (platform === 'dk' ? (p.dk_salary || 0) : (p.salary || 0)) > 0;
+        });
+    };
+    const pl = game.projectedLineups || {};
+    return checkRoster([pl.away?.startingPitcher]) || checkRoster(pl.away?.battingOrder) || 
+           checkRoster([pl.home?.startingPitcher]) || checkRoster(pl.home?.battingOrder);
+}
+
 async function init(dateToFetch) {
     if (window.updateSEO) window.updateSEO(dateToFetch); 
     
@@ -67,21 +137,28 @@ async function init(dateToFetch) {
     }
     
     try {
-        // 1. Try to load your Python-generated file first (Fastest & has Deep Stats)
         const response = await fetch(`data/daily_files/games_${dateToFetch}.json?v=` + new Date().getTime());
         
         if (!response.ok) {
             throw new Error("Local JSON not found");
         }
         
-        ALL_GAMES_DATA = await response.json();
+        const rawData = await response.json();
+
+        if (Array.isArray(rawData)) {
+            ALL_GAMES_DATA = rawData;
+            GLOBAL_SLATES = { fanduel: [], draftkings: [] };
+        } else {
+            ALL_GAMES_DATA = rawData.games || [];
+            GLOBAL_SLATES = rawData.slates || { fanduel: [], draftkings: [] };
+        }
+
+        populateSlates();
 
     } catch (error) {
         console.log(`No local file for ${dateToFetch}. Falling back to live MLB API...`);
         
         try {
-            // 2. Fallback: Hit the MLB API directly to construct the board on the fly
-            // The MLB API prefers MM/DD/YYYY formatting
             const [year, month, day] = dateToFetch.split('-');
             const mlbApiDate = `${month}/${day}/${year}`;
             
@@ -92,7 +169,6 @@ async function init(dateToFetch) {
             const mlbData = await mlbRes.json();
             
             if (mlbData.dates && mlbData.dates.length > 0) {
-                // Map the raw MLB data into the structure your rendering engine expects
                 ALL_GAMES_DATA = mlbData.dates[0].games.map(game => {
                     return {
                         gameRaw: game,
@@ -111,7 +187,6 @@ async function init(dateToFetch) {
         }
     }
 
-    // Render what we have (either the deep file or the raw fallback)
     if (ALL_GAMES_DATA.length === 0) {
         container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">No games scheduled for ${dateToFetch}</h5></div></div>`;
         return;
@@ -128,6 +203,10 @@ function renderGames() {
     const container = document.getElementById('games-container');
     container.innerHTML = '';
 
+    const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
+    const platform = platformNode ? platformNode.value : 'fd';
+    const selectedSlate = document.getElementById('slate-selector')?.value || 'all';
+
     const searchInput = document.getElementById('team-search');
     const searchText = searchInput ? searchInput.value.toLowerCase() : '';
 
@@ -137,8 +216,12 @@ function renderGames() {
         return matchString.includes(searchText);
     });
 
+    if (selectedSlate !== 'all') {
+        filteredGames = filteredGames.filter(item => hasSlatePlayers(item, platform, selectedSlate));
+    }
+
     if (filteredGames.length === 0) {
-        container.innerHTML = `<div class="col-12 text-center py-5 text-muted fw-bold">No games match your search.</div>`;
+        container.innerHTML = `<div class="col-12 text-center py-5 text-muted fw-bold">No games match your filters.</div>`;
         return;
     }
 
@@ -152,10 +235,10 @@ function renderGames() {
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
-    sortedGames.forEach(item => container.appendChild(createGameCard(item)));
+    sortedGames.forEach(item => container.appendChild(createGameCard(item, platform, selectedSlate)));
 }
 
-function createGameCard(data) {
+function createGameCard(data, platform, selectedSlate) {
     const game = data.gameRaw;
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
@@ -165,7 +248,8 @@ function createGameCard(data) {
     const umpStats = data.umpStats;
 
     const gameCard = document.createElement('div');
-    gameCard.className = 'col-md-6 col-lg-6 col-xl-4 mb-2';
+    // INCREASED WIDTH: Replaced col-xl-4 with col-lg-6 col-xl-6 to make cards take up 50% width on large screens
+    gameCard.className = 'col-12 col-lg-6 col-xl-6 mb-3 px-2';
 
     const awayNameFull = game.teams.away.team.name;
     const homeNameFull = game.teams.home.team.name;
@@ -276,34 +360,36 @@ function createGameCard(data) {
         `;
     }
 
-    // --- PROJECTIONS AWARE PITCHER LOGIC ---
+    // --- PITCHER LOGIC ---
     let awayPitcherId = null;
     let awayPitcher = "TBD";
     let awayPitcherHand = 'R'; 
+    let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
+
     if (game.teams.away.probablePitcher) {
         awayPitcherId = game.teams.away.probablePitcher.id;
         awayPitcherHand = game.teams.away.probablePitcher.pitchHand?.code || 'R';
         awayPitcher = game.teams.away.probablePitcher.fullName + ` (${awayPitcherHand})`;
-    } else if (data.projectedLineups && data.projectedLineups.away && data.projectedLineups.away.startingPitcher) {
-        let projSP = data.projectedLineups.away.startingPitcher;
-        awayPitcherId = projSP.id;
-        awayPitcher = projSP.name + " (Proj)";
+    } else if (awayPitcherObj) {
+        awayPitcherId = awayPitcherObj.id;
+        awayPitcher = awayPitcherObj.name + " (Proj)";
     }
 
     let homePitcherId = null;
     let homePitcher = "TBD";
     let homePitcherHand = 'R'; 
+    let homePitcherObj = data.projectedLineups?.home?.startingPitcher;
+
     if (game.teams.home.probablePitcher) {
         homePitcherId = game.teams.home.probablePitcher.id;
         homePitcherHand = game.teams.home.probablePitcher.pitchHand?.code || 'R';
         homePitcher = game.teams.home.probablePitcher.fullName + ` (${homePitcherHand})`;
-    } else if (data.projectedLineups && data.projectedLineups.home && data.projectedLineups.home.startingPitcher) {
-        let projSP = data.projectedLineups.home.startingPitcher;
-        homePitcherId = projSP.id;
-        homePitcher = projSP.name + " (Proj)";
+    } else if (homePitcherObj) {
+        homePitcherId = homePitcherObj.id;
+        homePitcher = homePitcherObj.name + " (Proj)";
     }
 
-    const buildPitcherToggle = (pId, pName) => {
+    const buildPitcherToggle = (pId, pName, pitcherObj) => {
         if (!pId) return `<div class="text-muted mt-1 fw-bold" style="font-size: 0.75rem;">${pName}</div>`;
         
         let shortName = pName;
@@ -312,10 +398,41 @@ function createGameCard(data) {
             shortName = `${parts[0].charAt(0)}. ${parts.slice(1).join(' ')}`;
         }
 
+        // Add Pitcher DFS Stats underneath their name
+        let showStats = false, salFmt = '-', projFmt = '-';
+        if (pitcherObj) {
+            const slatesDict = platform === 'dk' ? (pitcherObj.dk_slates || {}) : (pitcherObj.fd_slates || {});
+            let sal = 0, proj = 0;
+            
+            if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
+                sal = slatesDict[selectedSlate].salary; 
+                proj = slatesDict[selectedSlate].proj; 
+                showStats = true;
+            } else if (selectedSlate === 'all') {
+                sal = platform === 'dk' ? pitcherObj.dk_salary : pitcherObj.salary; 
+                proj = platform === 'dk' ? pitcherObj.dk_proj : pitcherObj.proj; 
+                if (sal > 0 || proj > 0) showStats = true;
+            }
+            
+            if (showStats) {
+                salFmt = sal > 0 ? '$' + (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+                projFmt = proj > 0 ? proj : '-';
+            }
+        }
+
+        let dfsHtml = showStats ? `
+            <div class="d-flex justify-content-center align-items-center w-100 mt-1" style="font-size: 0.65rem; letter-spacing: -0.2px;">
+                <span class="text-muted fw-bold me-2">${salFmt}</span>
+                <span class="text-primary fw-bold">${projFmt}</span>
+            </div>` : '';
+
+        // Entire block becomes clickable to expand matchup stats
         return `
-            <div class="d-flex justify-content-center align-items-center player-toggle mt-1" style="cursor: pointer;" data-target="stats-${game.gamePk}-p-${pId}">
-                <span class="text-muted fw-bold text-truncate" style="font-size: 0.70rem; max-width: 110px;" title="${pName}">${shortName}</span>
-                <span class="badge bg-light text-secondary border toggle-icon ms-1" style="font-size: 0.55rem; padding: 0.2em 0.3em;">+</span>
+            <div class="d-flex flex-column justify-content-center align-items-center player-toggle mt-1 w-100 rounded" style="cursor: pointer; padding: 2px; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-p-${pId}">
+                <div class="d-flex align-items-center justify-content-center w-100">
+                    <span class="text-dark fw-bold text-truncate" style="font-size: 0.75rem; max-width: 110px;" title="${pName}">${shortName}</span>
+                </div>
+                ${dfsHtml}
             </div>
         `;
     };
@@ -372,10 +489,10 @@ function createGameCard(data) {
         `;
     };
 
-    const awayPitcherToggle = buildPitcherToggle(awayPitcherId, awayPitcher);
+    const awayPitcherToggle = buildPitcherToggle(awayPitcherId, awayPitcher, awayPitcherObj);
     const awayPitcherStats = buildPitcherStats(awayPitcherId);
     
-    const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher);
+    const homePitcherToggle = buildPitcherToggle(homePitcherId, homePitcher, homePitcherObj);
     const homePitcherStats = buildPitcherStats(homePitcherId);
 
     // --- ODDS & LIVE SCOREBOARD ENGINE ---
@@ -525,6 +642,7 @@ function createGameCard(data) {
 
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         if (!playersArray || playersArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
+        
         const listItems = playersArray.map((p, index) => {
             let playerName = p.fullName || p.name;
             let abbrName = playerName;
@@ -532,11 +650,42 @@ function createGameCard(data) {
             if (nameParts.length > 1) abbrName = `${nameParts[0].charAt(0)}. ${nameParts.slice(1).join(' ')}`;
             
             const batCode = handDict[p.id] || "";
-            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.70rem; margin-left: 2px;">(${batCode})</span>` : "";
+            const handText = batCode ? `<span class="text-muted fw-normal" style="font-size: 0.65rem; margin-left: 2px;">(${batCode})</span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[p.id]) ? data.gamePositions[p.id] : "";
             const prefixText = gamePos ? gamePos : `${index + 1}.`;
             
+            // --- DFS STATS ---
+            let showStats = false, salFmt = '-', projFmt = '-', valFmt = '-';
+            const slatesDict = platform === 'dk' ? (p.dk_slates || {}) : (p.fd_slates || {});
+            let sal = 0, proj = 0, val = 0;
+            
+            if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
+                sal = slatesDict[selectedSlate].salary; 
+                proj = slatesDict[selectedSlate].proj; 
+                val = slatesDict[selectedSlate].value;
+                showStats = true;
+            } else if (selectedSlate === 'all') {
+                sal = platform === 'dk' ? p.dk_salary : p.salary; 
+                proj = platform === 'dk' ? p.dk_proj : p.proj; 
+                val = platform === 'dk' ? p.dk_value : p.value;
+                if (sal > 0 || proj > 0) showStats = true;
+            }
+            
+            if (showStats) {
+                salFmt = sal > 0 ? '$' + (sal / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+                projFmt = proj > 0 ? proj : '-';
+                valFmt = val > 0 ? val : '-';
+            }
+
+            const dfsHtml = showStats ? `
+                <div class="d-flex align-items-center justify-content-end text-muted flex-shrink-0" style="width: 48%; font-size: 0.65rem; letter-spacing: -0.4px;">
+                    <span class="text-end fw-bold" style="width: 32%;">${salFmt}</span>
+                    <span class="text-center text-primary fw-bold" style="width: 36%;">${projFmt}</span>
+                    <span class="text-start text-success fw-bold" style="width: 32%;">${valFmt}</span>
+                </div>` : `<div style="width: 48%;"></div>`;
+
+            // --- BvP & SPLITS ---
             let statsHtml = '';
             const pStats = deepStats[p.id];
             if (pStats && pStats.bvp) {
@@ -558,18 +707,22 @@ function createGameCard(data) {
                 statsHtml = `<div class="mt-1 p-1 rounded text-start text-muted fst-italic w-100" style="background-color: #f8f9fa; font-size: 0.65rem; border: 1px solid #e9ecef;">Matchup data pending...</div>`;
             }
 
+            // Entire Row acts as the toggle trigger, Squeezed pos and name to the left
             return `
-                <li class="d-flex flex-column w-100 px-2 py-1 border-bottom">
-                    <div class="d-flex justify-content-between align-items-center w-100 player-toggle" style="cursor: pointer;" data-target="stats-${game.gamePk}-${p.id}">
-                        <div class="text-truncate pe-1">
-                            <span class="text-muted fw-bold d-inline-block text-start" style="font-size: 0.7rem; width: 20px;">${prefixText}</span><span class="batter-name fw-bold text-dark" style="font-size: 0.85rem;" title="${playerName}">${abbrName}</span>${handText}
+                <li class="d-flex flex-column w-100 px-2 py-1 border-bottom player-toggle" style="cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'" data-target="stats-${game.gamePk}-${p.id}">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <div class="d-flex align-items-center text-truncate" style="width: 52%;">
+                            <span class="text-muted fw-bold text-center me-1 flex-shrink-0" style="font-size: 0.65rem; width: 14px;">${prefixText}</span>
+                            <span class="batter-name fw-bold text-dark text-truncate" style="font-size: 0.8rem;" title="${playerName}">${abbrName}</span>
+                            ${handText}
                         </div>
-                        <div><span class="badge bg-light text-secondary border toggle-icon" style="width: 24px;">+</span></div>
+                        ${dfsHtml}
                     </div>
-                    <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100">${statsHtml}</div>
+                    <div id="stats-${game.gamePk}-${p.id}" class="stats-collapse d-none w-100 mt-1">${statsHtml}</div>
                 </li>`;
         }).join('');
-        return `<ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul>`;
+        
+        return `<div class="w-100 m-0 p-0"><ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul></div>`;
     };
 
     // 1. Determine which players to use (Official fallback to Projected)
@@ -580,7 +733,7 @@ function createGameCard(data) {
     let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
     let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
 
-    // 3. Create the NBA-Style Banners
+    // 3. Create the Banners
     const getStatusBanner = (isOfficial, hasPlayers) => {
         if (!hasPlayers) return '';
         if (isOfficial) {
@@ -600,6 +753,18 @@ function createGameCard(data) {
     // 4. Build the HTML lists
     const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand);
     const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand);
+
+    const hasAnySlatePlayer = hasAnyDfsSalaries(data, platform);
+    let missingSlateHtml = '';
+    const platKey = platform === 'dk' ? 'draftkings' : 'fanduel';
+    
+    if (!hasAnySlatePlayer && selectedSlate === 'all') {
+        if (GLOBAL_SLATES[platKey] && GLOBAL_SLATES[platKey].length > 0) {
+            missingSlateHtml = `<div class="w-100 text-center py-1 fw-bold text-white bg-secondary border-top" style="font-size: 0.65rem;">🚫 Game not included in ${platform === 'dk' ? 'DK' : 'FD'} slates</div>`;
+        } else {
+            missingSlateHtml = `<div class="w-100 text-center py-1 fw-bold text-dark border-top" style="font-size: 0.65rem; background-color: #ffecb5;">⏳ ${platform === 'dk' ? 'DK' : 'FD'} salaries & slates pending...</div>`;
+        }
+    }
 
     const X_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" class="x-icon" viewBox="0 0 16 16"><path d="${X_SVG_PATH}"/></svg>`;
     
@@ -648,7 +813,7 @@ function createGameCard(data) {
     const awayRank = game.teams.away.team.rank ? `<span class="text-muted" style="font-size: 0.70rem;">[${game.teams.away.team.rank}]</span> ` : '';
 
     gameCard.innerHTML = `
-        <div class="lineup-card shadow-sm" style="margin-bottom: 8px;" id="game-${game.gamePk}">
+        <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden" style="margin-bottom: 8px;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
                 
                 <div class="d-flex align-items-center mb-2 w-100 pb-1 border-bottom border-white">
@@ -684,6 +849,8 @@ function createGameCard(data) {
                     </div>
                 </div>
             </div>
+            
+            ${missingSlateHtml}
 
             <div class="bg-light border-top border-bottom d-flex justify-content-between align-items-center px-2 py-1">
                 <div>${awayTweetBtn}</div>
@@ -749,6 +916,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Connect DFS Platform Radios to refresh the view
+    document.querySelectorAll('.dfs-toggle').forEach(radio => radio.addEventListener('change', () => {
+        populateSlates();
+        renderGames();
+    }));
+    
+    // Connect Slate Dropdown to filter the view
+    document.getElementById('slate-selector')?.addEventListener('change', renderGames);
+
     const copyBtn = document.getElementById('copy-tweet-btn');
     if(copyBtn) {
         copyBtn.addEventListener('click', () => {
@@ -767,29 +943,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('click', (e) => {
+        // Expand/Collapse individual player matchup rows
         if (e.target.closest('.player-toggle')) {
             const row = e.target.closest('.player-toggle');
             const div = document.getElementById(row.getAttribute('data-target'));
-            const icon = row.querySelector('.toggle-icon');
-            const isHidden = div.classList.contains('d-none');
-            div.classList.toggle('d-none');
-            icon.textContent = isHidden ? '-' : '+';
+            if (div) {
+                div.classList.toggle('d-none');
+            }
         }
         
+        // Expand/Collapse entire card
         if (e.target.closest('.card-toggle-btn')) {
             const btn = e.target.closest('.card-toggle-btn');
             const card = btn.closest('.lineup-card');
             const isExp = btn.textContent.includes('+');
             card.querySelectorAll('.stats-collapse').forEach(d => isExp ? d.classList.remove('d-none') : d.classList.add('d-none'));
-            card.querySelectorAll('.toggle-icon').forEach(i => i.textContent = isExp ? '-' : '+');
             btn.textContent = isExp ? '[-] Collapse Matchups' : '[+] Expand Matchups';
         }
         
+        // Expand/Collapse ALL cards globally
         if (e.target.closest('#global-toggle-btn')) {
             const btn = e.target.closest('#global-toggle-btn');
             const isExp = btn.textContent.includes('+');
             document.querySelectorAll('.stats-collapse').forEach(d => isExp ? d.classList.remove('d-none') : d.classList.add('d-none'));
-            document.querySelectorAll('.toggle-icon').forEach(i => i.textContent = isExp ? '-' : '+');
             document.querySelectorAll('.card-toggle-btn').forEach(b => b.textContent = isExp ? '[-] Collapse Matchups' : '[+] Expand Matchups');
             btn.textContent = isExp ? '[-] Collapse All' : '[+] Expand All';
         }
