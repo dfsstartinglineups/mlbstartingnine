@@ -247,6 +247,20 @@ window.updateTopPlaysView = function() {
     const tab = tabEl ? tabEl.getAttribute('data-tab') : 'value';
     
     document.querySelectorAll('.list-view').forEach(el => el.classList.add('d-none'));
+    
+    // BvP only exists for Hitters. If Pitchers is selected, hide the BvP tab entirely,
+    // and if the user was ON the BvP tab, forcefully switch them to the Value tab.
+    const bvpTab = document.querySelector('.leaderboard-tab[data-tab="bvp"]');
+    if (type === 'pitchers') {
+        if (bvpTab) bvpTab.style.display = 'none';
+        if (tab === 'bvp') {
+            document.querySelector('.leaderboard-tab[data-tab="value"]').click();
+            return; // The click will re-trigger this function, so we can stop here
+        }
+    } else {
+        if (bvpTab) bvpTab.style.display = 'block';
+    }
+
     const target = document.getElementById(`view-top-${tab}-${type}`);
     if(target) target.classList.remove('d-none');
 };
@@ -254,6 +268,7 @@ window.updateTopPlaysView = function() {
 function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     let allHitters = [];
     let allPitchers = [];
+    let allBvP = []; // New array to hold hitters with qualifying BvP
     
     filteredGames.forEach(game => {
         const pl = game.gameRaw?.teams || {}; 
@@ -262,7 +277,8 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.away?.team?.id}.svg`;
         const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.home?.team?.id}.svg`;
         
-        // Map official field positions dynamically
+        const deepStats = game.deepStats || {};
+
         let posMap = {};
         if (game.gamePositions) {
             Object.assign(posMap, game.gamePositions);
@@ -278,7 +294,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             });
         }
 
-        const extract = (roster, teamAbbr, teamLogo, isPitcher) => {
+        const extract = (roster, teamAbbr, teamLogo, isPitcher, opposingPitcherName) => {
             if (!roster) return;
             let arr = Array.isArray(roster) ? roster : [roster];
             arr.forEach(p => {
@@ -294,24 +310,48 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     val = platform === 'dk' ? (p.dk_value || 0) : (p.value || 0);
                 }
                 
+                let name = p.name || p.fullName || 'Unknown';
+                let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
+                let fieldPos = isPitcher ? 'P' : (posMap[p.id] || 'B');
+                
+                // Standard DFS Push
                 if (sal > 0 || proj > 0) {
-                    let name = p.name || p.fullName || 'Unknown';
-                    let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
                     let listToPush = isPitcher ? allPitchers : allHitters;
-                    
-                    // Display specific field position for batters, P for Pitchers
-                    let fieldPos = isPitcher ? 'P' : (posMap[p.id] || 'B');
-                    
                     listToPush.push({ id: p.id || name, name, pos: fieldPos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
+                }
+
+                // --- BvP Push (Hitters Only) ---
+                if (!isPitcher && p.id && deepStats[String(p.id)]) {
+                    const bvpStats = deepStats[String(p.id)].bvp;
+                    if (bvpStats && bvpStats.ab >= 5) {
+                        // Ensure ops is treated as a float for sorting
+                        let opsVal = parseFloat(bvpStats.ops) || 0;
+                        
+                        allBvP.push({
+                            id: p.id,
+                            name: name,
+                            pos: fieldPos,
+                            teamAbbrev: teamAbbr,
+                            teamLogo: teamLogo,
+                            photo: photo,
+                            bvp: bvpStats,
+                            oppPitcher: opposingPitcherName || "Unknown"
+                        });
+                    }
                 }
             });
         };
         
         const line = game.projectedLineups || {};
-        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true);
-        extract(line.away?.battingOrder, awayAbbr, awayLogo, false);
-        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true);
-        extract(line.home?.battingOrder, homeAbbr, homeLogo, false);
+        
+        // Grab pitcher names for the BvP label
+        let awayPitcherName = line.away?.startingPitcher?.name || game.gameRaw?.teams?.away?.probablePitcher?.fullName || "TBD";
+        let homePitcherName = line.home?.startingPitcher?.name || game.gameRaw?.teams?.home?.probablePitcher?.fullName || "TBD";
+
+        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true, null);
+        extract(line.away?.battingOrder, awayAbbr, awayLogo, false, homePitcherName);
+        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true, null);
+        extract(line.home?.battingOrder, homeAbbr, homeLogo, false, awayPitcherName);
     });
 
     if (allHitters.length === 0 && allPitchers.length === 0) return '';
@@ -319,25 +359,61 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     // Deduplicate
     allHitters = Array.from(new Map(allHitters.map(p => [p.id, p])).values());
     allPitchers = Array.from(new Map(allPitchers.map(p => [p.id, p])).values());
+    allBvP = Array.from(new Map(allBvP.map(p => [p.id, p])).values());
 
     const topHittersVal = [...allHitters].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
     const topHittersProj = [...allHitters].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
     const topPitchersVal = [...allPitchers].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
     const topPitchersProj = [...allPitchers].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
+    
+    // Sort BvP by OPS
+    const topBvP = [...allBvP].sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0)).slice(0, 20);
 
-    const buildList = (players, isValue) => {
+    const buildList = (players, mode) => {
         if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found for this selection.</div>`;
         return players.map((p, index) => {
             const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
             const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
-            const highlightMetric = isValue ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
-            const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
             let shortName = p.name;
             if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
 
-            // Switch the sub-metric to whatever is NOT the highlighted main number
-            const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
+            let rightSideHtml = '';
+            let subtitleHtml = '';
+
+            if (mode === 'bvp') {
+                // BvP Display Logic
+                let avg = p.bvp.avg;
+                if (!avg || avg === "-" || avg === ".000") {
+                    if(p.bvp.ab > 0) {
+                        let calcAvg = p.bvp.hits / p.bvp.ab;
+                        avg = calcAvg.toFixed(3).replace('0.', '.');
+                    } else {
+                        avg = ".000";
+                    }
+                }
+                
+                // Remove the leading zero from OPS for cleaner display
+                let opsDisplay = parseFloat(p.bvp.ops).toFixed(3).replace('0.', '.');
+                
+                let p_shortName = p.oppPitcher;
+                if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
+                    p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
+                }
+
+                subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} AVG • ${p.bvp.hr} HR`;
+                rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
+            } else {
+                // Standard DFS Display Logic
+                const isValue = mode === 'value';
+                const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+                const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
+                
+                subtitleHtml = `${p.pos} • ${salFmt} • ${subMetric}`;
+                rightSideHtml = isValue 
+                    ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` 
+                    : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
+            }
 
             return `
             <div class="d-flex align-items-center justify-content-between py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
@@ -350,12 +426,12 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     <div class="d-flex flex-column justify-content-center overflow-hidden pe-1">
                         <span class="fw-bold text-dark text-truncate" style="font-size: 0.95rem; max-width: 180px;" title="${p.name}">${shortName}</span>
                         <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 240px;">
-                            ${p.pos} • ${salFmt} • ${subMetric}
+                            ${subtitleHtml}
                         </span>
                     </div>
                 </div>
                 <div class="text-end ms-1 flex-shrink-0">
-                    <div class="fw-bold" style="font-size: 1.2rem;">${highlightMetric}</div>
+                    <div class="fw-bold" style="font-size: 1.2rem;">${rightSideHtml}</div>
                 </div>
             </div>`;
         }).join('');
@@ -376,15 +452,18 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             </div>
             <div class="bg-light border-bottom d-flex justify-content-center align-items-center px-2 py-0">
                 <div class="d-flex w-100">
-                    <div class="leaderboard-tab active w-50" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">TOP VALUE</div>
-                    <div class="leaderboard-tab w-50" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">TOP PROJ</div>
+                    <div class="leaderboard-tab active w-100" style="width: 33.33%;" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">VALUE</div>
+                    <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">PROJ</div>
+                    <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="bvp" onclick="window.setTopPlaysTab(this, 'bvp')">TOP BVP</div>
                 </div>
             </div>
             <div class="card-body p-0">
-                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topHittersVal, true)}</div>
-                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topHittersProj, false)}</div>
-                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topPitchersVal, true)}</div>
-                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 435px; overflow-y: auto;">${buildList(topPitchersProj, false)}</div>
+                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersVal, 'value')}</div>
+                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersProj, 'proj')}</div>
+                <div id="view-top-bvp-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topBvP, 'bvp')}</div>
+                
+                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersVal, 'value')}</div>
+                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersProj, 'proj')}</div>
             </div>
         </div>
     </div>`;
