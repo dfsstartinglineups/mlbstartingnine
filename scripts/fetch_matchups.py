@@ -691,12 +691,20 @@ def main():
             if has_valid_dfs:
                 away_abbr = get_dff_team_abbr(away_team_name)
                 home_abbr = get_dff_team_abbr(home_team_name)
+                
+                # 1. Inject into Projected Lineups (Baseball Monster)
                 if game_projected_lineups.get("away"):
                     inject_dfs(game_projected_lineups["away"].get("startingPitcher"), away_abbr)
                     for batter in game_projected_lineups["away"].get("battingOrder", []): inject_dfs(batter, away_abbr)
                 if game_projected_lineups.get("home"):
                     inject_dfs(game_projected_lineups["home"].get("startingPitcher"), home_abbr)
                     for batter in game_projected_lineups["home"].get("battingOrder", []): inject_dfs(batter, home_abbr)
+                    
+                # 2. Inject into Official Lineups (MLB API) to catch surprise starters
+                for batter in game.get('lineups', {}).get('awayPlayers', []):
+                    inject_dfs(batter, away_abbr)
+                for batter in game.get('lineups', {}).get('homePlayers', []):
+                    inject_dfs(batter, home_abbr)
 
             master_dates[date_str].append({
                 "gameRaw": game,
