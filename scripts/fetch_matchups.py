@@ -336,7 +336,7 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
         except Exception: pass
         time.sleep(0.05)
             
-    ab, h, hr, bb, hbp, sf, k = totals["ab"], totals["h"], totals["hr"], totals["bb"], totals["hbp"], sf, totals["k"]
+    ab, h, hr, bb, hbp, sf, k = totals["ab"], totals["h"], totals["hr"], totals["bb"], totals["hbp"], totals["sf"], totals["k"]
     avg = h / ab if ab > 0 else 0.0
     tb = (h - (totals["2b"] + totals["3b"] + hr)) + (2 * totals["2b"]) + (3 * totals["3b"]) + (4 * hr)
     slg = tb / ab if ab > 0 else 0.0
