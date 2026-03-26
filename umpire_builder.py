@@ -39,6 +39,10 @@ def build_umpire_json():
 
     df = pd.concat(all_chunks, ignore_index=True)
     
+    # --- NEW: Filter for Regular Season games only ---
+    print("Filtering out Spring Training and Postseason games...")
+    df = df[df['game_type'] == 'R']
+    
     # 2. Filter to only the final pitch of each at-bat
     at_bats = df.dropna(subset=['events'])
     
