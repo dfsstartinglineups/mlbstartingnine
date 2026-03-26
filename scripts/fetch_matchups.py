@@ -336,7 +336,7 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
         except Exception: pass
         time.sleep(0.05)
             
-    ab, h, hr, bb, hbp, sf, k = totals["ab"], totals["h"], totals["hr"], totals["bb"], totals["hbp"], totals["sf"], totals["k"]
+    ab, h, hr, bb, hbp, sf, k = totals["ab"], totals["h"], totals["hr"], totals["bb"], totals["hbp"], sf, totals["k"]
     avg = h / ab if ab > 0 else 0.0
     tb = (h - (totals["2b"] + totals["3b"] + hr)) + (2 * totals["2b"]) + (3 * totals["3b"]) + (4 * hr)
     slg = tb / ab if ab > 0 else 0.0
@@ -360,9 +360,13 @@ def main():
     current_est_time = datetime.now(est_tz)
     
     # --- 🛑 THE DEEP SLEEP CHECK ---
-    if 3 <= current_est_time.hour < 8:
+    if 4 <= current_est_time.hour < 8:
         print(f"💤 SLEEP MODE ACTIVE: It is currently {current_est_time.strftime('%I:%M %p')} EST.")
         return
+
+    is_nightly_refresh = current_est_time.hour == 3
+    if is_nightly_refresh:
+        print(f"🧹 NIGHTLY REFRESH ACTIVE: Wiping saved stats to fetch fresh data for the day.")
         
     today_est_str = current_est_time.strftime('%Y-%m-%d')
     start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
@@ -389,6 +393,10 @@ def main():
         return
 
     master_dates = {}
+    
+    # --- CROSS-DATE MEMORY CACHES ---
+    run_cache_splits = {}
+    run_cache_bvp = {}
 
     for date_item in schedule_data.get('dates', []):
         date_str = date_item['date']
@@ -485,7 +493,15 @@ def main():
             game_pk = str(game['gamePk'])
             
             existing_game_state = daily_memory.get(game_pk, {})
-            game_deep_stats = existing_game_state.get('deepStats', {})
+            
+            # 🌙 NIGHTLY REFRESH LOGIC
+            # If it's 3 AM, ignore the saved stats so the script is forced to fetch fresh ones.
+            # At any other time, use the saved stats so it only fetches missing players.
+            if is_nightly_refresh:
+                game_deep_stats = {}
+            else:
+                game_deep_stats = existing_game_state.get('deepStats', {})
+                
             game_positions = existing_game_state.get('gamePositions', {})
             lineup_handedness = existing_game_state.get('lineupHandedness', {})
             hp_umpire = existing_game_state.get('hpUmpire', "TBD")
@@ -517,11 +533,19 @@ def main():
             
             for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
                 if p_id and p_id not in game_deep_stats:
-                    print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
+                    # Check our script memory first
+                    if p_id not in run_cache_splits:
+                        print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
+                        run_cache_splits[p_id] = {
+                            "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
+                            "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
+                        }
+                    
                     game_deep_stats[p_id] = {
-                        "name": p_data['fullName'], "is_pitcher": True,
-                        "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
-                        "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
+                        "name": p_data['fullName'], 
+                        "is_pitcher": True,
+                        "split_vL": run_cache_splits[p_id]["split_vL"],
+                        "split_vR": run_cache_splits[p_id]["split_vR"]
                     }
 
             # --- CRITICAL FIX: BULK FETCH HANDEDNESS FOR ALL PLAYERS ---
@@ -572,13 +596,28 @@ def main():
                 if 'id' not in batter: continue
                 batter_id = str(batter['id'])
                 if batter_id not in game_deep_stats:
-                    # Use 'fullName' for Official MLB data, fallback to 'name' for BBM data
                     batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
+                    
+                    # 1. Fetch or load Splits
+                    if batter_id not in run_cache_splits:
+                        run_cache_splits[batter_id] = {
+                            "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
+                            "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                        }
+                    
+                    # 2. Fetch or load BvP
+                    bvp_stats = {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
+                    if home_starter_id:
+                        bvp_key = f"{batter_id}_{home_starter_id}"
+                        if bvp_key not in run_cache_bvp:
+                            run_cache_bvp[bvp_key] = fetch_bvp(session, batter_id, home_starter_id)
+                        bvp_stats = run_cache_bvp[bvp_key]
+
                     game_deep_stats[batter_id] = {
                         "name": batter_name, 
-                        "bvp": fetch_bvp(session, batter_id, home_starter_id) if home_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
-                        "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
-                        "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                        "bvp": bvp_stats,
+                        "split_vL": run_cache_splits[batter_id]["split_vL"], 
+                        "split_vR": run_cache_splits[batter_id]["split_vR"]
                     }
 
             for batter in combined_home_batters:
@@ -586,11 +625,27 @@ def main():
                 batter_id = str(batter['id'])
                 if batter_id not in game_deep_stats:
                     batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
+                    
+                    # 1. Fetch or load Splits
+                    if batter_id not in run_cache_splits:
+                        run_cache_splits[batter_id] = {
+                            "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
+                            "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                        }
+                    
+                    # 2. Fetch or load BvP
+                    bvp_stats = {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
+                    if away_starter_id:
+                        bvp_key = f"{batter_id}_{away_starter_id}"
+                        if bvp_key not in run_cache_bvp:
+                            run_cache_bvp[bvp_key] = fetch_bvp(session, batter_id, away_starter_id)
+                        bvp_stats = run_cache_bvp[bvp_key]
+
                     game_deep_stats[batter_id] = {
                         "name": batter_name, 
-                        "bvp": fetch_bvp(session, batter_id, away_starter_id) if away_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
-                        "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
-                        "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                        "bvp": bvp_stats,
+                        "split_vL": run_cache_splits[batter_id]["split_vL"], 
+                        "split_vR": run_cache_splits[batter_id]["split_vR"]
                     }
 
             game_state = game.get('status', {}).get('abstractGameState', '')
