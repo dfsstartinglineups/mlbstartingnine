@@ -529,16 +529,21 @@ def main():
             away_lineup = lineups.get('awayPlayers', [])
             home_lineup = lineups.get('homePlayers', [])
             
-            # Collect all known player IDs for this game (Official + Projected)
-            all_pids = set()
-            for p in away_lineup + home_lineup:
-                all_pids.add(str(p['id']))
+            # 1. Safely grab projected lineups whether fresh from BBM or from memory
+            away_proj = []
+            home_proj = []
             
             if needs_bbm_fetch:
                 away_proj = bbm_projections_for_date.get(f"{away_team_id}_{game_num}", {}).get('battingOrder', [])
                 home_proj = bbm_projections_for_date.get(f"{home_team_id}_{game_num}", {}).get('battingOrder', [])
-                for p in away_proj + home_proj:
-                    if 'id' in p: all_pids.add(str(p['id']))
+            else:
+                away_proj = existing_game_state.get('projectedLineups', {}).get('away', {}).get('battingOrder', []) or []
+                home_proj = existing_game_state.get('projectedLineups', {}).get('home', {}).get('battingOrder', []) or []
+
+            # Collect all known player IDs for this game (Official + Projected)
+            all_pids = set()
+            for p in away_lineup + home_lineup + away_proj + home_proj:
+                if 'id' in p: all_pids.add(str(p['id']))
             
             # Bulk fetch the missing handedness from MLB People API
             if all_pids:
@@ -559,21 +564,30 @@ def main():
                 lineup_handedness[str(home_starter['id'])] = home_starter['pitchHand'].get('code')
             # -------------------------------------------------------------------------------------
 
-            for batter in away_lineup:
+            # 2. Combine Official and Projected lists to fetch Deep Stats
+            combined_away_batters = away_lineup + away_proj
+            combined_home_batters = home_lineup + home_proj
+
+            for batter in combined_away_batters:
+                if 'id' not in batter: continue
                 batter_id = str(batter['id'])
                 if batter_id not in game_deep_stats:
+                    # Use 'fullName' for Official MLB data, fallback to 'name' for BBM data
+                    batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
                     game_deep_stats[batter_id] = {
-                        "name": batter['fullName'], 
+                        "name": batter_name, 
                         "bvp": fetch_bvp(session, batter_id, home_starter_id) if home_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
                         "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
                         "split_vR": fetch_combined_splits(session, batter_id, 'vr')
                     }
 
-            for batter in home_lineup:
+            for batter in combined_home_batters:
+                if 'id' not in batter: continue
                 batter_id = str(batter['id'])
                 if batter_id not in game_deep_stats:
+                    batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
                     game_deep_stats[batter_id] = {
-                        "name": batter['fullName'], 
+                        "name": batter_name, 
                         "bvp": fetch_bvp(session, batter_id, away_starter_id) if away_starter_id else {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"},
                         "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
                         "split_vR": fetch_combined_splits(session, batter_id, 'vr')
