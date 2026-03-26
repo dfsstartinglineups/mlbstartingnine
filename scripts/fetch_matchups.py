@@ -471,7 +471,12 @@ def main():
                 
         def inject_dfs(player_obj, team_abbr):
             if not player_obj: return
-            clean_name = clean_player_name(player_obj['name'])
+            
+            # Safely grab the name whether it's an MLB API object (fullName) or BBM object (name)
+            raw_name = player_obj.get('fullName', player_obj.get('name', ''))
+            if not raw_name: return
+            
+            clean_name = clean_player_name(raw_name)
             p_key = f"{team_abbr}_{clean_name}"
             dff_p = dff_projections.get(p_key)
             
