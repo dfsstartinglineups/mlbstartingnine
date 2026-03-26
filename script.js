@@ -385,7 +385,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
             let rightSideHtml = '';
             let subtitleHtml = '';
-            let rightFontSize = '1.2rem'; // Default Size
+            let rightFontSize = '1.1rem'; // Dialed down slightly for a better inline fit
 
             if (mode === 'bvp') {
                 // BvP Display Logic
@@ -409,7 +409,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
                 subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
                 rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
-                rightFontSize = '1.0rem'; // Dynamically shrink font size for BVP right column
+                rightFontSize = '1.0rem';
             } else {
                 // Standard DFS Display Logic
                 const isValue = mode === 'value';
@@ -423,22 +423,23 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             }
 
             return `
-            <div class="d-flex align-items-center justify-content-between py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
-                <div class="d-flex align-items-center overflow-hidden">
-                    <div class="fw-bold text-muted me-2 text-end" style="font-size: 0.85rem; width: 22px;">${index + 1}.</div>
-                    <div class="me-3 position-relative flex-shrink-0">
-                        ${photoHtml}
-                        ${teamBadge}
-                    </div>
-                    <div class="d-flex flex-column justify-content-center overflow-hidden pe-1">
-                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.95rem; max-width: 180px;" title="${p.name}">${shortName}</span>
-                        <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 260px;">
-                            ${subtitleHtml}
-                        </span>
-                    </div>
+            <div class="d-flex align-items-center py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
+                <div class="fw-bold text-muted me-2 text-end flex-shrink-0" style="font-size: 0.85rem; width: 22px;">${index + 1}.</div>
+                <div class="me-3 position-relative flex-shrink-0">
+                    ${photoHtml}
+                    ${teamBadge}
                 </div>
-                <div class="text-end ms-1 flex-shrink-0">
-                    <div class="fw-bold" style="font-size: ${rightFontSize};">${rightSideHtml}</div>
+                <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
+                    
+                    <div class="d-flex justify-content-between align-items-baseline">
+                        <div class="fw-bold text-dark text-truncate pe-2" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                        <div class="fw-bold text-end flex-shrink-0" style="font-size: ${rightFontSize}; line-height: 1;">${rightSideHtml}</div>
+                    </div>
+                    
+                    <div class="text-muted text-truncate w-100" style="font-size: 0.72rem; margin-top: -2px;">
+                        ${subtitleHtml}
+                    </div>
+
                 </div>
             </div>`;
         }).join('');
