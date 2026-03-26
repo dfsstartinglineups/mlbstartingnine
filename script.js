@@ -385,6 +385,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
             let rightSideHtml = '';
             let subtitleHtml = '';
+            let rightFontSize = '1.2rem'; // Default Size
 
             if (mode === 'bvp') {
                 // BvP Display Logic
@@ -408,6 +409,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
                 subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
                 rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
+                rightFontSize = '1.0rem'; // Dynamically shrink font size for BVP right column
             } else {
                 // Standard DFS Display Logic
                 const isValue = mode === 'value';
@@ -430,13 +432,13 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     </div>
                     <div class="d-flex flex-column justify-content-center overflow-hidden pe-1">
                         <span class="fw-bold text-dark text-truncate" style="font-size: 0.95rem; max-width: 180px;" title="${p.name}">${shortName}</span>
-                        <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 240px;">
+                        <span class="text-muted text-truncate" style="font-size: 0.72rem; max-width: 260px;">
                             ${subtitleHtml}
                         </span>
                     </div>
                 </div>
                 <div class="text-end ms-1 flex-shrink-0">
-                    <div class="fw-bold" style="font-size: 1.2rem;">${rightSideHtml}</div>
+                    <div class="fw-bold" style="font-size: ${rightFontSize};">${rightSideHtml}</div>
                 </div>
             </div>`;
         }).join('');
