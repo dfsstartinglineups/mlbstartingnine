@@ -253,17 +253,22 @@ window.updateTopPlaysView = function() {
     
     document.querySelectorAll('.list-view').forEach(el => el.classList.add('d-none'));
     
-    // BvP only exists for Hitters. If Pitchers is selected, hide the BvP tab entirely,
-    // and if the user was ON the BvP tab, forcefully switch them to the Value tab.
+    // BvP and HR only exist for Hitters. Hide them if Pitchers is selected.
     const bvpTab = document.querySelector('.leaderboard-tab[data-tab="bvp"]');
+    const hrTab = document.querySelector('.leaderboard-tab[data-tab="hr"]');
+    
     if (type === 'pitchers') {
         if (bvpTab) bvpTab.style.display = 'none';
-        if (tab === 'bvp') {
+        if (hrTab) hrTab.style.display = 'none';
+        
+        // Force switch back to Value tab if they were on a hitters-only tab
+        if (tab === 'bvp' || tab === 'hr') {
             document.querySelector('.leaderboard-tab[data-tab="value"]').click();
-            return; // The click will re-trigger this function, so we can stop here
+            return; 
         }
     } else {
         if (bvpTab) bvpTab.style.display = 'block';
+        if (hrTab) hrTab.style.display = 'block';
     }
 
     const target = document.getElementById(`view-top-${tab}-${type}`);
@@ -273,7 +278,8 @@ window.updateTopPlaysView = function() {
 function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     let allHitters = [];
     let allPitchers = [];
-    let allBvP = []; // New array to hold hitters with qualifying BvP
+    let allBvP = []; 
+    let allHR = []; 
     
     filteredGames.forEach(game => {
         const pl = game.gameRaw?.teams || {}; 
@@ -283,6 +289,8 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.home?.team?.id}.svg`;
         
         const deepStats = game.deepStats || {};
+        const handDict = game.lineupHandedness || {};
+        const parkStats = game.parkStats || null; // Grab the park stats!
 
         let posMap = {};
         if (game.gamePositions) {
@@ -299,7 +307,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             });
         }
 
-        const extract = (roster, teamAbbr, teamLogo, isPitcher, opposingPitcherName) => {
+        const extract = (roster, teamAbbr, teamLogo, isPitcher, opposingPitcherName, opposingPitcherHand) => {
             if (!roster) return;
             let arr = Array.isArray(roster) ? roster : [roster];
             arr.forEach(p => {
@@ -325,22 +333,55 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     listToPush.push({ id: p.id || name, name, pos: fieldPos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
                 }
 
-                // --- BvP Push (Hitters Only) ---
+                // --- BvP & HR Push (Hitters Only) ---
                 if (!isPitcher && p.id && deepStats[String(p.id)]) {
                     const bvpStats = deepStats[String(p.id)].bvp;
+                    
+                    // 1. BvP Array
                     if (bvpStats && bvpStats.ab >= 5) {
-                        // Ensure ops is treated as a float for sorting
-                        let opsVal = parseFloat(bvpStats.ops) || 0;
-                        
                         allBvP.push({
-                            id: p.id,
-                            name: name,
-                            pos: fieldPos,
-                            teamAbbrev: teamAbbr,
-                            teamLogo: teamLogo,
-                            photo: photo,
-                            bvp: bvpStats,
-                            oppPitcher: opposingPitcherName || "Unknown"
+                            id: p.id, name: name, pos: fieldPos, teamAbbrev: teamAbbr,
+                            teamLogo: teamLogo, photo: photo, bvp: bvpStats, oppPitcher: opposingPitcherName || "Unknown"
+                        });
+                    }
+                    
+                    // 2. HR Calculation Array
+                    let splitStats = opposingPitcherHand === 'L' ? deepStats[String(p.id)].split_vL : deepStats[String(p.id)].split_vR;
+                    let splitHrRate = 0;
+                    let bvpHrRate = 0;
+                    
+                    // Enforce the 10 AB minimum for Splits
+                    if (splitStats && splitStats.ab >= 10) splitHrRate = splitStats.hr / splitStats.ab;
+                    if (bvpStats && bvpStats.ab > 0) bvpHrRate = bvpStats.hr / bvpStats.ab;
+                    
+                    let baseHrScore = splitHrRate + bvpHrRate;
+                    
+                    // Apply Park Factors
+                    let finalHrScore = baseHrScore;
+                    if (baseHrScore > 0 && parkStats) {
+                        let batterHand = handDict[String(p.id)] || 'R'; // Default to R if unknown
+                        let activeBatSide = batterHand;
+                        
+                        // Switch hitters bat from the opposite side of the pitcher
+                        if (batterHand === 'S') {
+                            activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
+                        }
+                        
+                        let parkFactor = activeBatSide === 'L' ? parkStats.hr_l : parkStats.hr_r;
+                        if (parkFactor) {
+                            finalHrScore = baseHrScore * (parkFactor / 100);
+                        }
+                    }
+                    
+                    if (finalHrScore > 0) {
+                        allHR.push({
+                            id: p.id, name: name, pos: fieldPos, teamAbbrev: teamAbbr,
+                            teamLogo: teamLogo, photo: photo, 
+                            bvp: bvpStats || {ab: 0, hr: 0}, 
+                            split: splitStats || {ab: 0, hr: 0},
+                            oppPitcher: opposingPitcherName || "Unknown",
+                            oppHand: opposingPitcherHand,
+                            hrScore: finalHrScore // Push the park-adjusted score
                         });
                     }
                 }
@@ -349,14 +390,16 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         
         const line = game.projectedLineups || {};
         
-        // Grab pitcher names for the BvP label
         let awayPitcherName = line.away?.startingPitcher?.name || game.gameRaw?.teams?.away?.probablePitcher?.fullName || "TBD";
         let homePitcherName = line.home?.startingPitcher?.name || game.gameRaw?.teams?.home?.probablePitcher?.fullName || "TBD";
+        
+        let awayPitcherHand = game.gameRaw?.teams?.away?.probablePitcher?.pitchHand?.code || 'R';
+        let homePitcherHand = game.gameRaw?.teams?.home?.probablePitcher?.pitchHand?.code || 'R';
 
-        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true, null);
-        extract(line.away?.battingOrder, awayAbbr, awayLogo, false, homePitcherName);
-        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true, null);
-        extract(line.home?.battingOrder, homeAbbr, homeLogo, false, awayPitcherName);
+        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true, null, null);
+        extract(line.away?.battingOrder, awayAbbr, awayLogo, false, homePitcherName, homePitcherHand);
+        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true, null, null);
+        extract(line.home?.battingOrder, homeAbbr, homeLogo, false, awayPitcherName, awayPitcherHand);
     });
 
     if (allHitters.length === 0 && allPitchers.length === 0) return '';
@@ -365,14 +408,16 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     allHitters = Array.from(new Map(allHitters.map(p => [p.id, p])).values());
     allPitchers = Array.from(new Map(allPitchers.map(p => [p.id, p])).values());
     allBvP = Array.from(new Map(allBvP.map(p => [p.id, p])).values());
+    allHR = Array.from(new Map(allHR.map(p => [p.id, p])).values());
 
     const topHittersVal = [...allHitters].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
     const topHittersProj = [...allHitters].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
     const topPitchersVal = [...allPitchers].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
     const topPitchersProj = [...allPitchers].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
-    
-    // Sort BvP by OPS
     const topBvP = [...allBvP].sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0)).slice(0, 20);
+    
+    // Sort HR by the new park-adjusted score!
+    const topHR = [...allHR].sort((a, b) => b.hrScore - a.hrScore).slice(0, 20);
 
     const buildList = (players, mode) => {
         if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found for this selection.</div>`;
@@ -385,10 +430,10 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
             let rightSideHtml = '';
             let subtitleHtml = '';
-            let rightFontSize = '1.1rem'; // Dialed down slightly for a better inline fit
+            let rightFontSize = '1.1rem'; 
+            let subtitleClass = "text-muted text-truncate w-100"; 
 
             if (mode === 'bvp') {
-                // BvP Display Logic
                 let avg = p.bvp.avg;
                 if (!avg || avg === "-" || avg === ".000") {
                     if(p.bvp.ab > 0) {
@@ -399,7 +444,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     }
                 }
                 
-                // Remove the leading zero from OPS for cleaner display
                 let opsDisplay = parseFloat(p.bvp.ops).toFixed(3).replace('0.', '.');
                 
                 let p_shortName = p.oppPitcher;
@@ -410,8 +454,21 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
                 rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
                 rightFontSize = '1.0rem';
+            } else if (mode === 'hr') {
+                let p_shortName = p.oppPitcher;
+                if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
+                    p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
+                }
+                
+                subtitleClass = "text-muted w-100"; // Remove truncation so it stacks
+                subtitleHtml = `
+                    <div class="d-flex flex-column text-muted" style="font-size: 0.70rem; line-height: 1.3;">
+                        <span>v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
+                        <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
+                    </div>
+                `;
+                rightSideHtml = ``; 
             } else {
-                // Standard DFS Display Logic
                 const isValue = mode === 'value';
                 const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
                 const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
@@ -436,7 +493,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                         <div class="fw-bold text-end flex-shrink-0" style="font-size: ${rightFontSize}; line-height: 1;">${rightSideHtml}</div>
                     </div>
                     
-                    <div class="text-muted text-truncate w-100" style="font-size: 0.72rem; margin-top: -2px;">
+                    <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: -2px;">
                         ${subtitleHtml}
                     </div>
 
@@ -460,15 +517,17 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             </div>
             <div class="bg-light border-bottom d-flex justify-content-center align-items-center px-2 py-0">
                 <div class="d-flex w-100">
-                    <div class="leaderboard-tab active w-100" style="width: 33.33%;" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">VALUE</div>
-                    <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">PROJ</div>
-                    <div class="leaderboard-tab w-100" style="width: 33.33%;" data-tab="bvp" onclick="window.setTopPlaysTab(this, 'bvp')">BVP</div>
+                    <div class="leaderboard-tab active w-100" style="width: 25%;" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">VALUE</div>
+                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">PROJ</div>
+                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="bvp" onclick="window.setTopPlaysTab(this, 'bvp')">BVP</div>
+                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="hr" onclick="window.setTopPlaysTab(this, 'hr')">HR</div>
                 </div>
             </div>
             <div class="card-body p-0">
                 <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersVal, 'value')}</div>
                 <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersProj, 'proj')}</div>
                 <div id="view-top-bvp-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topBvP, 'bvp')}</div>
+                <div id="view-top-hr-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHR, 'hr')}</div>
                 
                 <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersVal, 'value')}</div>
                 <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersProj, 'proj')}</div>
