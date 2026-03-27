@@ -279,7 +279,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     let allHitters = [];
     let allPitchers = [];
     let allBvP = []; 
-    let allHR = []; // NEW: Array for HR calculations
+    let allHR = []; 
     
     filteredGames.forEach(game => {
         const pl = game.gameRaw?.teams || {}; 
@@ -289,6 +289,8 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.home?.team?.id}.svg`;
         
         const deepStats = game.deepStats || {};
+        const handDict = game.lineupHandedness || {};
+        const parkStats = game.parkStats || null; // Grab the park stats!
 
         let posMap = {};
         if (game.gamePositions) {
@@ -337,7 +339,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     
                     // 1. BvP Array
                     if (bvpStats && bvpStats.ab >= 5) {
-                        let opsVal = parseFloat(bvpStats.ops) || 0;
                         allBvP.push({
                             id: p.id, name: name, pos: fieldPos, teamAbbrev: teamAbbr,
                             teamLogo: teamLogo, photo: photo, bvp: bvpStats, oppPitcher: opposingPitcherName || "Unknown"
@@ -349,13 +350,30 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     let splitHrRate = 0;
                     let bvpHrRate = 0;
                     
-                    if (splitStats && splitStats.ab > 0) splitHrRate = splitStats.hr / splitStats.ab;
+                    // Enforce the 10 AB minimum for Splits
+                    if (splitStats && splitStats.ab >= 10) splitHrRate = splitStats.hr / splitStats.ab;
                     if (bvpStats && bvpStats.ab > 0) bvpHrRate = bvpStats.hr / bvpStats.ab;
                     
-                    let totalHrScore = splitHrRate + bvpHrRate;
+                    let baseHrScore = splitHrRate + bvpHrRate;
                     
-                    // Only push players that actually have a positive HR chance
-                    if (totalHrScore > 0) {
+                    // Apply Park Factors
+                    let finalHrScore = baseHrScore;
+                    if (baseHrScore > 0 && parkStats) {
+                        let batterHand = handDict[String(p.id)] || 'R'; // Default to R if unknown
+                        let activeBatSide = batterHand;
+                        
+                        // Switch hitters bat from the opposite side of the pitcher
+                        if (batterHand === 'S') {
+                            activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
+                        }
+                        
+                        let parkFactor = activeBatSide === 'L' ? parkStats.hr_l : parkStats.hr_r;
+                        if (parkFactor) {
+                            finalHrScore = baseHrScore * (parkFactor / 100);
+                        }
+                    }
+                    
+                    if (finalHrScore > 0) {
                         allHR.push({
                             id: p.id, name: name, pos: fieldPos, teamAbbrev: teamAbbr,
                             teamLogo: teamLogo, photo: photo, 
@@ -363,7 +381,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                             split: splitStats || {ab: 0, hr: 0},
                             oppPitcher: opposingPitcherName || "Unknown",
                             oppHand: opposingPitcherHand,
-                            hrScore: totalHrScore
+                            hrScore: finalHrScore // Push the park-adjusted score
                         });
                     }
                 }
@@ -375,7 +393,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         let awayPitcherName = line.away?.startingPitcher?.name || game.gameRaw?.teams?.away?.probablePitcher?.fullName || "TBD";
         let homePitcherName = line.home?.startingPitcher?.name || game.gameRaw?.teams?.home?.probablePitcher?.fullName || "TBD";
         
-        // Safely extract handedness
         let awayPitcherHand = game.gameRaw?.teams?.away?.probablePitcher?.pitchHand?.code || 'R';
         let homePitcherHand = game.gameRaw?.teams?.home?.probablePitcher?.pitchHand?.code || 'R';
 
@@ -399,7 +416,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     const topPitchersProj = [...allPitchers].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
     const topBvP = [...allBvP].sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0)).slice(0, 20);
     
-    // Exact request: Sort HR by score and slice to strictly top 20
+    // Sort HR by the new park-adjusted score!
     const topHR = [...allHR].sort((a, b) => b.hrScore - a.hrScore).slice(0, 20);
 
     const buildList = (players, mode) => {
@@ -414,7 +431,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             let rightSideHtml = '';
             let subtitleHtml = '';
             let rightFontSize = '1.1rem'; 
-            let subtitleClass = "text-muted text-truncate w-100"; // Default
+            let subtitleClass = "text-muted text-truncate w-100"; 
 
             if (mode === 'bvp') {
                 let avg = p.bvp.avg;
@@ -438,20 +455,19 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
                 rightFontSize = '1.0rem';
             } else if (mode === 'hr') {
-                // Formatting for HR Display specifically 
                 let p_shortName = p.oppPitcher;
                 if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
                     p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
                 }
                 
-                subtitleClass = "text-muted w-100"; // Remove truncation so it stacks multiline nicely
+                subtitleClass = "text-muted w-100"; // Remove truncation so it stacks
                 subtitleHtml = `
                     <div class="d-flex flex-column text-muted" style="font-size: 0.70rem; line-height: 1.3;">
                         <span>v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
                         <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
                     </div>
                 `;
-                rightSideHtml = ``; // Blank right side!
+                rightSideHtml = ``; 
             } else {
                 const isValue = mode === 'value';
                 const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
