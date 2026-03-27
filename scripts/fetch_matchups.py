@@ -425,7 +425,8 @@ def main():
         print(f"💤 SLEEP MODE ACTIVE: It is currently {current_est_time.strftime('%I:%M %p')} EST.")
         return
 
-    is_nightly_refresh = current_est_time.hour == 3
+    # is_nightly_refresh = current_est_time.hour == 3
+    is_nightly_refresh = True
     if is_nightly_refresh:
         print(f"🧹 NIGHTLY REFRESH ACTIVE: Wiping saved stats to fetch fresh data for the day.")
         
