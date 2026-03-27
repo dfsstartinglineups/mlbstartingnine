@@ -303,17 +303,78 @@ def scrape_dff_projections(target_date_str):
 def fetch_bvp(session, batter_id, pitcher_id):
     global API_CALL_TRACKER
     API_CALL_TRACKER["bvp"] += 1
-    url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=vsPlayer&opposingPlayerId={pitcher_id}&group=hitting&gameType=R"
+    
+    # Ask the API for ALL history
+    url = f"https://statsapi.mlb.com/api/v1/people/{batter_id}/stats?stats=vsPlayer&opposingPlayerId={pitcher_id}&group=hitting"
+    
     try:
         res = session.get(url, timeout=10).json()
-        splits = res.get('stats', [{}])[0].get('splits', [])
-        if splits:
-            stat = splits[0].get('stat', {})
-            return {
-                "ab": stat.get('atBats', 0), "hits": stat.get('hits', 0),
-                "hr": stat.get('homeRuns', 0), "avg": stat.get('avg', '.000'), "ops": stat.get('ops', '.000')
-            }
-    except Exception: pass
+        stats_list = res.get('stats', [])
+        
+        if stats_list and len(stats_list) > 0:
+            splits = stats_list[0].get('splits', [])
+            
+            if splits:
+                total_ab = 0
+                total_hits = 0
+                total_hr = 0
+                total_bb = 0
+                total_hbp = 0
+                total_sf = 0
+                total_2b = 0
+                total_3b = 0
+                
+                # Define exactly which game types we care about
+                # R = Regular Season
+                # D, L, W, F, P = Various Postseason rounds
+                valid_game_types = {'R', 'D', 'L', 'W', 'F', 'P'}
+                
+                for split in splits:
+                    # Check the game type for this specific stint
+                    game_type = split.get('gameType', '')
+                    
+                    # Only add the stats to the total if it's a meaningful game
+                    if game_type in valid_game_types:
+                        stat = split.get('stat', {})
+                        total_ab += stat.get('atBats', 0)
+                        total_hits += stat.get('hits', 0)
+                        total_hr += stat.get('homeRuns', 0)
+                        total_bb += stat.get('baseOnBalls', 0)
+                        total_hbp += stat.get('hitByPitch', 0)
+                        total_sf += stat.get('sacFlies', 0)
+                        total_2b += stat.get('doubles', 0)
+                        total_3b += stat.get('triples', 0)
+                
+                # If they have actual history in meaningful games, calculate!
+                if total_ab > 0:
+                    avg = total_hits / total_ab
+                    
+                    obp_denom = total_ab + total_bb + total_hbp + total_sf
+                    obp = (total_hits + total_bb + total_hbp) / obp_denom if obp_denom > 0 else 0.0
+                    
+                    singles = total_hits - (total_2b + total_3b + total_hr)
+                    total_bases = singles + (2 * total_2b) + (3 * total_3b) + (4 * total_hr)
+                    slg = total_bases / total_ab
+                    
+                    ops = obp + slg
+                    
+                    avg_str = f"{avg:.3f}".replace("0.", ".")
+                    ops_str = f"{ops:.3f}".replace("0.", ".")
+                    
+                    return {
+                        "ab": total_ab, 
+                        "hits": total_hits,
+                        "hr": total_hr, 
+                        "avg": avg_str, 
+                        "ops": ops_str
+                    }
+                
+    except requests.exceptions.RequestException as e:
+        print(f"   ⚠️ Network error fetching BvP: {e}")
+    except Exception as e:
+        print(f"   ⚠️ Unexpected error parsing BvP: {e}")
+
+    # Fallback if no history or error occurs
     return {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
 
 def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
