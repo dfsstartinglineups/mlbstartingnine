@@ -304,11 +304,18 @@ window.updateTopPlaysView = function() {
     // 3. Filter by Position
     let filtered = sourceArray;
     if (pos !== 'ALL' && pos !== 'P') {
+        // Split the clicked button's position (e.g., "C/1B" becomes ["C", "1B"])
+        const targetPositions = pos.split('/'); 
+        
         filtered = sourceArray.filter(p => {
             const pPos = p[posKey] || '';
             if (!pPos) return false;
-            const posList = pPos.split('/'); // Handles dual eligibility like "1B/OF"
-            return posList.includes(pos);
+            
+            // Split the player's eligible positions (e.g., "1B/OF" becomes ["1B", "OF"])
+            const playerPositions = pPos.split('/'); 
+            
+            // Keep the player if ANY of their positions match ANY of the target positions
+            return targetPositions.some(targetPos => playerPositions.includes(targetPos));
         });
     }
 
