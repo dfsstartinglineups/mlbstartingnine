@@ -594,17 +594,15 @@ function renderGames(isSilentRefresh = false) {
     
     // --- 1. CAPTURE STATE (Only if silently refreshing) ---
     let scrollY = 0;
-    let topPlaysType = 'hitters';
-    let activeTopPlaysTab = 'value';
+    let activeTopPlaysTab = 'value'; // Default fallback
     let openStatsIds = [];
     let expandedCardIds = [];
-    let listViewScrollPositions = {}; // <-- NEW: Track Top Plays scroll states
+    let listViewScrollPositions = {}; 
 
     if (isSilentRefresh) {
         scrollY = window.scrollY;
         
-        // Capture Top Plays State
-        topPlaysType = document.getElementById('top-plays-type')?.value || 'hitters';
+        // Capture Top Plays Tab
         const activeTabEl = document.querySelector('.leaderboard-tab.active');
         if (activeTabEl) activeTopPlaysTab = activeTabEl.getAttribute('data-tab');
 
@@ -658,7 +656,7 @@ function renderGames(isSilentRefresh = false) {
         const topPlaysHtml = buildTopPlaysCard(filteredGames, platform, selectedSlate);
         if (topPlaysHtml) {
             container.insertAdjacentHTML('beforeend', topPlaysHtml);
-            window.updateTopPlaysView(); // NEW: Fire the dynamic renderer!
+            window.updateTopPlaysView(); // Fire the dynamic renderer!
         }
     }
 
@@ -674,16 +672,12 @@ function renderGames(isSilentRefresh = false) {
 
     // --- 2. RESTORE STATE (Only if silently refreshing) ---
     if (isSilentRefresh) {
-        // Restore Top Plays Select and Tab
-        const newTopPlaysType = document.getElementById('top-plays-type');
-        if (newTopPlaysType) {
-            newTopPlaysType.value = topPlaysType;
-            const newActiveTab = document.querySelector(`.leaderboard-tab[data-tab="${activeTopPlaysTab}"]`);
-            if (newActiveTab) {
-                window.setTopPlaysTab(newActiveTab, activeTopPlaysTab);
-            } else {
-                window.updateTopPlaysView();
-            }
+        // Restore Top Plays Tab (Positional Button state is handled by window.CURRENT_TOP_PLAYS_POS globally)
+        const newActiveTab = document.querySelector(`.leaderboard-tab[data-tab="${activeTopPlaysTab}"]`);
+        if (newActiveTab) {
+            window.setTopPlaysTab(newActiveTab); // This also triggers the redraw
+        } else {
+            window.updateTopPlaysView(); // Failsafe
         }
 
         // Restore inner scroll positions for Top Plays lists
