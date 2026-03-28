@@ -239,25 +239,25 @@ def scrape_dff_projections(target_date_str):
                 except:
                     sal, proj, val = 0, 0, 0
                     
-                p_key = f"{team}_{clean_name}"
+                # 1. GRAB POSITIONS FIRST
+                pos = row.get('data-pos', '').strip()
+                pos_alt = row.get('data-pos_alt', '').strip()
+                combined_pos = f"{pos}/{pos_alt}" if pos_alt else pos
+                
+                # 2. DEFINE THE KEY WITH THE _P OR _B SUFFIX
+                is_pitcher = 'P' in combined_pos.split('/')
+                p_key = f"{team}_{clean_name}_{'P' if is_pitcher else 'B'}"
+                
+                # 3. INITIALIZE THE DICTIONARY USING THE CORRECT SUFFIXED KEY
                 if p_key not in dff_data:
                     dff_data[p_key] = {
                         "salary": 0, "proj": 0.0, "value": 0.0,
                         "dk_salary": 0, "dk_proj": 0.0, "dk_value": 0.0,
                         "fd_slates": {}, "dk_slates": {},
-                        "fd_positions": "", "dk_positions": "" # <-- ADD THIS LINE
+                        "fd_positions": "", "dk_positions": ""
                     }
                 
-                # --- NEW: GRAB POSITIONS ---
-                pos = row.get('data-pos', '').strip()
-                pos_alt = row.get('data-pos_alt', '').strip()
-                combined_pos = f"{pos}/{pos_alt}" if pos_alt else pos
-                # ---------------------------
-                # --- OHTANI FIX: APPEND _P or _B TO KEY ---
-                is_pitcher = 'P' in combined_pos.split('/')
-                p_key = f"{team}_{clean_name}_{'P' if is_pitcher else 'B'}"
-                # ------------------------------------------
-
+                # 4. SAVE THE DATA
                 if plt == 'fanduel' and sal > 0:
                     dff_data[p_key]["fd_positions"] = combined_pos # Save the FD string
                     if sid:
