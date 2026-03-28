@@ -253,6 +253,10 @@ def scrape_dff_projections(target_date_str):
                 pos_alt = row.get('data-pos_alt', '').strip()
                 combined_pos = f"{pos}/{pos_alt}" if pos_alt else pos
                 # ---------------------------
+                # --- OHTANI FIX: APPEND _P or _B TO KEY ---
+                is_pitcher = 'P' in combined_pos.split('/')
+                p_key = f"{team}_{clean_name}_{'P' if is_pitcher else 'B'}"
+                # ------------------------------------------
 
                 if plt == 'fanduel' and sal > 0:
                     dff_data[p_key]["fd_positions"] = combined_pos # Save the FD string
@@ -540,7 +544,7 @@ def main():
             if not has_valid_dfs:
                 print(f"⚠️ Safety Valve Triggered: DFF scrape for {date_str} failed or was empty. Skipping injection.")
                 
-        def inject_dfs(player_obj, team_abbr):
+        def inject_dfs(player_obj, team_abbr, is_pitcher_slot=False):
             if not player_obj: return
             
             # Safely grab the name whether it's an MLB API object (fullName) or BBM object (name)
@@ -548,16 +552,28 @@ def main():
             if not raw_name: return
             
             clean_name = clean_player_name(raw_name)
-            p_key = f"{team_abbr}_{clean_name}"
-            dff_p = dff_projections.get(p_key)
+            
+            # --- OHTANI FIX: PRIORITIZE THE CORRECT SUFFIX ---
+            suffixes = ['_P', '_B'] if is_pitcher_slot else ['_B', '_P']
+            
+            dff_p = None
+            for suffix in suffixes:
+                p_key = f"{team_abbr}_{clean_name}{suffix}"
+                if p_key in dff_projections:
+                    dff_p = dff_projections[p_key]
+                    break
             
             if not dff_p:
                 parts = clean_name.split()
                 if len(parts) >= 2:
-                    for d_key, d_val in dff_projections.items():
-                        if d_key.startswith(f"{team_abbr}_") and parts[-1] in d_key and d_key.split('_')[1].startswith(parts[0][0]):
-                            dff_p = d_val
-                            break
+                    for suffix in suffixes:
+                        for d_key, d_val in dff_projections.items():
+                            if d_key.startswith(f"{team_abbr}_") and d_key.endswith(suffix):
+                                d_name = d_key.split('_')[1]
+                                if parts[-1] in d_name and d_name.startswith(parts[0][0]):
+                                    dff_p = d_val
+                                    break
+                        if dff_p: break
             
             if dff_p and (dff_p.get('salary', 0) > 0 or dff_p.get('dk_salary', 0) > 0):
                 player_obj['salary'], player_obj['proj'], player_obj['value'] = dff_p.get('salary', 0), dff_p.get('proj', 0), dff_p.get('value', 0)
@@ -774,17 +790,17 @@ def main():
                 
                 # 1. Inject into Projected Lineups (Baseball Monster)
                 if game_projected_lineups.get("away"):
-                    inject_dfs(game_projected_lineups["away"].get("startingPitcher"), away_abbr)
-                    for batter in game_projected_lineups["away"].get("battingOrder", []): inject_dfs(batter, away_abbr)
+                    inject_dfs(game_projected_lineups["away"].get("startingPitcher"), away_abbr, is_pitcher_slot=True)
+                    for batter in game_projected_lineups["away"].get("battingOrder", []): inject_dfs(batter, away_abbr, is_pitcher_slot=False)
                 if game_projected_lineups.get("home"):
-                    inject_dfs(game_projected_lineups["home"].get("startingPitcher"), home_abbr)
-                    for batter in game_projected_lineups["home"].get("battingOrder", []): inject_dfs(batter, home_abbr)
+                    inject_dfs(game_projected_lineups["home"].get("startingPitcher"), home_abbr, is_pitcher_slot=True)
+                    for batter in game_projected_lineups["home"].get("battingOrder", []): inject_dfs(batter, home_abbr, is_pitcher_slot=False)
                     
                 # 2. Inject into Official Lineups (MLB API) to catch surprise starters
                 for batter in game.get('lineups', {}).get('awayPlayers', []):
-                    inject_dfs(batter, away_abbr)
+                    inject_dfs(batter, away_abbr, is_pitcher_slot=False)
                 for batter in game.get('lineups', {}).get('homePlayers', []):
-                    inject_dfs(batter, home_abbr)
+                    inject_dfs(batter, home_abbr, is_pitcher_slot=False)
 
             master_dates[date_str].append({
                 "gameRaw": game,
