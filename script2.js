@@ -26,8 +26,19 @@ style.innerHTML = `
     .dk-btn-label { color: #6c9d2f; border-color: #6c9d2f; background-color: #fff; }
     .dk-btn-label:hover { color: #fff; background-color: #6c9d2f; border-color: #6c9d2f; }
     .btn-check:checked + .dk-btn-label { background-color: #6c9d2f !important; border-color: #6c9d2f !important; color: #fff !important; }
+
+    /* NEW POSITIONAL BUTTON STYLES */
+    .pos-filter-btn { font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; border: 1px solid #dee2e6; color: #6c757d; background: #fff; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .pos-filter-btn:hover { background: #e9ecef; }
+    .pos-filter-btn.active { background: #343a40; color: #fff; border-color: #343a40; }
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `;
 document.head.appendChild(style);
+
+// NEW GLOBALS FOR TOP PLAYS
+window.TOP_PLAYS_DATA = null;
+window.CURRENT_TOP_PLAYS_POS = 'ALL';
 
 // ==========================================
 // 1. DEEP LINK SCROLLING
@@ -240,39 +251,163 @@ async function init(dateToFetch, isSilentRefresh = false) {
 // ==========================================
 // 3. LEADERBOARD BUILDERS
 // ==========================================
-window.setTopPlaysTab = function(el, tab) {
+window.setTopPlaysPos = function(el) {
+    document.querySelectorAll('.pos-filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    window.CURRENT_TOP_PLAYS_POS = el.getAttribute('data-pos');
+    window.updateTopPlaysView();
+};
+
+window.setTopPlaysTab = function(el) {
     document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
     window.updateTopPlaysView();
 };
 
 window.updateTopPlaysView = function() {
-    const type = document.getElementById('top-plays-type').value;
-    const tabEl = document.querySelector('.leaderboard-tab.active');
-    const tab = tabEl ? tabEl.getAttribute('data-tab') : 'value';
-    
-    document.querySelectorAll('.list-view').forEach(el => el.classList.add('d-none'));
-    
-    // BvP and HR only exist for Hitters. Hide them if Pitchers is selected.
+    if (!window.TOP_PLAYS_DATA) return;
+
+    const pos = window.CURRENT_TOP_PLAYS_POS || 'ALL';
+    let tabEl = document.querySelector('.leaderboard-tab.active');
+    let tab = tabEl ? tabEl.getAttribute('data-tab') : 'value';
+
     const bvpTab = document.querySelector('.leaderboard-tab[data-tab="bvp"]');
     const hrTab = document.querySelector('.leaderboard-tab[data-tab="hr"]');
-    
-    if (type === 'pitchers') {
+
+    // 1. Quarantining Pitchers & Tabs
+    if (pos === 'P') {
         if (bvpTab) bvpTab.style.display = 'none';
         if (hrTab) hrTab.style.display = 'none';
-        
-        // Force switch back to Value tab if they were on a hitters-only tab
         if (tab === 'bvp' || tab === 'hr') {
-            document.querySelector('.leaderboard-tab[data-tab="value"]').click();
-            return; 
+            tab = 'value';
+            document.querySelector('.leaderboard-tab[data-tab="value"]').classList.add('active');
+            if (tabEl) tabEl.classList.remove('active');
         }
     } else {
         if (bvpTab) bvpTab.style.display = 'block';
         if (hrTab) hrTab.style.display = 'block';
     }
 
-    const target = document.getElementById(`view-top-${tab}-${type}`);
-    if(target) target.classList.remove('d-none');
+    const platform = window.TOP_PLAYS_DATA.platform;
+    const posKey = platform === 'dk' ? 'dk_positions' : 'fd_positions';
+
+    // 2. Select Source Array (Pitchers are permanently separated from ALL)
+    let sourceArray = [];
+    if (pos === 'P') {
+        sourceArray = window.TOP_PLAYS_DATA.pitchers;
+    } else {
+        if (tab === 'value' || tab === 'proj') sourceArray = window.TOP_PLAYS_DATA.hitters;
+        else if (tab === 'bvp') sourceArray = window.TOP_PLAYS_DATA.bvp;
+        else if (tab === 'hr') sourceArray = window.TOP_PLAYS_DATA.hr;
+    }
+
+    // 3. Filter by Position
+    let filtered = sourceArray;
+    if (pos !== 'ALL' && pos !== 'P') {
+        filtered = sourceArray.filter(p => {
+            const pPos = p[posKey] || '';
+            if (!pPos) return false;
+            const posList = pPos.split('/'); // Handles dual eligibility like "1B/OF"
+            return posList.includes(pos);
+        });
+    }
+
+    // 4. Sort by Active Metric
+    let sorted = [...filtered];
+    if (tab === 'value') sorted.sort((a, b) => (b.value || 0) - (a.value || 0));
+    else if (tab === 'proj') sorted.sort((a, b) => (b.proj || 0) - (a.proj || 0));
+    else if (tab === 'bvp') sorted.sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0));
+    else if (tab === 'hr') sorted.sort((a, b) => (b.hrScore || 0) - (a.hrScore || 0));
+
+    // 5. Render top 20
+    const top20 = sorted.slice(0, 20);
+    const listContainer = document.getElementById('view-top-plays-list');
+    if (listContainer) listContainer.innerHTML = buildTopPlaysListHtml(top20, tab, platform);
+};
+
+window.buildTopPlaysListHtml = function(players, mode, platform) {
+    if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found for this selection.</div>`;
+    const posKey = platform === 'dk' ? 'dk_positions' : 'fd_positions';
+
+    return players.map((p, index) => {
+        const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
+        const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
+        
+        let shortName = p.name;
+        if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
+
+        let rightSideHtml = '';
+        let subtitleHtml = '';
+        let rightFontSize = '1.1rem'; 
+        let subtitleClass = "text-muted text-truncate w-100"; 
+        
+        // Grab the official DFS position. If missing, fall back to field position.
+        let displayPos = p[posKey] || p.pos;
+
+        if (mode === 'bvp') {
+            let avg = p.bvp.avg;
+            if (!avg || avg === "-" || avg === ".000") {
+                if(p.bvp.ab > 0) {
+                    let calcAvg = p.bvp.hits / p.bvp.ab;
+                    avg = calcAvg.toFixed(3).replace('0.', '.');
+                } else {
+                    avg = ".000";
+                }
+            }
+            
+            let opsDisplay = parseFloat(p.bvp.ops).toFixed(3).replace('0.', '.');
+            let p_shortName = p.oppPitcher;
+            if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
+                p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
+            }
+
+            subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
+            rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
+            rightFontSize = '1.0rem';
+        } else if (mode === 'hr') {
+            let p_shortName = p.oppPitcher;
+            if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
+                p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
+            }
+            
+            subtitleClass = "text-muted w-100"; 
+            subtitleHtml = `
+                <div class="d-flex flex-column text-muted" style="font-size: 0.70rem; line-height: 1.3;">
+                    <span>v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
+                    <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
+                </div>
+            `;
+            rightSideHtml = ``; 
+        } else {
+            const isValue = mode === 'value';
+            const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
+            const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
+            
+            // Format subtitle using the DFS eligible position!
+            subtitleHtml = `${displayPos} • ${salFmt} • ${subMetric}`;
+            rightSideHtml = isValue 
+                ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` 
+                : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
+        }
+
+        return `
+        <div class="d-flex align-items-center py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
+            <div class="fw-bold text-muted me-2 text-end flex-shrink-0" style="font-size: 0.85rem; width: 22px;">${index + 1}.</div>
+            <div class="me-3 position-relative flex-shrink-0">
+                ${photoHtml}
+                ${teamBadge}
+            </div>
+            <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
+                <div class="d-flex justify-content-between align-items-baseline">
+                    <div class="fw-bold text-dark text-truncate pe-2" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                    <div class="fw-bold text-end flex-shrink-0" style="font-size: ${rightFontSize}; line-height: 1;">${rightSideHtml}</div>
+                </div>
+                <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: -2px;">
+                    ${subtitleHtml}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
 };
 
 function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
@@ -290,7 +425,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         
         const deepStats = game.deepStats || {};
         const handDict = game.lineupHandedness || {};
-        const parkStats = game.parkStats || null; // Grab the park stats!
+        const parkStats = game.parkStats || null; 
 
         let posMap = {};
         if (game.gamePositions) {
@@ -327,61 +462,52 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
                 let fieldPos = isPitcher ? 'P' : (posMap[p.id] || 'B');
                 
-                // Standard DFS Push
+                // Grab DFS Positions!
+                let fd_pos = p.fd_positions || '';
+                let dk_pos = p.dk_positions || '';
+                
                 if (sal > 0 || proj > 0) {
                     let listToPush = isPitcher ? allPitchers : allHitters;
-                    listToPush.push({ id: p.id || name, name, pos: fieldPos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
+                    listToPush.push({ id: p.id || name, name, pos: fieldPos, fd_positions: fd_pos, dk_positions: dk_pos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
                 }
 
-                // --- BvP & HR Push (Hitters Only) ---
                 if (!isPitcher && p.id && deepStats[String(p.id)]) {
                     const bvpStats = deepStats[String(p.id)].bvp;
                     
-                    // 1. BvP Array
                     if (bvpStats && bvpStats.ab >= 5) {
                         allBvP.push({
-                            id: p.id, name: name, pos: fieldPos, teamAbbrev: teamAbbr,
+                            id: p.id, name: name, pos: fieldPos, fd_positions: fd_pos, dk_positions: dk_pos, teamAbbrev: teamAbbr,
                             teamLogo: teamLogo, photo: photo, bvp: bvpStats, oppPitcher: opposingPitcherName || "Unknown"
                         });
                     }
                     
-                    // 2. HR Calculation Array
                     let splitStats = opposingPitcherHand === 'L' ? deepStats[String(p.id)].split_vL : deepStats[String(p.id)].split_vR;
                     let splitHrRate = 0;
                     let bvpHrRate = 0;
                     
-                    // Enforce the 10 AB minimum for Splits
                     if (splitStats && splitStats.ab >= 10) splitHrRate = splitStats.hr / splitStats.ab;
                     if (bvpStats && bvpStats.ab > 0) bvpHrRate = bvpStats.hr / bvpStats.ab;
                     
                     let baseHrScore = splitHrRate + bvpHrRate;
-                    
-                    // Apply Park Factors
                     let finalHrScore = baseHrScore;
+                    
                     if (baseHrScore > 0 && parkStats) {
-                        let batterHand = handDict[String(p.id)] || 'R'; // Default to R if unknown
+                        let batterHand = handDict[String(p.id)] || 'R'; 
                         let activeBatSide = batterHand;
-                        
-                        // Switch hitters bat from the opposite side of the pitcher
-                        if (batterHand === 'S') {
-                            activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
-                        }
-                        
+                        if (batterHand === 'S') activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
                         let parkFactor = activeBatSide === 'L' ? parkStats.hr_l : parkStats.hr_r;
-                        if (parkFactor) {
-                            finalHrScore = baseHrScore * (parkFactor / 100);
-                        }
+                        if (parkFactor) finalHrScore = baseHrScore * (parkFactor / 100);
                     }
                     
                     if (finalHrScore > 0) {
                         allHR.push({
-                            id: p.id, name: name, pos: fieldPos, teamAbbrev: teamAbbr,
+                            id: p.id, name: name, pos: fieldPos, fd_positions: fd_pos, dk_positions: dk_pos, teamAbbrev: teamAbbr,
                             teamLogo: teamLogo, photo: photo, 
                             bvp: bvpStats || {ab: 0, hr: 0}, 
                             split: splitStats || {ab: 0, hr: 0},
                             oppPitcher: opposingPitcherName || "Unknown",
                             oppHand: opposingPitcherHand,
-                            hrScore: finalHrScore // Push the park-adjusted score
+                            hrScore: finalHrScore 
                         });
                     }
                 }
@@ -389,10 +515,8 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         };
         
         const line = game.projectedLineups || {};
-        
         let awayPitcherName = line.away?.startingPitcher?.name || game.gameRaw?.teams?.away?.probablePitcher?.fullName || "TBD";
         let homePitcherName = line.home?.startingPitcher?.name || game.gameRaw?.teams?.home?.probablePitcher?.fullName || "TBD";
-        
         let awayPitcherHand = game.gameRaw?.teams?.away?.probablePitcher?.pitchHand?.code || 'R';
         let homePitcherHand = game.gameRaw?.teams?.home?.probablePitcher?.pitchHand?.code || 'R';
 
@@ -404,133 +528,51 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
     if (allHitters.length === 0 && allPitchers.length === 0) return '';
     
-    // Deduplicate
-    allHitters = Array.from(new Map(allHitters.map(p => [p.id, p])).values());
-    allPitchers = Array.from(new Map(allPitchers.map(p => [p.id, p])).values());
-    allBvP = Array.from(new Map(allBvP.map(p => [p.id, p])).values());
-    allHR = Array.from(new Map(allHR.map(p => [p.id, p])).values());
-
-    const topHittersVal = [...allHitters].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
-    const topHittersProj = [...allHitters].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
-    const topPitchersVal = [...allPitchers].sort((a, b) => (b.value || 0) - (a.value || 0)).slice(0, 20);
-    const topPitchersProj = [...allPitchers].sort((a, b) => parseFloat(b.proj || 0) - parseFloat(a.proj || 0)).slice(0, 20);
-    const topBvP = [...allBvP].sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0)).slice(0, 20);
-    
-    // Sort HR by the new park-adjusted score!
-    const topHR = [...allHR].sort((a, b) => b.hrScore - a.hrScore).slice(0, 20);
-
-    const buildList = (players, mode) => {
-        if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found for this selection.</div>`;
-        return players.map((p, index) => {
-            const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
-            const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
-            
-            let shortName = p.name;
-            if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
-
-            let rightSideHtml = '';
-            let subtitleHtml = '';
-            let rightFontSize = '1.1rem'; 
-            let subtitleClass = "text-muted text-truncate w-100"; 
-
-            if (mode === 'bvp') {
-                let avg = p.bvp.avg;
-                if (!avg || avg === "-" || avg === ".000") {
-                    if(p.bvp.ab > 0) {
-                        let calcAvg = p.bvp.hits / p.bvp.ab;
-                        avg = calcAvg.toFixed(3).replace('0.', '.');
-                    } else {
-                        avg = ".000";
-                    }
-                }
-                
-                let opsDisplay = parseFloat(p.bvp.ops).toFixed(3).replace('0.', '.');
-                
-                let p_shortName = p.oppPitcher;
-                if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
-                    p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
-                }
-
-                subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
-                rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
-                rightFontSize = '1.0rem';
-            } else if (mode === 'hr') {
-                let p_shortName = p.oppPitcher;
-                if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
-                    p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
-                }
-                
-                subtitleClass = "text-muted w-100"; // Remove truncation so it stacks
-                subtitleHtml = `
-                    <div class="d-flex flex-column text-muted" style="font-size: 0.70rem; line-height: 1.3;">
-                        <span>v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
-                        <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
-                    </div>
-                `;
-                rightSideHtml = ``; 
-            } else {
-                const isValue = mode === 'value';
-                const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
-                const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
-                
-                subtitleHtml = `${p.pos} • ${salFmt} • ${subMetric}`;
-                rightSideHtml = isValue 
-                    ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` 
-                    : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
-            }
-
-            return `
-            <div class="d-flex align-items-center py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
-                <div class="fw-bold text-muted me-2 text-end flex-shrink-0" style="font-size: 0.85rem; width: 22px;">${index + 1}.</div>
-                <div class="me-3 position-relative flex-shrink-0">
-                    ${photoHtml}
-                    ${teamBadge}
-                </div>
-                <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
-                    
-                    <div class="d-flex justify-content-between align-items-baseline">
-                        <div class="fw-bold text-dark text-truncate pe-2" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
-                        <div class="fw-bold text-end flex-shrink-0" style="font-size: ${rightFontSize}; line-height: 1;">${rightSideHtml}</div>
-                    </div>
-                    
-                    <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: -2px;">
-                        ${subtitleHtml}
-                    </div>
-
-                </div>
-            </div>`;
-        }).join('');
+    // Save to Global Variables for fast filtering
+    window.TOP_PLAYS_DATA = {
+        hitters: Array.from(new Map(allHitters.map(p => [p.id, p])).values()),
+        pitchers: Array.from(new Map(allPitchers.map(p => [p.id, p])).values()),
+        bvp: Array.from(new Map(allBvP.map(p => [p.id, p])).values()),
+        hr: Array.from(new Map(allHR.map(p => [p.id, p])).values()),
+        platform: platform
     };
+
+    // Determine Buttons based on Platform
+    const posButtonsFD = ['ALL', 'P', 'C/1B', '2B', '3B', 'SS', 'OF'];
+    const posButtonsDK = ['ALL', 'P', 'C', '1B', '2B', '3B', 'SS', 'OF'];
+    const buttonsToUse = platform === 'dk' ? posButtonsDK : posButtonsFD;
+
+    // Reset fallback if platform switches
+    let activePos = window.CURRENT_TOP_PLAYS_POS || 'ALL';
+    if (!buttonsToUse.includes(activePos)) activePos = 'ALL';
+    window.CURRENT_TOP_PLAYS_POS = activePos;
+
+    const buttonsHtml = buttonsToUse.map(pos => `<button class="pos-filter-btn ${pos === activePos ? 'active' : ''}" data-pos="${pos}" onclick="window.setTopPlaysPos(this)">${pos}</button>`).join('');
 
     return `
     <div class="col-md-6 col-lg-6 col-xl-4 px-1 mb-3">
         <div class="card shadow-sm border overflow-hidden h-100" style="background-color: #fff; border-radius: 6px; border-color: #dee2e6 !important;">
             <div class="card-header bg-dark text-white py-2 d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-2">
-                    <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">⭐ Top Plays</h6>
-                    <select id="top-plays-type" class="form-select form-select-sm bg-dark text-white border-secondary fw-bold" style="font-size:0.7rem; padding: 2px 20px 2px 6px; width: auto; cursor: pointer;" onchange="window.updateTopPlaysView()">
-                        <option value="hitters">Batters</option>
-                        <option value="pitchers">Pitchers</option>
-                    </select>
-                </div>
+                <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">⭐ Top Plays</h6>
                 <span class="badge bg-secondary" style="font-size: 0.6rem;">${platform === 'dk' ? 'DraftKings' : 'FanDuel'}</span>
             </div>
+            
+            <div class="bg-light border-bottom d-flex align-items-center px-2 py-2 overflow-auto hide-scrollbar gap-1">
+                ${buttonsHtml}
+            </div>
+
             <div class="bg-light border-bottom d-flex justify-content-center align-items-center px-2 py-0">
                 <div class="d-flex w-100">
-                    <div class="leaderboard-tab active w-100" style="width: 25%;" data-tab="value" onclick="window.setTopPlaysTab(this, 'value')">VALUE</div>
-                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="proj" onclick="window.setTopPlaysTab(this, 'proj')">PROJ</div>
-                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="bvp" onclick="window.setTopPlaysTab(this, 'bvp')">BVP</div>
-                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="hr" onclick="window.setTopPlaysTab(this, 'hr')">HR</div>
+                    <div class="leaderboard-tab active w-100" style="width: 25%;" data-tab="value" onclick="window.setTopPlaysTab(this)">VALUE</div>
+                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="proj" onclick="window.setTopPlaysTab(this)">PROJ</div>
+                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="bvp" onclick="window.setTopPlaysTab(this)">BVP</div>
+                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="hr" onclick="window.setTopPlaysTab(this)">HR</div>
                 </div>
             </div>
+            
             <div class="card-body p-0">
-                <div id="view-top-value-hitters" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersVal, 'value')}</div>
-                <div id="view-top-proj-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHittersProj, 'proj')}</div>
-                <div id="view-top-bvp-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topBvP, 'bvp')}</div>
-                <div id="view-top-hr-hitters" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topHR, 'hr')}</div>
-                
-                <div id="view-top-value-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersVal, 'value')}</div>
-                <div id="view-top-proj-pitchers" class="px-2 d-none list-view" style="max-height: 480px; overflow-y: auto;">${buildList(topPitchersProj, 'proj')}</div>
+                <div id="view-top-plays-list" class="px-2 list-view" style="max-height: 480px; overflow-y: auto;">
+                    </div>
             </div>
         </div>
     </div>`;
@@ -607,7 +649,10 @@ function renderGames(isSilentRefresh = false) {
     // Insert Leaderboard if no search
     if (!searchText) {
         const topPlaysHtml = buildTopPlaysCard(filteredGames, platform, selectedSlate);
-        if (topPlaysHtml) container.insertAdjacentHTML('beforeend', topPlaysHtml);
+        if (topPlaysHtml) {
+            container.insertAdjacentHTML('beforeend', topPlaysHtml);
+            window.updateTopPlaysView(); // NEW: Fire the dynamic renderer!
+        }
     }
 
     let sortedGames = [...filteredGames].sort((a, b) => {
