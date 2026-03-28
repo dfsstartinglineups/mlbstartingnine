@@ -244,13 +244,22 @@ def scrape_dff_projections(target_date_str):
                     dff_data[p_key] = {
                         "salary": 0, "proj": 0.0, "value": 0.0,
                         "dk_salary": 0, "dk_proj": 0.0, "dk_value": 0.0,
-                        "fd_slates": {}, "dk_slates": {}
+                        "fd_slates": {}, "dk_slates": {},
+                        "fd_positions": "", "dk_positions": "" # <-- ADD THIS LINE
                     }
                 
+                # --- NEW: GRAB POSITIONS ---
+                pos = row.get('data-pos', '').strip()
+                pos_alt = row.get('data-pos_alt', '').strip()
+                combined_pos = f"{pos}/{pos_alt}" if pos_alt else pos
+                # ---------------------------
+
                 if plt == 'fanduel' and sal > 0:
+                    dff_data[p_key]["fd_positions"] = combined_pos # Save the FD string
                     if sid:
                         dff_data[p_key]["fd_slates"][sid] = {"salary": int(sal), "proj": round(proj, 1), "value": round(val, 2)}
                 elif plt == 'draftkings' and sal > 0:
+                    dff_data[p_key]["dk_positions"] = combined_pos # Save the DK string
                     if sid:
                         dff_data[p_key]["dk_slates"][sid] = {"salary": int(sal), "proj": round(proj, 1), "value": round(val, 2)}
 
@@ -554,6 +563,10 @@ def main():
                 player_obj['salary'], player_obj['proj'], player_obj['value'] = dff_p.get('salary', 0), dff_p.get('proj', 0), dff_p.get('value', 0)
                 player_obj['dk_salary'], player_obj['dk_proj'], player_obj['dk_value'] = dff_p.get('dk_salary', 0), dff_p.get('dk_proj', 0), dff_p.get('dk_value', 0)
                 player_obj['fd_slates'], player_obj['dk_slates'] = dff_p.get('fd_slates', {}), dff_p.get('dk_slates', {})
+                
+                # --- NEW: PUSH POSITIONS TO FINAL JSON ---
+                player_obj['fd_positions'] = dff_p.get('fd_positions', '')
+                player_obj['dk_positions'] = dff_p.get('dk_positions', '')
 
         # --- PROCESS GAMES ---
         for game in date_item.get('games', []):
