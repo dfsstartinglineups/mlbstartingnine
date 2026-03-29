@@ -400,12 +400,14 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
             }
             
-            // --- NEW: LIVE HR CHECK ---
+            // --- NEW: LIVE HR CHECK (FIXED ID MATCHING) ---
             let hrIcon = '';
             let hasHomered = false;
             let isGameFinal = false;
             
-            const pidStr = String(p.id);
+            // The MLB live boxscore prefixes all player IDs with "ID" (e.g., "ID680700")
+            const pidStr = `ID${p.id}`; 
+            
             // Scan the live data for this specific player
             for (const [gameId, liveGame] of Object.entries(LIVE_GAMES_DATA || {})) {
                 const awayPlayers = liveGame.players?.AWAY || {};
@@ -414,10 +416,11 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 
                 if (livePlayer) {
                     isGameFinal = (liveGame.status === 'Final');
+                    // Check if they have batting stats and if they've hit a HR
                     if (livePlayer.batting && livePlayer.batting.homeRuns > 0) {
                         hasHomered = true;
                     }
-                    break; // We found them, stop searching
+                    break; // We found them, stop searching the other games
                 }
             }
 
