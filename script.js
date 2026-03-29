@@ -233,25 +233,25 @@ async function init(dateToFetch, isSilentRefresh = false) {
         }
 
         // --- 🚨 TEMPORARY DFF BLOCK FOR MARCH 29 🚨 ---
-        if (dateToFetch === '2026-03-29') {
-            const wipeProj = (players) => {
-                if (!players) return;
-                const arr = Array.isArray(players) ? players : [players];
-                arr.forEach(p => {
-                    if (!p) return;
-                    p.proj = 0; p.value = 0; p.dk_proj = 0; p.dk_value = 0; p.fd_proj = 0; p.fd_value = 0;
-                    if (p.dk_slates) Object.values(p.dk_slates).forEach(s => { s.proj = 0; s.value = 0; });
-                    if (p.fd_slates) Object.values(p.fd_slates).forEach(s => { s.proj = 0; s.value = 0; });
-                });
-            };
-            ALL_GAMES_DATA.forEach(g => {
-                const pl = g.projectedLineups || {};
-                wipeProj(pl.away?.startingPitcher); wipeProj(pl.away?.battingOrder);
-                wipeProj(pl.home?.startingPitcher); wipeProj(pl.home?.battingOrder);
-                if (g.gameRaw?.lineups?.awayPlayers) wipeProj(g.gameRaw.lineups.awayPlayers);
-                if (g.gameRaw?.lineups?.homePlayers) wipeProj(g.gameRaw.lineups.homePlayers);
-            });
-        }
+      //  if (dateToFetch === '2026-03-29') {
+      //      const wipeProj = (players) => {
+      //          if (!players) return;
+      //          const arr = Array.isArray(players) ? players : [players];
+      //          arr.forEach(p => {
+      //              if (!p) return;
+      //              p.proj = 0; p.value = 0; p.dk_proj = 0; p.dk_value = 0; p.fd_proj = 0; p.fd_value = 0;
+      //              if (p.dk_slates) Object.values(p.dk_slates).forEach(s => { s.proj = 0; s.value = 0; });
+      //              if (p.fd_slates) Object.values(p.fd_slates).forEach(s => { s.proj = 0; s.value = 0; });
+      //          });
+      //      };
+      //      ALL_GAMES_DATA.forEach(g => {
+      //          const pl = g.projectedLineups || {};
+      //          wipeProj(pl.away?.startingPitcher); wipeProj(pl.away?.battingOrder);
+      //          wipeProj(pl.home?.startingPitcher); wipeProj(pl.home?.battingOrder);
+      //          if (g.gameRaw?.lineups?.awayPlayers) wipeProj(g.gameRaw.lineups.awayPlayers);
+      //          if (g.gameRaw?.lineups?.homePlayers) wipeProj(g.gameRaw.lineups.homePlayers);
+      //      });
+      //  }
         // ----------------------------------------------
 
         if(!isSilentRefresh) {
