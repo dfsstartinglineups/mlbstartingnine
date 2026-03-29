@@ -40,6 +40,11 @@ jobs:
           SERIEA_X_API_SECRET: ${{ secrets.SERIEA_X_API_SECRET }}
           SERIEA_X_ACCESS_TOKEN: ${{ secrets.SERIEA_X_ACCESS_TOKEN }}
           SERIEA_X_ACCESS_TOKEN_SECRET: ${{ secrets.SERIEA_X_ACCESS_TOKEN_SECRET }}
+          # ADD THESE 4 NEW LINES:
+          FRIENDLY_X_API_KEY: ${{ secrets.FRIENDLY_X_API_KEY }}
+          FRIENDLY_X_API_SECRET: ${{ secrets.FRIENDLY_X_API_SECRET }}
+          FRIENDLY_X_ACCESS_TOKEN: ${{ secrets.FRIENDLY_X_ACCESS_TOKEN }}
+          FRIENDLY_X_ACCESS_TOKEN_SECRET: ${{ secrets.FRIENDLY_X_ACCESS_TOKEN_SECRET }}
         run: python scripts/tweet_bot.py
 
       - name: Commit Log Silently
