@@ -6,13 +6,43 @@ import zoneinfo
 from datetime import datetime, timezone, timedelta
 import time
 import random
+from atproto import Client  # NEW: The Bluesky Library
 
 def save_memory_safely(memory_data):
     """Safely writes to the log file using a temporary file to prevent corruption."""
     temp_file = f"{LOG_FILE}.tmp"
     with open(temp_file, 'w') as f:
         json.dump(memory_data, f, indent=4)
-    os.replace(temp_file, LOG_FILE) # This atomic swap is instant and crash-proof
+    os.replace(temp_file, LOG_FILE)
+
+# ==========================================
+# 0. V2 ARCHITECTURE: BLUESKY & DICTIONARY
+# ==========================================
+try:
+    raw_secrets = os.environ.get("NEW_SOCIAL_CREDENTIALS", "{}")
+    auth_data = json.loads(raw_secrets)
+except Exception as e:
+    print(f"⚠️ Could not load V2 credentials: {e}")
+    auth_data = {}
+
+def setup_bsky_client(account_key):
+    creds = auth_data.get(account_key)
+    if creds and creds.get("bsky_handle"):
+        try:
+            client = Client()
+            client.login(creds["bsky_handle"], creds["bsky_password"])
+            print(f"✅ Logged into Bluesky as {creds['bsky_handle']}")
+            return client
+        except Exception as e:
+            print(f"❌ Failed to log into Bluesky for {account_key}: {e}")
+    return None
+
+LEAGUE_CONFIG = {
+    "nba": {
+        "league_name": "NBA 🏀",
+        "bsky_client": setup_bsky_client("nba_account")
+    }
+}
 
 
 # ==========================================
@@ -268,12 +298,24 @@ for game in nba_data:
             tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
             
             try:
+                # 1. Tweet to Twitter (X)
                 nba_client.create_tweet(text=tweet_text)
                 print(f"✅ Successfully tweeted {team_name} NBA lineup!")
+                
+                # 2. Post to Bluesky (V2 Architecture)
+                config = LEAGUE_CONFIG.get("nba")
+                if config and config.get("bsky_client"):
+                    try:
+                        # We use the exact same tweet_text!
+                        config["bsky_client"].send_post(text=tweet_text)
+                        print(f"✅ Successfully posted {team_name} NBA lineup to Bluesky!")
+                    except Exception as e:
+                        print(f"❌ Bluesky post failed for {team_name}: {e}")
+
+                # 3. Log the Tweet & Save
                 log_today.append(team_date_key)
                 tweeted_recently.append(team_date_key)
                 new_tweets_sent = True
-                # --- IMMEDIATE SAFE LOG SAVE ---
                 memory[date_str] = log_today
                 save_memory_safely(memory)
                 time.sleep(5)
