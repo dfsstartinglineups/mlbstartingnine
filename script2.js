@@ -87,10 +87,14 @@ async function pollLiveData(dateToFetch) {
         const response = await fetch(`data/LIVE/live_mlb_${dateToFetch}.json?v=` + new Date().getTime(), { cache: 'no-store' });
         if (response.ok) {
             LIVE_GAMES_DATA = await response.json();
-            // Re-render the Top Plays list silently to update the checkmarks
-            if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView(); 
+        } else {
+            LIVE_GAMES_DATA = {}; // Clear if file doesn't exist (e.g., future dates)
         }
+        // Re-render the Top Plays list silently to update the checkmarks
+        if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView(); 
     } catch (e) {
+        LIVE_GAMES_DATA = {}; // Clear on network error
+        if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView();
         console.log("Live MLB data not available yet.");
     }
 }
@@ -203,6 +207,9 @@ async function init(dateToFetch, isSilentRefresh = false) {
 
     // Only show the loading spinner if this is a manual/initial load, NOT a background refresh
     if (container && !isSilentRefresh) {
+        ALL_GAMES_DATA = [];  // <--- NEW: Clear old games
+        LIVE_GAMES_DATA = {}; // <--- NEW: Clear old live stats immediately
+        
         container.innerHTML = `
             <div class="col-12 text-center mt-5 pt-5">
                 <div class="spinner-border text-primary" role="status"></div>
