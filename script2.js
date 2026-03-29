@@ -36,9 +36,11 @@ style.innerHTML = `
 `;
 document.head.appendChild(style);
 
-// NEW GLOBALS FOR TOP PLAYS
+// NEW GLOBALS FOR TOP PLAYS & LIVE DATA
 window.TOP_PLAYS_DATA = null;
 window.CURRENT_TOP_PLAYS_POS = 'ALL';
+let LIVE_GAMES_DATA = {};
+let livePollInterval;
 
 // ==========================================
 // 1. DEEP LINK SCROLLING
@@ -80,6 +82,19 @@ function handleHashNavigation() {
 // ==========================================
 // 2. DATA FETCHING & SLATE HELPERS
 // ==========================================
+async function pollLiveData(dateToFetch) {
+    try {
+        const response = await fetch(`data/LIVE/live_mlb_${dateToFetch}.json?v=` + new Date().getTime(), { cache: 'no-store' });
+        if (response.ok) {
+            LIVE_GAMES_DATA = await response.json();
+            // Re-render the Top Plays list silently to update the checkmarks
+            if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView(); 
+        }
+    } catch (e) {
+        console.log("Live MLB data not available yet.");
+    }
+}
+
 function ensureDFSControls() {
     if (!document.getElementById('dfs-controls-row')) {
         const container = document.getElementById('games-container');
@@ -245,6 +260,14 @@ async function init(dateToFetch, isSilentRefresh = false) {
 
     // PASS THE FLAG HERE
     renderGames(isSilentRefresh); 
+    
+    // --- NEW: START LIVE POLLER ---
+    if (!isSilentRefresh) {
+        pollLiveData(dateToFetch);
+        clearInterval(livePollInterval);
+        livePollInterval = setInterval(() => pollLiveData(dateToFetch), 30000);
+    }
+    
     if (!isSilentRefresh) handleHashNavigation();
 }
 
@@ -377,6 +400,34 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
             }
             
+            // --- NEW: LIVE HR CHECK ---
+            let hrIcon = '';
+            let hasHomered = false;
+            let isGameFinal = false;
+            
+            const pidStr = String(p.id);
+            // Scan the live data for this specific player
+            for (const [gameId, liveGame] of Object.entries(LIVE_GAMES_DATA || {})) {
+                const awayPlayers = liveGame.players?.AWAY || {};
+                const homePlayers = liveGame.players?.HOME || {};
+                const livePlayer = awayPlayers[pidStr] || homePlayers[pidStr];
+                
+                if (livePlayer) {
+                    isGameFinal = (liveGame.status === 'Final');
+                    if (livePlayer.batting && livePlayer.batting.homeRuns > 0) {
+                        hasHomered = true;
+                    }
+                    break; // We found them, stop searching
+                }
+            }
+
+            if (hasHomered) {
+                hrIcon = `<span title="Hit a Home Run Today!">✅</span>`;
+            } else if (isGameFinal) {
+                hrIcon = `<span style="opacity: 0.5;" title="Game Final - No HR">❌</span>`;
+            }
+            // --------------------------
+            
             subtitleClass = "text-muted w-100"; 
             subtitleHtml = `
                 <div class="d-flex flex-column text-muted" style="font-size: 0.70rem; line-height: 1.3;">
@@ -384,7 +435,10 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                     <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
                 </div>
             `;
-            rightSideHtml = ``; 
+            
+            // Inject the icon exactly where the fantasy points usually sit
+            rightSideHtml = `<div class="text-end" style="font-size: 1.2rem;">${hrIcon}</div>`; 
+            
         } else {
             const isValue = mode === 'value';
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
