@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 # --- FOLDER SETUP ---
 # ==========================================================
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(SCRIPT_DIR, 'data', 'LIVE')
+DATA_DIR = os.path.join(SCRIPT_DIR, '..', 'data', 'LIVE')
 
 # Ensure the data directory exists
 os.makedirs(DATA_DIR, exist_ok=True)
