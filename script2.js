@@ -374,6 +374,48 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         // Grab the official DFS position. If missing, fall back to field position.
         let displayPos = p[posKey] || p.pos;
 
+        // ==========================================
+        // 1. FETCH LIVE DATA FOR THE PLAYER
+        // ==========================================
+        let livePlayer = null;
+        let liveGame = null;
+        let isGameFinal = false;
+        const pidStr = `ID${p.id}`; 
+        
+        for (const [gameId, lGame] of Object.entries(LIVE_GAMES_DATA || {})) {
+            const awayPlayers = lGame.players?.AWAY || {};
+            const homePlayers = lGame.players?.HOME || {};
+            const lPlayer = awayPlayers[pidStr] || homePlayers[pidStr];
+            
+            if (lPlayer) {
+                livePlayer = lPlayer;
+                liveGame = lGame;
+                isGameFinal = (lGame.status === 'Final');
+                break; // Stop searching once found
+            }
+        }
+
+        // ==========================================
+        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2")
+        // ==========================================
+        let gameStatusBadge = '';
+        if (liveGame) {
+            if (isGameFinal) {
+                gameStatusBadge = `<span class="badge bg-secondary ms-2" style="font-size:0.55rem; padding: 0.25em 0.4em;">Final</span>`;
+            } else if (liveGame.status === 'Live' || liveGame.status === 'In Progress' || liveGame.inning) {
+                let halfMap = { 'Top': 'T', 'Bottom': 'B' };
+                let half = halfMap[liveGame.half] || '';
+                let inn = (liveGame.inning || '').replace(/\D/g, ''); // Extract just the number
+                let score = `${liveGame.away_score}-${liveGame.home_score}`;
+                if(inn || score !== '0-0') {
+                     gameStatusBadge = `<span class="badge bg-success ms-2" style="font-size:0.55rem; padding: 0.25em 0.4em;">${half}${inn} ${score}</span>`;
+                }
+            }
+        }
+
+        // ==========================================
+        // 3. BUILD TAB-SPECIFIC CONTENT
+        // ==========================================
         if (mode === 'bvp') {
             let avg = p.bvp.avg;
             if (!avg || avg === "-" || avg === ".000") {
@@ -394,42 +436,21 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
             rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
             rightFontSize = '1.0rem';
+            
         } else if (mode === 'hr') {
             let p_shortName = p.oppPitcher;
             if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
                 p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
             }
             
-            // --- NEW: LIVE HR CHECK (FIXED ID MATCHING) ---
             let hrIcon = '';
-            let hasHomered = false;
-            let isGameFinal = false;
-            
-            // The MLB live boxscore prefixes all player IDs with "ID" (e.g., "ID680700")
-            const pidStr = `ID${p.id}`; 
-            
-            // Scan the live data for this specific player
-            for (const [gameId, liveGame] of Object.entries(LIVE_GAMES_DATA || {})) {
-                const awayPlayers = liveGame.players?.AWAY || {};
-                const homePlayers = liveGame.players?.HOME || {};
-                const livePlayer = awayPlayers[pidStr] || homePlayers[pidStr];
-                
-                if (livePlayer) {
-                    isGameFinal = (liveGame.status === 'Final');
-                    // Check if they have batting stats and if they've hit a HR
-                    if (livePlayer.batting && livePlayer.batting.homeRuns > 0) {
-                        hasHomered = true;
-                    }
-                    break; // We found them, stop searching the other games
+            if (livePlayer) {
+                if (livePlayer.batting && livePlayer.batting.homeRuns > 0) {
+                    hrIcon = `<span title="Hit a Home Run Today!">✅</span>`;
+                } else if (isGameFinal) {
+                    hrIcon = `<span style="opacity: 0.5;" title="Game Final - No HR">❌</span>`;
                 }
             }
-
-            if (hasHomered) {
-                hrIcon = `<span title="Hit a Home Run Today!">✅</span>`;
-            } else if (isGameFinal) {
-                hrIcon = `<span style="opacity: 0.5;" title="Game Final - No HR">❌</span>`;
-            }
-            // --------------------------
             
             subtitleClass = "text-muted w-100"; 
             subtitleHtml = `
@@ -439,19 +460,61 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 </div>
             `;
             
-            // Inject the icon exactly where the fantasy points usually sit
-            rightSideHtml = `<div class="text-end" style="font-size: 1.2rem;">${hrIcon}</div>`; 
+            rightSideHtml = `<div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 28px;">${hrIcon}</div>`; 
             
         } else {
+            // mode === 'value' OR 'proj'
             const isValue = mode === 'value';
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
             
-            // Format subtitle using the DFS eligible position!
-            subtitleHtml = `${displayPos} • ${salFmt} • ${subMetric}`;
-            rightSideHtml = isValue 
+            let liveStatLine = '';
+            let actualPtsDisplay = '';
+            
+            if (livePlayer) {
+                // Determine actual points based on the active DFS platform
+                let actualPts = platform === 'dk' ? (livePlayer.dk_pts || 0) : (livePlayer.fd_pts || 0);
+                
+                let bat = livePlayer.batting;
+                let pit = livePlayer.pitching;
+                
+                let statParts = [];
+                // Build Pitching Line
+                if (pit && pit.battersFaced > 0) {
+                    statParts.push(`${pit.inningsPitched || '0.0'} IP`);
+                    statParts.push(`${pit.strikeOuts || 0} K`);
+                    statParts.push(`${pit.earnedRuns || 0} ER`);
+                    if (pit.wins > 0) statParts.push(`W`);
+                } 
+                // Build Batting Line
+                else if (bat && (bat.plateAppearances > 0 || bat.atBats > 0)) {
+                    statParts.push(`${bat.hits || 0}-${bat.atBats || 0}`);
+                    if (bat.homeRuns > 0) statParts.push(`${bat.homeRuns} HR`);
+                    if (bat.rbi > 0) statParts.push(`${bat.rbi} RBI`);
+                    if (bat.stolenBases > 0) statParts.push(`${bat.stolenBases} SB`);
+                }
+                
+                if (statParts.length > 0) {
+                    liveStatLine = `<div class="text-success fw-bold" style="font-size:0.65rem; margin-top: 1px;">Live: ${statParts.join(', ')}</div>`;
+                }
+                
+                // Show actual points if the game has started
+                if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
+                    actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size:0.80rem; margin-top: 2px;">${actualPts.toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                }
+            }
+
+            subtitleHtml = `${displayPos} • ${salFmt} • ${subMetric}${liveStatLine}`;
+            
+            let topMetric = isValue 
                 ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` 
                 : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
+                
+            rightSideHtml = `
+                <div class="d-flex flex-column align-items-end justify-content-center" style="line-height: 1;">
+                    <div>${topMetric}</div>
+                    ${actualPtsDisplay}
+                </div>`;
         }
 
         return `
@@ -462,8 +525,11 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 ${teamBadge}
             </div>
             <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
-                <div class="d-flex justify-content-between align-items-baseline">
-                    <div class="fw-bold text-dark text-truncate pe-2" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="d-flex align-items-center pe-2" style="min-width: 0;">
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                        ${gameStatusBadge}
+                    </div>
                     <div class="fw-bold text-end flex-shrink-0" style="font-size: ${rightFontSize}; line-height: 1;">${rightSideHtml}</div>
                 </div>
                 <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: -2px;">
