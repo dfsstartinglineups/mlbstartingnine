@@ -469,24 +469,30 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
             
             let liveStatLine = '';
-            let actualPtsDisplay = '';
+            
+            // Build the top metric (Proj)
+            let topMetric = isValue 
+                ? `<div class="text-success fw-bold">${parseFloat(p.value || 0).toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.55rem;">Proj</span></div>` 
+                : `<div class="text-primary fw-bold">${parseFloat(p.proj || 0).toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.55rem;">Proj</span></div>`;
+                
+            // Base placeholder for Actual points to keep sizing identical
+            let actualPtsDisplay = `<div class="text-muted fw-bold" style="opacity:0.4;">-- <span class="fw-normal" style="font-size:0.55rem;">Act</span></div>`;
             
             if (livePlayer) {
-                // Determine actual points based on the active DFS platform
+                // Actual points and value calculations
                 let actualPts = platform === 'dk' ? (livePlayer.dk_pts || 0) : (livePlayer.fd_pts || 0);
+                let actualValue = p.salary > 0 ? actualPts / (p.salary / 1000) : 0;
                 
                 let bat = livePlayer.batting;
                 let pit = livePlayer.pitching;
                 
                 let statParts = [];
-                // Build Pitching Line
                 if (pit && pit.battersFaced > 0) {
                     statParts.push(`${pit.inningsPitched || '0.0'} IP`);
                     statParts.push(`${pit.strikeOuts || 0} K`);
                     statParts.push(`${pit.earnedRuns || 0} ER`);
                     if (pit.wins > 0) statParts.push(`W`);
                 } 
-                // Build Batting Line
                 else if (bat && (bat.plateAppearances > 0 || bat.atBats > 0)) {
                     statParts.push(`${bat.hits || 0}-${bat.atBats || 0}`);
                     if (bat.homeRuns > 0) statParts.push(`${bat.homeRuns} HR`);
@@ -495,25 +501,28 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 }
                 
                 if (statParts.length > 0) {
-                    liveStatLine = `<div class="text-success fw-bold" style="font-size:0.65rem; margin-top: 1px;">Live: ${statParts.join(', ')}</div>`;
+                    let prefix = isGameFinal ? 'Final:' : 'Live:';
+                    let prefixColor = isGameFinal ? 'text-secondary' : 'text-success';
+                    liveStatLine = `<div class="${prefixColor} fw-bold" style="font-size:0.65rem; margin-top: 1px;">${prefix} ${statParts.join(', ')}</div>`;
                 }
                 
-                // Show actual points if the game has started
+                // Show actual points/value if the game has started
                 if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
-                    actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size:0.80rem; margin-top: 2px;">${actualPts.toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                    if (isValue) {
+                        actualPtsDisplay = `<div class="text-dark fw-bold">${actualValue.toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                    } else {
+                        actualPtsDisplay = `<div class="text-dark fw-bold">${actualPts.toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                    }
                 }
             }
 
             subtitleHtml = `${displayPos} • ${salFmt} • ${subMetric}${liveStatLine}`;
             
-            let topMetric = isValue 
-                ? `<span class="text-success">${parseFloat(p.value || 0).toFixed(2)}x</span>` 
-                : `<span class="text-primary">${parseFloat(p.proj || 0).toFixed(1)}</span> <span class="text-muted" style="font-size:0.6rem;">pts</span>`;
-                
+            // Stack them nicely, same font sizing
             rightSideHtml = `
-                <div class="d-flex flex-column align-items-end justify-content-center" style="line-height: 1;">
-                    <div>${topMetric}</div>
-                    ${actualPtsDisplay}
+                <div class="d-flex flex-column align-items-end justify-content-center" style="line-height: 1.1; font-size: 0.95rem; min-width: 60px;">
+                    ${topMetric}
+                    <div style="margin-top: 3px;">${actualPtsDisplay}</div>
                 </div>`;
         }
 
@@ -530,7 +539,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                         <div class="fw-bold text-dark text-truncate" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
                         ${gameStatusBadge}
                     </div>
-                    <div class="fw-bold text-end flex-shrink-0" style="font-size: ${rightFontSize}; line-height: 1;">${rightSideHtml}</div>
+                    <div class="fw-bold text-end flex-shrink-0" style="line-height: 1;">${rightSideHtml}</div>
                 </div>
                 <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: -2px;">
                     ${subtitleHtml}
