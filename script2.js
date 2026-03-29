@@ -366,11 +366,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         let shortName = p.name;
         if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
 
-        let rightSideHtml = '';
-        let subtitleHtml = '';
-        let subtitleClass = "text-muted text-truncate w-100"; 
-        
-        // Grab the official DFS position. If missing, fall back to field position.
+        let tabSpecificHtml = '';
         let displayPos = p[posKey] || p.pos;
 
         // ==========================================
@@ -395,7 +391,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         }
 
         // ==========================================
-        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2" or "Final")
+        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2")
         // ==========================================
         let gameStatusBadge = '';
         if (liveGame) {
@@ -432,8 +428,15 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
             }
 
-            subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
-            rightSideHtml = `<div class="d-flex align-items-center justify-content-end h-100 fw-bold" style="font-size: 1.0rem;"><span class="text-dark">${opsDisplay}</span> <span class="text-muted ms-1" style="font-size:0.6rem;">OPS</span></div>`;
+            tabSpecificHtml = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="fw-bold text-dark text-truncate pe-2" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                    <div class="text-end fw-bold text-dark" style="font-size: 1.0rem;">${opsDisplay} <span class="text-muted" style="font-size:0.6rem;">OPS</span></div>
+                </div>
+                <div class="text-muted text-truncate w-100" style="font-size: 0.72rem; margin-top: -2px;">
+                    v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR
+                </div>
+            `;
             
         } else if (mode === 'hr') {
             let p_shortName = p.oppPitcher;
@@ -450,30 +453,33 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 }
             }
             
-            subtitleClass = "text-muted w-100"; 
-            subtitleHtml = `
-                <div class="d-flex flex-column text-muted" style="font-size: 0.70rem; line-height: 1.3;">
+            tabSpecificHtml = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center pe-2" style="min-width: 0;">
+                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                        ${gameStatusBadge}
+                    </div>
+                    <div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 20px;">${hrIcon}</div>
+                </div>
+                <div class="d-flex flex-column text-muted w-100" style="font-size: 0.70rem; line-height: 1.3; margin-top: -2px;">
                     <span>v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
                     <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
                 </div>
             `;
-            
-            rightSideHtml = `<div class="text-end d-flex align-items-center justify-content-end h-100" style="font-size: 1.2rem;">${hrIcon}</div>`; 
             
         } else {
             // mode === 'value' OR 'proj'
             const isValue = mode === 'value';
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
-            let liveStatLine = '';
-            
-            // Build the top metric (Proj)
+            // --- ROW 1: Name, Pos/Sal, & Projected ---
             let topMetric = isValue 
-                ? `<div class="text-success fw-bold">${parseFloat(p.value || 0).toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.55rem;">Proj</span></div>` 
-                : `<div class="text-primary fw-bold">${parseFloat(p.proj || 0).toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.55rem;">Proj</span></div>`;
-                
-            // Base placeholder for Actual points to keep sizing identical
-            let actualPtsDisplay = `<div class="text-muted fw-bold" style="opacity:0.4;">-- <span class="fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                ? `<div class="text-success fw-bold" style="font-size: 0.95rem;">${parseFloat(p.value || 0).toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.6rem;">Proj</span></div>` 
+                : `<div class="text-primary fw-bold" style="font-size: 0.95rem;">${parseFloat(p.proj || 0).toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.6rem;">Proj</span></div>`;
+
+            // --- ROW 2: Live Stats & Actuals ---
+            let actualPtsDisplay = `<div class="text-muted fw-bold" style="font-size: 0.95rem; opacity:0.4;">-- <span class="fw-normal" style="font-size:0.6rem;">Act</span></div>`;
+            let liveStatHtml = '';
             
             if (livePlayer) {
                 // Actual points and value calculations
@@ -483,43 +489,61 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 let bat = livePlayer.batting;
                 let pit = livePlayer.pitching;
                 
+                // Track all stats that score or lose points
                 let statParts = [];
                 if (pit && pit.battersFaced > 0) {
                     statParts.push(`${pit.inningsPitched || '0.0'} IP`);
                     statParts.push(`${pit.strikeOuts || 0} K`);
                     statParts.push(`${pit.earnedRuns || 0} ER`);
+                    if (pit.hits > 0) statParts.push(`${pit.hits} H`);
+                    if (pit.baseOnBalls > 0) statParts.push(`${pit.baseOnBalls} BB`);
+                    if (pit.hitByPitch > 0) statParts.push(`${pit.hitByPitch} HBP`);
                     if (pit.wins > 0) statParts.push(`W`);
                 } 
                 else if (bat && (bat.plateAppearances > 0 || bat.atBats > 0)) {
                     statParts.push(`${bat.hits || 0}-${bat.atBats || 0}`);
+                    if (bat.doubles > 0) statParts.push(`${bat.doubles} 2B`);
+                    if (bat.triples > 0) statParts.push(`${bat.triples} 3B`);
                     if (bat.homeRuns > 0) statParts.push(`${bat.homeRuns} HR`);
+                    if (bat.runs > 0) statParts.push(`${bat.runs} R`);
                     if (bat.rbi > 0) statParts.push(`${bat.rbi} RBI`);
+                    if (bat.baseOnBalls > 0) statParts.push(`${bat.baseOnBalls} BB`);
+                    if (bat.hitByPitch > 0) statParts.push(`${bat.hitByPitch} HBP`);
                     if (bat.stolenBases > 0) statParts.push(`${bat.stolenBases} SB`);
                 }
                 
                 if (statParts.length > 0) {
                     let textColor = isGameFinal ? 'text-secondary' : 'text-success';
-                    liveStatLine = `<div class="${textColor} fw-bold" style="font-size:0.65rem; margin-top: 2px;">${statParts.join(', ')}</div>`;
+                    liveStatHtml = `<div class="${textColor} fw-bold text-truncate pe-2" style="font-size:0.70rem;">${statParts.join(', ')}</div>`;
+                } else if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
+                    liveStatHtml = `<div class="text-muted fst-italic text-truncate pe-2" style="font-size:0.70rem;">No stats recorded</div>`;
                 }
                 
                 // Show actual points/value if the game has started
                 if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
                     if (isValue) {
-                        actualPtsDisplay = `<div class="text-dark fw-bold">${actualValue.toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                        actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size: 0.95rem;">${actualValue.toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.6rem;">Act</span></div>`;
                     } else {
-                        actualPtsDisplay = `<div class="text-dark fw-bold">${actualPts.toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.55rem;">Act</span></div>`;
+                        actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size: 0.95rem;">${actualPts.toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.6rem;">Act</span></div>`;
                     }
                 }
             }
 
-            subtitleHtml = `${displayPos} • ${salFmt}${liveStatLine}`;
-            
-            // Stack them nicely, same font sizing
-            rightSideHtml = `
-                <div class="d-flex flex-column align-items-end justify-content-center h-100" style="line-height: 1.2; font-size: 0.95rem;">
-                    ${topMetric}
-                    <div>${actualPtsDisplay}</div>
-                </div>`;
+            tabSpecificHtml = `
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div class="d-flex align-items-baseline text-truncate pe-2" style="min-width: 0;">
+                        <div class="fw-bold text-dark text-truncate me-1" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                        ${gameStatusBadge}
+                        <div class="text-muted ms-2" style="font-size: 0.70rem; white-space: nowrap;">${displayPos} • ${salFmt}</div>
+                    </div>
+                    <div class="text-end flex-shrink-0 ms-2">${topMetric}</div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center w-100 mt-1">
+                    <div style="min-width: 0;">${liveStatHtml}</div>
+                    <div class="text-end flex-shrink-0 ms-auto">${actualPtsDisplay}</div>
+                </div>
+            `;
         }
 
         return `
@@ -530,22 +554,8 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 ${teamBadge}
             </div>
             
-            <div class="d-flex justify-content-between align-items-center w-100" style="min-width: 0;">
-                
-                <div class="d-flex flex-column justify-content-center pe-2" style="min-width: 0; flex: 1;">
-                    <div class="d-flex align-items-center" style="min-width: 0;">
-                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
-                        ${gameStatusBadge}
-                    </div>
-                    <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: 2px;">
-                        ${subtitleHtml}
-                    </div>
-                </div>
-                
-                <div class="flex-shrink-0 ms-auto text-end" style="min-width: 60px;">
-                    ${rightSideHtml}
-                </div>
-                
+            <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
+                ${tabSpecificHtml}
             </div>
         </div>`;
     }).join('');
