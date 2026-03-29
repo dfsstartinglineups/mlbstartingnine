@@ -602,7 +602,7 @@ for target_date_str in futbol_dates_to_check:
         if random.randint(1, 100) <= 33:
             # --- THE URL TRAFFIC COP ---
             if league_id == 10:
-                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=friendlies#lineup-{fixture_id}\n\n"
+                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/friendlies.html#lineup-{fixture_id}\n\n"
             else:
                 footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
             
@@ -862,7 +862,7 @@ for target_date_str in futbol_dates_to_check:
             
             # --- THE URL TRAFFIC COP ---
             if league_id == 10:
-                link = f"https://futbolstartingeleven.com/?league=friendlies#goal-{fixture_id}"
+                link = f"https://futbolstartingeleven.com/friendlies.html#goal-{fixture_id}"
             else:
                 link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
             
@@ -933,7 +933,7 @@ for target_date_str in futbol_dates_to_check:
                 
                 # --- THE URL TRAFFIC COP ---
                 if league_id == 10:
-                    link = f"https://futbolstartingeleven.com/?league=friendlies#goal-{fixture_id}"
+                    link = f"https://futbolstartingeleven.com/friendlies.html#goal-{fixture_id}"
                 else:
                     link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
                 
