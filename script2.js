@@ -198,7 +198,8 @@ function hasAnyDfsSalaries(game, platform) {
 }
 
 async function init(dateToFetch, isSilentRefresh = false) {
-    if (window.updateSEO && !isSilentRefresh) window.updateSEO(dateToFetch); 
+    // UPDATED: Renamed from updateSEO to updatePageMetadata
+    if (window.updatePageMetadata && !isSilentRefresh) window.updatePageMetadata(dateToFetch); 
     
     const container = document.getElementById('games-container');
     const datePicker = document.getElementById('date-picker');
@@ -207,9 +208,9 @@ async function init(dateToFetch, isSilentRefresh = false) {
 
     // Only show the loading spinner if this is a manual/initial load, NOT a background refresh
     if (container && !isSilentRefresh) {
-        ALL_GAMES_DATA = [];  // <--- NEW: Clear old games
-        LIVE_GAMES_DATA = {}; // <--- NEW: Clear old live stats immediately
-        
+        ALL_GAMES_DATA = [];  // Clear old games
+        LIVE_GAMES_DATA = {}; // Clear old live stats immediately
+
         container.innerHTML = `
             <div class="col-12 text-center mt-5 pt-5">
                 <div class="spinner-border text-primary" role="status"></div>
@@ -398,7 +399,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         }
 
         // ==========================================
-        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2")
+        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2" or "Final")
         // ==========================================
         let gameStatusBadge = '';
         if (liveGame) {
