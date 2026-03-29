@@ -455,7 +455,7 @@ FUTBOL_LEAGUES = {
     262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
    # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
     94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-    239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"}
+    239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
    # 203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
    # 144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
    # 179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership", "url_slug": "scotland"},
