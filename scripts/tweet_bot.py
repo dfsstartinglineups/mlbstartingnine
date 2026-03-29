@@ -43,6 +43,14 @@ futbol_client = tweepy.Client(
     access_token_secret=os.environ.get("SERIEA_X_ACCESS_TOKEN_SECRET")
 )
 
+# NEW: International Friendlies Client
+friendly_client = tweepy.Client(
+    consumer_key=os.environ.get("FRIENDLY_X_API_KEY"),
+    consumer_secret=os.environ.get("FRIENDLY_X_API_SECRET"),
+    access_token=os.environ.get("FRIENDLY_X_ACCESS_TOKEN"),
+    access_token_secret=os.environ.get("FRIENDLY_X_ACCESS_TOKEN_SECRET")
+)
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -592,7 +600,11 @@ for target_date_str in futbol_dates_to_check:
         # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
         footer_text = ""
         if random.randint(1, 100) <= 33:
-            footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
+            # --- THE URL TRAFFIC COP ---
+            if league_id == 10:
+                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=friendlies#lineup-{fixture_id}\n\n"
+            else:
+                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
             
         footer = f"{footer_text}{league_info['tag']} #{h_hash} #{a_hash}"
         
@@ -602,8 +614,14 @@ for target_date_str in futbol_dates_to_check:
         tweet_text = "\n\n".join(tweet_parts)
         
         try:
-            futbol_client.create_tweet(text=tweet_text)
-            print(f"✅ Successfully tweeted Futbol matchup: {h_name} vs {a_name}!")
+            # --- THE CLIENT TRAFFIC COP ---
+            if league_id == 10:
+                friendly_client.create_tweet(text=tweet_text)
+                print(f"✅ [FRIENDLIES] Successfully tweeted matchup: {h_name} vs {a_name}!")
+            else:
+                futbol_client.create_tweet(text=tweet_text)
+                print(f"✅ [MAIN] Successfully tweeted Futbol matchup: {h_name} vs {a_name}!")
+                
             log_target_date.append(team_key)
             tweeted_recently.append(team_key)
             new_tweets_sent = True
@@ -842,8 +860,11 @@ for target_date_str in futbol_dates_to_check:
             h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
             a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
             
-            # Link uses target_date_str, NOT the global date_str
-            link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
+            # --- THE URL TRAFFIC COP ---
+            if league_id == 10:
+                link = f"https://futbolstartingeleven.com/?league=friendlies#goal-{fixture_id}"
+            else:
+                link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
             
             title = random.choice(PHRASES[scenario_key]["titles"])
             blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
@@ -862,8 +883,13 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
             
             try:
-                futbol_client.create_tweet(text=tweet_text)
-                print(f"✅ Successfully tweeted ALERTS for {scoring_team_name}!")
+                # --- THE CLIENT TRAFFIC COP ---
+                if league_id == 10:
+                    friendly_client.create_tweet(text=tweet_text)
+                    print(f"✅ [FRIENDLIES] Successfully tweeted ALERTS for {scoring_team_name}!")
+                else:
+                    futbol_client.create_tweet(text=tweet_text)
+                    print(f"✅ [MAIN] Successfully tweeted ALERTS for {scoring_team_name}!")
                 
                 log_target_date.append(event_key)
                 tweeted_recently.append(event_key)
@@ -905,7 +931,11 @@ for target_date_str in futbol_dates_to_check:
                 h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
                 a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
                 
-                link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
+                # --- THE URL TRAFFIC COP ---
+                if league_id == 10:
+                    link = f"https://futbolstartingeleven.com/?league=friendlies#goal-{fixture_id}"
+                else:
+                    link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
                 
                 # 5% Chance to add the link
                 if random.randint(1, 100) <= 33:
@@ -915,8 +945,13 @@ for target_date_str in futbol_dates_to_check:
                 
                 # 3. Send the Tweet
                 try:
-                    futbol_client.create_tweet(text=disallowed_tweet)
-                    print(f"✅ Successfully tweeted Disallowed Goal for {t_name}!")
+                    # --- THE CLIENT TRAFFIC COP ---
+                    if league_id == 10:
+                        friendly_client.create_tweet(text=disallowed_tweet)
+                        print(f"✅ [FRIENDLIES] Successfully tweeted Disallowed Goal for {t_name}!")
+                    else:
+                        futbol_client.create_tweet(text=disallowed_tweet)
+                        print(f"✅ [MAIN] Successfully tweeted Disallowed Goal for {t_name}!")
                     
                     # Log that we did the reversal so we don't spam it
                     reversal_key = f"DISALLOWED_{fixture_id}_{t_id}_Reversed_{c_score + 1}"
