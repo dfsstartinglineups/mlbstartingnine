@@ -368,7 +368,6 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
 
         let rightSideHtml = '';
         let subtitleHtml = '';
-        let rightFontSize = '1.1rem'; 
         let subtitleClass = "text-muted text-truncate w-100"; 
         
         // Grab the official DFS position. If missing, fall back to field position.
@@ -396,7 +395,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         }
 
         // ==========================================
-        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2")
+        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2" or "Final")
         // ==========================================
         let gameStatusBadge = '';
         if (liveGame) {
@@ -434,8 +433,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             }
 
             subtitleHtml = `v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR`;
-            rightSideHtml = `<span class="text-dark">${opsDisplay}</span> <span class="text-muted" style="font-size:0.6rem;">OPS</span>`;
-            rightFontSize = '1.0rem';
+            rightSideHtml = `<div class="d-flex align-items-center justify-content-end h-100 fw-bold" style="font-size: 1.0rem;"><span class="text-dark">${opsDisplay}</span> <span class="text-muted ms-1" style="font-size:0.6rem;">OPS</span></div>`;
             
         } else if (mode === 'hr') {
             let p_shortName = p.oppPitcher;
@@ -460,13 +458,12 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 </div>
             `;
             
-            rightSideHtml = `<div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 28px;">${hrIcon}</div>`; 
+            rightSideHtml = `<div class="text-end d-flex align-items-center justify-content-end h-100" style="font-size: 1.2rem;">${hrIcon}</div>`; 
             
         } else {
             // mode === 'value' OR 'proj'
             const isValue = mode === 'value';
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
-            const subMetric = isValue ? `${parseFloat(p.proj || 0).toFixed(1)} pts` : `${parseFloat(p.value || 0).toFixed(2)}x`;
             
             let liveStatLine = '';
             
@@ -501,9 +498,8 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 }
                 
                 if (statParts.length > 0) {
-                    let prefix = isGameFinal ? 'Final:' : 'Live:';
-                    let prefixColor = isGameFinal ? 'text-secondary' : 'text-success';
-                    liveStatLine = `<div class="${prefixColor} fw-bold" style="font-size:0.65rem; margin-top: 1px;">${prefix} ${statParts.join(', ')}</div>`;
+                    let textColor = isGameFinal ? 'text-secondary' : 'text-success';
+                    liveStatLine = `<div class="${textColor} fw-bold" style="font-size:0.65rem; margin-top: 2px;">${statParts.join(', ')}</div>`;
                 }
                 
                 // Show actual points/value if the game has started
@@ -516,13 +512,13 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 }
             }
 
-            subtitleHtml = `${displayPos} • ${salFmt} • ${subMetric}${liveStatLine}`;
+            subtitleHtml = `${displayPos} • ${salFmt}${liveStatLine}`;
             
             // Stack them nicely, same font sizing
             rightSideHtml = `
-                <div class="d-flex flex-column align-items-end justify-content-center" style="line-height: 1.1; font-size: 0.95rem; min-width: 60px;">
+                <div class="d-flex flex-column align-items-end justify-content-center h-100" style="line-height: 1.2; font-size: 0.95rem;">
                     ${topMetric}
-                    <div style="margin-top: 3px;">${actualPtsDisplay}</div>
+                    <div>${actualPtsDisplay}</div>
                 </div>`;
         }
 
@@ -533,17 +529,23 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 ${photoHtml}
                 ${teamBadge}
             </div>
-            <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
-                <div class="d-flex justify-content-between align-items-start">
-                    <div class="d-flex align-items-center pe-2" style="min-width: 0;">
+            
+            <div class="d-flex justify-content-between align-items-center w-100" style="min-width: 0;">
+                
+                <div class="d-flex flex-column justify-content-center pe-2" style="min-width: 0; flex: 1;">
+                    <div class="d-flex align-items-center" style="min-width: 0;">
                         <div class="fw-bold text-dark text-truncate" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
                         ${gameStatusBadge}
                     </div>
-                    <div class="fw-bold text-end flex-shrink-0" style="line-height: 1;">${rightSideHtml}</div>
+                    <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: 2px;">
+                        ${subtitleHtml}
+                    </div>
                 </div>
-                <div class="${subtitleClass}" style="font-size: 0.72rem; margin-top: -2px;">
-                    ${subtitleHtml}
+                
+                <div class="flex-shrink-0 ms-auto text-end" style="min-width: 60px;">
+                    ${rightSideHtml}
                 </div>
+                
             </div>
         </div>`;
     }).join('');
