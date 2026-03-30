@@ -603,6 +603,98 @@ FUTBOL_LEAGUES = {
     10: {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl"}
 }
 
+# ==========================================
+# NATIONAL TEAM FLAG DICTIONARY (MASTER LIST)
+# ==========================================
+INTL_FLAGS = {
+    # --- The UK Nations (Explicit Unicode escapes to prevent file corruption) ---
+    "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f",
+    "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f",
+    "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
+    "Northern Ireland": "🇬🇧", # Standard emoji fallback for NI
+
+    # --- Global Nations (Alphabetical) ---
+    "Albania": "🇦🇱",
+    "Algeria": "🇩🇿",
+    "Argentina": "🇦🇷",
+    "Australia": "🇦🇺",
+    "Austria": "🇦🇹",
+    "Belgium": "🇧🇪",
+    "Bolivia": "🇧🇴",
+    "Bosnia and Herzegovina": "🇧🇦",
+    "Brazil": "🇧🇷",
+    "Bulgaria": "🇧🇬",
+    "Burkina Faso": "🇧🇫",
+    "Cameroon": "🇨🇲",
+    "Canada": "🇨🇦",
+    "Chile": "🇨🇱",
+    "China": "🇨🇳",
+    "Colombia": "🇨🇴",
+    "Costa Rica": "🇨🇷",
+    "Croatia": "🇭🇷",
+    "Czech Republic": "🇨🇿",
+    "Denmark": "🇩🇰",
+    "DR Congo": "🇨🇩",
+    "Ecuador": "🇪🇨",
+    "Egypt": "🇪🇬",
+    "El Salvador": "🇸🇻",
+    "Finland": "🇫🇮",
+    "France": "🇫🇷",
+    "Georgia": "🇬🇪",
+    "Germany": "🇩🇪",
+    "Ghana": "🇬🇭",
+    "Greece": "🇬🇷",
+    "Guatemala": "🇬🇹",
+    "Guinea": "🇬🇳",
+    "Honduras": "🇭🇳",
+    "Hungary": "🇭🇺",
+    "Iceland": "🇮🇸",
+    "Iran": "🇮🇷",
+    "Iraq": "🇮🇶",
+    "Israel": "🇮🇱",
+    "Italy": "🇮🇹",
+    "Ivory Coast": "🇨🇮",
+    "Jamaica": "🇯🇲",
+    "Japan": "🇯🇵",
+    "Mali": "🇲🇱",
+    "Mexico": "🇲🇽",
+    "Montenegro": "🇲🇪",
+    "Morocco": "🇲🇦",
+    "Netherlands": "🇳🇱",
+    "New Zealand": "🇳🇿",
+    "Nigeria": "🇳🇬",
+    "North Macedonia": "🇲🇰",
+    "Norway": "🇳🇴",
+    "Oman": "🇴🇲",
+    "Panama": "🇵🇦",
+    "Paraguay": "🇵🇾",
+    "Peru": "🇵🇪",
+    "Poland": "🇵🇱",
+    "Portugal": "🇵🇹",
+    "Qatar": "🇶🇦",
+    "Republic of Ireland": "🇮🇪",
+    "Romania": "🇷🇴",
+    "Saudi Arabia": "🇸🇦",
+    "Senegal": "🇸🇳",
+    "Serbia": "🇷🇸",
+    "Slovakia": "🇸🇰",
+    "Slovenia": "🇸🇮",
+    "South Africa": "🇿🇦",
+    "South Korea": "🇰🇷",
+    "Spain": "🇪🇸",
+    "Sweden": "🇸🇪",
+    "Switzerland": "🇨🇭",
+    "Trinidad and Tobago": "🇹🇹",
+    "Tunisia": "🇹🇳",
+    "Turkey": "🇹🇷",
+    "UAE": "🇦🇪",
+    "Ukraine": "🇺🇦",
+    "Uruguay": "🇺🇾",
+    "USA": "🇺🇸",
+    "Uzbekistan": "🇺🇿",
+    "Venezuela": "🇻🇪"
+}
+
 def parse_futbol_lineup(startXI):
     pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
     for player_item in startXI:
@@ -668,10 +760,19 @@ for target_date_str in futbol_dates_to_check:
         away_t = match['teams']['away']
         h_rank = f"[{home_t['rank']}] " if home_t.get('rank') else ""
         h_rec = f"({home_t['record']})" if home_t.get('record') else ""
-        h_name = home_t['name']
+        raw_h_name = home_t['name']
+        
         a_rank = f"[{away_t['rank']}] " if away_t.get('rank') else ""
         a_rec = f"({away_t['record']})" if away_t.get('record') else ""
-        a_name = away_t['name']
+        raw_a_name = away_t['name']
+        
+        # If it's the International Friendlies league (10), append the flag!
+        if league_id == 10:
+            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip()
+            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip()
+        else:
+            h_name = raw_h_name
+            a_name = raw_a_name
         
         print(f"[{fixture_id}] Both lineups found for {h_name} vs {a_name} ({league_info['tag']}). Building tweet...")
 
@@ -716,8 +817,8 @@ for target_date_str in futbol_dates_to_check:
         if a_inj: inj_lines.append(f"{a_name}: {a_inj}")
         inj_str = f"🤕 Key Absences:\n" + "\n".join(inj_lines) if inj_lines else ""
         
-        h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
-        a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+        h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
+        a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
         
         # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
         footer_text = ""
@@ -769,8 +870,15 @@ for target_date_str in futbol_dates_to_check:
             
         h_id = match['teams']['home']['id']
         a_id = match['teams']['away']['id']
-        h_name = match['teams']['home']['name']
-        a_name = match['teams']['away']['name']
+        raw_h_name = match['teams']['home']['name']
+        raw_a_name = match['teams']['away']['name']
+        
+        if league_id == 10:
+            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip()
+            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip()
+        else:
+            h_name = raw_h_name
+            a_name = raw_a_name
         
         official_home_score = int(match.get('goals', {}).get('home') or 0)
         official_away_score = int(match.get('goals', {}).get('away') or 0)
@@ -979,8 +1087,8 @@ for target_date_str in futbol_dates_to_check:
             scorer_str = f"{scorer} ({scoring_team_name})" if scorer and scorer != "null" else f"{scoring_team_name}"
             american_odds = f"+{int((scorer_odds - 1) * 100)}"
             
-            h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
-            a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+            h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
+            a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
             
             # --- THE URL TRAFFIC COP ---
             if league_id == 10:
@@ -1050,8 +1158,10 @@ for target_date_str in futbol_dates_to_check:
                 ]
                 
                 disallowed_tweet = random.choice(disallowed_phrases)
-                h_hash = h_name.replace(' ', '').replace('-', '').replace('.', '')
-                a_hash = a_name.replace(' ', '').replace('-', '').replace('.', '')
+                
+                # CRITICAL FIX: Use the safe raw names for the hashtags here too!
+                h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
+                a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
                 
                 # --- THE URL TRAFFIC COP ---
                 if league_id == 10:
