@@ -6,7 +6,7 @@ import zoneinfo
 from datetime import datetime, timezone, timedelta
 import time
 import random
-from atproto import Client  # NEW: The Bluesky Library
+from atproto import Client, client_utils
 
 def save_memory_safely(memory_data):
     """Safely writes to the log file using a temporary file to prevent corruption."""
@@ -291,12 +291,32 @@ for game in nba_data:
                 
             team_hash = team_name.replace(" ", "")
             
-            # 5% Chance to add the link
-            if random.randint(1, 100) <= 100:
-                tweet_text += f"\n\nFull matchups & odds: https://nbastartingfive.com/#game-{url_game_id}"
-                
-            tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
+            # --- START NEW BLUESKY TEXT BUILDER ---
+            # We initialize a special Bluesky builder with the base text
+            bsky_tb = client_utils.TextBuilder()
+            bsky_tb.text(tweet_text)
             
+            # --- ADD FOOTERS & LINKS ---
+            if random.randint(1, 100) <= 100:
+                link_url = f"https://nbastartingfive.com/#game-{url_game_id}"
+                
+                # 1. Add to Twitter (Plain string)
+                tweet_text += f"\n\nFull matchups & odds: {link_url}"
+                
+                # 2. Add to Bluesky (Makes it officially clickable!)
+                bsky_tb.text("\n\nFull matchups & odds: ")
+                bsky_tb.link(link_url, link_url)
+                
+            # --- ADD HASHTAGS ---
+            tags_string = f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
+            
+            # Add to both as plain text
+            tweet_text += tags_string
+            bsky_tb.text(tags_string)
+            
+            # ==========================================
+            # POST TO PLATFORMS
+            # ==========================================
             try:
                 # 1. Tweet to Twitter (X)
                 nba_client.create_tweet(text=tweet_text)
@@ -306,8 +326,8 @@ for game in nba_data:
                 config = LEAGUE_CONFIG.get("nba")
                 if config and config.get("bsky_client"):
                     try:
-                        # We use the exact same tweet_text!
-                        config["bsky_client"].send_post(text=tweet_text)
+                        # CRITICAL: We pass the 'bsky_tb' object here!
+                        config["bsky_client"].send_post(bsky_tb)
                         print(f"✅ Successfully posted {team_name} NBA lineup to Bluesky!")
                     except Exception as e:
                         print(f"❌ Bluesky post failed for {team_name}: {e}")
