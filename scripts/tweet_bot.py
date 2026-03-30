@@ -38,6 +38,10 @@ def setup_bsky_client(account_key):
     return None
 
 LEAGUE_CONFIG = {
+    "mlb": {
+        "league_name": "MLB ⚾",
+        "bsky_client": setup_bsky_client("mlb_account")
+    },
     "nba": {
         "league_name": "NBA 🏀",
         "bsky_client": setup_bsky_client("nba_account")
@@ -459,33 +463,89 @@ for game in games:
         team_odds_display = f" [{team_odds}]" if team_odds != "TBD" else ""
         opp_odds_display = f" [{opp_odds}]" if opp_odds != "TBD" else ""
         
+        # Helper function to instantly compress "Steven Kwan" into "S. Kwan"
+        def shorten_name(name):
+            clean_name = name.split(' (')[0] # Strips the (R)/(L) off pitchers
+            parts = clean_name.split(' ')
+            return f"{parts[0][0]}. {' '.join(parts[1:])}" if len(parts) > 1 else clean_name
+
+        # ==========================================
+        # 1. BUILD THE STRINGS
+        # ==========================================
+        
+        # Twitter Header (Long - keeps O/U)
         tweet_text = f"⚾ {game_date_short} {team_short} Lineup{total_string}\nSP: {team_pitcher}{team_odds_display}\nvs {opp_pitcher}{opp_odds_display}\n\n"
         
+        # Bluesky Header (Compressed - strips O/U)
+        bsky_p1 = shorten_name(team_pitcher)
+        bsky_p2 = shorten_name(opp_pitcher)
+        bsky_text = f"⚾ {game_date_short} {team_short} Lineup\nSPs: {bsky_p1} vs {bsky_p2}\n\n"
+        
+        # Add batters
         for i, p in enumerate(players):
             pid = p['id']
             hand = f"({hands.get(pid)})" if hands.get(pid) else ""
-            pos = f"({positions.get(pid)})" if positions.get(pid) else ""
-            line = f"{i+1}. {p['fullName']} {pos} {hand}"
-            tweet_text += " ".join(line.split()) + "\n"
+            raw_pos = positions.get(pid, "")
+            tweet_pos = f"({raw_pos})" if raw_pos else ""
+            
+            # Twitter gets full name, numbered, with parentheses
+            tweet_line = f"{i+1}. {p['fullName']} {tweet_pos} {hand}"
+            tweet_text += " ".join(tweet_line.split()) + "\n"
+            
+            # Bluesky gets Position first, First Initial + Last Name, Catcher padding
+            b_name = shorten_name(p['fullName'])
+            if raw_pos:
+                padded_pos = f"{raw_pos:<2}" 
+                bsky_text += f"{padded_pos} {b_name}\n"
+            else:
+                bsky_text += f"{b_name}\n"
             
         team_hash = team_short.replace(" ", "")
         
-        # 5% Chance to add the link
+        # ==========================================
+        # 2. ADD FOOTERS & LINKS
+        # ==========================================
+        
+        link_url = f"https://mlbstartingnine.com/#game-{game_pk}"
+        
+        # Twitter Footer
         if random.randint(1, 100) <= 100:
-            tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: https://mlbstartingnine.com/#game-{game_pk}"
-            
+            tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: {link_url}"
         tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB"
         
+        # Bluesky Footer (Using TextBuilder for a clickable link!)
+        bsky_tb = client_utils.TextBuilder()
+        bsky_tb.text(bsky_text)
+        bsky_tb.text("\nStats: ")
+        bsky_tb.link(link_url, link_url)
+        bsky_tb.text(f"\n#{team_hash} #MLB")
+        
+        # ==========================================
+        # 3. POST TO PLATFORMS
+        # ==========================================
         try:
+            # 1. Post to Twitter
             mlb_client.create_tweet(text=tweet_text)
             print(f"✅ Successfully tweeted {team_short} MLB lineup!")
+            
+            # 2. Post to Bluesky (V2 Architecture)
+            config = LEAGUE_CONFIG.get("mlb")
+            if config and config.get("bsky_client"):
+                # Safety check: (Approx length of text + link + tags)
+                if len(bsky_text) + len(link_url) + len(team_hash) + 15 <= 300:
+                    try:
+                        config["bsky_client"].send_post(bsky_tb)
+                        print(f"✅ Successfully posted {team_short} MLB lineup to Bluesky!")
+                    except Exception as e:
+                        print(f"❌ Bluesky post failed for {team_short}: {e}")
+                else:
+                    print(f"⚠️ Bluesky skipped for {team_short}: Text is too long.")
+
+            # 3. Save to log
             log_today.append(f"{game_pk}_{side}")
             tweeted_recently.append(f"{game_pk}_{side}")
             return True
-            # --- IMMEDIATE SAFE LOG SAVE ---
-            memory[date_str] = log_today
-            save_memory_safely(memory)
-            time.sleep(5)
+            
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
             return False
