@@ -767,8 +767,13 @@ def main():
                     
                     for p_key, p_val in all_live_players.items():
                         pid = str(p_val.get('person', {}).get('id'))
-                        if p_val.get('allPositions'): game_positions[pid] = p_val['allPositions'][0].get('abbreviation')
-                        elif p_val.get('position'): game_positions[pid] = p_val['position'].get('abbreviation')
+                        
+                        # Ask for TODAY'S position first!
+                        if p_val.get('position') and p_val['position'].get('abbreviation'): 
+                            game_positions[pid] = p_val['position'].get('abbreviation')
+                        elif p_val.get('allPositions'): 
+                            game_positions[pid] = p_val['allPositions'][0].get('abbreviation')
+                            
                         if p_val.get('person', {}).get('batSide'): lineup_handedness[pid] = p_val['person']['batSide'].get('code')
                 except Exception: pass
                 
