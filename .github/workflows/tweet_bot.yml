@@ -6,6 +6,14 @@ on:
 permissions:
   contents: write
 
+# ==========================================
+# 🛑 THE ANTI-DUPLICATE FIX
+# ==========================================
+concurrency:
+  group: tweet-bot-production
+  cancel-in-progress: false
+# ==========================================  
+
 jobs:
   run-bot:
     runs-on: ubuntu-latest
