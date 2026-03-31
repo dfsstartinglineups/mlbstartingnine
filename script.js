@@ -198,7 +198,6 @@ function hasAnyDfsSalaries(game, platform) {
 }
 
 async function init(dateToFetch, isSilentRefresh = false) {
-    // UPDATED: Renamed from updateSEO to updatePageMetadata
     if (window.updatePageMetadata && !isSilentRefresh) window.updatePageMetadata(dateToFetch); 
     
     const container = document.getElementById('games-container');
@@ -231,28 +230,6 @@ async function init(dateToFetch, isSilentRefresh = false) {
             ALL_GAMES_DATA = rawData.games || [];
             if(!isSilentRefresh) GLOBAL_SLATES = rawData.slates || { fanduel: [], draftkings: [] };
         }
-
-        // --- 🚨 TEMPORARY DFF BLOCK FOR MARCH 29 🚨 ---
-      //  if (dateToFetch === '2026-03-29') {
-      //      const wipeProj = (players) => {
-      //          if (!players) return;
-      //          const arr = Array.isArray(players) ? players : [players];
-      //          arr.forEach(p => {
-      //              if (!p) return;
-      //              p.proj = 0; p.value = 0; p.dk_proj = 0; p.dk_value = 0; p.fd_proj = 0; p.fd_value = 0;
-      //              if (p.dk_slates) Object.values(p.dk_slates).forEach(s => { s.proj = 0; s.value = 0; });
-      //              if (p.fd_slates) Object.values(p.fd_slates).forEach(s => { s.proj = 0; s.value = 0; });
-      //          });
-      //      };
-      //      ALL_GAMES_DATA.forEach(g => {
-      //          const pl = g.projectedLineups || {};
-      //          wipeProj(pl.away?.startingPitcher); wipeProj(pl.away?.battingOrder);
-      //          wipeProj(pl.home?.startingPitcher); wipeProj(pl.home?.battingOrder);
-      //          if (g.gameRaw?.lineups?.awayPlayers) wipeProj(g.gameRaw.lineups.awayPlayers);
-      //          if (g.gameRaw?.lineups?.homePlayers) wipeProj(g.gameRaw.lineups.homePlayers);
-      //      });
-      //  }
-        // ----------------------------------------------
 
         if(!isSilentRefresh) {
             ensureDFSControls();
@@ -382,7 +359,7 @@ window.updateTopPlaysView = function() {
     // 5. Render top 20
     const top20 = sorted.slice(0, 20);
     const listContainer = document.getElementById('view-top-plays-list');
-    if (listContainer) listContainer.innerHTML = buildTopPlaysListHtml(top20, tab, platform);
+    if (listContainer) listContainer.innerHTML = window.buildTopPlaysListHtml(top20, tab, platform);
 };
 
 window.buildTopPlaysListHtml = function(players, mode, platform) {
@@ -483,6 +460,14 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 }
             }
             
+            // Format the Opposing Pitcher's split text
+            let pitcherSplitHtml = '';
+            if (p.oppPitcherSplit && p.oppPitcherSplit.ab > 0) {
+                pitcherSplitHtml = `<span>${p_shortName} v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
+            } else {
+                pitcherSplitHtml = `<span>${p_shortName} v${p.activeBatSide}: No History</span>`;
+            }
+            
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center pe-2" style="min-width: 0;">
@@ -492,8 +477,9 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                     <div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 20px;">${hrIcon}</div>
                 </div>
                 <div class="d-flex flex-column text-muted w-100" style="font-size: 0.70rem; line-height: 1.3; margin-top: -2px;">
-                    <span>v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
-                    <span>v. ${p_shortName}: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
+                    <span>Batter v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
+                    ${pitcherSplitHtml}
+                    <span>BvP: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
                 </div>
             `;
             
@@ -623,7 +609,7 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
             });
         }
 
-        const extract = (roster, teamAbbr, teamLogo, isPitcher, opposingPitcherName, opposingPitcherHand) => {
+        const extract = (roster, teamAbbr, teamLogo, isPitcher, opposingPitcherName, opposingPitcherHand, opposingPitcherId) => {
             if (!roster) return;
             let arr = Array.isArray(roster) ? roster : [roster];
             arr.forEach(p => {
@@ -662,20 +648,33 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                         });
                     }
                     
+                    let batterHand = handDict[String(p.id)] || 'R'; 
+                    let activeBatSide = batterHand;
+                    if (batterHand === 'S') activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
+
                     let splitStats = opposingPitcherHand === 'L' ? deepStats[String(p.id)].split_vL : deepStats[String(p.id)].split_vR;
                     let splitHrRate = 0;
                     let bvpHrRate = 0;
+                    let oppPitcherHrRate = 0;
+                    let oppPitcherSplit = null;
                     
                     if (splitStats && splitStats.ab >= 10) splitHrRate = splitStats.hr / splitStats.ab;
                     if (bvpStats && bvpStats.ab > 0) bvpHrRate = bvpStats.hr / bvpStats.ab;
                     
-                    let baseHrScore = splitHrRate + bvpHrRate;
+                    // Pitcher HR Rate given up to this batter's active side
+                    if (opposingPitcherId && deepStats[String(opposingPitcherId)]) {
+                        let oppPitcherStats = deepStats[String(opposingPitcherId)];
+                        oppPitcherSplit = activeBatSide === 'L' ? oppPitcherStats.split_vL : oppPitcherStats.split_vR;
+                        
+                        if (oppPitcherSplit && oppPitcherSplit.ab >= 10) {
+                            oppPitcherHrRate = oppPitcherSplit.hr / oppPitcherSplit.ab;
+                        }
+                    }
+                    
+                    let baseHrScore = splitHrRate + bvpHrRate + oppPitcherHrRate;
                     let finalHrScore = baseHrScore;
                     
                     if (baseHrScore > 0 && parkStats) {
-                        let batterHand = handDict[String(p.id)] || 'R'; 
-                        let activeBatSide = batterHand;
-                        if (batterHand === 'S') activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
                         let parkFactor = activeBatSide === 'L' ? parkStats.hr_l : parkStats.hr_r;
                         if (parkFactor) finalHrScore = baseHrScore * (parkFactor / 100);
                     }
@@ -688,6 +687,8 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                             split: splitStats || {ab: 0, hr: 0},
                             oppPitcher: opposingPitcherName || "Unknown",
                             oppHand: opposingPitcherHand,
+                            oppPitcherSplit: oppPitcherSplit || {ab: 0, hr: 0},
+                            activeBatSide: activeBatSide,
                             hrScore: finalHrScore 
                         });
                     }
@@ -700,11 +701,14 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         let homePitcherName = line.home?.startingPitcher?.name || game.gameRaw?.teams?.home?.probablePitcher?.fullName || "TBD";
         let awayPitcherHand = game.gameRaw?.teams?.away?.probablePitcher?.pitchHand?.code || 'R';
         let homePitcherHand = game.gameRaw?.teams?.home?.probablePitcher?.pitchHand?.code || 'R';
+        
+        let awayPitcherId = line.away?.startingPitcher?.id || game.gameRaw?.teams?.away?.probablePitcher?.id || null;
+        let homePitcherId = line.home?.startingPitcher?.id || game.gameRaw?.teams?.home?.probablePitcher?.id || null;
 
-        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true, null, null);
-        extract(line.away?.battingOrder, awayAbbr, awayLogo, false, homePitcherName, homePitcherHand);
-        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true, null, null);
-        extract(line.home?.battingOrder, homeAbbr, homeLogo, false, awayPitcherName, awayPitcherHand);
+        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true, null, null, null);
+        extract(line.away?.battingOrder, awayAbbr, awayLogo, false, homePitcherName, homePitcherHand, homePitcherId);
+        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true, null, null, null);
+        extract(line.home?.battingOrder, homeAbbr, homeLogo, false, awayPitcherName, awayPitcherHand, awayPitcherId);
     });
 
     if (allHitters.length === 0 && allPitchers.length === 0) return '';
