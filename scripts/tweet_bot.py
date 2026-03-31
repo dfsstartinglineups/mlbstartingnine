@@ -833,7 +833,7 @@ for target_date_str in futbol_dates_to_check:
         
         # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
         footer_text = ""
-        if random.randint(1, 100) <= 33:
+        if random.randint(1, 100) <= 50:
             # --- THE URL TRAFFIC COP ---
             if league_id == 10:
                 footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/friendlies.html#lineup-{fixture_id}\n\n"
@@ -1125,7 +1125,7 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{blurb}\n\n"
             
             # 5% Chance to add the link
-            if random.randint(1, 100) <= 33:
+            if random.randint(1, 100) <= 50:
                 tweet_text += f"{cta}\n⬇️\n{link}\n\n"
                 
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
@@ -1193,7 +1193,7 @@ for target_date_str in futbol_dates_to_check:
                     link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
                 
                 # 5% Chance to add the link
-                if random.randint(1, 100) <= 33:
+                if random.randint(1, 100) <= 50:
                     disallowed_tweet += f"\n\nLive match center:\n⬇️\n{link}"
                     
                 disallowed_tweet += f"\n\n{league_info['tag']} #{h_hash} #{a_hash}"
