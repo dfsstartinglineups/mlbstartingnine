@@ -406,8 +406,11 @@ for game in games:
         all_players = {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}
         for pid, p_data in all_players.items():
             person_id = p_data.get('person', {}).get('id')
-            if p_data.get('allPositions'): positions[person_id] = p_data['allPositions'][0].get('abbreviation', '')
-            elif p_data.get('position'): positions[person_id] = p_data['position'].get('abbreviation', '')
+            # Ask for TODAY'S position first!
+            if p_data.get('position') and p_data['position'].get('abbreviation'): 
+                positions[person_id] = p_data['position'].get('abbreviation', '')
+            elif p_data.get('allPositions'): 
+                positions[person_id] = p_data['allPositions'][0].get('abbreviation', '')
 
         player_ids = [str(p['id']) for p in game.get('lineups', {}).get('awayPlayers', []) + game.get('lineups', {}).get('homePlayers', [])]
         if player_ids:
