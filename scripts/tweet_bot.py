@@ -85,6 +85,17 @@ friendly_client = tweepy.Client(
     access_token_secret=os.environ.get("FRIENDLY_X_ACCESS_TOKEN_SECRET")
 )
 
+# NEW: Championship Client (Loaded dynamically from the JSON Secret)
+champ_creds = auth_data.get("championship_x", {})
+championship_client = None
+if champ_creds:
+    championship_client = tweepy.Client(
+        consumer_key=champ_creds.get("consumer_key"),
+        consumer_secret=champ_creds.get("consumer_secret"),
+        access_token=champ_creds.get("access_token"),
+        access_token_secret=champ_creds.get("access_token_secret")
+    )
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -826,6 +837,8 @@ for target_date_str in futbol_dates_to_check:
             # --- THE URL TRAFFIC COP ---
             if league_id == 10:
                 footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/friendlies.html#lineup-{fixture_id}\n\n"
+            elif league_id == 40:
+                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/championship.html#lineup-{fixture_id}\n\n"
             else:
                 footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
             
@@ -841,6 +854,9 @@ for target_date_str in futbol_dates_to_check:
             if league_id == 10:
                 friendly_client.create_tweet(text=tweet_text)
                 print(f"✅ [FRIENDLIES] Successfully tweeted matchup: {h_name} vs {a_name}!")
+            elif league_id == 40 and championship_client:
+                championship_client.create_tweet(text=tweet_text)
+                print(f"✅ [CHAMPIONSHIP] Successfully tweeted matchup: {h_name} vs {a_name}!")
             else:
                 futbol_client.create_tweet(text=tweet_text)
                 print(f"✅ [MAIN] Successfully tweeted Futbol matchup: {h_name} vs {a_name}!")
@@ -1093,6 +1109,8 @@ for target_date_str in futbol_dates_to_check:
             # --- THE URL TRAFFIC COP ---
             if league_id == 10:
                 link = f"https://futbolstartingeleven.com/friendlies.html#goal-{fixture_id}"
+            elif league_id == 40:
+                link = f"https://futbolstartingeleven.com/championship.html#goal-{fixture_id}"
             else:
                 link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
             
@@ -1117,6 +1135,9 @@ for target_date_str in futbol_dates_to_check:
                 if league_id == 10:
                     friendly_client.create_tweet(text=tweet_text)
                     print(f"✅ [FRIENDLIES] Successfully tweeted ALERTS for {scoring_team_name}!")
+                elif league_id == 40 and championship_client:
+                    championship_client.create_tweet(text=tweet_text)
+                    print(f"✅ [CHAMPIONSHIP] Successfully tweeted ALERTS for {scoring_team_name}!")
                 else:
                     futbol_client.create_tweet(text=tweet_text)
                     print(f"✅ [MAIN] Successfully tweeted ALERTS for {scoring_team_name}!")
@@ -1166,6 +1187,8 @@ for target_date_str in futbol_dates_to_check:
                 # --- THE URL TRAFFIC COP ---
                 if league_id == 10:
                     link = f"https://futbolstartingeleven.com/friendlies.html#goal-{fixture_id}"
+                elif league_id == 40:
+                    link = f"https://futbolstartingeleven.com/championship.html#goal-{fixture_id}"
                 else:
                     link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
                 
@@ -1181,6 +1204,9 @@ for target_date_str in futbol_dates_to_check:
                     if league_id == 10:
                         friendly_client.create_tweet(text=disallowed_tweet)
                         print(f"✅ [FRIENDLIES] Successfully tweeted Disallowed Goal for {t_name}!")
+                    elif league_id == 40 and championship_client:
+                        championship_client.create_tweet(text=disallowed_tweet)
+                        print(f"✅ [CHAMPIONSHIP] Successfully tweeted Disallowed Goal for {t_name}!")
                     else:
                         futbol_client.create_tweet(text=disallowed_tweet)
                         print(f"✅ [MAIN] Successfully tweeted Disallowed Goal for {t_name}!")
