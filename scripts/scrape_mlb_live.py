@@ -85,7 +85,12 @@ def calc_pitcher_dfs(stats):
 def scrape_live_games():
     ny_tz = zoneinfo.ZoneInfo("America/New_York")
     now_est = datetime.now(ny_tz)
-    date_str = now_est.strftime('%Y-%m-%d')
+    
+    # --- THE FIX: The "Sports Day" Offset ---
+    # Subtract 5 hours so the date doesn't roll over until 5:00 AM EST.
+    # A game at 1:30 AM EST will still be treated as "yesterday's" schedule.
+    sports_day = now_est - timedelta(hours=5)
+    date_str = sports_day.strftime('%Y-%m-%d')
     
     # 1. Get today's schedule to find the gamePks
     sched_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&date={date_str}"
