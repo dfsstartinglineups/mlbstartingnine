@@ -334,17 +334,12 @@ window.updateTopPlaysView = function() {
     // 3. Filter by Position
     let filtered = sourceArray;
     if (pos !== 'ALL' && pos !== 'P') {
-        // Split the clicked button's position (e.g., "C/1B" becomes ["C", "1B"])
         const targetPositions = pos.split('/'); 
         
         filtered = sourceArray.filter(p => {
             const pPos = p[posKey] || '';
             if (!pPos) return false;
-            
-            // Split the player's eligible positions (e.g., "1B/OF" becomes ["1B", "OF"])
             const playerPositions = pPos.split('/'); 
-            
-            // Keep the player if ANY of their positions match ANY of the target positions
             return targetPositions.some(targetPos => playerPositions.includes(targetPos));
         });
     }
@@ -398,7 +393,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         }
 
         // ==========================================
-        // 2. BUILD GAME STATUS BADGE (e.g. "T6 3-2" or "Final")
+        // 2. BUILD GAME STATUS BADGE
         // ==========================================
         let gameStatusBadge = '';
         if (liveGame) {
@@ -407,7 +402,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             } else if (liveGame.status === 'Live' || liveGame.status === 'In Progress' || liveGame.inning) {
                 let halfMap = { 'Top': 'T', 'Bottom': 'B' };
                 let half = halfMap[liveGame.half] || '';
-                let inn = (liveGame.inning || '').replace(/\D/g, ''); // Extract just the number
+                let inn = (liveGame.inning || '').replace(/\D/g, ''); 
                 let score = `${liveGame.away_score}-${liveGame.home_score}`;
                 if(inn || score !== '0-0') {
                      gameStatusBadge = `<span class="badge bg-success ms-2" style="font-size:0.55rem; padding: 0.25em 0.4em;">${half}${inn} ${score}</span>`;
@@ -460,7 +455,6 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 }
             }
             
-            // Format the Opposing Pitcher's split text
             let pitcherSplitHtml = '';
             if (p.oppPitcherSplit && p.oppPitcherSplit.ab > 0) {
                 pitcherSplitHtml = `<span>${p_shortName} v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
@@ -511,9 +505,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                     statParts.push(`${pit.inningsPitched || '0.0'} IP`);
                     statParts.push(`${pit.strikeOuts || 0} K`);
                     statParts.push(`${pit.earnedRuns || 0} ER`);
-                    if (pit.hits > 0) statParts.push(`${pit.hits} H`);
-                    if (pit.baseOnBalls > 0) statParts.push(`${pit.baseOnBalls} BB`);
-                    if (pit.hitByPitch > 0) statParts.push(`${pit.hitByPitch} HBP`);
+                    // Removed Hits, BB, and HBP to save space on the UI for Pitchers
                     if (pit.wins > 0) statParts.push(`W`);
                 } 
                 else if (bat && (bat.plateAppearances > 0 || bat.atBats > 0)) {
@@ -528,11 +520,16 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                     if (bat.stolenBases > 0) statParts.push(`${bat.stolenBases} SB`);
                 }
                 
+                // Adjusting the bottom row layout to prepend the game status badge
+                let bottomBadge = gameStatusBadge ? gameStatusBadge.replace('ms-2', 'me-2') : '';
+
                 if (statParts.length > 0) {
                     let textColor = isGameFinal ? 'text-secondary' : 'text-success';
-                    liveStatHtml = `<div class="${textColor} fw-bold text-truncate pe-2" style="font-size:0.70rem;">${statParts.join(', ')}</div>`;
+                    liveStatHtml = `${bottomBadge}<span class="${textColor} fw-bold text-truncate pe-2" style="font-size:0.70rem;">${statParts.join(', ')}</span>`;
                 } else if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
-                    liveStatHtml = `<div class="text-muted fst-italic text-truncate pe-2" style="font-size:0.70rem;">No stats recorded</div>`;
+                    liveStatHtml = `${bottomBadge}<span class="text-muted fst-italic text-truncate pe-2" style="font-size:0.70rem;">No stats recorded</span>`;
+                } else if (bottomBadge) {
+                     liveStatHtml = `${bottomBadge}`;
                 }
                 
                 // Show actual points/value if the game has started
@@ -549,15 +546,14 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 <div class="d-flex justify-content-between align-items-center w-100">
                     <div class="d-flex align-items-baseline text-truncate pe-2" style="min-width: 0;">
                         <div class="fw-bold text-dark text-truncate me-1" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
-                        ${gameStatusBadge}
-                        <div class="text-muted ms-2" style="font-size: 0.70rem; white-space: nowrap;">${displayPos} • ${salFmt}</div>
+                        <div class="text-muted ms-1" style="font-size: 0.70rem; white-space: nowrap;">${displayPos} • ${salFmt}</div>
                     </div>
                     <div class="text-end flex-shrink-0 ms-2">${topMetric}</div>
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center w-100 mt-1">
-                    <div style="min-width: 0;">${liveStatHtml}</div>
-                    <div class="text-end flex-shrink-0 ms-auto">${actualPtsDisplay}</div>
+                    <div class="d-flex align-items-center text-truncate" style="min-width: 0; flex-grow: 1;">${liveStatHtml}</div>
+                    <div class="text-end flex-shrink-0 ms-auto ps-2">${actualPtsDisplay}</div>
                 </div>
             `;
         }
