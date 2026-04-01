@@ -444,7 +444,14 @@ def main():
         print(f"🧹 NIGHTLY REFRESH ACTIVE: Wiping saved stats to fetch fresh data for the day.")
         
     today_est_str = current_est_time.strftime('%Y-%m-%d')
-    start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
+    
+    # --- 🌅 MORNING CUTOFF FOR YESTERDAY'S GAMES ---
+    # Only scrape yesterday's games to finalize late West Coast box scores before 6:00 AM EST
+    if current_est_time.hour < 6:
+        start_date = (current_est_time - timedelta(days=1)).strftime('%Y-%m-%d')
+    else:
+        start_date = today_est_str
+        
     end_date = (current_est_time + timedelta(days=7)).strftime('%Y-%m-%d') 
     
     print(f"🚀 Building Master JSONs using the Daily File as Memory")
