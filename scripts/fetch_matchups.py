@@ -591,12 +591,12 @@ def main():
             existing_game_state = daily_memory.get(game_pk, {})
             
             # 🌙 NIGHTLY REFRESH LOGIC
-            # If it's 3 AM, ignore the saved stats so the script is forced to fetch fresh ones.
-            # At any other time, use the saved stats so it only fetches missing players.
             if is_nightly_refresh and date_str >= today_est_str:
                 game_deep_stats = {}
+                lineup_tracking = {'away': {}, 'home': {}}
             else:
                 game_deep_stats = existing_game_state.get('deepStats', {})
+                lineup_tracking = existing_game_state.get('lineupTracking', {'away': {}, 'home': {}})
                 
             game_positions = existing_game_state.get('gamePositions', {})
             lineup_handedness = existing_game_state.get('lineupHandedness', {})
@@ -648,6 +648,27 @@ def main():
             lineups = game.get('lineups', {})
             away_lineup = lineups.get('awayPlayers', [])
             home_lineup = lineups.get('homePlayers', [])
+            
+            # --- LINEUP STATE TRACKER (For Late Swaps) ---
+            def get_lineup_hash(players_array):
+                return "-".join([str(p['id']) for p in players_array[:9]]) if players_array else ""
+
+            for side, lineup in [('away', away_lineup), ('home', home_lineup)]:
+                if len(lineup) > 0:
+                    current_hash = get_lineup_hash(lineup)
+                    tracking = lineup_tracking.get(side, {})
+                    
+                    if not tracking.get('hash'):
+                        tracking['hash'] = current_hash
+                        tracking['status'] = "OFFICIAL"
+                        tracking['officialAt'] = current_est_time.strftime("%I:%M %p ET")
+                    elif tracking.get('hash') != current_hash:
+                        tracking['hash'] = current_hash
+                        tracking['status'] = "MODIFIED"
+                        tracking['modifiedAt'] = current_est_time.strftime("%I:%M %p ET")
+                        
+                    lineup_tracking[side] = tracking
+            # ---------------------------------------------
             
             # 1. Safely grab projected lineups whether fresh from BBM or from memory
             away_proj = []
@@ -830,6 +851,7 @@ def main():
                 "gameRaw": game,
                 "projectedLineups": game_projected_lineups,
                 "odds": game_odds,
+                "lineupTracking": lineup_tracking,
                 "lineupHandedness": lineup_handedness,
                 "gamePositions": game_positions,
                 "deepStats": game_deep_stats,
