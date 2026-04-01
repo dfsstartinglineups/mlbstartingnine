@@ -1228,21 +1228,33 @@ function createGameCard(data, platform, selectedSlate) {
         });
     }
 
-    const getStatusBanner = (isOfficial, hasPlayers) => {
+    // --- SMART LINEUP STATUS BANNER ---
+    const tracking = data.lineupTracking || { away: {}, home: {} };
+
+    const getStatusBanner = (side, isOfficial, hasPlayers) => {
         if (!hasPlayers) return '';
+        const track = tracking[side] || {};
+
         if (isOfficial) {
-            return `<div class="text-center py-1 fw-bold text-white w-100 border-bottom" style="background-color: #198754; font-size: 0.75rem; letter-spacing: 0.5px;">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align: -2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> OFFICIAL
-                    </div>`;
+            if (track.status === 'MODIFIED') {
+                return `<div class="text-center py-1 fw-bold text-white w-100 border-bottom" style="background-color: #dc3545; font-size: 0.75rem; letter-spacing: 0.5px;">
+                            ⚠️ LATE SWAP <span style="font-size:0.65rem; opacity:0.9; font-weight:normal;">(${track.modifiedAt})</span>
+                        </div>`;
+            } else {
+                let timeStr = track.officialAt ? ` <span style="font-size:0.65rem; opacity:0.9; font-weight:normal;">(${track.officialAt})</span>` : '';
+                return `<div class="text-center py-1 fw-bold text-white w-100 border-bottom" style="background-color: #198754; font-size: 0.75rem; letter-spacing: 0.5px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align: -2px;"><polyline points="20 6 9 17 4 12"></polyline></svg> OFFICIAL${timeStr}
+                        </div>`;
+            }
         } else {
             return `<div class="text-center py-1 fw-bold text-dark w-100 border-bottom" style="background-color: #ffecb5; font-size: 0.75rem; letter-spacing: 0.5px;">
-                        <span style="font-size: 0.7rem; vertical-align: 0px;">⚠️</span> PROJECTED
+                        <span style="font-size: 0.7rem; vertical-align: 0px;">⏳</span> PROJECTED
                     </div>`;
         }
     };
 
-    const awayBanner = getStatusBanner(isAwayOfficial, awayPlayers.length > 0);
-    const homeBanner = getStatusBanner(isHomeOfficial, homePlayers.length > 0);
+    const awayBanner = getStatusBanner('away', isAwayOfficial, awayPlayers.length > 0);
+    const homeBanner = getStatusBanner('home', isHomeOfficial, homePlayers.length > 0);
     
     // Inject the pitcher objects and their handedness into the lineup build function
     const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand, awayPitcherObj, awayPitcherHand);
