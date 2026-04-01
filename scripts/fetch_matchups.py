@@ -687,62 +687,81 @@ def main():
             # 2. Combine Official and Projected lists to fetch Deep Stats
             combined_away_batters = away_lineup + away_proj
             combined_home_batters = home_lineup + home_proj
+            
 
+            # --- AWAY BATTERS VS HOME STARTER ---
             for batter in combined_away_batters:
                 if 'id' not in batter: continue
                 batter_id = str(batter['id'])
+                batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
+                
+                # Initialize the player if they are totally new to memory
                 if batter_id not in game_deep_stats:
-                    batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
+                    game_deep_stats[batter_id] = {"name": batter_name}
                     
-                    # 1. Fetch or load Splits
+                # 1. Fetch Splits (Only if missing from memory)
+                if "split_vL" not in game_deep_stats[batter_id]:
                     if batter_id not in run_cache_splits:
                         run_cache_splits[batter_id] = {
                             "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
                             "split_vR": fetch_combined_splits(session, batter_id, 'vr')
                         }
+                    game_deep_stats[batter_id]["split_vL"] = run_cache_splits[batter_id]["split_vL"]
+                    game_deep_stats[batter_id]["split_vR"] = run_cache_splits[batter_id]["split_vR"]
                     
-                    # 2. Fetch or load BvP
-                    bvp_stats = {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
-                    if home_starter_id:
-                        bvp_key = f"{batter_id}_{home_starter_id}"
-                        if bvp_key not in run_cache_bvp:
-                            run_cache_bvp[bvp_key] = fetch_bvp(session, batter_id, home_starter_id)
-                        bvp_stats = run_cache_bvp[bvp_key]
+                # 2. Fetch BvP (Refetch automatically if the Pitcher changed)
+                current_bvp = game_deep_stats[batter_id].get("bvp", {})
+                saved_pitcher_id = current_bvp.get("pitcher_id")
+                
+                if home_starter_id and saved_pitcher_id != home_starter_id:
+                    bvp_key = f"{batter_id}_{home_starter_id}"
+                    if bvp_key not in run_cache_bvp:
+                        run_cache_bvp[bvp_key] = fetch_bvp(session, batter_id, home_starter_id)
+                    
+                    # Copy the stats and stamp the new pitcher's ID into memory
+                    bvp_stats = dict(run_cache_bvp[bvp_key])
+                    bvp_stats["pitcher_id"] = home_starter_id
+                    game_deep_stats[batter_id]["bvp"] = bvp_stats
+                    
+                elif not home_starter_id and "bvp" not in game_deep_stats[batter_id]:
+                    game_deep_stats[batter_id]["bvp"] = {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
 
-                    game_deep_stats[batter_id] = {
-                        "name": batter_name, 
-                        "bvp": bvp_stats,
-                        "split_vL": run_cache_splits[batter_id]["split_vL"], 
-                        "split_vR": run_cache_splits[batter_id]["split_vR"]
-                    }
-
+            # --- HOME BATTERS VS AWAY STARTER ---
             for batter in combined_home_batters:
                 if 'id' not in batter: continue
                 batter_id = str(batter['id'])
+                batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
+                
+                # Initialize the player if they are totally new to memory
                 if batter_id not in game_deep_stats:
-                    batter_name = batter.get('fullName', batter.get('name', 'Unknown'))
+                    game_deep_stats[batter_id] = {"name": batter_name}
                     
-                    # 1. Fetch or load Splits
+                # 1. Fetch Splits (Only if missing from memory)
+                if "split_vL" not in game_deep_stats[batter_id]:
                     if batter_id not in run_cache_splits:
                         run_cache_splits[batter_id] = {
                             "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
                             "split_vR": fetch_combined_splits(session, batter_id, 'vr')
                         }
+                    game_deep_stats[batter_id]["split_vL"] = run_cache_splits[batter_id]["split_vL"]
+                    game_deep_stats[batter_id]["split_vR"] = run_cache_splits[batter_id]["split_vR"]
                     
-                    # 2. Fetch or load BvP
-                    bvp_stats = {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
-                    if away_starter_id:
-                        bvp_key = f"{batter_id}_{away_starter_id}"
-                        if bvp_key not in run_cache_bvp:
-                            run_cache_bvp[bvp_key] = fetch_bvp(session, batter_id, away_starter_id)
-                        bvp_stats = run_cache_bvp[bvp_key]
-
-                    game_deep_stats[batter_id] = {
-                        "name": batter_name, 
-                        "bvp": bvp_stats,
-                        "split_vL": run_cache_splits[batter_id]["split_vL"], 
-                        "split_vR": run_cache_splits[batter_id]["split_vR"]
-                    }
+                # 2. Fetch BvP (Refetch automatically if the Pitcher changed)
+                current_bvp = game_deep_stats[batter_id].get("bvp", {})
+                saved_pitcher_id = current_bvp.get("pitcher_id")
+                
+                if away_starter_id and saved_pitcher_id != away_starter_id:
+                    bvp_key = f"{batter_id}_{away_starter_id}"
+                    if bvp_key not in run_cache_bvp:
+                        run_cache_bvp[bvp_key] = fetch_bvp(session, batter_id, away_starter_id)
+                    
+                    # Copy the stats and stamp the new pitcher's ID into memory
+                    bvp_stats = dict(run_cache_bvp[bvp_key])
+                    bvp_stats["pitcher_id"] = away_starter_id
+                    game_deep_stats[batter_id]["bvp"] = bvp_stats
+                    
+                elif not away_starter_id and "bvp" not in game_deep_stats[batter_id]:
+                    game_deep_stats[batter_id]["bvp"] = {"ab": 0, "hits": 0, "hr": 0, "avg": "-", "ops": "-"}
 
             game_state = game.get('status', {}).get('abstractGameState', '')
             needs_live_feed = False
