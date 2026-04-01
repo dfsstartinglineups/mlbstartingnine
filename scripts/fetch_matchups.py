@@ -593,7 +593,7 @@ def main():
             # 🌙 NIGHTLY REFRESH LOGIC
             # If it's 3 AM, ignore the saved stats so the script is forced to fetch fresh ones.
             # At any other time, use the saved stats so it only fetches missing players.
-            if is_nightly_refresh:
+            if is_nightly_refresh and date_str >= today_est_str:
                 game_deep_stats = {}
             else:
                 game_deep_stats = existing_game_state.get('deepStats', {})
