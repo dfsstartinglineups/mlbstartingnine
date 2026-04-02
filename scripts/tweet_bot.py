@@ -390,15 +390,13 @@ def format_odds(price):
     if price == "TBD": return price
     return f"+{price}" if price > 0 else str(price)
 
+def get_lineup_hash(players_array):
+    """Generates a simple string hash of the 9 starters: '123-456-789...'"""
+    return "-".join([str(p['id']) for p in players_array[:9]])
+
 for game in games:
-    game_pk = game['gamePk']
+    game_pk = str(game['gamePk'])
     
-    away_needs_tweet = 'lineups' in game and 'awayPlayers' in game['lineups'] and len(game['lineups']['awayPlayers']) > 0 and f"{game_pk}_away" not in tweeted_recently
-    home_needs_tweet = 'lineups' in game and 'homePlayers' in game['lineups'] and len(game['lineups']['homePlayers']) > 0 and f"{game_pk}_home" not in tweeted_recently
-
-    if not away_needs_tweet and not home_needs_tweet:
-        continue
-
     positions, hands = {}, {}
     try:
         feed_data = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live").json()
@@ -406,7 +404,6 @@ for game in games:
         all_players = {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}
         for pid, p_data in all_players.items():
             person_id = p_data.get('person', {}).get('id')
-            # Ask for TODAY'S position first!
             if p_data.get('position') and p_data['position'].get('abbreviation'): 
                 positions[person_id] = p_data['position'].get('abbreviation', '')
             elif p_data.get('allPositions'): 
@@ -437,140 +434,172 @@ for game in games:
     def parse_odds_time(date_str):
         if date_str.endswith('Z'): date_str = date_str[:-1]
         if len(date_str.split(':')) == 2: date_str += ":00"
-        try:
-            return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
-        except Exception:
-            return 0
+        try: return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
+        except: return 0
             
-    try:
-        game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() * 1000
-    except Exception:
-        game_time_ms = 0
+    try: game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() * 1000
+    except: game_time_ms = 0
 
-    # 1. Filter for the correct matchup
     potential_odds = [o for o in odds_data if o['home_team'] == home_full and o['away_team'] == away_full]
-    
-    # 2. Sort by the closest timestamp (Solves Doubleheaders and Consecutive Days!)
     if potential_odds and game_time_ms > 0:
         closest_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
-        
         for bookie in closest_odds.get('bookmakers', []):
             h2h = next((m for m in bookie['markets'] if m['key'] == 'h2h'), None)
             totals = next((m for m in bookie['markets'] if m['key'] == 'totals'), None)
-            
             if h2h:
                 for outcome in h2h['outcomes']:
                     if outcome['name'] == away_full: raw_away_odds = outcome['price']
                     if outcome['name'] == home_full: raw_home_odds = outcome['price']
-                    
-            if totals and totals['outcomes']:
-                raw_total = totals['outcomes'][0]['point']
-                
-            if raw_away_odds != "TBD": 
-                break
+            if totals and totals['outcomes']: raw_total = totals['outcomes'][0]['point']
+            if raw_away_odds != "TBD": break
 
     total_string = f" • O/U {raw_total}" if raw_total != "TBD" else ""
     away_odds_str = format_odds(raw_away_odds)
     home_odds_str = format_odds(raw_home_odds)
 
-    def send_mlb_tweet(team_short, team_pitcher, team_odds, opp_pitcher, opp_odds, players, side):
+    def send_mlb_tweet(team_short, team_pitcher, team_odds, opp_pitcher, opp_odds, players, side, alert_header=None):
         team_odds_display = f" [{team_odds}]" if team_odds != "TBD" else ""
         opp_odds_display = f" [{opp_odds}]" if opp_odds != "TBD" else ""
         
-        # Helper function to instantly compress "Steven Kwan" into "S. Kwan"
         def shorten_name(name):
-            clean_name = name.split(' (')[0] # Strips the (R)/(L) off pitchers
+            clean_name = name.split(' (')[0]
             parts = clean_name.split(' ')
             return f"{parts[0][0]}. {' '.join(parts[1:])}" if len(parts) > 1 else clean_name
 
-        # ==========================================
-        # 1. BUILD THE STRINGS
-        # ==========================================
+        # --- 1. BUILD HEADERS ---
+        if alert_header:
+            tweet_text = f"{alert_header}\n\n"
+            bsky_text = f"{alert_header}\n\n"
+        else:
+            tweet_text = f"⚾ {game_date_short} {team_short} Lineup{total_string}\nSP: {team_pitcher}{team_odds_display}\nvs {opp_pitcher}{opp_odds_display}\n\n"
+            bsky_p1 = shorten_name(team_pitcher)
+            bsky_p2 = shorten_name(opp_pitcher)
+            bsky_text = f"⚾ {game_date_short} {team_short} Lineup\nSPs: {bsky_p1} vs {bsky_p2}\n\n"
         
-        # Twitter Header (Long - keeps O/U)
-        tweet_text = f"⚾ {game_date_short} {team_short} Lineup{total_string}\nSP: {team_pitcher}{team_odds_display}\nvs {opp_pitcher}{opp_odds_display}\n\n"
-        
-        # Bluesky Header (Compressed - strips O/U)
-        bsky_p1 = shorten_name(team_pitcher)
-        bsky_p2 = shorten_name(opp_pitcher)
-        bsky_text = f"⚾ {game_date_short} {team_short} Lineup\nSPs: {bsky_p1} vs {bsky_p2}\n\n"
-        
-        # Add batters
+        # --- 2. ADD BATTERS ---
         for i, p in enumerate(players):
             pid = p['id']
             hand = f"({hands.get(pid)})" if hands.get(pid) else ""
             raw_pos = positions.get(pid, "")
             tweet_pos = f"({raw_pos})" if raw_pos else ""
             
-            # Twitter gets full name, numbered, with parentheses
             tweet_line = f"{i+1}. {p['fullName']} {tweet_pos} {hand}"
             tweet_text += " ".join(tweet_line.split()) + "\n"
             
-            # Bluesky gets Position first, First Initial + Last Name, Catcher padding
             b_name = shorten_name(p['fullName'])
             if raw_pos:
-                padded_pos = f"{raw_pos:<2}" 
-                bsky_text += f"{padded_pos} {b_name}\n"
+                bsky_text += f"{raw_pos:<2} {b_name}\n"
             else:
                 bsky_text += f"{b_name}\n"
             
         team_hash = team_short.replace(" ", "")
         
-        # ==========================================
-        # 2. ADD FOOTERS & LINKS
-        # ==========================================
-        
+        # --- 3. ADD FOOTERS & POST ---
         link_url = f"https://mlbstartingnine.com/#game-{game_pk}"
         
-        # Twitter Footer
-        if random.randint(1, 100) <= 100:
+        if random.randint(1, 100) <= 100 and not alert_header:
             tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: {link_url}"
         tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB"
         
-        # Bluesky Footer (Using TextBuilder for a clickable link!)
         bsky_tb = client_utils.TextBuilder()
         bsky_tb.text(bsky_text)
-        bsky_tb.text("\nStats: ")
-        bsky_tb.link(link_url, link_url)
+        if not alert_header:
+            bsky_tb.text("\nStats: ")
+            bsky_tb.link(link_url, link_url)
         bsky_tb.text(f"\n#{team_hash} #MLB")
         
-        # ==========================================
-        # 3. POST TO PLATFORMS
-        # ==========================================
         try:
-            # 1. Post to Twitter
             mlb_client.create_tweet(text=tweet_text)
             print(f"✅ Successfully tweeted {team_short} MLB lineup!")
             
-            # 2. Post to Bluesky (V2 Architecture)
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
-                # Safety check: (Approx length of text + link + tags)
                 if len(bsky_text) + len(link_url) + len(team_hash) + 15 <= 300:
                     try:
                         config["bsky_client"].send_post(bsky_tb)
-                        print(f"✅ Successfully posted {team_short} MLB lineup to Bluesky!")
                     except Exception as e:
                         print(f"❌ Bluesky post failed for {team_short}: {e}")
-                else:
-                    print(f"⚠️ Bluesky skipped for {team_short}: Text is too long.")
-
-            # 3. Save to log
-            log_today.append(f"{game_pk}_{side}")
-            tweeted_recently.append(f"{game_pk}_{side}")
             return True
-            
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
             return False
 
-    if away_needs_tweet:
-        if send_mlb_tweet(away_short, away_pitcher_str, away_odds_str, home_pitcher_str, home_odds_str, game['lineups']['awayPlayers'], 'away'):
-            new_tweets_sent = True
+    # ==========================================
+    # 🧠 THE SMART DIFF ENGINE
+    # ==========================================
+    for side in ['away', 'home']:
+        players_array = game.get('lineups', {}).get(f'{side}Players', [])
+        if not players_array: continue
 
-    if home_needs_tweet:
-        if send_mlb_tweet(home_short, home_pitcher_str, home_odds_str, away_pitcher_str, away_odds_str, game['lineups']['homePlayers'], 'home'):
-            new_tweets_sent = True
+        current_hash = get_lineup_hash(players_array)
+        base_key = f"{game_pk}_{side}"
+        full_key = f"{base_key}_{current_hash}"
+
+        team_short_ref = away_short if side == 'away' else home_short
+        team_p_ref = away_pitcher_str if side == 'away' else home_pitcher_str
+        team_o_ref = away_odds_str if side == 'away' else home_odds_str
+        opp_p_ref = home_pitcher_str if side == 'away' else away_pitcher_str
+        opp_o_ref = home_odds_str if side == 'away' else away_odds_str
+
+        previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
+
+        # --- 1. FIRST TIME TWEET ---
+        if not previously_tweeted_keys:
+            if send_mlb_tweet(team_short_ref, team_p_ref, team_o_ref, opp_p_ref, opp_o_ref, players_array, side):
+                log_today.append(full_key)
+                tweeted_recently.append(full_key)
+                new_tweets_sent = True
+
+        # --- 2. LATE SCRATCH / SHUFFLE ALERTS ---
+        elif full_key not in previously_tweeted_keys:
+            old_key = previously_tweeted_keys[0] 
+            old_hash = old_key.replace(f"{base_key}_", "")
+            
+            old_ids = old_hash.split('-')
+            new_ids = current_hash.split('-')
+
+            out_ids = [pid for pid in old_ids if pid not in new_ids]
+            in_ids = [pid for pid in new_ids if pid not in old_ids]
+
+            alert_header = ""
+
+            # Scenario A: Lineup Shuffle
+            if len(out_ids) == 0 and len(in_ids) == 0:
+                alert_header = "⚠️ LINEUP SHUFFLE: The batting order has changed."
+            
+            # Scenario B & C: Late Scratch(es)
+            else:
+                out_names = []
+                if out_ids:
+                    try:
+                        # Fetch the names of the scratched players directly from MLB
+                        out_data = requests.get(f"https://statsapi.mlb.com/api/v1/people?personIds={','.join(out_ids)}").json()
+                        out_names = [p['fullName'] for p in out_data.get('people', [])]
+                    except:
+                        out_names = ["Unknown Player"]
+
+                in_names = []
+                for pid in in_ids:
+                    # The new players are already in the array we possess
+                    player_obj = next((p for p in players_array if str(p['id']) == pid), None)
+                    if player_obj: in_names.append(player_obj.get('fullName', 'Unknown Player'))
+
+                out_str = ", ".join(out_names) if out_names else "None"
+                in_str = ", ".join(in_names) if in_names else "None"
+                
+                alert_header = f"🚨 LATE SCRATCH\nOUT: {out_str}\nIN: {in_str}"
+
+            print(f"🚨 ALERT TRIGGERED FOR {team_short_ref}:\n{alert_header}")
+
+            if send_mlb_tweet(team_short_ref, team_p_ref, team_o_ref, opp_p_ref, opp_o_ref, players_array, side, alert_header=alert_header):
+                # Clean up old key to prevent duplicate tweets on the next run
+                for k in previously_tweeted_keys:
+                    if k in log_today: log_today.remove(k)
+                    if k in tweeted_recently: tweeted_recently.remove(k)
+                
+                log_today.append(full_key)
+                tweeted_recently.append(full_key)
+                new_tweets_sent = True
 
 
 # ==========================================
@@ -1155,77 +1184,7 @@ for target_date_str in futbol_dates_to_check:
             except Exception as e:
                 print(f"❌ Failed to tweet ALERT: {e}")
 
-        # ==========================================
-        # 🛑 DISALLOWED GOAL DETECTOR
-        # ==========================================
-        for side, c_score, t_id, t_name in [
-            ("home", current_home_score, h_id, h_name), 
-            ("away", current_away_score, a_id, a_name)
-        ]:
-            # The key for the goal that *would* be next if it wasn't reversed
-            ghost_goal_key = f"ALERT_{fixture_id}_{t_id}_Goal_{c_score + 1}"
-            
-            # If the ghost goal is in our memory, but the current score is lower... it was disallowed!
-            if ghost_goal_key in tweeted_recently:
-                print(f"🛑 DISALLOWED GOAL DETECTED FOR {t_name}! They dropped from {c_score + 1} back to {c_score}.")
-                
-                # 1. Purge the fake goal from memory so if they score a REAL goal later, it tweets normally
-                if ghost_goal_key in tweeted_recently: tweeted_recently.remove(ghost_goal_key)
-                if ghost_goal_key in log_target_date: log_target_date.remove(ghost_goal_key)
-                
-                # 2. Build the Disallowed Goal Tweet
-                disallowed_phrases = [
-                    f"❌ HOLD EVERYTHING! The goal for {t_name} has been DISALLOWED. The score remains {current_home_score}-{current_away_score}.",
-                    f"🛑 GOAL CHALKED OFF! {t_name} has their goal wiped off the board. We are back to {current_home_score}-{current_away_score}!",
-                    f"💔 Heartbreak for {t_name}! The officials wave off the goal. It stays {current_home_score}-{current_away_score}.",
-                    f"⚠️ SCRATCH THAT! The recent goal for {t_name} is ruled out. Scoreline remains {current_home_score}-{current_away_score}."
-                ]
-                
-                disallowed_tweet = random.choice(disallowed_phrases)
-                
-                # CRITICAL FIX: Use the safe raw names for the hashtags here too!
-                h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
-                a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
-                
-                # --- THE URL TRAFFIC COP ---
-                if league_id == 10:
-                    link = f"https://futbolstartingeleven.com/friendlies.html#goal-{fixture_id}"
-                elif league_id == 40:
-                    link = f"https://futbolstartingeleven.com/championship.html#goal-{fixture_id}"
-                else:
-                    link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
-                
-                # 5% Chance to add the link
-                if random.randint(1, 100) <= 50:
-                    disallowed_tweet += f"\n\nLive match center:\n⬇️\n{link}"
-                    
-                disallowed_tweet += f"\n\n{league_info['tag']} #{h_hash} #{a_hash}"
-                
-                # 3. Send the Tweet
-                try:
-                    # --- THE CLIENT TRAFFIC COP ---
-                    if league_id == 10:
-                        friendly_client.create_tweet(text=disallowed_tweet)
-                        print(f"✅ [FRIENDLIES] Successfully tweeted Disallowed Goal for {t_name}!")
-                    elif league_id == 40 and championship_client:
-                        championship_client.create_tweet(text=disallowed_tweet)
-                        print(f"✅ [CHAMPIONSHIP] Successfully tweeted Disallowed Goal for {t_name}!")
-                    else:
-                        futbol_client.create_tweet(text=disallowed_tweet)
-                        print(f"✅ [MAIN] Successfully tweeted Disallowed Goal for {t_name}!")
-                    
-                    # Log that we did the reversal so we don't spam it
-                    reversal_key = f"DISALLOWED_{fixture_id}_{t_id}_Reversed_{c_score + 1}"
-                    log_target_date.append(reversal_key)
-                    tweeted_recently.append(reversal_key)
-                    
-                    new_tweets_sent = True
-                    memory[target_date_str] = log_target_date
-                    save_memory_safely(memory)
-                    time.sleep(5)
-                except Exception as e:
-                    print(f"❌ Failed to tweet Disallowed Goal: {e}")
-        # ==========================================
+        
 
 # ==========================================
 # 7. SAVE MEMORY
