@@ -576,7 +576,7 @@ for game in games:
 
             # Scenario A: Lineup Shuffle
             if len(out_ids) == 0 and len(in_ids) == 0:
-                alert_header = "⚠️ LINEUP SHUFFLE: The batting order has changed."
+                alert_header = f"⚠️ {team_short_ref} LINEUP SHUFFLE: The batting order has changed."
             
             # Scenario B & C: Late Scratch(es)
             else:
@@ -598,7 +598,7 @@ for game in games:
                 out_str = ", ".join(out_names) if out_names else "None"
                 in_str = ", ".join(in_names) if in_names else "None"
                 
-                alert_header = f"🚨 LATE SCRATCH\nOUT: {out_str}\nIN: {in_str}"
+                alert_header = f"🚨 {team_short_ref} LATE SCRATCH\nOUT: {out_str}\nIN: {in_str}"
 
             print(f"🚨 ALERT TRIGGERED FOR {team_short_ref}:\n{alert_header}")
 
