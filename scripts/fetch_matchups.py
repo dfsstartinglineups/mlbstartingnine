@@ -77,8 +77,18 @@ def get_dff_team_abbr(team_name):
 def load_json(path, default_val):
     if os.path.exists(path):
         try:
-            with open(path, 'r') as f: return json.load(f)
-        except Exception: pass
+            with open(path, 'r') as f:
+                # Load the data, but use the default if f is empty (None)
+                loaded_data = json.load(f)
+                return loaded_data if loaded_data is not None else default_val
+        except (json.JSONDecodeError, OSError) as e:
+            # If the file is corrupted, print a warning and use the default
+            print(f"⚠️ Warning: Found corrupted JSON file at {path}. Ignoring file. Error: {e}")
+            return default_val
+        except Exception as e:
+            # Catch-all for unexpected issues
+            print(f"⚠️ Unexpected error loading {path}: {e}")
+            return default_val
     return default_val
 
 def save_json(path, data):
