@@ -96,6 +96,17 @@ if champ_creds:
         access_token_secret=champ_creds.get("access_token_secret")
     )
 
+# NEW: Bundesliga Client (Loaded dynamically from the JSON Secret)
+bundes_creds = auth_data.get("bundesliga_x", {})
+bundesliga_client = None
+if bundes_creds:
+    bundesliga_client = tweepy.Client(
+        consumer_key=bundes_creds.get("consumer_key"),
+        consumer_secret=bundes_creds.get("consumer_secret"),
+        access_token=bundes_creds.get("access_token"),
+        access_token_secret=bundes_creds.get("access_token_secret")
+    )
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -602,19 +613,21 @@ for game in games:
                 new_tweets_sent = True
 
 
+
 # ==========================================
 # 6. MULTI-LEAGUE FUTBOL ENGINE
 # ==========================================
 print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 
+# Define all leagues, their tags, and optionally their dedicated X client and URL
 FUTBOL_LEAGUES = {
     39:  {"name": "PREMIER LEAGUE 🇬🇧", "tag": "#EPL", "url_slug": "epl"},
     140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea"},
     2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
     45:  {"name": "FA CUP 🇬🇧", "tag": "#FACup", "url_slug": "facup"},
-    40:  {"name": "CHAMPIONSHIP 🇬🇧", "tag": "#Championship", "url_slug": "championship"},
-    78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga"},
+    40:  {"name": "CHAMPIONSHIP 🇬🇧", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
+    78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
     253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"},
     3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
@@ -622,30 +635,30 @@ FUTBOL_LEAGUES = {
     16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
     71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
     128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
-   # 848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
-   # 307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
-    88:  { "name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
+    88:  {"name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
     262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
-   # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
     94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
     239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
-   # 203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
-   # 144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
-   # 179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership", "url_slug": "scotland"},
     188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
-   # 119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"}
-   # 292: {"name": "K LEAGUE 1 🇰🇷", "tag": "#KLeague #KLeague1 #SouthKorea", "url_slug": "k1"},
     11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
-   # 143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
-   # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia"},
-   # 81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal"},
     5:   {"name": "UEFA NATIONS LEAGUE 🇪🇺", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
     531: {"name": "CONCACAF NATIONS LEAGUE 🌎", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-   # 44:  {"name": "WOMEN'S SUPER LEAGUE 🇬🇧", "tag": "#BarclaysWSL #WSL", "url_slug": "wsl"},
     254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl"},
-    10: {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl"}
+    10:  {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
-
+    # 848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
+   # 307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
+   # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
+    # 203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
+   # 144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
+   # 179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership", "url_slug": "scotland"},
+    # 119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"}
+   # 292: {"name": "K LEAGUE 1 🇰🇷", "tag": "#KLeague #KLeague1 #SouthKorea", "url_slug": "k1"},
+    # 143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
+   # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia"},
+   # 81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal"},
+    # 44:  {"name": "WOMEN'S SUPER LEAGUE 🇬🇧", "tag": "#BarclaysWSL #WSL", "url_slug": "wsl"},
+    
 # ==========================================
 # NATIONAL TEAM FLAG DICTIONARY (MASTER LIST)
 # ==========================================
@@ -866,13 +879,9 @@ for target_date_str in futbol_dates_to_check:
         # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
         footer_text = ""
         if random.randint(1, 100) <= 50:
-            # --- THE URL TRAFFIC COP ---
-            if league_id == 10:
-                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/friendlies.html#lineup-{fixture_id}\n\n"
-            elif league_id == 40:
-                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/championship.html#lineup-{fixture_id}\n\n"
-            else:
-                footer_text = f"📱 Live stats & scores: https://futbolstartingeleven.com/?league=top&date={target_date_str}#lineup-{fixture_id}\n\n"
+            # Dynamic URL reading from the dictionary
+            base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
+            footer_text = f"📱 Live stats & scores: {base_url}#lineup-{fixture_id}\n\n"
             
         footer = f"{footer_text}{league_info['tag']} #{h_hash} #{a_hash}"
         
@@ -882,16 +891,14 @@ for target_date_str in futbol_dates_to_check:
         tweet_text = "\n\n".join(tweet_parts)
         
         try:
-            # --- THE CLIENT TRAFFIC COP ---
-            if league_id == 10:
-                friendly_client.create_tweet(text=tweet_text)
-                print(f"✅ [FRIENDLIES] Successfully tweeted matchup: {h_name} vs {a_name}!")
-            elif league_id == 40 and championship_client:
-                championship_client.create_tweet(text=tweet_text)
-                print(f"✅ [CHAMPIONSHIP] Successfully tweeted matchup: {h_name} vs {a_name}!")
+            # Dynamic client reading from the dictionary
+            target_client = league_info.get("x_client") or futbol_client
+            
+            if target_client:
+                target_client.create_tweet(text=tweet_text)
+                print(f"✅ [{league_info['name']}] Successfully tweeted matchup: {h_name} vs {a_name}!")
             else:
-                futbol_client.create_tweet(text=tweet_text)
-                print(f"✅ [MAIN] Successfully tweeted Futbol matchup: {h_name} vs {a_name}!")
+                print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
                 
             log_target_date.append(team_key)
             tweeted_recently.append(team_key)
@@ -1138,13 +1145,9 @@ for target_date_str in futbol_dates_to_check:
             h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
             a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
             
-            # --- THE URL TRAFFIC COP ---
-            if league_id == 10:
-                link = f"https://futbolstartingeleven.com/friendlies.html#goal-{fixture_id}"
-            elif league_id == 40:
-                link = f"https://futbolstartingeleven.com/championship.html#goal-{fixture_id}"
-            else:
-                link = f"https://futbolstartingeleven.com/?league=top&date={target_date_str}#goal-{fixture_id}"
+            # Dynamic URL reading from the dictionary
+            base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
+            link = f"{base_url}#goal-{fixture_id}"
             
             title = random.choice(PHRASES[scenario_key]["titles"])
             blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
@@ -1163,16 +1166,14 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
             
             try:
-                # --- THE CLIENT TRAFFIC COP ---
-                if league_id == 10:
-                    friendly_client.create_tweet(text=tweet_text)
-                    print(f"✅ [FRIENDLIES] Successfully tweeted ALERTS for {scoring_team_name}!")
-                elif league_id == 40 and championship_client:
-                    championship_client.create_tweet(text=tweet_text)
-                    print(f"✅ [CHAMPIONSHIP] Successfully tweeted ALERTS for {scoring_team_name}!")
+                # Dynamic client reading from the dictionary
+                target_client = league_info.get("x_client") or futbol_client
+                
+                if target_client:
+                    target_client.create_tweet(text=tweet_text)
+                    print(f"✅ [{league_info['name']}] Successfully tweeted ALERTS for {scoring_team_name}!")
                 else:
-                    futbol_client.create_tweet(text=tweet_text)
-                    print(f"✅ [MAIN] Successfully tweeted ALERTS for {scoring_team_name}!")
+                    print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
                 
                 log_target_date.append(event_key)
                 tweeted_recently.append(event_key)
