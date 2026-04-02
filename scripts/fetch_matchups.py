@@ -688,15 +688,17 @@ def main():
             # ---------------------------------------------
             
             # 1. Safely grab projected lineups whether fresh from BBM or from memory
+            # 1. Safely grab projected lineups whether fresh from BBM or from memory
             away_proj = []
             home_proj = []
             
             if needs_bbm_fetch:
-                away_proj = bbm_projections_for_date.get(f"{away_team_id}_{game_num}", {}).get('battingOrder', [])
-                home_proj = bbm_projections_for_date.get(f"{home_team_id}_{game_num}", {}).get('battingOrder', [])
+                away_proj = (bbm_projections_for_date.get(f"{away_team_id}_{game_num}") or {}).get('battingOrder', [])
+                home_proj = (bbm_projections_for_date.get(f"{home_team_id}_{game_num}") or {}).get('battingOrder', [])
             else:
-                away_proj = existing_game_state.get('projectedLineups', {}).get('away', {}).get('battingOrder', []) or []
-                home_proj = existing_game_state.get('projectedLineups', {}).get('home', {}).get('battingOrder', []) or []
+                proj_lineups = existing_game_state.get('projectedLineups') or {}
+                away_proj = (proj_lineups.get('away') or {}).get('battingOrder', [])
+                home_proj = (proj_lineups.get('home') or {}).get('battingOrder', [])
 
             # Collect all known player IDs for this game (Official + Projected)
             all_pids = set()
@@ -837,8 +839,8 @@ def main():
             if needs_bbm_fetch:
                 game_projected_lineups = {
                     "lastUpdated": current_est_time.timestamp(),
-                    "away": bbm_projections_for_date.get(f"{away_team_id}_{game_num}"),
-                    "home": bbm_projections_for_date.get(f"{home_team_id}_{game_num}")
+                    "away": bbm_projections_for_date.get(f"{away_team_id}_{game_num}") or {},
+                    "home": bbm_projections_for_date.get(f"{home_team_id}_{game_num}") or {}
                 }
             else:
                 game_projected_lineups = existing_game_state.get('projectedLineups', {})
