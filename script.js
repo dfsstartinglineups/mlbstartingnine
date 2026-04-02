@@ -580,6 +580,12 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     let allHR = []; 
     
     filteredGames.forEach(game => {
+        // --- NEW: SKIP POSTPONED/CANCELLED GAMES FOR TOP PLAYS ---
+        const gameState = game.gameRaw?.status?.detailedState || '';
+        if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(gameState)) {
+            return; // Skip this iteration, keeping these players off the leaderboard
+        }
+        // ---------------------------------------------------------
         const pl = game.gameRaw?.teams || {}; 
         const awayAbbr = pl.away?.team?.abbreviation || pl.away?.team?.name?.substring(0,3).toUpperCase();
         const homeAbbr = pl.home?.team?.abbreviation || pl.home?.team?.name?.substring(0,3).toUpperCase();
