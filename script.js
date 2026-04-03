@@ -841,10 +841,25 @@ function renderGames(isSilentRefresh = false) {
     }
 
     let sortedGames = [...filteredGames].sort((a, b) => {
-        const isFinalA = a.gameRaw.status.abstractGameState === 'Final';
-        const isFinalB = b.gameRaw.status.abstractGameState === 'Final';
-        if (isFinalA && !isFinalB) return 1; 
-        if (!isFinalA && isFinalB) return -1; 
+        // 1. Define Helper to get status weight
+        const getStatusWeight = (item) => {
+            const status = item.gameRaw.status?.abstractGameState;
+            const detailed = item.gameRaw.status?.detailedState || "";
+
+            if (status === "Final") return 2; // Bottom
+            if (status === "Live" || detailed.includes("In Progress")) return 1; // Middle
+            return 0; // Top (Upcoming / Scheduled / Preview)
+        };
+
+        const weightA = getStatusWeight(a);
+        const weightB = getStatusWeight(b);
+
+        // 2. Primary Sort: By Status Weight (Upcoming -> Live -> Final)
+        if (weightA !== weightB) {
+            return weightA - weightB;
+        }
+
+        // 3. Secondary Sort: Sort by Game Start Time within those groups
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
