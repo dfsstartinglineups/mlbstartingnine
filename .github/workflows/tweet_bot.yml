@@ -54,6 +54,7 @@ jobs:
           FRIENDLY_X_ACCESS_TOKEN: ${{ secrets.FRIENDLY_X_ACCESS_TOKEN }}
           FRIENDLY_X_ACCESS_TOKEN_SECRET: ${{ secrets.FRIENDLY_X_ACCESS_TOKEN_SECRET }}
           NEW_SOCIAL_CREDENTIALS: ${{ secrets.NEW_SOCIAL_CREDENTIALS }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: python scripts/tweet_bot.py
 
       - name: Commit Log Silently
