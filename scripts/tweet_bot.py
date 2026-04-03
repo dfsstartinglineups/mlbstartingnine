@@ -7,6 +7,24 @@ from datetime import datetime, timezone, timedelta
 import time
 import random
 from atproto import Client, client_utils
+import firebase_admin
+from firebase_admin import credentials, db
+
+# ==========================================
+# FIREBASE INITIALIZATION
+# ==========================================
+if not firebase_admin._apps:
+    raw_firebase_key = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+    if raw_firebase_key:
+        try:
+            cred_dict = json.loads(raw_firebase_key)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://nbastartingfive-8b420-default-rtdb.firebaseio.com/'
+            })
+            print("✅ Firebase authenticated for Tweet Bot!")
+        except Exception as e:
+            print(f"❌ Firebase Auth Failed: {e}")
 
 def save_memory_safely(memory_data):
     """Safely writes to the log file using a temporary file to prevent corruption."""
@@ -912,7 +930,24 @@ for target_date_str in futbol_dates_to_check:
     # ==========================================
     # B. LIVE ALERTS ENGINE (For target_date_str)
     # ==========================================
-    for match in futbol_data:
+    # NEW: Fetch live data from Firebase instead of the static JSON
+    live_futbol_data = {}
+    if target_date_str == date_str: # Only use Firebase for 'Today'
+        try:
+            live_ref = db.reference('futbol_live_games')
+            live_snapshot = live_ref.get()
+            if live_snapshot:
+                # Convert dictionary {id: data} into a list [data, data] to match your existing loop logic
+                live_futbol_data = list(live_snapshot.values())
+                print(f"📡 Fetched {len(live_futbol_data)} live games from Firebase for alerts.")
+        except Exception as e:
+            print(f"⚠️ Firebase fetch failed: {e}")
+
+    # Fallback/Merge: If it's a past/future date or Firebase failed, we can use the local file
+    # but for live alerts, we primarily want the Firebase list.
+    alerts_source = live_futbol_data if live_futbol_data else futbol_data
+
+    for match in alerts_source:
         league_id = match.get('league', {}).get('id')
         if league_id not in FUTBOL_LEAGUES: continue
             
