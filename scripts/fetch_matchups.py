@@ -527,7 +527,15 @@ def main():
         if needs_bbm_fetch and daily_memory:
             first_game = list(daily_memory.values())[0]
             last_updated = first_game.get('projectedLineups', {}).get('lastUpdated', 0)
-            threshold_seconds = 600 if days_away == 0 else 86400
+            
+            # --- NEW: 3-TIER CACHE SYSTEM ---
+            if days_away == 0:
+                threshold_seconds = 600       # 10 minutes for Today
+            elif days_away == 1:
+                threshold_seconds = 28800     # 8 hours for Tomorrow
+            else:
+                threshold_seconds = 86400     # 24 hours for the Future
+                
             if (current_est_time.timestamp() - last_updated) < threshold_seconds:
                 needs_bbm_fetch = False
 
