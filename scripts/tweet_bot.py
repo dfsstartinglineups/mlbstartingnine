@@ -125,6 +125,17 @@ if bundes_creds:
         access_token_secret=bundes_creds.get("access_token_secret")
     )
 
+# NEW: NWSL Client (Loaded dynamically from the JSON Secret)
+nwsl_creds = auth_data.get("nwsl_x", {})
+nwsl_client = None
+if nwsl_creds:
+    nwsl_client = tweepy.Client(
+        consumer_key=nwsl_creds.get("consumer_key"),
+        consumer_secret=nwsl_creds.get("consumer_secret"),
+        access_token=nwsl_creds.get("access_token"),
+        access_token_secret=nwsl_creds.get("access_token_secret")
+    )
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -646,6 +657,7 @@ FUTBOL_LEAGUES = {
     45:  {"name": "FA CUP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#FACup", "url_slug": "facup"},
     40:  {"name": "CHAMPIONSHIP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
     78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
+    254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
     253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"},
     3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
@@ -661,7 +673,6 @@ FUTBOL_LEAGUES = {
     11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
     5:   {"name": "UEFA NATIONS LEAGUE 🇪🇺", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
     531: {"name": "CONCACAF NATIONS LEAGUE 🌎", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl"},
     10:  {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
     # 848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
