@@ -1160,7 +1160,7 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{blurb}\n\n"
             
             # 5% Chance to add the link
-            if random.randint(1, 100) <= 50:
+            if random.randint(1, 100) <= 100:
                 tweet_text += f"{cta}\n⬇️\n{link}\n\n"
                 
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
