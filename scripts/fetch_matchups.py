@@ -637,7 +637,15 @@ def main():
                 
             potential_odds = [o for o in odds_data if o['home_team'] == home_team_name and o['away_team'] == away_team_name]
             if potential_odds:
-                game_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
+                closest_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
+                
+                # --- NEW: THE ODDS TIME SHIELD ---
+                # Calculate the gap between the game time and the odds time in milliseconds
+                time_diff_ms = abs(parse_odds_time(closest_odds['commence_time']) - game_time_ms)
+                
+                # Only apply the odds if they are within 16 hours (57,600,000 ms) of first pitch
+                if time_diff_ms <= 57600000:
+                    game_odds = closest_odds
 
             away_starter = teams.get('away', {}).get('probablePitcher')
             home_starter = teams.get('home', {}).get('probablePitcher')
