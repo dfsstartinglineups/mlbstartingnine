@@ -437,6 +437,62 @@ def get_lineup_hash(players_array):
 for game in games:
     game_pk = str(game['gamePk'])
     
+    # ----------------------------------------------------
+    # NEW: POSTPONEMENT CHECK
+    # ----------------------------------------------------
+    status = game.get('status', {})
+    if status.get('detailedState') == 'Postponed':
+        postponed_key = f"MLB_POSTPONED_{game_pk}"
+        
+        # If we haven't tweeted this postponement yet
+        if postponed_key not in tweeted_recently:
+            # Safely extract team names just for this alert
+            away_full = game['teams']['away']['team']['name']
+            home_full = game['teams']['home']['team']['name']
+            away_short = get_short_name(away_full, game['teams']['away']['team'].get('teamName'))
+            home_short = get_short_name(home_full, game['teams']['home']['team'].get('teamName'))
+            
+            # Grab the reason (e.g., "Rain") if it exists
+            reason = status.get('reason', 'unspecified reasons')
+            
+            # Build the alert text
+            away_hash = away_short.replace(" ", "")
+            home_hash = home_short.replace(" ", "")
+            alert_text = f"🚨 POSTPONED: The game between the {away_short} and {home_short} has been postponed due to {reason}.\n\n#{away_hash} #{home_hash} #MLB"
+            
+            print(f"🚨 ALERT TRIGGERED: {away_short} vs {home_short} Postponed!")
+            
+            # Post to platforms
+            try:
+                # 1. Tweet to X
+                mlb_client.create_tweet(text=alert_text)
+                print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short}!")
+                
+                # 2. Post to Bluesky
+                config = LEAGUE_CONFIG.get("mlb")
+                if config and config.get("bsky_client"):
+                    bsky_tb = client_utils.TextBuilder()
+                    bsky_tb.text(alert_text)
+                    try:
+                        config["bsky_client"].send_post(bsky_tb)
+                    except Exception as e:
+                        print(f"❌ Bluesky post failed for postponement: {e}")
+
+                # 3. Log it & save memory so we don't spam it
+                log_today.append(postponed_key)
+                tweeted_recently.append(postponed_key)
+                new_tweets_sent = True
+                memory[date_str] = log_today
+                save_memory_safely(memory)
+                time.sleep(5)
+                
+            except Exception as e:
+                print(f"❌ Failed to tweet postponement: {e}")
+                
+        # CRITICAL: Skip the lineup feed logic for this game regardless
+        continue
+    # ----------------------------------------------------
+    
     positions, hands = {}, {}
     try:
         feed_data = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live").json()
