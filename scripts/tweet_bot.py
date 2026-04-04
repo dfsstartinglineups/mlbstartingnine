@@ -147,6 +147,17 @@ if mls_creds:
         access_token_secret=mls_creds.get("access_token_secret")
     )
 
+# NEW: Ligue1 Client (Loaded dynamically from the JSON Secret)
+ligue1_creds = auth_data.get("ligue1_x", {})
+ligue1_client = None
+if ligue1_creds:
+    ligue1_client = tweepy.Client(
+        consumer_key=ligue1_creds.get("consumer_key"),
+        consumer_secret=ligue1_creds.get("consumer_secret"),
+        access_token=ligue1_creds.get("access_token"),
+        access_token_secret=ligue1_creds.get("access_token_secret")
+    )
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -717,31 +728,60 @@ print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 
 # Define all leagues, their tags, and optionally their dedicated X client and URL
 FUTBOL_LEAGUES = {
-    39:  {"name": "PREMIER LEAGUE \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#EPL", "url_slug": "epl"},
-    140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
-    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea"},
-    2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
-    45:  {"name": "FA CUP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#FACup", "url_slug": "facup"},
-    40:  {"name": "CHAMPIONSHIP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
-    78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
-    254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
-    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "base_url": "https://futbolstartingeleven.com/mls.html"},
-    61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
-    3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
-    13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
-    16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
-    71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
-    128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
-    88:  {"name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
-    262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
-    94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-    239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
-    188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
-    11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
-    5:   {"name": "UEFA NATIONS LEAGUE 🇪🇺", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
-    531: {"name": "CONCACAF NATIONS LEAGUE 🌎", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    10:  {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
+    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl"},
+    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga"},
+    135: {"name": "🇮🇹 SERIE A", "tag": "#SerieA", "url_slug": "seriea"},
+    2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
+    45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup"},
+    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
+    78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
+    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "base_url": "https://futbolstartingeleven.com/mls.html"},
+    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": ligue1_client, "base_url": "https://futbolstartingeleven.com/ligue1.html"},
+    3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
+    13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores"},
+    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf"},
+    71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil"},
+    128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina"},
+    88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie" },
+    262: {"name": "LIGA MX 🇲🇽 Liga MX", "tag": "#LigaMX", "url_slug": "ligamx"}, # Note: Input had "LIGA MX 🇲🇽", fixed to follow pattern "🇲🇽 LIGA MX" below. Assuming typo in input prompt's example vs list.
+    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "ligamx"},
+    94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
+    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia"},
+    188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "australia"},
+    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
+    5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
+    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
+    10:  {"name": "🌎 INTERNATIONAL", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
+
+
+#FUTBOL_LEAGUES = {
+ #   39:  {"name": "PREMIER LEAGUE \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#EPL", "url_slug": "epl"},
+  #  140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
+   # 135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea"},
+    #2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
+    #45:  {"name": "FA CUP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#FACup", "url_slug": "facup"},
+    #40:  {"name": "CHAMPIONSHIP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
+    #78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
+    #254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+    #253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "base_url": "https://futbolstartingeleven.com/mls.html"},
+    #61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": ligue1_client, "base_url": "https://futbolstartingeleven.com/ligue1.html"},
+    #3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
+    #13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
+    #16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
+    #71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
+    #128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
+    #88:  {"name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
+    #262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
+    #94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
+    #239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
+    #188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
+    #11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
+    #5:   {"name": "UEFA NATIONS LEAGUE 🇪🇺", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
+    #531: {"name": "CONCACAF NATIONS LEAGUE 🌎", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
+    #10:  {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
+#}
     # 848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
    # 307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
    # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
