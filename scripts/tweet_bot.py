@@ -136,6 +136,17 @@ if nwsl_creds:
         access_token_secret=nwsl_creds.get("access_token_secret")
     )
 
+# NEW: MLS Client (Loaded dynamically from the JSON Secret)
+mls_creds = auth_data.get("mls_x", {})
+mls_client = None
+if mls_creds:
+    mls_client = tweepy.Client(
+        consumer_key=mls_creds.get("consumer_key"),
+        consumer_secret=mls_creds.get("consumer_secret"),
+        access_token=mls_creds.get("access_token"),
+        access_token_secret=mls_creds.get("access_token_secret")
+    )
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -714,8 +725,8 @@ FUTBOL_LEAGUES = {
     40:  {"name": "CHAMPIONSHIP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
     78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
     254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "base_url": "https://futbolstartingeleven.com/mls.html"},
     61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1"},
-    253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls"},
     3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
     13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
     16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
