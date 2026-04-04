@@ -845,9 +845,21 @@ function renderGames(isSilentRefresh = false) {
         const getStatusWeight = (item) => {
             const status = item.gameRaw.status?.abstractGameState;
             const detailed = item.gameRaw.status?.detailedState || "";
+            
+            // Extract the current inning and half
+            const inning = item.gameRaw.linescore?.currentInning || 0;
+            const half = item.gameRaw.linescore?.inningHalf || "";
 
             if (status === "Final") return 2; // Bottom
-            if (status === "Live" || detailed.includes("In Progress")) return 1; // Middle
+            
+            if (status === "Live" || detailed.includes("In Progress")) {
+                // If the game is in warmups (0) or Top of the 1st, keep it grouped with Pre-Game
+                if (inning === 0 || (inning === 1 && half === 'Top')) {
+                    return 0; 
+                }
+                return 1; // Middle (Truly Live from Bottom 1st onward)
+            }
+            
             return 0; // Top (Upcoming / Scheduled / Preview)
         };
 
