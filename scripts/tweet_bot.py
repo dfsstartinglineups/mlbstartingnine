@@ -158,6 +158,17 @@ if ligue1_creds:
         access_token_secret=ligue1_creds.get("access_token_secret")
     )
 
+# NEW: SerieA Client (Loaded dynamically from the JSON Secret)
+seriea_creds = auth_data.get("seriea_x", {})
+seriea_client = None
+if seriea_creds:
+    seriea_client = tweepy.Client(
+        consumer_key=seriea_creds.get("consumer_key"),
+        consumer_secret=seriea_creds.get("consumer_secret"),
+        access_token=seriea_creds.get("access_token"),
+        access_token_secret=seriea_creds.get("access_token_secret")
+    )
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -759,7 +770,7 @@ FUTBOL_LEAGUES = {
 #FUTBOL_LEAGUES = {
  #   39:  {"name": "PREMIER LEAGUE \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#EPL", "url_slug": "epl"},
   #  140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
-   # 135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea"},
+   # 135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     #2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
     #45:  {"name": "FA CUP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#FACup", "url_slug": "facup"},
     #40:  {"name": "CHAMPIONSHIP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
