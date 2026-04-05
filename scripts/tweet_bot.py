@@ -741,7 +741,7 @@ print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 FUTBOL_LEAGUES = {
     39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl"},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga"},
-    135: {"name": "🇮🇹 SERIE A", "tag": "#SerieA", "url_slug": "seriea"},
+    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
     45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup"},
     40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
