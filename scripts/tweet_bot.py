@@ -1016,8 +1016,12 @@ for target_date_str in futbol_dates_to_check:
         try:
             print(f"📸 Match detected! Generating graphic for {h_name} vs {a_name}...")
 
-            # Keep Header, Odds, and Footer. Exclude Lineups and Injuries.
-            tweet_parts = [header, odds_str, footer]
+            # Reorder the tweet: Header, Link, Odds, Hashtags
+            base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
+            link_text = f"📱 Live stats & scores: {base_url}#lineup-{fixture_id}"
+            tags_text = f"{league_info['tag']} #{h_hash} #{a_hash}"
+            
+            tweet_parts = [header, link_text, odds_str, tags_text]
             tweet_text = "\n\n".join(tweet_parts)
 
             # 1. Take the screenshot (halts script temporarily to run async)
