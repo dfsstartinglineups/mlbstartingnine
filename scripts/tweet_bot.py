@@ -72,135 +72,54 @@ LEAGUE_CONFIG = {
 # ==========================================
 # 1. AUTHENTICATE WITH X (TWITTER)
 # ==========================================
+# Helper to create both V2 Client and V1.1 API simultaneously
+def create_x_clients(consumer_key, consumer_secret, access_token, access_token_secret):
+    if not all([consumer_key, consumer_secret, access_token, access_token_secret]):
+        return None, None
+    client = tweepy.Client(consumer_key, consumer_secret, access_token, access_token_secret)
+    auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
+    api_v1 = tweepy.API(auth)
+    return client, api_v1
 
 # MLB Client (Main Account)
-mlb_client = tweepy.Client(
-    consumer_key=os.environ.get("X_API_KEY"),
-    consumer_secret=os.environ.get("X_API_SECRET"),
-    access_token=os.environ.get("X_ACCESS_TOKEN"),
-    access_token_secret=os.environ.get("X_ACCESS_TOKEN_SECRET")
+mlb_client, mlb_api_v1 = create_x_clients(
+    os.environ.get("X_API_KEY"), os.environ.get("X_API_SECRET"),
+    os.environ.get("X_ACCESS_TOKEN"), os.environ.get("X_ACCESS_TOKEN_SECRET")
 )
 
 # NBA Client (@DailyNBAlineups)
-nba_client = tweepy.Client(
-    consumer_key=os.environ.get("NBA_X_API_KEY"),
-    consumer_secret=os.environ.get("NBA_X_API_SECRET"),
-    access_token=os.environ.get("NBA_X_ACCESS_TOKEN"),
-    access_token_secret=os.environ.get("NBA_X_ACCESS_TOKEN_SECRET")
+nba_client, nba_api_v1 = create_x_clients(
+    os.environ.get("NBA_X_API_KEY"), os.environ.get("NBA_X_API_SECRET"),
+    os.environ.get("NBA_X_ACCESS_TOKEN"), os.environ.get("NBA_X_ACCESS_TOKEN_SECRET")
 )
 
 # Futbol Client (@FutbolStarting11 - Using existing SerieA Env Vars)
-futbol_client = tweepy.Client(
-    consumer_key=os.environ.get("SERIEA_X_API_KEY"),
-    consumer_secret=os.environ.get("SERIEA_X_API_SECRET"),
-    access_token=os.environ.get("SERIEA_X_ACCESS_TOKEN"),
-    access_token_secret=os.environ.get("SERIEA_X_ACCESS_TOKEN_SECRET")
+futbol_client, futbol_api_v1 = create_x_clients(
+    os.environ.get("SERIEA_X_API_KEY"), os.environ.get("SERIEA_X_API_SECRET"),
+    os.environ.get("SERIEA_X_ACCESS_TOKEN"), os.environ.get("SERIEA_X_ACCESS_TOKEN_SECRET")
 )
 
-# NEW: International Friendlies Client
-friendly_client = tweepy.Client(
-    consumer_key=os.environ.get("FRIENDLY_X_API_KEY"),
-    consumer_secret=os.environ.get("FRIENDLY_X_API_SECRET"),
-    access_token=os.environ.get("FRIENDLY_X_ACCESS_TOKEN"),
-    access_token_secret=os.environ.get("FRIENDLY_X_ACCESS_TOKEN_SECRET")
+# International Friendlies Client
+friendly_client, friendly_api_v1 = create_x_clients(
+    os.environ.get("FRIENDLY_X_API_KEY"), os.environ.get("FRIENDLY_X_API_SECRET"),
+    os.environ.get("FRIENDLY_X_ACCESS_TOKEN"), os.environ.get("FRIENDLY_X_ACCESS_TOKEN_SECRET")
 )
 
-# NEW: Championship Client (Loaded dynamically from the JSON Secret)
-champ_creds = auth_data.get("championship_x", {})
-championship_client = None
-if champ_creds:
-    championship_client = tweepy.Client(
-        consumer_key=champ_creds.get("consumer_key"),
-        consumer_secret=champ_creds.get("consumer_secret"),
-        access_token=champ_creds.get("access_token"),
-        access_token_secret=champ_creds.get("access_token_secret")
+# Dynamic Clients Helper
+def get_dynamic_clients(key):
+    creds = auth_data.get(key, {})
+    return create_x_clients(
+        creds.get("consumer_key"), creds.get("consumer_secret"),
+        creds.get("access_token"), creds.get("access_token_secret")
     )
 
-# NEW: Bundesliga Client (Loaded dynamically from the JSON Secret)
-bundes_creds = auth_data.get("bundesliga_x", {})
-bundesliga_client = None
-if bundes_creds:
-    bundesliga_client = tweepy.Client(
-        consumer_key=bundes_creds.get("consumer_key"),
-        consumer_secret=bundes_creds.get("consumer_secret"),
-        access_token=bundes_creds.get("access_token"),
-        access_token_secret=bundes_creds.get("access_token_secret")
-    )
-
-# NEW: NWSL Client (Loaded dynamically from the JSON Secret)
-nwsl_creds = auth_data.get("nwsl_x", {})
-nwsl_client = None
-if nwsl_creds:
-    nwsl_client = tweepy.Client(
-        consumer_key=nwsl_creds.get("consumer_key"),
-        consumer_secret=nwsl_creds.get("consumer_secret"),
-        access_token=nwsl_creds.get("access_token"),
-        access_token_secret=nwsl_creds.get("access_token_secret")
-    )
-
-# NEW: MLS Client (Loaded dynamically from the JSON Secret)
-mls_creds = auth_data.get("mls_x", {})
-mls_client = None
-if mls_creds:
-    mls_client = tweepy.Client(
-        consumer_key=mls_creds.get("consumer_key"),
-        consumer_secret=mls_creds.get("consumer_secret"),
-        access_token=mls_creds.get("access_token"),
-        access_token_secret=mls_creds.get("access_token_secret")
-    )
-
-# NEW: Ligue1 Client (Loaded dynamically from the JSON Secret)
-ligue1_creds = auth_data.get("ligue1_x", {})
-ligue1_client = None
-if ligue1_creds:
-    ligue1_client = tweepy.Client(
-        consumer_key=ligue1_creds.get("consumer_key"),
-        consumer_secret=ligue1_creds.get("consumer_secret"),
-        access_token=ligue1_creds.get("access_token"),
-        access_token_secret=ligue1_creds.get("access_token_secret")
-    )
-
-# NEW: SerieA Client (Loaded dynamically from the JSON Secret)
-seriea_creds = auth_data.get("seriea_x", {})
-seriea_client = None
-if seriea_creds:
-    seriea_client = tweepy.Client(
-        consumer_key=seriea_creds.get("consumer_key"),
-        consumer_secret=seriea_creds.get("consumer_secret"),
-        access_token=seriea_creds.get("access_token"),
-        access_token_secret=seriea_creds.get("access_token_secret")
-    )
-
-# NEW: SerieA Client (Loaded dynamically from the JSON Secret)
-seriea_creds = auth_data.get("seriea_x", {})
-seriea_client = None
-seriea_api_v1 = None  # <--- NEW
-if seriea_creds:
-    seriea_client = tweepy.Client(
-        consumer_key=seriea_creds.get("consumer_key"),
-        consumer_secret=seriea_creds.get("consumer_secret"),
-        access_token=seriea_creds.get("access_token"),
-        access_token_secret=seriea_creds.get("access_token_secret")
-    )
-    # --- NEW: V1.1 Client specifically for uploading Serie A images ---
-    auth = tweepy.OAuth1UserHandler(
-        seriea_creds.get("consumer_key"),
-        seriea_creds.get("consumer_secret"),
-        seriea_creds.get("access_token"),
-        seriea_creds.get("access_token_secret")
-    )
-    seriea_api_v1 = tweepy.API(auth)
-
-# NEW: La Liga Client (Loaded dynamically from the JSON Secret)
-laliga_creds = auth_data.get("laliga_x", {})
-laliga_client = None
-if laliga_creds:
-    laliga_client = tweepy.Client(
-        consumer_key=laliga_creds.get("consumer_key"),
-        consumer_secret=laliga_creds.get("consumer_secret"),
-        access_token=laliga_creds.get("access_token"),
-        access_token_secret=laliga_creds.get("access_token_secret")
-    )
+championship_client, championship_api_v1 = get_dynamic_clients("championship_x")
+bundesliga_client, bundesliga_api_v1 = get_dynamic_clients("bundesliga_x")
+nwsl_client, nwsl_api_v1 = get_dynamic_clients("nwsl_x")
+mls_client, mls_api_v1 = get_dynamic_clients("mls_x")
+ligue1_client, ligue1_api_v1 = get_dynamic_clients("ligue1_x")
+seriea_client, seriea_api_v1 = get_dynamic_clients("seriea_x")
+laliga_client, laliga_api_v1 = get_dynamic_clients("laliga_x")
 
 async def take_screenshot(fixture_id, target_date):
     print(f"📸 Booting headless browser for Fixture {fixture_id}...")
@@ -796,22 +715,21 @@ print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 # Define all leagues, their tags, and optionally their dedicated X client and URL
 FUTBOL_LEAGUES = {
     39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl"},
-    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": laliga_client, "base_url": "https://futbolstartingeleven.com/laliga.html"},
-    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "base_url": "https://futbolstartingeleven.com/seriea.html"},
+    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": laliga_client, "v1_client": laliga_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},
+    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
     45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup"},
-    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
-    78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
-    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
-    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "base_url": "https://futbolstartingeleven.com/mls.html"},
-    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": ligue1_client, "base_url": "https://futbolstartingeleven.com/ligue1.html"},
+    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0066\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "v1_client": championship_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
+    78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
+    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},
+    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": ligue1_client, "v1_client": ligue1_api_v1, "base_url": "https://futbolstartingeleven.com/ligue1.html"},
     3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
     13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores"},
     16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf"},
     71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil"},
     128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina"},
     88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie" },
-    262: {"name": "LIGA MX 🇲🇽 Liga MX", "tag": "#LigaMX", "url_slug": "ligamx"}, # Note: Input had "LIGA MX 🇲🇽", fixed to follow pattern "🇲🇽 LIGA MX" below. Assuming typo in input prompt's example vs list.
     262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "ligamx"},
     94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
     239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia"},
@@ -819,7 +737,7 @@ FUTBOL_LEAGUES = {
     11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
     5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
     531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    10:  {"name": "🌎 INTERNATIONAL", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
+    10:  {"name": "🌎 INTERNATIONAL", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "v1_client": friendly_api_v1, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
 
 
@@ -1079,57 +997,43 @@ for target_date_str in futbol_dates_to_check:
         h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
         a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
         
-        # 3. Clean Footer: Link (5% chance) + strictly 3 hashtags
-        footer_text = ""
-        if random.randint(1, 100) <= 50:
-            # Dynamic URL reading from the dictionary
-            base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
-            footer_text = f"📱 Live stats & scores: {base_url}#lineup-{fixture_id}\n\n"
-            
+        # 3. Clean Footer: Link ALWAYS visible + strictly 3 hashtags
+        base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
+        footer_text = f"📱 Live stats & scores: {base_url}#lineup-{fixture_id}\n\n"
         footer = f"{footer_text}{league_info['tag']} #{h_hash} #{a_hash}"
-        
+
         # ---------------------------------------------------------
-        # NEW: SERIE A IMAGE TWEET LOGIC VS STANDARD TEXT LOGIC
+        # NEW: UNIVERSAL IMAGE TWEET LOGIC (NO TEXT LINEUPS, NO INJURIES)
         # ---------------------------------------------------------
         try:
-            if league_id == 135: # 🇮🇹 SERIE A
-                print("📸 Serie A Match detected! Generating graphic...")
-                
-                # Exclude the bulky text lineups
-                tweet_parts = [header, odds_str]
-                if inj_str: tweet_parts.append(inj_str)
-                tweet_parts.append(footer)
-                tweet_text = "\n\n".join(tweet_parts)
-                
-                # 1. Take the screenshot (halts script temporarily to run async)
-                asyncio.run(take_screenshot(fixture_id, target_date_str))
-                
-                # 2. Upload the image using V1.1
-                print("⬆️ Uploading graphic to X servers...")
-                media = seriea_api_v1.media_upload("temp_matchup.png")
-                
-                # 3. Post the V2 Tweet with the media attached
-                if seriea_client:
-                    seriea_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                    print(f"✅ [{league_info['name']}] Successfully tweeted graphic for {h_name} vs {a_name}!")
-                
-                # 4. Clean up the server
-                if os.path.exists("temp_matchup.png"):
-                    os.remove("temp_matchup.png")
-                    
-            else: # 🌎 ALL OTHER LEAGUES
-                tweet_parts = [header, home_str, away_str, odds_str]
-                if inj_str: tweet_parts.append(inj_str)
-                tweet_parts.append(footer)
-                tweet_text = "\n\n".join(tweet_parts)
-                
-                target_client = league_info.get("x_client") or futbol_client
-                if target_client:
-                    target_client.create_tweet(text=tweet_text)
-                    print(f"✅ [{league_info['name']}] Successfully tweeted matchup: {h_name} vs {a_name}!")
-                else:
-                    print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
-                
+            print(f"📸 Match detected! Generating graphic for {h_name} vs {a_name}...")
+
+            # Keep Header, Odds, and Footer. Exclude Lineups and Injuries.
+            tweet_parts = [header, odds_str, footer]
+            tweet_text = "\n\n".join(tweet_parts)
+
+            # 1. Take the screenshot (halts script temporarily to run async)
+            asyncio.run(take_screenshot(fixture_id, target_date_str))
+
+            # 2. Identify the correct clients for this specific league
+            target_client = league_info.get("x_client") or futbol_client
+            target_v1_client = league_info.get("v1_client") or futbol_api_v1
+
+            # 3. Upload the image using the correct V1.1 API
+            print("⬆️ Uploading graphic to X servers...")
+            media = target_v1_client.media_upload("temp_matchup.png")
+
+            # 4. Post the V2 Tweet with the media attached
+            if target_client:
+                target_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                print(f"✅ [{league_info['name']}] Successfully tweeted graphic for {h_name} vs {a_name}!")
+            else:
+                print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
+
+            # 5. Clean up the server
+            if os.path.exists("temp_matchup.png"):
+                os.remove("temp_matchup.png")
+
             # Log success into memory
             log_target_date.append(team_key)
             tweeted_recently.append(team_key)
@@ -1137,7 +1041,7 @@ for target_date_str in futbol_dates_to_check:
             memory[target_date_str] = log_target_date
             save_memory_safely(memory)
             time.sleep(5)
-            
+
         except Exception as e:
             print(f"❌ Failed to tweet Futbol matchup ({h_name} vs {a_name}): {e}")
 
