@@ -76,9 +76,17 @@ LEAGUE_CONFIG = {
 def create_x_clients(consumer_key, consumer_secret, access_token, access_token_secret):
     if not all([consumer_key, consumer_secret, access_token, access_token_secret]):
         return None, None
-    client = tweepy.Client(consumer_key, consumer_secret, access_token, access_token_secret)
+        
+    # CRITICAL FIX: Must use explicit keyword arguments here!
+    client = tweepy.Client(
+        consumer_key=consumer_key, 
+        consumer_secret=consumer_secret, 
+        access_token=access_token, 
+        access_token_secret=access_token_secret
+    )
     auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
     api_v1 = tweepy.API(auth)
+    
     return client, api_v1
 
 # MLB Client (Main Account)
