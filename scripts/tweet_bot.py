@@ -9,6 +9,8 @@ import random
 from atproto import Client, client_utils
 import firebase_admin
 from firebase_admin import credentials, db
+import asyncio
+from playwright.async_api import async_playwright
 
 # ==========================================
 # FIREBASE INITIALIZATION
@@ -169,6 +171,26 @@ if seriea_creds:
         access_token_secret=seriea_creds.get("access_token_secret")
     )
 
+# NEW: SerieA Client (Loaded dynamically from the JSON Secret)
+seriea_creds = auth_data.get("seriea_x", {})
+seriea_client = None
+seriea_api_v1 = None  # <--- NEW
+if seriea_creds:
+    seriea_client = tweepy.Client(
+        consumer_key=seriea_creds.get("consumer_key"),
+        consumer_secret=seriea_creds.get("consumer_secret"),
+        access_token=seriea_creds.get("access_token"),
+        access_token_secret=seriea_creds.get("access_token_secret")
+    )
+    # --- NEW: V1.1 Client specifically for uploading Serie A images ---
+    auth = tweepy.OAuth1UserHandler(
+        seriea_creds.get("consumer_key"),
+        seriea_creds.get("consumer_secret"),
+        seriea_creds.get("access_token"),
+        seriea_creds.get("access_token_secret")
+    )
+    seriea_api_v1 = tweepy.API(auth)
+
 # NEW: La Liga Client (Loaded dynamically from the JSON Secret)
 laliga_creds = auth_data.get("laliga_x", {})
 laliga_client = None
@@ -179,6 +201,29 @@ if laliga_creds:
         access_token=laliga_creds.get("access_token"),
         access_token_secret=laliga_creds.get("access_token_secret")
     )
+
+async def take_screenshot(fixture_id, target_date):
+    print(f"📸 Booting headless browser for Fixture {fixture_id}...")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+        
+        # Inject the date and fixture directly into the URL!
+        url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
+        print(f"🌐 Navigating to {url}...")
+        await page.goto(url)
+        
+        # Wait for the specific players to render
+        try:
+            await page.wait_for_selector(".player-node", timeout=10000)
+            await asyncio.sleep(2) # Extra buffer for images/fonts
+        except Exception:
+            print("⚠️ Timeout waiting for players. Taking screenshot anyway...")
+
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="temp_matchup.png")
+        print("✅ Screenshot saved!")
+        await browser.close()
 
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
@@ -1043,27 +1088,56 @@ for target_date_str in futbol_dates_to_check:
             
         footer = f"{footer_text}{league_info['tag']} #{h_hash} #{a_hash}"
         
-        tweet_parts = [header, home_str, away_str, odds_str]
-        if inj_str: tweet_parts.append(inj_str)
-        tweet_parts.append(footer)
-        tweet_text = "\n\n".join(tweet_parts)
-        
+        # ---------------------------------------------------------
+        # NEW: SERIE A IMAGE TWEET LOGIC VS STANDARD TEXT LOGIC
+        # ---------------------------------------------------------
         try:
-            # Dynamic client reading from the dictionary
-            target_client = league_info.get("x_client") or futbol_client
-            
-            if target_client:
-                target_client.create_tweet(text=tweet_text)
-                print(f"✅ [{league_info['name']}] Successfully tweeted matchup: {h_name} vs {a_name}!")
-            else:
-                print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
+            if league_id == 135: # 🇮🇹 SERIE A
+                print("📸 Serie A Match detected! Generating graphic...")
                 
+                # Exclude the bulky text lineups
+                tweet_parts = [header, odds_str]
+                if inj_str: tweet_parts.append(inj_str)
+                tweet_parts.append(footer)
+                tweet_text = "\n\n".join(tweet_parts)
+                
+                # 1. Take the screenshot (halts script temporarily to run async)
+                asyncio.run(take_screenshot(fixture_id, target_date_str))
+                
+                # 2. Upload the image using V1.1
+                print("⬆️ Uploading graphic to X servers...")
+                media = seriea_api_v1.media_upload("temp_matchup.png")
+                
+                # 3. Post the V2 Tweet with the media attached
+                if seriea_client:
+                    seriea_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    print(f"✅ [{league_info['name']}] Successfully tweeted graphic for {h_name} vs {a_name}!")
+                
+                # 4. Clean up the server
+                if os.path.exists("temp_matchup.png"):
+                    os.remove("temp_matchup.png")
+                    
+            else: # 🌎 ALL OTHER LEAGUES
+                tweet_parts = [header, home_str, away_str, odds_str]
+                if inj_str: tweet_parts.append(inj_str)
+                tweet_parts.append(footer)
+                tweet_text = "\n\n".join(tweet_parts)
+                
+                target_client = league_info.get("x_client") or futbol_client
+                if target_client:
+                    target_client.create_tweet(text=tweet_text)
+                    print(f"✅ [{league_info['name']}] Successfully tweeted matchup: {h_name} vs {a_name}!")
+                else:
+                    print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
+                
+            # Log success into memory
             log_target_date.append(team_key)
             tweeted_recently.append(team_key)
             new_tweets_sent = True
             memory[target_date_str] = log_target_date
             save_memory_safely(memory)
             time.sleep(5)
+            
         except Exception as e:
             print(f"❌ Failed to tweet Futbol matchup ({h_name} vs {a_name}): {e}")
 
