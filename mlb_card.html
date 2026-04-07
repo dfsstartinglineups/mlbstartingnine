@@ -167,7 +167,7 @@
 
         /* Vertical Grid Lines */
         .col-order {
-            width: 90px; /* Slightly widened to safely hold 'SP' */
+            width: 90px;
             height: 100%;
             display: flex;
             justify-content: center;
@@ -203,7 +203,7 @@
         }
 
         .col-pos {
-            width: 100px;
+            width: 130px; /* Widened to fit Position + Handedness */
             height: 100%;
             display: flex;
             justify-content: center;
@@ -212,6 +212,13 @@
             font-size: 42px;
             font-weight: 700;
             color: var(--pencil-ink);
+        }
+
+        .hand-indicator {
+            font-size: 26px;
+            color: rgba(74, 79, 88, 0.6);
+            margin-left: 8px;
+            font-weight: 600;
         }
 
         .headshot-wrapper {
@@ -254,7 +261,7 @@
         }
 
         .col-order.sp-text {
-            font-size: 28px; /* Reduced to ensure it never overflows 90px width */
+            font-size: 28px; /* Reduced to ensure it never overflows */
         }
     </style>
 </head>
@@ -370,13 +377,19 @@
             document.getElementById('side-selector').addEventListener('change', () => renderCard());
         }
 
-        function buildPlayerHTML(player, index, isPitcher, positionMap) {
+        function buildPlayerHTML(player, index, isPitcher, positionMap, handMap) {
             const headshot = getHeadshotUrl(player.id);
             const orderDisplay = isPitcher ? 'SP' : (index + 1);
             const posClass = isPitcher ? 'sp-text' : '';
             
-            // Map position from our boxscore dictionary, fallback to dash if missing
+            // Map position
             const positionStr = isPitcher ? 'SP' : (positionMap[player.id] || "—");
+            
+            // Map handedness
+            const handObj = handMap[player.id] || {};
+            const hand = isPitcher ? (handObj.pitch || '') : (handObj.bat || '');
+            const handDisplay = hand ? `<span class="hand-indicator">(${hand})</span>` : '';
+
             let name = player.fullName;
 
             return `
@@ -388,7 +401,7 @@
                         </div>
                     </div>
                     <div class="col-name">${name}</div>
-                    <div class="col-pos">${positionStr}</div>
+                    <div class="col-pos">${positionStr} ${handDisplay}</div>
                 </div>
             `;
         }
@@ -411,14 +424,15 @@
             document.getElementById('matchup-info').textContent = `vs ${oppTeam.name}`;
             document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
 
-            // Fetch Live Feed to extract exact game positions (Mirrors Python Bot Logic)
             const positionMap = {};
+            const handMap = {};
+            
+            // 1. Fetch Live Feed to extract exact game positions
             try {
                 const feedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${gamePk}/feed/live`);
                 const feedData = await feedRes.json();
                 const boxTeams = feedData.liveData?.boxscore?.teams || {};
 
-                // Map positions for both teams
                 ['away', 'home'].forEach(teamSide => {
                     const players = boxTeams[teamSide]?.players || {};
                     for (const key in players) {
@@ -437,23 +451,43 @@
                 console.error("Failed to fetch live positions mapping", e);
             }
 
-            // Get Batters (1 through 9)
             const playersArray = game.lineups[`${side}Players`] || [];
+            const batters = playersArray.slice(0, 9);
+            const probablePitcher = game.teams[side].probablePitcher;
+
+            // 2. Fetch Handedness via MLB People API
+            try {
+                const playerIds = batters.map(b => b.id);
+                if (probablePitcher) playerIds.push(probablePitcher.id);
+                
+                if (playerIds.length > 0) {
+                    const peopleRes = await fetch(`https://statsapi.mlb.com/api/v1/people?personIds=${playerIds.join(',')}`);
+                    const peopleData = await peopleRes.json();
+                    
+                    peopleData.people.forEach(p => {
+                        handMap[p.id] = {
+                            bat: p.batSide?.code || '',
+                            pitch: p.pitchHand?.code || ''
+                        };
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to fetch handedness mapping", e);
+            }
+
+            // Render Batters
             const container = document.getElementById('lineup-container');
             container.innerHTML = '';
-
-            const batters = playersArray.slice(0, 9);
             batters.forEach((player, index) => {
-                container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false, positionMap));
+                container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false, positionMap, handMap));
             });
 
-            // Get Pitcher
+            // Render Pitcher
             const pitcherContainer = document.getElementById('pitcher-container');
             pitcherContainer.innerHTML = '';
             
-            const probablePitcher = game.teams[side].probablePitcher;
             if (probablePitcher) {
-                pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true, positionMap));
+                pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true, positionMap, handMap));
             } else {
                 pitcherContainer.innerHTML = `
                     <div class="player-row" id="pitcher-row">
