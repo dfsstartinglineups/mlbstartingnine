@@ -11,6 +11,8 @@ import firebase_admin
 from firebase_admin import credentials, db
 import asyncio
 from playwright.async_api import async_playwright
+from PIL import Image
+import io
 
 # ==========================================
 # FIREBASE INITIALIZATION
@@ -507,15 +509,28 @@ for game in games:
                 mlb_client.create_tweet(text=alert_text)
                 print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short}!")
                 
-                # 2. Post to Bluesky
-                config = LEAGUE_CONFIG.get("mlb")
-                if config and config.get("bsky_client"):
-                    bsky_tb = client_utils.TextBuilder()
-                    bsky_tb.text(alert_text)
-                    try:
-                        config["bsky_client"].send_post(bsky_tb)
-                    except Exception as e:
-                        print(f"❌ Bluesky post failed for postponement: {e}")
+               # --- START BLUESKY UPLOAD FIX ---
+            config = LEAGUE_CONFIG.get("mlb")
+            if config and config.get("bsky_client"):
+                try:
+                    # 1. Open the massive PNG we generated for Twitter
+                    with Image.open("mlb_matchup.png") as img:
+                        # 2. Convert it to RGB (removes transparency so JPEG works)
+                        rgb_img = img.convert('RGB')
+                        
+                        # 3. Save it to a temporary memory buffer as a highly compressed JPEG
+                        img_byte_arr = io.BytesIO()
+                        rgb_img.save(img_byte_arr, format='JPEG', quality=70)
+                        
+                        # 4. Get the raw bytes to send to Bluesky (now well under 1MB!)
+                        img_data = img_byte_arr.getvalue()
+
+                    # Send the lightweight JPEG data to Bluesky
+                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_short} Starting Lineup")
+                    print(f"✅ Successfully posted {team_short} to Bluesky (Compressed JPEG)!")
+                except Exception as e:
+                    print(f"❌ Bluesky post failed for {team_short}: {e}")
+            # --- END BLUESKY UPLOAD FIX ---
 
                 # 3. Log it & save memory so we don't spam it
                 log_today.append(postponed_key)
