@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Starting 9 Generator</title>
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: rgba(25, 30, 45, 0.85);
+            --text-main: #ffffff;
+            --text-muted: #8a93a0;
+            --accent: #e31837; /* Default MLB Red */
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #111;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- UI Controls (Hidden from screenshot) --- */
+        #controls {
+            margin-bottom: 20px;
+            background: #2a2a2a;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        select, button {
+            padding: 8px 16px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover { background: #444; }
+
+        /* =========================================
+           THE EXPORTABLE CANVAS (1080x1350)
+           ========================================= */
+        #capture-area {
+            width: 1080px;
+            height: 1350px; 
+            background: radial-gradient(circle at top, #1a2235 0%, var(--bg-color) 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border: 2px solid #222;
+        }
+
+        /* Subtle Baseball Diamond Background Watermark */
+        #capture-area::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 5 L95 50 L50 95 L5 50 Z" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></svg>');
+            background-size: cover;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- Header Section --- */
+        #header {
+            padding: 50px 60px 30px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            z-index: 10;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .team-logo-container {
+            width: 180px;
+            height: 180px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        #team-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .title-tag {
+            font-size: 24px;
+            color: var(--accent);
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        #team-name {
+            font-size: 65px;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        #matchup-info {
+            font-size: 22px;
+            color: var(--text-muted);
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        /* --- Lineup Section --- */
+        #lineup-container {
+            flex-grow: 1;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 10px 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .batting-order {
+            font-size: 32px;
+            font-weight: 900;
+            color: rgba(255,255,255,0.2);
+            width: 40px;
+            text-align: left;
+        }
+
+        .headshot-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #222;
+            margin-right: 25px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .headshot {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+        }
+
+        .player-details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .player-name {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .player-position {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--accent);
+            width: 60px;
+            text-align: right;
+        }
+
+        /* --- Pitcher Footer --- */
+        #pitcher-section {
+            background: rgba(0,0,0,0.6);
+            padding: 30px 60px;
+            border-top: 2px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+
+        .pitcher-label {
+            font-size: 18px;
+            color: var(--text-muted);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        #pitcher-row {
+            background: linear-gradient(90deg, rgba(25, 30, 45, 0.9) 0%, rgba(20, 24, 35, 0.9) 100%);
+            border-left: 6px solid var(--accent);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <label>Game:</label>
+        <select id="game-selector"></select>
+        
+        <label>Side:</label>
+        <select id="side-selector">
+            <option value="away">Away Team</option>
+            <option value="home">Home Team</option>
+        </select>
+        
+        <button onclick="takeScreenshot()">Simulate Screenshot</button>
+    </div>
+
+    <div id="capture-area">
+        <div id="header">
+            <div class="team-logo-container">
+                <img id="team-logo" src="" alt="Team Logo">
+            </div>
+            <div class="header-text">
+                <div class="title-tag">Starting 9</div>
+                <h1 id="team-name">LOADING...</h1>
+                <div id="matchup-info">Fetching match details...</div>
+            </div>
+        </div>
+
+        <div id="lineup-container">
+            </div>
+
+        <div id="pitcher-section">
+            <div class="pitcher-label">Starting Pitcher</div>
+            <div id="pitcher-container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let allGames = [];
+        const BASE_API_URL = "https://statsapi.mlb.com/api/v1";
+
+        // Generates the MLB CDN image link
+        function getHeadshotUrl(personId) {
+            return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${personId}/headshot/67/current`;
+        }
+
+        // Generates the MLB SVG logo link
+        function getLogoUrl(teamId) {
+            return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+        }
+
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Default to today if no date is provided
+            let targetDate = urlParams.get('date');
+            if (!targetDate) {
+                const today = new Date();
+                targetDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            }
+
+            try {
+                // Fetch games with lineups and probable pitchers hydrated
+                const res = await fetch(`${BASE_API_URL}/schedule?sportId=1&date=${targetDate}&hydrate=probablePitcher,lineups`);
+                const data = await res.json();
+                
+                if (data.dates && data.dates.length > 0) {
+                    // Filter for games that actually have lineups available
+                    allGames = data.dates[0].games.filter(g => g.lineups && (g.lineups.awayPlayers || g.lineups.homePlayers));
+                }
+            } catch (e) {
+                console.error("Failed to fetch MLB data:", e);
+            }
+
+            populateDropdowns();
+
+            // Auto-load from URL if parameters are passed (for the bot)
+            const urlGamePk = urlParams.get('gamePk');
+            const urlSide = urlParams.get('side');
+
+            if (urlGamePk) document.getElementById('game-selector').value = urlGamePk;
+            if (urlSide) document.getElementById('side-selector').value = urlSide;
+
+            if (allGames.length > 0) {
+                renderCard();
+            } else {
+                document.getElementById('team-name').textContent = "NO LINEUPS YET";
+                document.getElementById('matchup-info').textContent = "Check back closer to first pitch.";
+            }
+        }
+
+        function populateDropdowns() {
+            const gameSelect = document.getElementById('game-selector');
+            gameSelect.innerHTML = '';
+            
+            allGames.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.gamePk;
+                opt.textContent = `${g.teams.away.team.name} @ ${g.teams.home.team.name}`;
+                gameSelect.appendChild(opt);
+            });
+
+            // Re-render when dropdowns change
+            gameSelect.addEventListener('change', renderCard);
+            document.getElementById('side-selector').addEventListener('change', renderCard);
+        }
+
+        function buildPlayerHTML(player, index, isPitcher = false) {
+            const headshot = getHeadshotUrl(player.id);
+            const orderDisplay = isPitcher ? 'SP' : (index + 1);
+            
+            // Some players might not have positions loaded yet in the raw array, fallback to 'DH' or 'SP'
+            let position = isPitcher ? 'P' : 'DH'; 
+            
+            // Clean up the name (e.g., remove Jr. for space, or just use fullName)
+            let name = player.fullName;
+
+            return `
+                <div class="player-row" ${isPitcher ? 'id="pitcher-row"' : ''}>
+                    <div class="batting-order">${orderDisplay}</div>
+                    <div class="headshot-wrapper">
+                        <img src="${headshot}" class="headshot" crossorigin="anonymous">
+                    </div>
+                    <div class="player-details">
+                        <div class="player-name">${name}</div>
+                    </div>
+                    </div>
+            `;
+        }
+
+        function renderCard() {
+            if (allGames.length === 0) return;
+
+            const gamePk = parseInt(document.getElementById('game-selector').value);
+            const side = document.getElementById('side-selector').value; // "away" or "home"
+            
+            const game = allGames.find(g => g.gamePk === gamePk);
+            if (!game) return;
+
+            const targetTeam = game.teams[side].team;
+            const oppTeam = side === 'away' ? game.teams['home'].team : game.teams['away'].team;
+            
+            // Update Header
+            document.getElementById('team-name').textContent = targetTeam.name;
+            document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
+            document.getElementById('matchup-info').textContent = `vs ${oppTeam.name}`;
+
+            // Adjust accent color based on Home/Away just for visual pop
+            document.documentElement.style.setProperty('--accent', side === 'home' ? '#ffffff' : '#aaaaaa');
+
+            // Get Batters (1 through 9)
+            const playersArray = game.lineups[`${side}Players`] || [];
+            const container = document.getElementById('lineup-container');
+            container.innerHTML = '';
+
+            // Render first 9 players in the array
+            const batters = playersArray.slice(0, 9);
+            batters.forEach((player, index) => {
+                container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false));
+            });
+
+            // Get Pitcher
+            const pitcherContainer = document.getElementById('pitcher-container');
+            pitcherContainer.innerHTML = '';
+            
+            const probablePitcher = game.teams[side].probablePitcher;
+            if (probablePitcher) {
+                pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true));
+            } else {
+                pitcherContainer.innerHTML = `<div class="player-row"><div class="player-name" style="color:#666;">TBD</div></div>`;
+            }
+        }
+
+        function takeScreenshot() {
+            const capture = document.getElementById('capture-area');
+            capture.style.opacity = '0.5';
+            setTimeout(() => { capture.style.opacity = '1'; }, 100);
+            alert("Ready! Playwright will capture this specific div (#capture-area).");
+        }
+
+        // Boot the app
+        init();
+    </script>
+</body>
+</html>
