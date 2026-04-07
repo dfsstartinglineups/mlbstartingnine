@@ -38,7 +38,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install requests tweepy atproto firebase-admin playwright
+          python -m pip install requests tweepy atproto firebase-admin playwright Pillow
           playwright install chromium
 
       - name: Run Tweet Bot
