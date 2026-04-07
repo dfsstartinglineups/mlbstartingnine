@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MLB Starting 9 Generator</title>
+    <title>MLB Dugout Lineup Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: rgba(25, 30, 45, 0.85);
-            --text-main: #ffffff;
-            --text-muted: #8a93a0;
-            --accent: #e31837; /* Default MLB Red */
+            /* Paper & Ink Colors */
+            --paper-bg: #f4f1ea;
+            --paper-line: rgba(40, 45, 55, 0.3);
+            --marker-ink: #1a1e24;
+            --pencil-ink: #4a4f58;
+            --highlighter: rgba(230, 255, 0, 0.5);
+            --accent: #e31837; 
         }
 
         body {
             margin: 0;
             padding: 20px;
-            background-color: #111;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            color: white;
+            background-color: #222; /* Dark outside canvas */
+            font-family: sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,12 +32,13 @@
         /* --- UI Controls (Hidden from screenshot) --- */
         #controls {
             margin-bottom: 20px;
-            background: #2a2a2a;
+            background: #333;
             padding: 15px 25px;
             border-radius: 8px;
             display: flex;
             gap: 15px;
             align-items: center;
+            color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             z-index: 100;
         }
@@ -41,13 +47,13 @@
             padding: 8px 16px;
             font-size: 16px;
             border-radius: 4px;
-            border: 1px solid #444;
-            background: #333;
+            border: 1px solid #555;
+            background: #444;
             color: white;
             cursor: pointer;
         }
 
-        button:hover { background: #444; }
+        button:hover { background: #555; }
 
         /* =========================================
            THE EXPORTABLE CANVAS (1080x1350)
@@ -55,183 +61,200 @@
         #capture-area {
             width: 1080px;
             height: 1350px; 
-            background: radial-gradient(circle at top, #1a2235 0%, var(--bg-color) 100%);
+            background-color: var(--paper-bg);
+            /* SVG Noise filter for paper texture */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            border: 2px solid #222;
-        }
-
-        /* Subtle Baseball Diamond Background Watermark */
-        #capture-area::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 800px;
-            height: 800px;
-            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 5 L95 50 L50 95 L5 50 Z" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></svg>');
-            background-size: cover;
-            transform: translate(-50%, -50%);
-            z-index: 0;
-            pointer-events: none;
+            color: var(--marker-ink);
         }
 
         /* --- Header Section --- */
         #header {
-            padding: 40px 60px 20px; /* Reduced top/bottom padding to save space */
+            padding: 40px 50px 30px;
             display: flex;
             align-items: center;
-            gap: 30px;
-            z-index: 10;
-            border-bottom: 2px solid rgba(255,255,255,0.1);
+            gap: 40px;
+            border-bottom: 4px solid var(--paper-line);
+            position: relative;
         }
 
         .team-logo-container {
-            width: 160px; /* Slightly scaled down */
-            height: 160px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
+            width: 150px; 
+            height: 150px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
             flex-shrink: 0;
         }
 
         #team-logo {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             object-fit: contain;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
+            /* Faint shadow to look like it's printed on the page */
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
         }
 
         .header-text {
             display: flex;
             flex-direction: column;
             justify-content: center;
+            flex-grow: 1;
         }
 
-        .title-tag {
-            font-size: 24px;
-            color: var(--accent);
-            font-weight: 900;
-            letter-spacing: 4px;
-            text-transform: uppercase;
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-bottom: 5px;
         }
 
+        .title-tag {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 28px;
+            color: var(--marker-ink);
+            background-color: var(--highlighter);
+            padding: 0 10px;
+            transform: rotate(-2deg);
+            display: inline-block;
+        }
+
+        .date-display {
+            font-family: 'Caveat', cursive;
+            font-size: 32px;
+            color: var(--pencil-ink);
+            font-weight: 700;
+        }
+
         #team-name {
-            font-size: 52px; /* Reduced from 65px to prevent wrapping on long names */
-            font-weight: 900;
-            margin: 0;
-            line-height: 1.05;
+            font-family: 'Permanent Marker', cursive;
+            font-size: 58px; 
+            margin: 5px 0 0 0;
+            line-height: 1.1;
             text-transform: uppercase;
-            letter-spacing: -1px;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #matchup-info {
-            font-size: 22px;
-            color: var(--text-muted);
-            margin-top: 10px;
-            font-weight: 600;
+            font-family: 'Caveat', cursive;
+            font-size: 34px;
+            color: var(--pencil-ink);
+            margin-top: 5px;
+            font-weight: 700;
         }
 
-        .date-highlight {
-            color: white;
-            font-weight: 800;
-        }
-
-        /* --- Lineup Section --- */
+        /* --- Lineup Section (The Grid) --- */
         #lineup-container {
             flex-grow: 1;
-            padding: 20px 60px; /* Reduced vertical padding */
             display: flex;
             flex-direction: column;
-            gap: 12px; /* Tightened gap from 15px to 12px */
-            z-index: 10;
+            padding: 0 40px;
         }
 
         .player-row {
             display: flex;
             align-items: center;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 8px 25px; /* Tightened internal padding */
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-bottom: 2px solid var(--paper-line);
+            height: 95px; /* Fixed height for consistent grid */
         }
 
-        .batting-order {
-            font-size: 32px;
-            font-weight: 900;
-            color: rgba(255,255,255,0.2);
-            width: 40px;
-            text-align: left;
+        /* Vertical Grid Lines */
+        .col-order {
+            width: 80px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 2px solid var(--paper-line);
+            font-family: 'Permanent Marker', cursive;
+            font-size: 42px;
+            color: var(--marker-ink);
+        }
+
+        .col-photo {
+            width: 110px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 2px solid var(--paper-line);
+        }
+
+        .col-name {
+            flex-grow: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 25px;
+            border-right: 2px solid var(--paper-line);
+            font-family: 'Permanent Marker', cursive;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .col-pos {
+            width: 100px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--pencil-ink);
         }
 
         .headshot-wrapper {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            background: #222;
-            margin-right: 25px;
+            background: #e0dcd3;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 3px solid var(--marker-ink);
+            /* Adds a slight hand-drawn wobble to the border */
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; 
         }
 
         .headshot {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* FIX: Removed 'object-position: top' to allow natural centering, fixing cut-off hats */
-            object-position: center; 
-        }
-
-        .player-details {
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .player-name {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .player-position {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--accent);
-            width: 60px;
-            text-align: right;
+            object-position: center; /* Prevents hat cutoff */
         }
 
         /* --- Pitcher Footer --- */
         #pitcher-section {
-            background: rgba(0,0,0,0.6);
-            padding: 25px 60px; /* Tightened padding */
-            border-top: 2px solid rgba(255,255,255,0.1);
-            z-index: 10;
+            padding: 10px 40px 30px;
+            position: relative;
         }
 
         .pitcher-label {
-            font-size: 18px;
-            color: var(--text-muted);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+            color: var(--pencil-ink);
+            font-weight: 700;
+            margin-bottom: 5px;
+            padding-left: 10px;
         }
 
         #pitcher-row {
-            background: linear-gradient(90deg, rgba(25, 30, 45, 0.9) 0%, rgba(20, 24, 35, 0.9) 100%);
-            border-left: 6px solid var(--accent);
+            border-top: 4px solid var(--paper-line);
+            border-bottom: 4px solid var(--paper-line);
+            background-color: rgba(0,0,0,0.03); /* Slight shade to differentiate */
+        }
+
+        .col-order.sp-text {
+            font-size: 36px; /* Slightly smaller to fit 'SP' */
         }
     </style>
 </head>
@@ -256,7 +279,10 @@
                 <img id="team-logo" src="" alt="Team Logo">
             </div>
             <div class="header-text">
-                <div class="title-tag">Starting 9</div>
+                <div class="title-row">
+                    <div class="title-tag">Starting 9</div>
+                    <div id="game-date" class="date-display">April 10, 2024</div>
+                </div>
                 <h1 id="team-name">LOADING...</h1>
                 <div id="matchup-info">Fetching match details...</div>
             </div>
@@ -277,28 +303,34 @@
         let globalTargetDate = "";
         const BASE_API_URL = "https://statsapi.mlb.com/api/v1";
 
-        // Generates the MLB CDN image link
         function getHeadshotUrl(personId) {
             return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${personId}/headshot/67/current`;
         }
 
-        // Generates the MLB SVG logo link
         function getLogoUrl(teamId) {
             return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
         }
 
-        // Formats the date cleanly (e.g., "Wed, Apr 10")
         function formatDisplayDate(dateString) {
-            // Append T00:00:00 so JS doesn't shift the day backwards based on local timezone
             const dateObj = new Date(dateString + 'T00:00:00'); 
-            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
             return dateObj.toLocaleDateString('en-US', options);
+        }
+
+        // Helper to safely extract position from the MLB API object
+        function getPlayerPosition(player) {
+            if (player.position && player.position.abbreviation) {
+                return player.position.abbreviation;
+            }
+            if (player.allPositions && player.allPositions.length > 0) {
+                return player.allPositions[0].abbreviation;
+            }
+            return "—"; // Fallback pencil dash
         }
 
         async function init() {
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Default to today if no date is provided
             let targetDate = urlParams.get('date');
             if (!targetDate) {
                 const today = new Date();
@@ -307,12 +339,10 @@
             globalTargetDate = targetDate;
 
             try {
-                // Fetch games with lineups and probable pitchers hydrated
                 const res = await fetch(`${BASE_API_URL}/schedule?sportId=1&date=${targetDate}&hydrate=probablePitcher,lineups`);
                 const data = await res.json();
                 
                 if (data.dates && data.dates.length > 0) {
-                    // Filter for games that actually have lineups available
                     allGames = data.dates[0].games.filter(g => g.lineups && (g.lineups.awayPlayers || g.lineups.homePlayers));
                 }
             } catch (e) {
@@ -321,7 +351,6 @@
 
             populateDropdowns();
 
-            // Auto-load from URL if parameters are passed (for the bot)
             const urlGamePk = urlParams.get('gamePk');
             const urlSide = urlParams.get('side');
 
@@ -332,7 +361,8 @@
                 renderCard();
             } else {
                 document.getElementById('team-name').textContent = "NO LINEUPS YET";
-                document.getElementById('matchup-info').textContent = `Check back closer to first pitch on ${formatDisplayDate(globalTargetDate)}.`;
+                document.getElementById('matchup-info').textContent = "Check back closer to first pitch.";
+                document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
             }
         }
 
@@ -347,7 +377,6 @@
                 gameSelect.appendChild(opt);
             });
 
-            // Re-render when dropdowns change
             gameSelect.addEventListener('change', renderCard);
             document.getElementById('side-selector').addEventListener('change', renderCard);
         }
@@ -355,18 +384,21 @@
         function buildPlayerHTML(player, index, isPitcher = false) {
             const headshot = getHeadshotUrl(player.id);
             const orderDisplay = isPitcher ? 'SP' : (index + 1);
+            const posClass = isPitcher ? 'sp-text' : '';
             
+            const positionStr = isPitcher ? 'P' : getPlayerPosition(player);
             let name = player.fullName;
 
             return `
                 <div class="player-row" ${isPitcher ? 'id="pitcher-row"' : ''}>
-                    <div class="batting-order">${orderDisplay}</div>
-                    <div class="headshot-wrapper">
-                        <img src="${headshot}" class="headshot" crossorigin="anonymous">
+                    <div class="col-order ${posClass}">${orderDisplay}</div>
+                    <div class="col-photo">
+                        <div class="headshot-wrapper">
+                            <img src="${headshot}" class="headshot" crossorigin="anonymous">
+                        </div>
                     </div>
-                    <div class="player-details">
-                        <div class="player-name">${name}</div>
-                    </div>
+                    <div class="col-name">${name}</div>
+                    <div class="col-pos">${positionStr}</div>
                 </div>
             `;
         }
@@ -375,7 +407,7 @@
             if (allGames.length === 0) return;
 
             const gamePk = parseInt(document.getElementById('game-selector').value);
-            const side = document.getElementById('side-selector').value; // "away" or "home"
+            const side = document.getElementById('side-selector').value; 
             
             const game = allGames.find(g => g.gamePk === gamePk);
             if (!game) return;
@@ -383,23 +415,17 @@
             const targetTeam = game.teams[side].team;
             const oppTeam = side === 'away' ? game.teams['home'].team : game.teams['away'].team;
             
-            // Format the display string (e.g., "vs Baltimore Orioles  •  Wed, Apr 10")
-            const displayDateStr = formatDisplayDate(globalTargetDate);
-            
             // Update Header
             document.getElementById('team-name').textContent = targetTeam.name;
             document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
-            document.getElementById('matchup-info').innerHTML = `vs ${oppTeam.name} &nbsp;&bull;&nbsp; <span class="date-highlight">${displayDateStr}</span>`;
-
-            // Adjust accent color based on Home/Away just for visual pop
-            document.documentElement.style.setProperty('--accent', side === 'home' ? '#ffffff' : '#aaaaaa');
+            document.getElementById('matchup-info').textContent = `vs ${oppTeam.name}`;
+            document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
 
             // Get Batters (1 through 9)
             const playersArray = game.lineups[`${side}Players`] || [];
             const container = document.getElementById('lineup-container');
             container.innerHTML = '';
 
-            // Render first 9 players in the array
             const batters = playersArray.slice(0, 9);
             batters.forEach((player, index) => {
                 container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false));
@@ -413,7 +439,13 @@
             if (probablePitcher) {
                 pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true));
             } else {
-                pitcherContainer.innerHTML = `<div class="player-row"><div class="player-name" style="color:#666;">TBD</div></div>`;
+                pitcherContainer.innerHTML = `
+                    <div class="player-row" id="pitcher-row">
+                        <div class="col-order sp-text">SP</div>
+                        <div class="col-photo"></div>
+                        <div class="col-name" style="color:var(--pencil-ink); font-family:'Caveat', cursive;">To Be Determined</div>
+                        <div class="col-pos">P</div>
+                    </div>`;
             }
         }
 
