@@ -167,16 +167,20 @@ async def take_mlb_screenshot(game_pk, side, target_date):
         
         # Wait for the players to render from the API
         try:
+            # If the players don't load in 15 seconds, this throws an error and jumps to 'except'
             await page.wait_for_selector(".player-row", timeout=15000)
             await asyncio.sleep(2) # Buffer for images and fonts to snap into place
-        except Exception:
-            print("⚠️ Timeout waiting for MLB players. Taking screenshot anyway...")
-
-        capture_area = page.locator("#capture-area")
-        await capture_area.screenshot(path="mlb_matchup.png")
-        print("✅ MLB Screenshot saved!")
-        await browser.close()
-
+            
+            capture_area = page.locator("#capture-area")
+            await capture_area.screenshot(path="mlb_matchup.png")
+            print("✅ MLB Screenshot saved!")
+            await browser.close()
+            return True
+            
+        except Exception as e:
+            print(f"⚠️ Players failed to load. Aborting screenshot. Error: {e}")
+            await browser.close()
+            return False
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -626,11 +630,23 @@ for game in games:
             bsky_tb.text("\n\n")
         bsky_tb.text(tags_text)
 
-        # 2. Generate the Graphic via Playwright
-        try:
-            asyncio.run(take_mlb_screenshot(game_pk, side, date_string))
-        except Exception as e:
-            print(f"❌ Failed to generate MLB screenshot: {e}")
+        # 2. Generate the Graphic via Playwright (With 1 Retry)
+        screenshot_success = False
+        for attempt in range(2):
+            try:
+                if asyncio.run(take_mlb_screenshot(game_pk, side, date_string)):
+                    screenshot_success = True
+                    break # The screenshot worked! Break out of the retry loop.
+                else:
+                    print(f"⚠️ Screenshot attempt {attempt + 1} failed. Pausing for 5 seconds then retrying...")
+                    time.sleep(5)
+            except Exception as e:
+                print(f"❌ Playwright crashed on attempt {attempt + 1}: {e}")
+                time.sleep(5)
+                
+        # If both attempts failed, abort the tweet so it can try again on the next cron run
+        if not screenshot_success:
+            print(f"⏭️ Skipping {team_short} tweet due to screenshot failure. Will retry next run.")
             return False
 
         # 3. Upload and Post
