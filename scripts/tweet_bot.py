@@ -600,7 +600,7 @@ for game in games:
             tweet_text = f"{alert_header}\n\n"
             bsky_text = f"{alert_header}\n\n"
         else:
-            header_text = f"{game_date_short} ⚾ {team_short} Lineups Out\n\n"
+            header_text = f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n"
             tweet_text = header_text
             bsky_text = header_text
         
