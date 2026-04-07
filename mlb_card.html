@@ -167,7 +167,7 @@
 
         /* Vertical Grid Lines */
         .col-order {
-            width: 80px;
+            width: 90px; /* Slightly widened to safely hold 'SP' */
             height: 100%;
             display: flex;
             justify-content: center;
@@ -254,7 +254,7 @@
         }
 
         .col-order.sp-text {
-            font-size: 36px; /* Slightly smaller to fit 'SP' */
+            font-size: 28px; /* Reduced to ensure it never overflows 90px width */
         }
     </style>
 </head>
@@ -281,7 +281,7 @@
             <div class="header-text">
                 <div class="title-row">
                     <div class="title-tag">Starting 9</div>
-                    <div id="game-date" class="date-display">April 10, 2024</div>
+                    <div id="game-date" class="date-display">LOADING...</div>
                 </div>
                 <h1 id="team-name">LOADING...</h1>
                 <div id="matchup-info">Fetching match details...</div>
@@ -317,17 +317,6 @@
             return dateObj.toLocaleDateString('en-US', options);
         }
 
-        // Helper to safely extract position from the MLB API object
-        function getPlayerPosition(player) {
-            if (player.position && player.position.abbreviation) {
-                return player.position.abbreviation;
-            }
-            if (player.allPositions && player.allPositions.length > 0) {
-                return player.allPositions[0].abbreviation;
-            }
-            return "—"; // Fallback pencil dash
-        }
-
         async function init() {
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -358,7 +347,7 @@
             if (urlSide) document.getElementById('side-selector').value = urlSide;
 
             if (allGames.length > 0) {
-                renderCard();
+                await renderCard();
             } else {
                 document.getElementById('team-name').textContent = "NO LINEUPS YET";
                 document.getElementById('matchup-info').textContent = "Check back closer to first pitch.";
@@ -377,16 +366,17 @@
                 gameSelect.appendChild(opt);
             });
 
-            gameSelect.addEventListener('change', renderCard);
-            document.getElementById('side-selector').addEventListener('change', renderCard);
+            gameSelect.addEventListener('change', () => renderCard());
+            document.getElementById('side-selector').addEventListener('change', () => renderCard());
         }
 
-        function buildPlayerHTML(player, index, isPitcher = false) {
+        function buildPlayerHTML(player, index, isPitcher, positionMap) {
             const headshot = getHeadshotUrl(player.id);
             const orderDisplay = isPitcher ? 'SP' : (index + 1);
             const posClass = isPitcher ? 'sp-text' : '';
             
-            const positionStr = isPitcher ? 'P' : getPlayerPosition(player);
+            // Map position from our boxscore dictionary, fallback to dash if missing
+            const positionStr = isPitcher ? 'SP' : (positionMap[player.id] || "—");
             let name = player.fullName;
 
             return `
@@ -403,7 +393,7 @@
             `;
         }
 
-        function renderCard() {
+        async function renderCard() {
             if (allGames.length === 0) return;
 
             const gamePk = parseInt(document.getElementById('game-selector').value);
@@ -415,11 +405,37 @@
             const targetTeam = game.teams[side].team;
             const oppTeam = side === 'away' ? game.teams['home'].team : game.teams['away'].team;
             
-            // Update Header
+            // Update Header quickly
             document.getElementById('team-name').textContent = targetTeam.name;
             document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
             document.getElementById('matchup-info').textContent = `vs ${oppTeam.name}`;
             document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
+
+            // Fetch Live Feed to extract exact game positions (Mirrors Python Bot Logic)
+            const positionMap = {};
+            try {
+                const feedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${gamePk}/feed/live`);
+                const feedData = await feedRes.json();
+                const boxTeams = feedData.liveData?.boxscore?.teams || {};
+
+                // Map positions for both teams
+                ['away', 'home'].forEach(teamSide => {
+                    const players = boxTeams[teamSide]?.players || {};
+                    for (const key in players) {
+                        const p = players[key];
+                        const pId = p.person?.id;
+                        if (pId) {
+                            if (p.position && p.position.abbreviation) {
+                                positionMap[pId] = p.position.abbreviation;
+                            } else if (p.allPositions && p.allPositions.length > 0) {
+                                positionMap[pId] = p.allPositions[0].abbreviation;
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Failed to fetch live positions mapping", e);
+            }
 
             // Get Batters (1 through 9)
             const playersArray = game.lineups[`${side}Players`] || [];
@@ -428,7 +444,7 @@
 
             const batters = playersArray.slice(0, 9);
             batters.forEach((player, index) => {
-                container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false));
+                container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false, positionMap));
             });
 
             // Get Pitcher
@@ -437,14 +453,14 @@
             
             const probablePitcher = game.teams[side].probablePitcher;
             if (probablePitcher) {
-                pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true));
+                pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true, positionMap));
             } else {
                 pitcherContainer.innerHTML = `
                     <div class="player-row" id="pitcher-row">
                         <div class="col-order sp-text">SP</div>
                         <div class="col-photo"></div>
                         <div class="col-name" style="color:var(--pencil-ink); font-family:'Caveat', cursive;">To Be Determined</div>
-                        <div class="col-pos">P</div>
+                        <div class="col-pos">SP</div>
                     </div>`;
             }
         }
