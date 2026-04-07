@@ -203,7 +203,7 @@
         }
 
         .col-pos {
-            width: 130px; /* Widened to fit Position + Handedness */
+            width: 100px;
             height: 100%;
             display: flex;
             justify-content: center;
@@ -215,10 +215,14 @@
         }
 
         .hand-indicator {
-            font-size: 26px;
-            color: rgba(74, 79, 88, 0.6);
-            margin-left: 8px;
-            font-weight: 600;
+            font-family: 'Caveat', cursive;
+            font-size: 32px;
+            color: var(--pencil-ink);
+            opacity: 0.8;
+            margin-right: 12px;
+            font-weight: 700;
+            text-transform: none; /* Keep parenthesis clean */
+            letter-spacing: 0;
         }
 
         .headshot-wrapper {
@@ -400,8 +404,8 @@
                             <img src="${headshot}" class="headshot" crossorigin="anonymous">
                         </div>
                     </div>
-                    <div class="col-name">${name}</div>
-                    <div class="col-pos">${positionStr} ${handDisplay}</div>
+                    <div class="col-name">${handDisplay}${name}</div>
+                    <div class="col-pos">${positionStr}</div>
                 </div>
             `;
         }
