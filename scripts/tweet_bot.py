@@ -152,6 +152,29 @@ async def take_screenshot(fixture_id, target_date):
         print("✅ Screenshot saved!")
         await browser.close()
 
+async def take_mlb_screenshot(game_pk, side, target_date):
+    print(f"📸 Booting headless browser for MLB Game {game_pk} ({side})...")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+        
+        # ⚠️ UPDATE THIS URL TO YOUR HOSTED HTML FILE ⚠️
+        url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
+        print(f"🌐 Navigating to {url}...")
+        await page.goto(url)
+        
+        # Wait for the players to render from the API
+        try:
+            await page.wait_for_selector(".player-row", timeout=15000)
+            await asyncio.sleep(2) # Buffer for images and fonts to snap into place
+        except Exception:
+            print("⚠️ Timeout waiting for MLB players. Taking screenshot anyway...")
+
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="mlb_matchup.png")
+        print("✅ MLB Screenshot saved!")
+        await browser.close()
+
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -569,72 +592,68 @@ for game in games:
     away_odds_str = format_odds(raw_away_odds)
     home_odds_str = format_odds(raw_home_odds)
 
-    def send_mlb_tweet(team_short, team_pitcher, team_odds, opp_pitcher, opp_odds, players, side, alert_header=None):
-        team_odds_display = f" [{team_odds}]" if team_odds != "TBD" else ""
-        opp_odds_display = f" [{opp_odds}]" if opp_odds != "TBD" else ""
-        
-        def shorten_name(name):
-            clean_name = name.split(' (')[0]
-            parts = clean_name.split(' ')
-            return f"{parts[0][0]}. {' '.join(parts[1:])}" if len(parts) > 1 else clean_name
-
-        # --- 1. BUILD HEADERS ---
+    def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alert_header=None):
+        # 1. Build the lightweight text payload
         if alert_header:
             tweet_text = f"{alert_header}\n\n"
             bsky_text = f"{alert_header}\n\n"
         else:
-            tweet_text = f"⚾ {game_date_short} {team_short} Lineup{total_string}\nSP: {team_pitcher}{team_odds_display}\nvs {opp_pitcher}{opp_odds_display}\n\n"
-            bsky_p1 = shorten_name(team_pitcher)
-            bsky_p2 = shorten_name(opp_pitcher)
-            bsky_text = f"⚾ {game_date_short} {team_short} Lineup\nSPs: {bsky_p1} vs {bsky_p2}\n\n"
+            tweet_text = f"🚨 OFFICIAL STARTING 9 🚨\n\nThe {team_short} lineup is locked in.\n\n"
+            bsky_text = f"🚨 OFFICIAL STARTING 9 🚨\n\nThe {team_short} lineup is locked in.\n\n"
         
-        # --- 2. ADD BATTERS ---
-        for i, p in enumerate(players):
-            pid = p['id']
-            hand = f"({hands.get(pid)})" if hands.get(pid) else ""
-            raw_pos = positions.get(pid, "")
-            tweet_pos = f"({raw_pos})" if raw_pos else ""
-            
-            tweet_line = f"{i+1}. {p['fullName']} {tweet_pos} {hand}"
-            tweet_text += " ".join(tweet_line.split()) + "\n"
-            
-            b_name = shorten_name(p['fullName'])
-            if raw_pos:
-                bsky_text += f"{raw_pos:<2} {b_name}\n"
-            else:
-                bsky_text += f"{b_name}\n"
-            
-        team_hash = team_short.replace(" ", "")
+        # --- INJECT THE ODDS HERE ---
+        if team_odds != "TBD":
+            odds_display = f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
+            tweet_text += odds_display
+            bsky_text += odds_display
         
-        # --- 3. ADD FOOTERS & POST ---
         link_url = f"https://mlbstartingnine.com/#game-{game_pk}"
         
         if random.randint(1, 100) <= 100 and not alert_header:
-            tweet_text += f"\n\nGo directly to this gameCard with BvP, Splits, umpire ratings, etc here: {link_url}"
-        tweet_text += f"\n\n#{team_hash} #{team_hash}Lineup #MLB"
+            tweet_text += f"Full matchup stats, BvP, & umpire ratings:\n{link_url}\n\n"
+            bsky_text += f"Full matchup stats, BvP, & umpire ratings:\n"
+        
+        tags_text = f"#{team_hash} #{team_hash}Lineup #MLB"
+        tweet_text += tags_text
         
         bsky_tb = client_utils.TextBuilder()
         bsky_tb.text(bsky_text)
         if not alert_header:
-            bsky_tb.text("\nStats: ")
             bsky_tb.link(link_url, link_url)
-        bsky_tb.text(f"\n#{team_hash} #MLB")
-        
+            bsky_tb.text("\n\n")
+        bsky_tb.text(tags_text)
+
+        # 2. Generate the Graphic via Playwright
         try:
-            mlb_client.create_tweet(text=tweet_text)
-            print(f"✅ Successfully tweeted {team_short} MLB lineup!")
+            asyncio.run(take_mlb_screenshot(game_pk, side, date_string))
+        except Exception as e:
+            print(f"❌ Failed to generate MLB screenshot: {e}")
+            return False
+
+        # 3. Upload and Post
+        try:
+            print("⬆️ Uploading MLB graphic to X servers...")
+            media = mlb_api_v1.media_upload("mlb_matchup.png")
+            
+            mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+            print(f"✅ Successfully tweeted {team_short} MLB lineup graphic!")
             
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
-                if len(bsky_text) + len(link_url) + len(team_hash) + 15 <= 300:
-                    try:
-                        config["bsky_client"].send_post(bsky_tb)
-                    except Exception as e:
-                        print(f"❌ Bluesky post failed for {team_short}: {e}")
+                try:
+                    # Bluesky requires the raw image data to be sent with the post
+                    with open("mlb_matchup.png", "rb") as f:
+                        img_data = f.read()
+                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_short} Starting Lineup")
+                    print(f"✅ Successfully posted {team_short} to Bluesky!")
+                except Exception as e:
+                    print(f"❌ Bluesky post failed for {team_short}: {e}")
             return True
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
             return False
+
+       
 
     # ==========================================
     # 🧠 THE SMART DIFF ENGINE
@@ -657,7 +676,9 @@ for game in games:
 
         # --- 1. FIRST TIME TWEET ---
         if not previously_tweeted_keys:
-            if send_mlb_tweet(team_short_ref, team_p_ref, team_o_ref, opp_p_ref, opp_o_ref, players_array, side):
+            team_hash = team_short_ref.replace(" ", "")
+            # Pass the odds variables right after team_hash!
+            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string):
                 log_today.append(full_key)
                 tweeted_recently.append(full_key)
                 new_tweets_sent = True
@@ -703,7 +724,9 @@ for game in games:
 
             print(f"🚨 ALERT TRIGGERED FOR {team_short_ref}:\n{alert_header}")
 
-            if send_mlb_tweet(team_short_ref, team_p_ref, team_o_ref, opp_p_ref, opp_o_ref, players_array, side, alert_header=alert_header):
+            team_hash = team_short_ref.replace(" ", "")
+            # Pass the odds variables here too!
+            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, alert_header=alert_header):
                 # Clean up old key to prevent duplicate tweets on the next run
                 for k in previously_tweeted_keys:
                     if k in log_today: log_today.remove(k)
