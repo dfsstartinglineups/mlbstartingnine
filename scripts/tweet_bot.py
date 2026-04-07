@@ -203,7 +203,7 @@ NBA_DATA_URL = f"https://nbastartingfive.com/nba_data.json?v={today_est.timestam
 # --- FUTBOL URL ---
 FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp()}"
 
-                                                                                        
+                                                                                                    
 
 # ==========================================
 # 3. LOAD & CLEAN MEMORY
@@ -509,28 +509,15 @@ for game in games:
                 mlb_client.create_tweet(text=alert_text)
                 print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short}!")
                 
-               # --- START BLUESKY UPLOAD FIX ---
-            config = LEAGUE_CONFIG.get("mlb")
-            if config and config.get("bsky_client"):
-                try:
-                    # 1. Open the massive PNG we generated for Twitter
-                    with Image.open("mlb_matchup.png") as img:
-                        # 2. Convert it to RGB (removes transparency so JPEG works)
-                        rgb_img = img.convert('RGB')
-                        
-                        # 3. Save it to a temporary memory buffer as a highly compressed JPEG
-                        img_byte_arr = io.BytesIO()
-                        rgb_img.save(img_byte_arr, format='JPEG', quality=70)
-                        
-                        # 4. Get the raw bytes to send to Bluesky (now well under 1MB!)
-                        img_data = img_byte_arr.getvalue()
-
-                    # Send the lightweight JPEG data to Bluesky
-                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_short} Starting Lineup")
-                    print(f"✅ Successfully posted {team_short} to Bluesky (Compressed JPEG)!")
-                except Exception as e:
-                    print(f"❌ Bluesky post failed for {team_short}: {e}")
-            # --- END BLUESKY UPLOAD FIX ---
+                # 2. Post to Bluesky (Text only)
+                config = LEAGUE_CONFIG.get("mlb")
+                if config and config.get("bsky_client"):
+                    bsky_tb = client_utils.TextBuilder()
+                    bsky_tb.text(alert_text)
+                    try:
+                        config["bsky_client"].send_post(bsky_tb)
+                    except Exception as e:
+                        print(f"❌ Bluesky post failed for postponement: {e}")
 
                 # 3. Log it & save memory so we don't spam it
                 log_today.append(postponed_key)
@@ -654,16 +641,29 @@ for game in games:
             mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
             print(f"✅ Successfully tweeted {team_short} MLB lineup graphic!")
             
+            # --- START BLUESKY UPLOAD FIX ---
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
                 try:
-                    # Bluesky requires the raw image data to be sent with the post
-                    with open("mlb_matchup.png", "rb") as f:
-                        img_data = f.read()
+                    # 1. Open the massive PNG we generated for Twitter
+                    with Image.open("mlb_matchup.png") as img:
+                        # 2. Convert it to RGB (removes transparency so JPEG works)
+                        rgb_img = img.convert('RGB')
+                        
+                        # 3. Save it to a temporary memory buffer as a highly compressed JPEG
+                        img_byte_arr = io.BytesIO()
+                        rgb_img.save(img_byte_arr, format='JPEG', quality=70)
+                        
+                        # 4. Get the raw bytes to send to Bluesky (now well under 1MB!)
+                        img_data = img_byte_arr.getvalue()
+
+                    # Send the lightweight JPEG data to Bluesky
                     config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_short} Starting Lineup")
-                    print(f"✅ Successfully posted {team_short} to Bluesky!")
+                    print(f"✅ Successfully posted {team_short} to Bluesky (Compressed JPEG)!")
                 except Exception as e:
                     print(f"❌ Bluesky post failed for {team_short}: {e}")
+            # --- END BLUESKY UPLOAD FIX ---
+            
             return True
         except Exception as e:
             print(f"❌ Failed to tweet {team_short}: {e}")
@@ -788,45 +788,6 @@ FUTBOL_LEAGUES = {
 }
 
 
-#FUTBOL_LEAGUES = {
- #   39:  {"name": "PREMIER LEAGUE \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#EPL", "url_slug": "epl"},
-  #  140: {"name": "LA LIGA 🇪🇸", "tag": "#LaLiga", "url_slug": "laliga"},
-   # 135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "base_url": "https://futbolstartingeleven.com/seriea.html"},
-    #2:   {"name": "CHAMPIONS LEAGUE 🇪🇺", "tag": "#UCL", "url_slug": "ucl"},
-    #45:  {"name": "FA CUP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#FACup", "url_slug": "facup"},
-    #40:  {"name": "CHAMPIONSHIP \U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "tag": "#Championship", "url_slug": "championship", "x_client": championship_client, "base_url": "https://futbolstartingeleven.com/championship.html"},
-    #78:  {"name": "BUNDESLIGA 🇩🇪", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
-    #254: {"name": "NWSL 🇺🇸", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
-    #253: {"name": "MLS 🇺🇸", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "base_url": "https://futbolstartingeleven.com/mls.html"},
-    #61:  {"name": "LIGUE 1 🇫🇷", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": ligue1_client, "base_url": "https://futbolstartingeleven.com/ligue1.html"},
-    #3:   {"name": "EUROPA LEAGUE 🇪🇺", "tag": "#EuropaLeague", "url_slug": "europa"},
-    #13:  {"name": "COPA LIBERTADORES 🌎", "tag": "#Libertadores", "url_slug": "libertadores"},
-    #16:  {"name": "CHAMPIONS CUP 🏆", "tag": "#ChampionsCup", "url_slug": "concacaf"},
-    #71:  {"name": "BRASILEIRÃO 🇧🇷", "tag": "#Brasileirao", "url_slug": "brazil"},
-    #128: {"name": "LIGA PROFESIONAL 🇦🇷", "tag": "#LigaProfesional", "url_slug": "argentina"},
-    #88:  {"name": "EREDIVISIE 🇳🇱", "tag": "#Eredivisie", "url_slug": "eredivisie" },
-    #262: {"name": "LIGA MX 🇲🇽", "tag": "#LigaMX", "url_slug": "ligamx"},
-    #94:  {"name": "PRIMEIRA LIGA 🇵🇹", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-    #239: {"name": "PRIMERA A 🇨🇴", "tag": "#PrimeraA", "url_slug": "colombia"},
-    #188: {"name": "A-LEAGUE 🇦🇺", "tag": "#ALeague", "url_slug": "australia"},
-    #11:  {"name": "COPA SUDAMERICANA 🌎", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
-    #5:   {"name": "UEFA NATIONS LEAGUE 🇪🇺", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
-    #531: {"name": "CONCACAF NATIONS LEAGUE 🌎", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    #10:  {"name": "INTERNATIONAL 🌎", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
-#}
-    # 848: { "name": "CONFERENCE LEAGUE 🇪🇺", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },
-   # 307: { "name": "SAUDI PRO LEAGUE 🇸🇦", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
-   # 98:  {"name": "J1 LEAGUE 🇯🇵", "tag": "#J1League", "url_slug": "japan"},
-    # 203: {"name": "SÜPER LIG 🇹🇷", "tag": "#SuperLig", "url_slug": "turkey"},
-   # 144: {"name": "PRO LEAGUE 🇧🇪", "tag": "#ProLeague", "url_slug": "belgium"},
-   # 179: {"name": "PREMIERSHIP \U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "tag": "#ScottishPremiership", "url_slug": "scotland"},
-    # 119: {"name": "SUPERLIGA 🇩🇰", "tag": "#Superliga", "url_slug": "denmark"}
-   # 292: {"name": "K LEAGUE 1 🇰🇷", "tag": "#KLeague #KLeague1 #SouthKorea", "url_slug": "k1"},
-    # 143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
-   # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia"},
-   # 81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal"},
-    # 44:  {"name": "WOMEN'S SUPER LEAGUE 🇬🇧", "tag": "#BarclaysWSL #WSL", "url_slug": "wsl"},
-    
 # ==========================================
 # NATIONAL TEAM FLAG DICTIONARY (MASTER LIST)
 # ==========================================
