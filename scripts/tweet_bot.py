@@ -613,8 +613,9 @@ for game in games:
             tweet_text = f"{alert_header}\n\n"
             bsky_text = f"{alert_header}\n\n"
         else:
-            tweet_text = f"🚨 OFFICIAL STARTING 9 🚨\n\nThe {team_short} lineup is locked in.\n\n"
-            bsky_text = f"🚨 OFFICIAL STARTING 9 🚨\n\nThe {team_short} lineup is locked in.\n\n"
+            header_text = f"{game_date_short} ⚾ {team_short} Lineups Out\n\n"
+            tweet_text = header_text
+            bsky_text = header_text
         
         # --- INJECT THE ODDS HERE ---
         if team_odds != "TBD":
