@@ -25,6 +25,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+        # 🛑 ADD THIS STEP: Installs the missing OS utility for setup-python
+      - name: Install lsb-release
+        run: apt-get update && apt-get install -y lsb-release
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
