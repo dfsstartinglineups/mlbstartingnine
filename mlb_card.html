@@ -148,6 +148,14 @@
             color: var(--pencil-ink);
             margin-top: 5px;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .opp-sp {
+            font-size: 28px;
+            opacity: 0.85;
         }
 
         /* --- Lineup Section (The Grid) --- */
@@ -415,19 +423,14 @@
 
             const gamePk = parseInt(document.getElementById('game-selector').value);
             const side = document.getElementById('side-selector').value; 
+            const oppSide = side === 'away' ? 'home' : 'away';
             
             const game = allGames.find(g => g.gamePk === gamePk);
             if (!game) return;
 
             const targetTeam = game.teams[side].team;
-            const oppTeam = side === 'away' ? game.teams['home'].team : game.teams['away'].team;
+            const oppTeam = game.teams[oppSide].team;
             
-            // Update Header quickly
-            document.getElementById('team-name').textContent = targetTeam.name;
-            document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
-            document.getElementById('matchup-info').textContent = `vs ${oppTeam.name}`;
-            document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
-
             const positionMap = {};
             const handMap = {};
             
@@ -458,11 +461,13 @@
             const playersArray = game.lineups[`${side}Players`] || [];
             const batters = playersArray.slice(0, 9);
             const probablePitcher = game.teams[side].probablePitcher;
+            const oppPitcher = game.teams[oppSide].probablePitcher;
 
             // 2. Fetch Handedness via MLB People API
             try {
                 const playerIds = batters.map(b => b.id);
                 if (probablePitcher) playerIds.push(probablePitcher.id);
+                if (oppPitcher) playerIds.push(oppPitcher.id); // Grab the opposing pitcher too!
                 
                 if (playerIds.length > 0) {
                     const peopleRes = await fetch(`https://statsapi.mlb.com/api/v1/people?personIds=${playerIds.join(',')}`);
@@ -479,14 +484,28 @@
                 console.error("Failed to fetch handedness mapping", e);
             }
 
-            // Render Batters
+            // 3. Update Header (Now we have the oppPitcher hand mapping!)
+            let oppSpString = "TBD";
+            if (oppPitcher) {
+                const oppHandObj = handMap[oppPitcher.id] || {};
+                const oppHand = oppHandObj.pitch || '';
+                const oppHandDisplay = oppHand ? `(${oppHand}) ` : '';
+                oppSpString = `${oppHandDisplay}${oppPitcher.fullName}`;
+            }
+
+            document.getElementById('team-name').textContent = targetTeam.name;
+            document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
+            document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
+            document.getElementById('matchup-info').innerHTML = `vs ${oppTeam.name} <span style="color:var(--paper-line); margin: 0 5px;">|</span> <span class="opp-sp">Opp SP: ${oppSpString}</span>`;
+
+            // 4. Render Batters
             const container = document.getElementById('lineup-container');
             container.innerHTML = '';
             batters.forEach((player, index) => {
                 container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false, positionMap, handMap));
             });
 
-            // Render Pitcher
+            // 5. Render Pitcher
             const pitcherContainer = document.getElementById('pitcher-container');
             pitcherContainer.innerHTML = '';
             
