@@ -81,7 +81,7 @@
 
         /* --- Header Section --- */
         #header {
-            padding: 50px 60px 30px;
+            padding: 40px 60px 20px; /* Reduced top/bottom padding to save space */
             display: flex;
             align-items: center;
             gap: 30px;
@@ -90,8 +90,8 @@
         }
 
         .team-logo-container {
-            width: 180px;
-            height: 180px;
+            width: 160px; /* Slightly scaled down */
+            height: 160px;
             background: rgba(255,255,255,0.05);
             border-radius: 20px;
             display: flex;
@@ -99,11 +99,12 @@
             align-items: center;
             box-shadow: 0 10px 20px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
         }
 
         #team-logo {
-            width: 140px;
-            height: 140px;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.4));
         }
@@ -124,10 +125,10 @@
         }
 
         #team-name {
-            font-size: 65px;
+            font-size: 52px; /* Reduced from 65px to prevent wrapping on long names */
             font-weight: 900;
             margin: 0;
-            line-height: 1.1;
+            line-height: 1.05;
             text-transform: uppercase;
             letter-spacing: -1px;
         }
@@ -139,13 +140,18 @@
             font-weight: 600;
         }
 
+        .date-highlight {
+            color: white;
+            font-weight: 800;
+        }
+
         /* --- Lineup Section --- */
         #lineup-container {
             flex-grow: 1;
-            padding: 30px 60px;
+            padding: 20px 60px; /* Reduced vertical padding */
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px; /* Tightened gap from 15px to 12px */
             z-index: 10;
         }
 
@@ -154,7 +160,7 @@
             align-items: center;
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 10px 25px;
+            padding: 8px 25px; /* Tightened internal padding */
             border: 1px solid rgba(255,255,255,0.05);
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
@@ -181,7 +187,8 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: top;
+            /* FIX: Removed 'object-position: top' to allow natural centering, fixing cut-off hats */
+            object-position: center; 
         }
 
         .player-details {
@@ -208,7 +215,7 @@
         /* --- Pitcher Footer --- */
         #pitcher-section {
             background: rgba(0,0,0,0.6);
-            padding: 30px 60px;
+            padding: 25px 60px; /* Tightened padding */
             border-top: 2px solid rgba(255,255,255,0.1);
             z-index: 10;
         }
@@ -219,7 +226,7 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         #pitcher-row {
@@ -267,6 +274,7 @@
 
     <script>
         let allGames = [];
+        let globalTargetDate = "";
         const BASE_API_URL = "https://statsapi.mlb.com/api/v1";
 
         // Generates the MLB CDN image link
@@ -279,6 +287,14 @@
             return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
         }
 
+        // Formats the date cleanly (e.g., "Wed, Apr 10")
+        function formatDisplayDate(dateString) {
+            // Append T00:00:00 so JS doesn't shift the day backwards based on local timezone
+            const dateObj = new Date(dateString + 'T00:00:00'); 
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            return dateObj.toLocaleDateString('en-US', options);
+        }
+
         async function init() {
             const urlParams = new URLSearchParams(window.location.search);
             
@@ -288,6 +304,7 @@
                 const today = new Date();
                 targetDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
             }
+            globalTargetDate = targetDate;
 
             try {
                 // Fetch games with lineups and probable pitchers hydrated
@@ -315,7 +332,7 @@
                 renderCard();
             } else {
                 document.getElementById('team-name').textContent = "NO LINEUPS YET";
-                document.getElementById('matchup-info').textContent = "Check back closer to first pitch.";
+                document.getElementById('matchup-info').textContent = `Check back closer to first pitch on ${formatDisplayDate(globalTargetDate)}.`;
             }
         }
 
@@ -339,10 +356,6 @@
             const headshot = getHeadshotUrl(player.id);
             const orderDisplay = isPitcher ? 'SP' : (index + 1);
             
-            // Some players might not have positions loaded yet in the raw array, fallback to 'DH' or 'SP'
-            let position = isPitcher ? 'P' : 'DH'; 
-            
-            // Clean up the name (e.g., remove Jr. for space, or just use fullName)
             let name = player.fullName;
 
             return `
@@ -354,7 +367,7 @@
                     <div class="player-details">
                         <div class="player-name">${name}</div>
                     </div>
-                    </div>
+                </div>
             `;
         }
 
@@ -370,10 +383,13 @@
             const targetTeam = game.teams[side].team;
             const oppTeam = side === 'away' ? game.teams['home'].team : game.teams['away'].team;
             
+            // Format the display string (e.g., "vs Baltimore Orioles  •  Wed, Apr 10")
+            const displayDateStr = formatDisplayDate(globalTargetDate);
+            
             // Update Header
             document.getElementById('team-name').textContent = targetTeam.name;
             document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
-            document.getElementById('matchup-info').textContent = `vs ${oppTeam.name}`;
+            document.getElementById('matchup-info').innerHTML = `vs ${oppTeam.name} &nbsp;&bull;&nbsp; <span class="date-highlight">${displayDateStr}</span>`;
 
             // Adjust accent color based on Home/Away just for visual pop
             document.documentElement.style.setProperty('--accent', side === 'home' ? '#ffffff' : '#aaaaaa');
