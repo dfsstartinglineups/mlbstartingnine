@@ -692,7 +692,10 @@ for game in games:
     # ==========================================
     for side in ['away', 'home']:
         players_array = game.get('lineups', {}).get(f'{side}Players', [])
-        if not players_array: continue
+        
+        # FIX: A real lineup has at least 9 players. If it's just the pitcher, skip it!
+        if not players_array or len(players_array) < 9: 
+            continue
 
         current_hash = get_lineup_hash(players_array)
         base_key = f"{game_pk}_{side}"
