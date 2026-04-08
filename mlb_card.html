@@ -10,7 +10,7 @@
     
     <style>
         :root {
-            /* Paper & Ink Colors */
+            /* Default Paper & Ink Colors (Fallback) */
             --paper-bg: #f4f1ea;
             --paper-line: rgba(40, 45, 55, 0.3);
             --marker-ink: #1a1e24;
@@ -95,7 +95,6 @@
             width: 140px;
             height: 140px;
             object-fit: contain;
-            /* Faint shadow to look like it's printed on the page */
             filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
         }
 
@@ -164,13 +163,30 @@
             display: flex;
             flex-direction: column;
             padding: 0 40px;
+            position: relative; /* ADDED for watermark positioning */
         }
 
         .player-row {
             display: flex;
             align-items: center;
             border-bottom: 2px solid var(--paper-line);
-            height: 95px; /* Fixed height for consistent grid */
+            height: 95px; 
+            position: relative; /* ADDED for z-index context */
+            z-index: 10;        /* ADDED to float above watermark */
+        }
+
+        /* NEW WATERMARK CLASS */
+        .watermark-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 850px; 
+            height: 850px;
+            object-fit: contain;
+            opacity: 0.05; /* Faint ghost-like opacity */
+            z-index: 0; /* Shoves it to the back */
+            pointer-events: none;
         }
 
         /* Vertical Grid Lines */
@@ -229,7 +245,7 @@
             opacity: 0.8;
             margin-right: 12px;
             font-weight: 700;
-            text-transform: none; /* Keep parenthesis clean */
+            text-transform: none; 
             letter-spacing: 0;
         }
 
@@ -240,7 +256,6 @@
             background: #e0dcd3;
             overflow: hidden;
             border: 3px solid var(--marker-ink);
-            /* Adds a slight hand-drawn wobble to the border */
             border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; 
         }
 
@@ -248,7 +263,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: center; /* Prevents hat cutoff */
+            object-position: center; 
         }
 
         /* --- Pitcher Footer --- */
@@ -269,11 +284,11 @@
         #pitcher-row {
             border-top: 4px solid var(--paper-line);
             border-bottom: 4px solid var(--paper-line);
-            background-color: rgba(0,0,0,0.03); /* Slight shade to differentiate */
+            background-color: rgba(0,0,0,0.03); 
         }
 
         .col-order.sp-text {
-            font-size: 28px; /* Reduced to ensure it never overflows */
+            font-size: 28px; 
         }
     </style>
 </head>
@@ -318,6 +333,55 @@
     </div>
 
     <script>
+        // ==========================================
+        // THE MASTER THEME DICTIONARY
+        // ==========================================
+        const TEAM_THEMES = {
+            108: { name: "Angels", paperBg: "#f4f1ea", paperLine: "rgba(186, 0, 33, 0.4)", markerInk: "#ba0021" },
+            109: { name: "Diamondbacks", paperBg: "#f4f1ea", paperLine: "rgba(167, 25, 48, 0.4)", markerInk: "#a71930" },
+            110: { name: "Orioles", paperBg: "#f4f1ea", paperLine: "rgba(223, 70, 1, 0.4)", markerInk: "#000000" },
+            111: { name: "Red Sox", paperBg: "#f8f0f1", paperLine: "rgba(189, 48, 57, 0.4)", markerInk: "#0c2340" },
+            112: { name: "Cubs", paperBg: "#f0f4f8", paperLine: "rgba(14, 51, 134, 0.4)", markerInk: "#0e3386" },
+            113: { name: "Reds", paperBg: "#f8f0f1", paperLine: "rgba(198, 1, 31, 0.4)", markerInk: "#c6011f" },
+            114: { name: "Guardians", paperBg: "#f4f1ea", paperLine: "rgba(227, 25, 55, 0.4)", markerInk: "#0c2340" },
+            115: { name: "Rockies", paperBg: "#f3f0f6", paperLine: "rgba(51, 0, 111, 0.4)", markerInk: "#33006f" },
+            116: { name: "Tigers", paperBg: "#f4f1ea", paperLine: "rgba(12, 35, 64, 0.4)", markerInk: "#0c2340" },
+            117: { name: "Astros", paperBg: "#f4f1ea", paperLine: "rgba(0, 45, 98, 0.4)", markerInk: "#002d62" },
+            118: { name: "Royals", paperBg: "#f0f4f8", paperLine: "rgba(0, 70, 135, 0.4)", markerInk: "#004687" },
+            119: { name: "Dodgers", paperBg: "#f0f4f8", paperLine: "rgba(0, 90, 156, 0.4)", markerInk: "#003b6b" },
+            120: { name: "Nationals", paperBg: "#f4f1ea", paperLine: "rgba(171, 0, 3, 0.4)", markerInk: "#ab0003" },
+            121: { name: "Mets", paperBg: "#f4f1ea", paperLine: "rgba(0, 45, 114, 0.4)", markerInk: "#002d72" },
+            133: { name: "Athletics", paperBg: "#f0f6f2", paperLine: "rgba(0, 56, 49, 0.4)", markerInk: "#003831" },
+            134: { name: "Pirates", paperBg: "#f4f1ea", paperLine: "rgba(253, 184, 39, 0.6)", markerInk: "#000000" },
+            135: { name: "Padres", paperBg: "#f5f2ed", paperLine: "rgba(47, 36, 29, 0.4)", markerInk: "#2f241d" },
+            136: { name: "Mariners", paperBg: "#f0f5f6", paperLine: "rgba(0, 92, 92, 0.4)", markerInk: "#005c5c" },
+            137: { name: "Giants", paperBg: "#f4f1ea", paperLine: "rgba(253, 90, 30, 0.5)", markerInk: "#27251f" },
+            138: { name: "Cardinals", paperBg: "#f8f0f1", paperLine: "rgba(196, 30, 58, 0.4)", markerInk: "#c41e3a" },
+            139: { name: "Rays", paperBg: "#f0f4f8", paperLine: "rgba(9, 44, 92, 0.4)", markerInk: "#092c5c" },
+            140: { name: "Rangers", paperBg: "#f4f1ea", paperLine: "rgba(0, 50, 120, 0.4)", markerInk: "#003278" },
+            141: { name: "Blue Jays", paperBg: "#f0f4f8", paperLine: "rgba(19, 74, 142, 0.4)", markerInk: "#134a8e" },
+            142: { name: "Twins", paperBg: "#f4f1ea", paperLine: "rgba(0, 43, 92, 0.4)", markerInk: "#002b5c" },
+            143: { name: "Phillies", paperBg: "#f8f0f1", paperLine: "rgba(232, 24, 40, 0.4)", markerInk: "#e81828" },
+            144: { name: "Braves", paperBg: "#f4f1ea", paperLine: "rgba(206, 17, 65, 0.4)", markerInk: "#13274f" },
+            145: { name: "White Sox", paperBg: "#f4f1ea", paperLine: "rgba(39, 37, 31, 0.4)", markerInk: "#27251f" },
+            146: { name: "Marlins", paperBg: "#f4f1ea", paperLine: "rgba(0, 163, 224, 0.4)", markerInk: "#000000" },
+            147: { name: "Yankees", paperBg: "#f4f1ea", paperLine: "rgba(12, 35, 64, 0.4)", markerInk: "#0c2340" },
+            158: { name: "Brewers", paperBg: "#f0f4f8", paperLine: "rgba(18, 40, 75, 0.4)", markerInk: "#12284b" }
+        };
+
+        function applyTeamTheme(teamId) {
+            const theme = TEAM_THEMES[teamId];
+            if (theme) {
+                document.documentElement.style.setProperty('--paper-bg', theme.paperBg);
+                document.documentElement.style.setProperty('--paper-line', theme.paperLine);
+                document.documentElement.style.setProperty('--marker-ink', theme.markerInk);
+            } else {
+                document.documentElement.style.setProperty('--paper-bg', '#f4f1ea');
+                document.documentElement.style.setProperty('--paper-line', 'rgba(40, 45, 55, 0.3)');
+                document.documentElement.style.setProperty('--marker-ink', '#1a1e24');
+            }
+        }
+
         let allGames = [];
         let globalTargetDate = "";
         const BASE_API_URL = "https://statsapi.mlb.com/api/v1";
@@ -394,10 +458,8 @@
             const orderDisplay = isPitcher ? 'SP' : (index + 1);
             const posClass = isPitcher ? 'sp-text' : '';
             
-            // Map position
             const positionStr = isPitcher ? 'SP' : (positionMap[player.id] || "—");
             
-            // Map handedness
             const handObj = handMap[player.id] || {};
             const hand = isPitcher ? (handObj.pitch || '') : (handObj.bat || '');
             const handDisplay = hand ? `<span class="hand-indicator">(${hand})</span>` : '';
@@ -431,10 +493,12 @@
             const targetTeam = game.teams[side].team;
             const oppTeam = game.teams[oppSide].team;
             
+            // APPLY THE DYNAMIC THEME
+            applyTeamTheme(targetTeam.id);
+            
             const positionMap = {};
             const handMap = {};
             
-            // 1. Fetch Live Feed to extract exact game positions
             try {
                 const feedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${gamePk}/feed/live`);
                 const feedData = await feedRes.json();
@@ -463,11 +527,10 @@
             const probablePitcher = game.teams[side].probablePitcher;
             const oppPitcher = game.teams[oppSide].probablePitcher;
 
-            // 2. Fetch Handedness via MLB People API
             try {
                 const playerIds = batters.map(b => b.id);
                 if (probablePitcher) playerIds.push(probablePitcher.id);
-                if (oppPitcher) playerIds.push(oppPitcher.id); // Grab the opposing pitcher too!
+                if (oppPitcher) playerIds.push(oppPitcher.id);
                 
                 if (playerIds.length > 0) {
                     const peopleRes = await fetch(`https://statsapi.mlb.com/api/v1/people?personIds=${playerIds.join(',')}`);
@@ -484,7 +547,6 @@
                 console.error("Failed to fetch handedness mapping", e);
             }
 
-            // 3. Update Header (Now we have the oppPitcher hand mapping!)
             let oppSpString = "TBD";
             if (oppPitcher) {
                 const oppHandObj = handMap[oppPitcher.id] || {};
@@ -498,14 +560,16 @@
             document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
             document.getElementById('matchup-info').innerHTML = `vs ${oppTeam.name} <span style="color:var(--paper-line); margin: 0 5px;">|</span> <span class="opp-sp">Opp SP: ${oppSpString}</span>`;
 
-            // 4. Render Batters
             const container = document.getElementById('lineup-container');
             container.innerHTML = '';
+
+            // INJECT THE BACKGROUND WATERMARK
+            container.insertAdjacentHTML('beforeend', `<img src="${getLogoUrl(targetTeam.id)}" class="watermark-logo">`);
+
             batters.forEach((player, index) => {
                 container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false, positionMap, handMap));
             });
 
-            // 5. Render Pitcher
             const pitcherContainer = document.getElementById('pitcher-container');
             pitcherContainer.innerHTML = '';
             
@@ -529,7 +593,6 @@
             alert("Ready! Playwright will capture this specific div (#capture-area).");
         }
 
-        // Boot the app
         init();
     </script>
 </body>
