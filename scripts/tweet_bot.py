@@ -168,7 +168,8 @@ async def take_mlb_screenshot(game_pk, side, target_date):
         # Wait for the players to render from the API
         try:
             # If the players don't load in 15 seconds, this throws an error and jumps to 'except'
-            await page.wait_for_selector(".player-row", timeout=15000)
+            # Wait specifically for the 9th batter in the lineup container to appear
+            await page.locator("#lineup-container .player-row").nth(8).wait_for(timeout=15000)
             await asyncio.sleep(2) # Buffer for images and fonts to snap into place
             
             capture_area = page.locator("#capture-area")
