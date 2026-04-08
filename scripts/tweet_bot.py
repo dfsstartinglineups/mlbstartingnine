@@ -804,6 +804,7 @@ FUTBOL_LEAGUES = {
     11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
     5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
     531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
+    307: { "name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
     10:  {"name": "🌎 INTERNATIONAL", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "v1_client": friendly_api_v1, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
 
