@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Dugout Lineup Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Default Paper & Ink Colors (Fallback) */
+            --paper-bg: #f4f1ea;
+            --paper-line: rgba(40, 45, 55, 0.3);
+            --marker-ink: #1a1e24;
+            --pencil-ink: #4a4f58;
+            --highlighter: rgba(230, 255, 0, 0.5);
+            --accent: #e31837; 
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #222; /* Dark outside canvas */
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- UI Controls (Hidden from screenshot) --- */
+        #controls {
+            margin-bottom: 20px;
+            background: #333;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        select, button {
+            padding: 8px 16px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #444;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover { background: #555; }
+
+        /* =========================================
+           THE EXPORTABLE CANVAS (1080x1350)
+           ========================================= */
+        #capture-area {
+            width: 1080px;
+            height: 1350px; 
+            background-color: var(--paper-bg);
+            /* SVG Noise filter for paper texture */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            color: var(--marker-ink);
+        }
+
+        /* --- Header Section --- */
+        #header {
+            padding: 40px 50px 30px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            border-bottom: 4px solid var(--paper-line);
+            position: relative;
+        }
+
+        .team-logo-container {
+            width: 150px; 
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        #team-logo {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 5px;
+        }
+
+        .title-tag {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 28px;
+            color: var(--marker-ink);
+            background-color: var(--highlighter);
+            padding: 0 10px;
+            transform: rotate(-2deg);
+            display: inline-block;
+        }
+
+        .date-display {
+            font-family: 'Caveat', cursive;
+            font-size: 32px;
+            color: var(--pencil-ink);
+            font-weight: 700;
+        }
+
+        #team-name {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 58px; 
+            margin: 5px 0 0 0;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #matchup-info {
+            font-family: 'Caveat', cursive;
+            font-size: 34px;
+            color: var(--pencil-ink);
+            margin-top: 5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .opp-sp {
+            font-size: 28px;
+            opacity: 0.85;
+        }
+
+        /* --- Lineup Section (The Grid) --- */
+        #lineup-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0 40px;
+            position: relative; /* ADDED for watermark positioning */
+        }
+
+        .player-row {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--paper-line);
+            height: 95px; 
+            position: relative; /* ADDED for z-index context */
+            z-index: 10;        /* ADDED to float above watermark */
+        }
+
+        /* NEW WATERMARK CLASS */
+        .watermark-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 850px; 
+            height: 850px;
+            object-fit: contain;
+            opacity: 0.05; /* Faint ghost-like opacity */
+            z-index: 0; /* Shoves it to the back */
+            pointer-events: none;
+        }
+
+        /* Vertical Grid Lines */
+        .col-order {
+            width: 90px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 2px solid var(--paper-line);
+            font-family: 'Permanent Marker', cursive;
+            font-size: 42px;
+            color: var(--marker-ink);
+        }
+
+        .col-photo {
+            width: 110px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-right: 2px solid var(--paper-line);
+        }
+
+        .col-name {
+            flex-grow: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 25px;
+            border-right: 2px solid var(--paper-line);
+            font-family: 'Permanent Marker', cursive;
+            font-size: 36px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .col-pos {
+            width: 100px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--pencil-ink);
+        }
+
+        .hand-indicator {
+            font-family: 'Caveat', cursive;
+            font-size: 32px;
+            color: var(--pencil-ink);
+            opacity: 0.8;
+            margin-right: 12px;
+            font-weight: 700;
+            text-transform: none; 
+            letter-spacing: 0;
+        }
+
+        .headshot-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #e0dcd3;
+            overflow: hidden;
+            border: 3px solid var(--marker-ink);
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; 
+        }
+
+        .headshot {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center; 
+        }
+
+        /* --- Pitcher Footer --- */
+        #pitcher-section {
+            padding: 10px 40px 30px;
+            position: relative;
+        }
+
+        .pitcher-label {
+            font-family: 'Caveat', cursive;
+            font-size: 28px;
+            color: var(--pencil-ink);
+            font-weight: 700;
+            margin-bottom: 5px;
+            padding-left: 10px;
+        }
+
+        #pitcher-row {
+            border-top: 4px solid var(--paper-line);
+            border-bottom: 4px solid var(--paper-line);
+            background-color: rgba(0,0,0,0.03); 
+        }
+
+        .col-order.sp-text {
+            font-size: 28px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <label>Game:</label>
+        <select id="game-selector"></select>
+        
+        <label>Side:</label>
+        <select id="side-selector">
+            <option value="away">Away Team</option>
+            <option value="home">Home Team</option>
+        </select>
+        
+        <button onclick="takeScreenshot()">Simulate Screenshot</button>
+    </div>
+
+    <div id="capture-area">
+        <div id="header">
+            <div class="team-logo-container">
+                <img id="team-logo" src="" alt="Team Logo">
+            </div>
+            <div class="header-text">
+                <div class="title-row">
+                    <div class="title-tag">Starting 9</div>
+                    <div id="game-date" class="date-display">LOADING...</div>
+                </div>
+                <h1 id="team-name">LOADING...</h1>
+                <div id="matchup-info">Fetching match details...</div>
+            </div>
+        </div>
+
+        <div id="lineup-container">
+            </div>
+
+        <div id="pitcher-section">
+            <div class="pitcher-label">Starting Pitcher</div>
+            <div id="pitcher-container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // THE MASTER THEME DICTIONARY
+        // ==========================================
+        const TEAM_THEMES = {
+            108: { name: "Angels", paperBg: "#f4f1ea", paperLine: "rgba(186, 0, 33, 0.4)", markerInk: "#ba0021" },
+            109: { name: "Diamondbacks", paperBg: "#f4f1ea", paperLine: "rgba(167, 25, 48, 0.4)", markerInk: "#a71930" },
+            110: { name: "Orioles", paperBg: "#f4f1ea", paperLine: "rgba(223, 70, 1, 0.4)", markerInk: "#000000" },
+            111: { name: "Red Sox", paperBg: "#f8f0f1", paperLine: "rgba(189, 48, 57, 0.4)", markerInk: "#0c2340" },
+            112: { name: "Cubs", paperBg: "#f0f4f8", paperLine: "rgba(14, 51, 134, 0.4)", markerInk: "#0e3386" },
+            113: { name: "Reds", paperBg: "#f8f0f1", paperLine: "rgba(198, 1, 31, 0.4)", markerInk: "#c6011f" },
+            114: { name: "Guardians", paperBg: "#f4f1ea", paperLine: "rgba(227, 25, 55, 0.4)", markerInk: "#0c2340" },
+            115: { name: "Rockies", paperBg: "#f3f0f6", paperLine: "rgba(51, 0, 111, 0.4)", markerInk: "#33006f" },
+            116: { name: "Tigers", paperBg: "#f4f1ea", paperLine: "rgba(12, 35, 64, 0.4)", markerInk: "#0c2340" },
+            117: { name: "Astros", paperBg: "#f4f1ea", paperLine: "rgba(0, 45, 98, 0.4)", markerInk: "#002d62" },
+            118: { name: "Royals", paperBg: "#f0f4f8", paperLine: "rgba(0, 70, 135, 0.4)", markerInk: "#004687" },
+            119: { name: "Dodgers", paperBg: "#f0f4f8", paperLine: "rgba(0, 90, 156, 0.4)", markerInk: "#003b6b" },
+            120: { name: "Nationals", paperBg: "#f4f1ea", paperLine: "rgba(171, 0, 3, 0.4)", markerInk: "#ab0003" },
+            121: { name: "Mets", paperBg: "#f4f1ea", paperLine: "rgba(0, 45, 114, 0.4)", markerInk: "#002d72" },
+            133: { name: "Athletics", paperBg: "#f0f6f2", paperLine: "rgba(0, 56, 49, 0.4)", markerInk: "#003831" },
+            134: { name: "Pirates", paperBg: "#f4f1ea", paperLine: "rgba(253, 184, 39, 0.6)", markerInk: "#000000" },
+            135: { name: "Padres", paperBg: "#f5f2ed", paperLine: "rgba(47, 36, 29, 0.4)", markerInk: "#2f241d" },
+            136: { name: "Mariners", paperBg: "#f0f5f6", paperLine: "rgba(0, 92, 92, 0.4)", markerInk: "#005c5c" },
+            137: { name: "Giants", paperBg: "#f4f1ea", paperLine: "rgba(253, 90, 30, 0.5)", markerInk: "#27251f" },
+            138: { name: "Cardinals", paperBg: "#f8f0f1", paperLine: "rgba(196, 30, 58, 0.4)", markerInk: "#c41e3a" },
+            139: { name: "Rays", paperBg: "#f0f4f8", paperLine: "rgba(9, 44, 92, 0.4)", markerInk: "#092c5c" },
+            140: { name: "Rangers", paperBg: "#f4f1ea", paperLine: "rgba(0, 50, 120, 0.4)", markerInk: "#003278" },
+            141: { name: "Blue Jays", paperBg: "#f0f4f8", paperLine: "rgba(19, 74, 142, 0.4)", markerInk: "#134a8e" },
+            142: { name: "Twins", paperBg: "#f4f1ea", paperLine: "rgba(0, 43, 92, 0.4)", markerInk: "#002b5c" },
+            143: { name: "Phillies", paperBg: "#f8f0f1", paperLine: "rgba(232, 24, 40, 0.4)", markerInk: "#e81828" },
+            144: { name: "Braves", paperBg: "#f4f1ea", paperLine: "rgba(206, 17, 65, 0.4)", markerInk: "#13274f" },
+            145: { name: "White Sox", paperBg: "#f4f1ea", paperLine: "rgba(39, 37, 31, 0.4)", markerInk: "#27251f" },
+            146: { name: "Marlins", paperBg: "#f4f1ea", paperLine: "rgba(0, 163, 224, 0.4)", markerInk: "#000000" },
+            147: { name: "Yankees", paperBg: "#f4f1ea", paperLine: "rgba(12, 35, 64, 0.4)", markerInk: "#0c2340" },
+            158: { name: "Brewers", paperBg: "#f0f4f8", paperLine: "rgba(18, 40, 75, 0.4)", markerInk: "#12284b" }
+        };
+
+        function applyTeamTheme(teamId) {
+            const theme = TEAM_THEMES[teamId];
+            if (theme) {
+                document.documentElement.style.setProperty('--paper-bg', theme.paperBg);
+                document.documentElement.style.setProperty('--paper-line', theme.paperLine);
+                document.documentElement.style.setProperty('--marker-ink', theme.markerInk);
+            } else {
+                document.documentElement.style.setProperty('--paper-bg', '#f4f1ea');
+                document.documentElement.style.setProperty('--paper-line', 'rgba(40, 45, 55, 0.3)');
+                document.documentElement.style.setProperty('--marker-ink', '#1a1e24');
+            }
+        }
+
+        let allGames = [];
+        let globalTargetDate = "";
+        const BASE_API_URL = "https://statsapi.mlb.com/api/v1";
+
+        function getHeadshotUrl(personId) {
+            return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${personId}/headshot/67/current`;
+        }
+
+        function getLogoUrl(teamId) {
+            return `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+        }
+
+        function formatDisplayDate(dateString) {
+            const dateObj = new Date(dateString + 'T00:00:00'); 
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            return dateObj.toLocaleDateString('en-US', options);
+        }
+
+        async function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            let targetDate = urlParams.get('date');
+            if (!targetDate) {
+                const today = new Date();
+                targetDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            }
+            globalTargetDate = targetDate;
+
+            try {
+                const res = await fetch(`${BASE_API_URL}/schedule?sportId=1&date=${targetDate}&hydrate=probablePitcher,lineups`);
+                const data = await res.json();
+                
+                if (data.dates && data.dates.length > 0) {
+                    allGames = data.dates[0].games.filter(g => g.lineups && (g.lineups.awayPlayers || g.lineups.homePlayers));
+                }
+            } catch (e) {
+                console.error("Failed to fetch MLB data:", e);
+            }
+
+            populateDropdowns();
+
+            const urlGamePk = urlParams.get('gamePk');
+            const urlSide = urlParams.get('side');
+
+            if (urlGamePk) document.getElementById('game-selector').value = urlGamePk;
+            if (urlSide) document.getElementById('side-selector').value = urlSide;
+
+            if (allGames.length > 0) {
+                await renderCard();
+            } else {
+                document.getElementById('team-name').textContent = "NO LINEUPS YET";
+                document.getElementById('matchup-info').textContent = "Check back closer to first pitch.";
+                document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
+            }
+        }
+
+        function populateDropdowns() {
+            const gameSelect = document.getElementById('game-selector');
+            gameSelect.innerHTML = '';
+            
+            allGames.forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.gamePk;
+                opt.textContent = `${g.teams.away.team.name} @ ${g.teams.home.team.name}`;
+                gameSelect.appendChild(opt);
+            });
+
+            gameSelect.addEventListener('change', () => renderCard());
+            document.getElementById('side-selector').addEventListener('change', () => renderCard());
+        }
+
+        function buildPlayerHTML(player, index, isPitcher, positionMap, handMap) {
+            const headshot = getHeadshotUrl(player.id);
+            const orderDisplay = isPitcher ? 'SP' : (index + 1);
+            const posClass = isPitcher ? 'sp-text' : '';
+            
+            const positionStr = isPitcher ? 'SP' : (positionMap[player.id] || "—");
+            
+            const handObj = handMap[player.id] || {};
+            const hand = isPitcher ? (handObj.pitch || '') : (handObj.bat || '');
+            const handDisplay = hand ? `<span class="hand-indicator">(${hand})</span>` : '';
+
+            let name = player.fullName;
+
+            return `
+                <div class="player-row" ${isPitcher ? 'id="pitcher-row"' : ''}>
+                    <div class="col-order ${posClass}">${orderDisplay}</div>
+                    <div class="col-photo">
+                        <div class="headshot-wrapper">
+                            <img src="${headshot}" class="headshot" crossorigin="anonymous">
+                        </div>
+                    </div>
+                    <div class="col-name">${handDisplay}${name}</div>
+                    <div class="col-pos">${positionStr}</div>
+                </div>
+            `;
+        }
+
+        async function renderCard() {
+            if (allGames.length === 0) return;
+
+            const gamePk = parseInt(document.getElementById('game-selector').value);
+            const side = document.getElementById('side-selector').value; 
+            const oppSide = side === 'away' ? 'home' : 'away';
+            
+            const game = allGames.find(g => g.gamePk === gamePk);
+            if (!game) return;
+
+            const targetTeam = game.teams[side].team;
+            const oppTeam = game.teams[oppSide].team;
+            
+            // APPLY THE DYNAMIC THEME
+            applyTeamTheme(targetTeam.id);
+            
+            const positionMap = {};
+            const handMap = {};
+            
+            try {
+                const feedRes = await fetch(`https://statsapi.mlb.com/api/v1.1/game/${gamePk}/feed/live`);
+                const feedData = await feedRes.json();
+                const boxTeams = feedData.liveData?.boxscore?.teams || {};
+
+                ['away', 'home'].forEach(teamSide => {
+                    const players = boxTeams[teamSide]?.players || {};
+                    for (const key in players) {
+                        const p = players[key];
+                        const pId = p.person?.id;
+                        if (pId) {
+                            if (p.position && p.position.abbreviation) {
+                                positionMap[pId] = p.position.abbreviation;
+                            } else if (p.allPositions && p.allPositions.length > 0) {
+                                positionMap[pId] = p.allPositions[0].abbreviation;
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Failed to fetch live positions mapping", e);
+            }
+
+            const playersArray = game.lineups[`${side}Players`] || [];
+            const batters = playersArray.slice(0, 9);
+            const probablePitcher = game.teams[side].probablePitcher;
+            const oppPitcher = game.teams[oppSide].probablePitcher;
+
+            try {
+                const playerIds = batters.map(b => b.id);
+                if (probablePitcher) playerIds.push(probablePitcher.id);
+                if (oppPitcher) playerIds.push(oppPitcher.id);
+                
+                if (playerIds.length > 0) {
+                    const peopleRes = await fetch(`https://statsapi.mlb.com/api/v1/people?personIds=${playerIds.join(',')}`);
+                    const peopleData = await peopleRes.json();
+                    
+                    peopleData.people.forEach(p => {
+                        handMap[p.id] = {
+                            bat: p.batSide?.code || '',
+                            pitch: p.pitchHand?.code || ''
+                        };
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to fetch handedness mapping", e);
+            }
+
+            let oppSpString = "TBD";
+            if (oppPitcher) {
+                const oppHandObj = handMap[oppPitcher.id] || {};
+                const oppHand = oppHandObj.pitch || '';
+                const oppHandDisplay = oppHand ? `(${oppHand}) ` : '';
+                oppSpString = `${oppHandDisplay}${oppPitcher.fullName}`;
+            }
+
+            document.getElementById('team-name').textContent = targetTeam.name;
+            document.getElementById('team-logo').src = getLogoUrl(targetTeam.id);
+            document.getElementById('game-date').textContent = formatDisplayDate(globalTargetDate);
+            document.getElementById('matchup-info').innerHTML = `vs ${oppTeam.name} <span style="color:var(--paper-line); margin: 0 5px;">|</span> <span class="opp-sp">Opp SP: ${oppSpString}</span>`;
+
+            const container = document.getElementById('lineup-container');
+            container.innerHTML = '';
+
+            // INJECT THE BACKGROUND WATERMARK
+            container.insertAdjacentHTML('beforeend', `<img src="${getLogoUrl(targetTeam.id)}" class="watermark-logo">`);
+
+            batters.forEach((player, index) => {
+                container.insertAdjacentHTML('beforeend', buildPlayerHTML(player, index, false, positionMap, handMap));
+            });
+
+            const pitcherContainer = document.getElementById('pitcher-container');
+            pitcherContainer.innerHTML = '';
+            
+            if (probablePitcher) {
+                pitcherContainer.insertAdjacentHTML('beforeend', buildPlayerHTML(probablePitcher, 0, true, positionMap, handMap));
+            } else {
+                pitcherContainer.innerHTML = `
+                    <div class="player-row" id="pitcher-row">
+                        <div class="col-order sp-text">SP</div>
+                        <div class="col-photo"></div>
+                        <div class="col-name" style="color:var(--pencil-ink); font-family:'Caveat', cursive;">To Be Determined</div>
+                        <div class="col-pos">SP</div>
+                    </div>`;
+            }
+        }
+
+        function takeScreenshot() {
+            const capture = document.getElementById('capture-area');
+            capture.style.opacity = '0.5';
+            setTimeout(() => { capture.style.opacity = '1'; }, 100);
+            alert("Ready! Playwright will capture this specific div (#capture-area).");
+        }
+
+        init();
+    </script>
+</body>
+</html>
