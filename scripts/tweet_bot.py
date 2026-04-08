@@ -182,6 +182,33 @@ async def take_mlb_screenshot(game_pk, side, target_date):
             print(f"⚠️ Players failed to load. Aborting screenshot. Error: {e}")
             await browser.close()
             return False
+
+async def take_nba_screenshot(team_abbr, side, target_date):
+    print(f"📸 Booting headless browser for NBA {team_abbr} ({side})...")
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(headless=True)
+        # 1080x1080 for the square layout
+        page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
+        
+        # Uses the ?team= parameter so the HTML safely finds the right matchup
+        url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
+        print(f"🌐 Navigating to {url}...")
+        await page.goto(url)
+        
+        try:
+            await page.wait_for_selector(".player-node", timeout=15000)
+            await asyncio.sleep(3) # Extra buffer for ESPN headshots and fonts
+            
+            capture_area = page.locator("#capture-area")
+            await capture_area.screenshot(path="nba_matchup.png")
+            print("✅ NBA Screenshot saved!")
+            await browser.close()
+            return True
+            
+        except Exception as e:
+            print(f"⚠️ Players failed to load. Aborting screenshot. Error: {e}")
+            await browser.close()
+            return False
 # ==========================================
 # 2. SETUP DATES & FILE PATHS
 # ==========================================
@@ -203,7 +230,7 @@ MLB_API_URL = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&dat
 MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
 
 # --- NBA URL ---
-NBA_DATA_URL = f"https://nbastartingfive.com/nba_data.json?v={today_est.timestamp()}"
+NBA_DATA_URL = f"https://nbastartingfive.com/data/{date_str}.json?v={today_est.timestamp()}"
 
 # --- FUTBOL URL ---
 FUTBOL_API_URL = f"https://futbolstartingeleven.com/data/games_{date_str}.json?v={today_est.timestamp()}"
@@ -374,74 +401,97 @@ for game in nba_data:
             
         players = data.get('players', [])
         
-        is_official = len(players) >= 5 and all(p.get('verified') == True for p in players)
+        # Check for the roster-level 'is_official' flag, or fallback to the old 5-player check
+        is_official = data.get('is_official') == True or (len(players) >= 5 and all(p.get('verified') == True for p in players))
         
         if is_official:
             opp = matchup.replace(team, '').replace(' vs ', '').strip()
-            
             team_name = NBA_TEAM_NAMES.get(team, team)
             opp_name = NBA_TEAM_NAMES.get(opp, opp)
-            
-            tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\n{odds_str}\n\n"
-            
-            for index, p in enumerate(players):
-                if index < 5:
-                    final_pos = NBA_POS_ORDER[index]
-                    name = p.get('name', 'Unknown')
-                    tweet_text += f"{final_pos} {name}\n"
-                
             team_hash = team_name.replace(" ", "")
             
-            # --- START NEW BLUESKY TEXT BUILDER ---
-            # We initialize a special Bluesky builder with the base text
-            bsky_tb = client_utils.TextBuilder()
-            bsky_tb.text(tweet_text)
+            # Determine "side" for the HTML URL so Playwright loads the correct team
+            side = "away" if team == away_team else "home"
+
+            # 1. Build the lightweight text payload
+            tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\n\n"
+            bsky_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\n\n"
             
-            # --- ADD FOOTERS & LINKS ---
+            if odds_str:
+                tweet_text += f"📊 Live Line:{odds_str}\n\n"
+                bsky_text += f"📊 Live Line:{odds_str}\n\n"
+                
+            link_url = f"https://nbastartingfive.com/#game-{url_game_id}"
+            
             if random.randint(1, 100) <= 100:
-                link_url = f"https://nbastartingfive.com/#game-{url_game_id}"
+                tweet_text += f"Full matchups, stats, & odds:\n{link_url}\n\n"
+                bsky_text += f"Full matchups, stats, & odds:\n"
                 
-                # 1. Add to Twitter (Plain string)
-                tweet_text += f"\n\nFull matchups & odds: {link_url}"
-                
-                # 2. Add to Bluesky (Makes it officially clickable!)
-                bsky_tb.text("\n\nFull matchups & odds: ")
-                bsky_tb.link(link_url, link_url)
-                
-            # --- ADD HASHTAGS ---
-            tags_string = f"\n\n#{team_hash} #{team_hash}Lineup #NBA"
+            tags_text = f"#{team_hash} #{team_hash}Lineup #NBA"
+            tweet_text += tags_text
             
-            # Add to both as plain text
-            tweet_text += tags_string
-            bsky_tb.text(tags_string)
-            
-            # ==========================================
-            # POST TO PLATFORMS
-            # ==========================================
+            bsky_tb = client_utils.TextBuilder()
+            bsky_tb.text(bsky_text)
+            bsky_tb.link(link_url, link_url)
+            bsky_tb.text("\n\n")
+            bsky_tb.text(tags_text)
+
+            # 2. Generate the Graphic via Playwright (With 1 Retry)
+            screenshot_success = False
+            for attempt in range(2):
+                try:
+                    if asyncio.run(take_nba_screenshot(team, side, date_str)):
+                        screenshot_success = True
+                        break 
+                    else:
+                        print(f"⚠️ NBA Screenshot attempt {attempt + 1} failed. Pausing...")
+                        time.sleep(5)
+                except Exception as e:
+                    print(f"❌ Playwright crashed: {e}")
+                    time.sleep(5)
+                    
+            if not screenshot_success:
+                print(f"⏭️ Skipping {team_name} tweet due to screenshot failure. Will retry next run.")
+                continue 
+
+            # 3. Upload and Post
             try:
-                # 1. Tweet to Twitter (X)
-                nba_client.create_tweet(text=tweet_text)
-                print(f"✅ Successfully tweeted {team_name} NBA lineup!")
+                print("⬆️ Uploading NBA graphic to X servers...")
+                media = nba_api_v1.media_upload("nba_matchup.png")
                 
-                # 2. Post to Bluesky (V2 Architecture)
+                nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                print(f"✅ Successfully tweeted {team_name} NBA lineup graphic!")
+                
+                # --- START BLUESKY UPLOAD ---
                 config = LEAGUE_CONFIG.get("nba")
                 if config and config.get("bsky_client"):
                     try:
-                        # CRITICAL: We pass the 'bsky_tb' object here!
-                        config["bsky_client"].send_post(bsky_tb)
-                        print(f"✅ Successfully posted {team_name} NBA lineup to Bluesky!")
+                        with Image.open("nba_matchup.png") as img:
+                            rgb_img = img.convert('RGB')
+                            img_byte_arr = io.BytesIO()
+                            rgb_img.save(img_byte_arr, format='JPEG', quality=70)
+                            img_data = img_byte_arr.getvalue()
+
+                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_name} Starting Lineup")
+                        print(f"✅ Successfully posted {team_name} to Bluesky (Compressed JPEG)!")
                     except Exception as e:
                         print(f"❌ Bluesky post failed for {team_name}: {e}")
-
-                # 3. Log the Tweet & Save
+                # --- END BLUESKY UPLOAD ---
+                
+                # Clean up local file
+                if os.path.exists("nba_matchup.png"):
+                    os.remove("nba_matchup.png")
+                
+                # Log success into memory
                 log_today.append(team_date_key)
                 tweeted_recently.append(team_date_key)
                 new_tweets_sent = True
                 memory[date_str] = log_today
                 save_memory_safely(memory)
                 time.sleep(5)
+                
             except Exception as e:
-                print(f"❌ Failed to tweet {team_name} NBA lineup: {e}")
+                print(f"❌ Failed to tweet {team_name}: {e}")
 
 # ==========================================
 # 5. MLB ENGINE
