@@ -196,6 +196,8 @@ async def take_nba_screenshot(team_abbr, side, target_date):
         await page.goto(url)
         
         try:
+            # wait_until="networkidle" ensures the NBA.com logos are actually downloaded
+            await page.goto(url, wait_until="networkidle", timeout=20000)
             await page.wait_for_selector(".player-node", timeout=15000)
             await asyncio.sleep(3) # Extra buffer for ESPN headshots and fonts
             
