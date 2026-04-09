@@ -130,6 +130,7 @@ mls_client, mls_api_v1 = get_dynamic_clients("mls_x")
 ligue1_client, ligue1_api_v1 = get_dynamic_clients("ligue1_x")
 seriea_client, seriea_api_v1 = get_dynamic_clients("seriea_x")
 laliga_client, laliga_api_v1 = get_dynamic_clients("laliga_x")
+epl_client, epl_api_v1 = get_dynamic_clients("epl_x")
 
 async def take_screenshot(fixture_id, target_date):
     print(f"📸 Booting headless browser for Fixture {fixture_id}...")
@@ -838,7 +839,7 @@ print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 
 # Define all leagues, their tags, and optionally their dedicated X client and URL
 FUTBOL_LEAGUES = {
-    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl"},
+    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": epl_client, "v1_client": epl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": laliga_client, "v1_client": laliga_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
@@ -861,8 +862,9 @@ FUTBOL_LEAGUES = {
     11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
     5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
     531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    307: { "name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi" },
-    10:  {"name": "🌎 INTERNATIONAL", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "v1_client": friendly_api_v1, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
+    307: { "name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"},
+    10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl"}
+    #10:  {"name": "🌎 INTERNATIONALFriendlies", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "v1_client": friendly_api_v1, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
 
 
