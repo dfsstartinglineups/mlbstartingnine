@@ -197,15 +197,6 @@ async def take_nba_screenshot(team_abbr, side, target_date):
         
         try:
             await page.wait_for_selector(".player-node", timeout=15000)
-            # 2. LOGO GUARD: Wait until both logos have actual pixel dimensions (fully loaded)
-            await page.wait_for_function("""
-                () => {
-                    const logo = document.getElementById('team-logo');
-                    const watermark = document.getElementById('watermark');
-                    return logo && logo.complete && logo.naturalWidth > 0 &&
-                           watermark && watermark.complete && watermark.naturalWidth > 0;
-                }
-            """, timeout=15000)
             await asyncio.sleep(3) # Extra buffer for ESPN headshots and fonts
             
             capture_area = page.locator("#capture-area")
