@@ -193,22 +193,27 @@ async def take_nba_screenshot(team_abbr, side, target_date):
         # Uses the ?team= parameter so the HTML safely finds the right matchup
         url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
         print(f"🌐 Navigating to {url}...")
-        await page.goto(url)
         
         try:
-            # wait_until="networkidle" ensures the NBA.com logos are actually downloaded
-            #await page.goto(url, wait_until="networkidle", timeout=20000)
+            # 1. GOTO is now safely inside the try block with a 15-second timeout limit
+            await page.goto(url, timeout=15000)
+            
+            # 2. Wait for the player nodes to appear
             await page.wait_for_selector(".player-node", timeout=15000)
-            await asyncio.sleep(3) # Extra buffer for ESPN headshots and fonts
+            
+            # 3. Tiny 1-second buffer for local fonts/logos to snap into place
+            await asyncio.sleep(1) 
             
             capture_area = page.locator("#capture-area")
             await capture_area.screenshot(path="nba_matchup.png")
             print("✅ NBA Screenshot saved!")
+            
             await browser.close()
             return True
             
         except Exception as e:
-            print(f"⚠️ Players failed to load. Aborting screenshot. Error: {e}")
+            # If ANY of the steps above fail, it gracefully catches it here
+            print(f"⚠️ Graphics failed to load. Aborting screenshot. Error: {e}")
             await browser.close()
             return False
 # ==========================================
