@@ -462,10 +462,21 @@ for game in nba_data:
                 print(f"⏭️ Skipping {team_name} tweet due to screenshot failure. Will retry next run.")
                 continue 
 
+            # --- BUILD NBA ALT TEXT ---
+            alt_parts = [f"Graphical lineup card for the {team_name} starting 5 against the {opp_name}."]
+            for p in players[:5]:
+                p_name = p.get('name', 'Unknown')
+                p_pos = p.get('pos', 'Flex')
+                alt_parts.append(f"{p_pos}: {p_name}.")
+            nba_alt_text = " ".join(alt_parts)[:1000]
+
             # 3. Upload and Post
             try:
                 print("⬆️ Uploading NBA graphic to X servers...")
                 media = nba_api_v1.media_upload("nba_matchup.png")
+                
+                # 🛑 NEW: Add Alt Text to X
+                nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
                 
                 nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
                 print(f"✅ Successfully tweeted {team_name} NBA lineup graphic!")
@@ -480,7 +491,8 @@ for game in nba_data:
                             rgb_img.save(img_byte_arr, format='JPEG', quality=70)
                             img_data = img_byte_arr.getvalue()
 
-                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_name} Starting Lineup")
+                        # 🛑 NEW: Pass Alt Text to Bluesky
+                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
                         print(f"✅ Successfully posted {team_name} to Bluesky (Compressed JPEG)!")
                     except Exception as e:
                         print(f"❌ Bluesky post failed for {team_name}: {e}")
@@ -657,7 +669,8 @@ for game in games:
     away_odds_str = format_odds(raw_away_odds)
     home_odds_str = format_odds(raw_home_odds)
 
-    def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alert_header=None):
+    # 🛑 NEW: Added alt_text to the parameters
+    def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alt_text, alert_header=None):
         # 1. Build the lightweight text payload
         if alert_header:
             tweet_text = f"{alert_header}\n\n"
@@ -695,7 +708,7 @@ for game in games:
             try:
                 if asyncio.run(take_mlb_screenshot(game_pk, side, date_string)):
                     screenshot_success = True
-                    break # The screenshot worked! Break out of the retry loop.
+                    break 
                 else:
                     print(f"⚠️ Screenshot attempt {attempt + 1} failed. Pausing for 5 seconds then retrying...")
                     time.sleep(5)
@@ -703,7 +716,6 @@ for game in games:
                 print(f"❌ Playwright crashed on attempt {attempt + 1}: {e}")
                 time.sleep(5)
                 
-        # If both attempts failed, abort the tweet so it can try again on the next cron run
         if not screenshot_success:
             print(f"⏭️ Skipping {team_short} tweet due to screenshot failure. Will retry next run.")
             return False
@@ -713,6 +725,9 @@ for game in games:
             print("⬆️ Uploading MLB graphic to X servers...")
             media = mlb_api_v1.media_upload("mlb_matchup.png")
             
+            # 🛑 NEW: Add Alt Text to X
+            mlb_api_v1.create_media_metadata(media.media_id, alt_text)
+            
             mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
             print(f"✅ Successfully tweeted {team_short} MLB lineup graphic!")
             
@@ -720,20 +735,14 @@ for game in games:
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
                 try:
-                    # 1. Open the massive PNG we generated for Twitter
                     with Image.open("mlb_matchup.png") as img:
-                        # 2. Convert it to RGB (removes transparency so JPEG works)
                         rgb_img = img.convert('RGB')
-                        
-                        # 3. Save it to a temporary memory buffer as a highly compressed JPEG
                         img_byte_arr = io.BytesIO()
                         rgb_img.save(img_byte_arr, format='JPEG', quality=70)
-                        
-                        # 4. Get the raw bytes to send to Bluesky (now well under 1MB!)
                         img_data = img_byte_arr.getvalue()
 
-                    # Send the lightweight JPEG data to Bluesky
-                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=f"{team_short} Starting Lineup")
+                    # 🛑 NEW: Pass Alt Text to Bluesky
+                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
                     print(f"✅ Successfully posted {team_short} to Bluesky (Compressed JPEG)!")
                 except Exception as e:
                     print(f"❌ Bluesky post failed for {team_short}: {e}")
@@ -763,16 +772,29 @@ for game in games:
         team_short_ref = away_short if side == 'away' else home_short
         team_p_ref = away_pitcher_str if side == 'away' else home_pitcher_str
         team_o_ref = away_odds_str if side == 'away' else home_odds_str
+        opp_short_ref = home_short if side == 'away' else away_short
         opp_p_ref = home_pitcher_str if side == 'away' else away_pitcher_str
         opp_o_ref = home_odds_str if side == 'away' else away_odds_str
+
+        # --- BUILD MLB ALT TEXT ---
+        mlb_alt_parts = [f"Graphical lineup card for the {team_short_ref} against the {opp_short_ref}."]
+        mlb_alt_parts.append("Batting Order:")
+        for i in range(9):
+            p_id = players_array[i].get('id')
+            p_name = players_array[i].get('fullName', 'Unknown')
+            p_pos = positions.get(p_id, '-') 
+            mlb_alt_parts.append(f"{i+1}. {p_name} ({p_pos}).")
+        
+        mlb_alt_parts.append(f"Starting Pitcher: {team_p_ref}.")
+        mlb_alt_text = " ".join(mlb_alt_parts)[:1000]
 
         previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
 
         # --- 1. FIRST TIME TWEET ---
         if not previously_tweeted_keys:
             team_hash = team_short_ref.replace(" ", "")
-            # Pass the odds variables right after team_hash!
-            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string):
+            # 🛑 NEW: Passed mlb_alt_text
+            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, mlb_alt_text):
                 log_today.append(full_key)
                 tweeted_recently.append(full_key)
                 new_tweets_sent = True
@@ -820,7 +842,7 @@ for game in games:
 
             team_hash = team_short_ref.replace(" ", "")
             # Pass the odds variables here too!
-            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, alert_header=alert_header):
+            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, mlb_alt_text, alert_header=alert_header):
                 # Clean up old key to prevent duplicate tweets on the next run
                 for k in previously_tweeted_keys:
                     if k in log_today: log_today.remove(k)
@@ -1100,6 +1122,11 @@ for target_date_str in futbol_dates_to_check:
         try:
             print(f"📸 Match detected! Generating graphic for {h_name} vs {a_name}...")
 
+            # --- BUILD FUTBOL ALT TEXT ---
+            home_alt_str = f"{h_name} Starting XI (Formation: {h_form}) — Goalkeeper: {', '.join(h_pos['G'])}. Defenders: {', '.join(h_pos['D'])}. Midfielders: {', '.join(h_pos['M'])}. Forwards: {', '.join(h_pos['F'])}."
+            away_alt_str = f"{a_name} Starting XI (Formation: {a_form}) — Goalkeeper: {', '.join(a_pos['G'])}. Defenders: {', '.join(a_pos['D'])}. Midfielders: {', '.join(a_pos['M'])}. Forwards: {', '.join(a_pos['F'])}."
+            futbol_alt_text = f"Graphical tactical lineup card for {h_name} vs {a_name}. {home_alt_str} {away_alt_str}"[:1000]
+
             # Reorder the tweet: Header, Link, Odds, Hashtags
             base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
             link_text = f"📱 Live stats & scores: {base_url}#lineup-{fixture_id}"
@@ -1107,6 +1134,12 @@ for target_date_str in futbol_dates_to_check:
             
             tweet_parts = [header, link_text, odds_str, tags_text]
             tweet_text = "\n\n".join(tweet_parts)
+
+            # Build Bluesky text formatting
+            bsky_tb = client_utils.TextBuilder()
+            bsky_tb.text(header + "\n\n")
+            bsky_tb.link(link_text, base_url + f"#lineup-{fixture_id}")
+            bsky_tb.text("\n\n" + odds_str + "\n\n" + tags_text)
 
             # 1. Take the screenshot (halts script temporarily to run async)
             asyncio.run(take_screenshot(fixture_id, target_date_str))
@@ -1119,12 +1152,32 @@ for target_date_str in futbol_dates_to_check:
             print("⬆️ Uploading graphic to X servers...")
             media = target_v1_client.media_upload("temp_matchup.png")
 
+            # 🛑 NEW: Add Alt Text to X
+            target_v1_client.create_media_metadata(media.media_id, futbol_alt_text)
+
             # 4. Post the V2 Tweet with the media attached
             if target_client:
                 target_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
                 print(f"✅ [{league_info['name']}] Successfully tweeted graphic for {h_name} vs {a_name}!")
             else:
                 print(f"⚠️ Target client for {league_info['name']} is missing credentials. Skipping tweet.")
+
+            # --- START BLUESKY UPLOAD FIX ---
+            target_bsky_client = league_info.get("bsky_client")
+            if target_bsky_client:
+                try:
+                    with Image.open("temp_matchup.png") as img:
+                        rgb_img = img.convert('RGB')
+                        img_byte_arr = io.BytesIO()
+                        rgb_img.save(img_byte_arr, format='JPEG', quality=70)
+                        img_data = img_byte_arr.getvalue()
+
+                    # 🛑 NEW: Pass Alt Text to Bluesky
+                    target_bsky_client.send_image(text=bsky_tb, image=img_data, image_alt=futbol_alt_text)
+                    print(f"✅ Successfully posted to Bluesky (Compressed JPEG)!")
+                except Exception as e:
+                    print(f"❌ Bluesky post failed: {e}")
+            # --- END BLUESKY UPLOAD FIX ---
 
             # 5. Clean up the server
             if os.path.exists("temp_matchup.png"):
