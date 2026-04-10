@@ -79,14 +79,20 @@ def create_x_clients(consumer_key, consumer_secret, access_token, access_token_s
     if not all([consumer_key, consumer_secret, access_token, access_token_secret]):
         return None, None
         
-    # CRITICAL FIX: Must use explicit keyword arguments here!
+    # V2 Client (Explicit kwargs)
     client = tweepy.Client(
         consumer_key=consumer_key, 
         consumer_secret=consumer_secret, 
         access_token=access_token, 
         access_token_secret=access_token_secret
     )
-    auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret, access_token, access_token_secret)
+    
+    # 🛑 BULLETPROOF V1.1 API FIX
+    # Instantiate the handler with just the consumer keys first
+    auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret)
+    # Then explicitly set the access tokens to avoid the callback_url positional trap
+    auth.set_access_token(access_token, access_token_secret)
+    
     api_v1 = tweepy.API(auth)
     
     return client, api_v1
