@@ -40,11 +40,11 @@ jobs:
           if ! git diff --quiet --staged; then
             git commit -m "📊 Automated update: Master Board and Matchup Stats [skip ci]"
             
-            # Pull latest changes and rebase BEFORE pushing
-            git pull --rebase origin main || echo "Nothing to pull"
+            # 🛑 THE FIX: Pull latest changes, rebase, and aggressively force our new scrape to win any conflicts
+            git pull origin main --rebase --strategy-option=theirs
             
-            # Try pushing. If rejected, pull again and immediately push.
-            git push origin main || (git pull --rebase origin main && git push origin main)
+            # Push cleanly to the repository
+            git push origin main
           else
             echo "No new matchup stats or daily files. Skipping commit."
           fi
