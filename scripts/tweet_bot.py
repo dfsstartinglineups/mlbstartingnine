@@ -867,16 +867,19 @@ print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 
 # Define all leagues, their tags, and optionally their dedicated X client and URL
 FUTBOL_LEAGUES = {
+    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "base_url": "https://futbolstartingeleven.com/championship.html"},
+    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "base_url": "https://futbolstartingeleven.com/ligue1.html"}, 
+    10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
     39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": epl_client, "v1_client": epl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": laliga_client, "v1_client": laliga_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
     45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup"},
-    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship"},
+   # 40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship"},
     78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
     254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
     253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},
-    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1"},
+  #  61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1"},
     3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
     13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores"},
     16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf"},
@@ -894,8 +897,8 @@ FUTBOL_LEAGUES = {
     11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana"},
     5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
     531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    307: { "name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"},
-    10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl"}
+    307: { "name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"}
+  #  10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl"}
     #10:  {"name": "🌎 INTERNATIONALFriendlies", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "v1_client": friendly_api_v1, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
 }
 
