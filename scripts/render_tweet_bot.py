@@ -448,6 +448,12 @@ def run_engines(memory):
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             return True
 
+    def parse_odds_time(date_str):
+        if date_str.endswith('Z'): date_str = date_str[:-1]
+        if len(date_str.split(':')) == 2: date_str += ":00"
+        try: return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
+        except: return 0
+
     for game in games:
         game_pk = str(game['gamePk'])
         status = game.get('status', {})
@@ -500,7 +506,7 @@ def run_engines(memory):
 
         potential_odds = [o for o in odds_data if o['home_team'] == home_full and o['away_team'] == away_full]
         if potential_odds and game_time_ms > 0:
-            closest_odds = sorted(potential_odds, key=lambda o: abs((datetime.strptime(o['commence_time'].replace('Z',''), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000) - game_time_ms))[0]
+            closest_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
             for bookie in closest_odds.get('bookmakers', []):
                 h2h = next((m for m in bookie['markets'] if m['key'] == 'h2h'), None)
                 totals = next((m for m in bookie['markets'] if m['key'] == 'totals'), None)
