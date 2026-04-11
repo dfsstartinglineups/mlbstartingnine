@@ -196,7 +196,7 @@ def fetch_initial_memory():
             
     # MIGRATION BRIDGE (Update Repo URL here if needed)
     print("🌉 Firebase empty. Bridging gap: Fetching legacy tweet log from GitHub...")
-    gh_url = f"https://raw.githubusercontent.com/dfsstartinglineups/futbolstartingeleven/refs/heads/main/data/tweet_log.json?v={time.time()}"
+    gh_url = f"https://raw.githubusercontent.com/dfsstartinglineups/mlbstartingnine/refs/heads/main/data/tweet_log.json?v={time.time()}"
     try:
         gh_resp = requests.get(gh_url, headers={'Cache-Control': 'no-cache'}, timeout=10)
         if gh_resp.status_code == 200:
