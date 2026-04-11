@@ -14,6 +14,16 @@ import asyncio
 from playwright.async_api import async_playwright
 from PIL import Image
 import io
+import subprocess
+
+# --- AUTOMATIC PLAYWRIGHT BROWSER INSTALL ---
+try:
+    import playwright
+    # Check if chromium exists; if not, install it
+    print("🌐 Checking Playwright browser binaries...")
+    subprocess.run(["playwright", "install", "chromium"], check=True)
+except Exception as e:
+    print(f"⚠️ Playwright auto-install failed: {e}")
 
 # ==========================================
 # 0. ENVIRONMENT & DRY RUN SETTINGS
