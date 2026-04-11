@@ -15,15 +15,21 @@ from playwright.async_api import async_playwright
 from PIL import Image
 import io
 import subprocess
+import sys
 
 # --- AUTOMATIC PLAYWRIGHT BROWSER INSTALL ---
-try:
-    import playwright
-    # Check if chromium exists; if not, install it
-    print("🌐 Checking Playwright browser binaries...")
-    subprocess.run(["playwright", "install", "chromium"], check=True)
-except Exception as e:
-    print(f"⚠️ Playwright auto-install failed: {e}")
+def ensure_browsers():
+    try:
+        import playwright
+        print("🌐 Checking Playwright browser binaries...")
+        # Use check_call to block the script until installation is finished
+        subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])
+        print("✅ Playwright binaries are ready.")
+    except Exception as e:
+        print(f"⚠️ Playwright auto-install failed: {e}")
+
+# Call it immediately
+ensure_browsers()
 
 # ==========================================
 # 0. ENVIRONMENT & DRY RUN SETTINGS
@@ -118,13 +124,27 @@ async def take_screenshot(fixture_id, target_date):
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
         url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
-        await page.goto(url)
+        
         try:
-            await page.wait_for_selector(".player-node", timeout=10000)
+            # 1. Wait for the network to settle
+            await page.goto(url, wait_until="networkidle", timeout=30000)
+            
+            # 2. Strict Check: Wait up to 30s for the 22nd player to render!
+            # (11 away + 11 home = 22 players. Zero-indexed = 21)
+            await page.locator(".player-node").nth(21).wait_for(timeout=30000)
+            
+            # 3. Buffer for images/fonts
             await asyncio.sleep(2)
-        except Exception: pass
-        await page.locator("#capture-area").screenshot(path="temp_matchup.png")
-        await browser.close()
+            
+            await page.locator("#capture-area").screenshot(path="temp_matchup.png")
+            print("✅ Futbol Screenshot saved!")
+            await browser.close()
+            return True
+            
+        except Exception as e:
+            print(f"⚠️ Futbol Graphics failed to render within 30s. Aborting. Error: {e}")
+            await browser.close()
+            return False
 
 async def take_mlb_screenshot(game_pk, side, target_date):
     print(f"📸 Booting headless browser for MLB {game_pk} ({side})...")
@@ -163,15 +183,26 @@ async def take_nba_screenshot(team_abbr, side, target_date):
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
         url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
+        
         try:
-            await page.goto(url, timeout=15000)
-            await page.wait_for_selector(".player-node", timeout=15000)
-            await asyncio.sleep(1) 
+            # 1. Increase navigation timeout and wait for network to settle
+            await page.goto(url, wait_until="networkidle", timeout=30000)
+            
+            # 2. Strict Check: Wait up to 30s for the 5th player to render
+            # This ensures we NEVER take a screenshot of a partial 4-man lineup.
+            await page.locator(".player-node").nth(4).wait_for(timeout=30000)
+            
+            # 3. Tiny buffer for fonts/images to snap in
+            await asyncio.sleep(2) 
+            
             await page.locator("#capture-area").screenshot(path="nba_matchup.png")
+            print("✅ NBA Screenshot saved!")
             await browser.close()
             return True
+            
         except Exception as e:
-            print(f"⚠️ NBA Graphics failed to load. Error: {e}")
+            # If it times out or only loads 3 players, we safely abort.
+            print(f"⚠️ NBA Graphics failed to render within 30s. Aborting. Error: {e}")
             await browser.close()
             return False
 
@@ -706,7 +737,18 @@ def run_engines(memory):
 
             if team_key in memory.get(date_str, []): continue
 
-            asyncio.run(take_screenshot(fixture_id, target_date_str))
+            # Apply the 2-attempt safety net to Futbol!
+            screenshot_success = False
+            for attempt in range(2):
+                try:
+                    if asyncio.run(take_screenshot(fixture_id, target_date_str)):
+                        screenshot_success = True
+                        break 
+                    time.sleep(5)
+                except: time.sleep(5)
+                
+            if not screenshot_success: continue
+
             target_client, target_v1_client = league_info.get("x_client") or futbol_client, league_info.get("v1_client") or futbol_api_v1
 
             if DRY_RUN:
