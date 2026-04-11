@@ -383,12 +383,18 @@ def run_engines(memory):
                 tweeted_recently.append(team_date_key)
                 memory[date_str] = log_today
                 new_tweets_sent = True
+                # 🛑 ADD THIS HERE:
+                if firebase_admin._apps:
+                    db.reference('tweet_log').update({date_str: log_today})
 
     # ==========================================
     # MLB ENGINE
     # ==========================================
-    try: games = requests.get(MLB_API_URL).json().get('dates', [{}])[0].get('games', [])
-    except: games = []
+    try:
+        schedule_data = requests.get(MLB_API_URL).json()
+        games = schedule_data['dates'][0]['games'] if schedule_data.get('dates') else []
+    except:
+        games = []
 
     try: odds_data = requests.get(MLB_ODDS_URL).json().get('odds', [])
     except: odds_data = []
@@ -448,11 +454,7 @@ def run_engines(memory):
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             return True
 
-    def parse_odds_time(date_str):
-        if date_str.endswith('Z'): date_str = date_str[:-1]
-        if len(date_str.split(':')) == 2: date_str += ":00"
-        try: return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
-        except: return 0
+    
 
     for game in games:
         game_pk = str(game['gamePk'])
@@ -484,6 +486,9 @@ def run_engines(memory):
                 tweeted_recently.append(postponed_key)
                 memory[date_str] = log_today
                 new_tweets_sent = True
+                # 🛑 ADD THIS HERE:
+                if firebase_admin._apps:
+                    db.reference('tweet_log').update({date_str: log_today})
             continue
         
         positions = {}
@@ -503,6 +508,12 @@ def run_engines(memory):
         raw_away_odds, raw_home_odds, raw_total = "TBD", "TBD", "TBD"
         try: game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() * 1000
         except: game_time_ms = 0
+
+        def parse_odds_time(date_str):
+            if date_str.endswith('Z'): date_str = date_str[:-1]
+            if len(date_str.split(':')) == 2: date_str += ":00"
+            try: return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
+            except: return 0
 
         potential_odds = [o for o in odds_data if o['home_team'] == home_full and o['away_team'] == away_full]
         if potential_odds and game_time_ms > 0:
@@ -545,6 +556,9 @@ def run_engines(memory):
                     log_today.append(full_key)
                     tweeted_recently.append(full_key)
                     new_tweets_sent = True
+                    # 🛑 ADD THIS HERE:
+                    if firebase_admin._apps:
+                        db.reference('tweet_log').update({date_str: log_today})
             elif full_key not in previously_tweeted_keys:
                 old_ids = previously_tweeted_keys[0].replace(f"{base_key}_", "").split('-')
                 new_ids = current_hash.split('-')
@@ -626,7 +640,12 @@ def run_engines(memory):
             
             if team_key in tweeted_recently: continue
                 
-            home_startXI, away_startXI = match.get('homeLineup', {}).get('startXI', []), match.get('awayLineup', {}).get('startXI', [])
+            home_lineup = match.get('homeLineup')
+            away_lineup = match.get('awayLineup')
+            if not home_lineup or not away_lineup: continue
+                
+            home_startXI = home_lineup.get('startXI', [])
+            away_startXI = away_lineup.get('startXI', [])
             if not home_startXI or not away_startXI: continue
 
             raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
@@ -634,7 +653,8 @@ def run_engines(memory):
             a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 10 else raw_a_name
 
             h_pos, a_pos = parse_futbol_lineup(home_startXI), parse_futbol_lineup(away_startXI)
-            h_form, a_form = match.get('homeLineup', {}).get('formation', 'TBD'), match.get('awayLineup', {}).get('formation', 'TBD')
+            h_form = home_lineup.get('formation', 'TBD')
+            a_form = away_lineup.get('formation', 'TBD')
             odds = match.get('odds', {})
             odds_str = f"📊 Live Match Odds\n{h_name}: {odds.get('home', 'TBD')} | Draw: {odds.get('draw', 'TBD')} | {a_name}: {odds.get('away', 'TBD')}\nOver {odds.get('total', '2.5')}: {odds.get('over', 'TBD')} | Under {odds.get('total', '2.5')}: {odds.get('under', 'TBD')}"
             
@@ -686,6 +706,9 @@ def run_engines(memory):
             log_target_date.append(team_key)
             tweeted_recently.append(team_key)
             new_tweets_sent = True
+            # 🛑 ADD THIS HERE:
+            if firebase_admin._apps:
+                db.reference('tweet_log').update({target_date_str: log_target_date})
 
         # --- B. FUTBOL LIVE ALERTS ---
         live_futbol_data = {}
