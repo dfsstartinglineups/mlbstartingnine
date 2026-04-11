@@ -1282,7 +1282,7 @@ for target_date_str in futbol_dates_to_check:
             is_shootout = True
             
         for e in events:
-            if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty']:
+            if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty', 'Own Goal']:
                 e_time = get_actual_minute(e)
                 
                 # Nuke shootout penalties so they don't corrupt the live score or trigger tweets
@@ -1464,7 +1464,12 @@ for target_date_str in futbol_dates_to_check:
             conceding_team_name = a_name if team_id == h_id else h_name
             scorer = event.get('player')
             
-            scorer_str = f"{scorer} ({scoring_team_name})" if scorer and scorer != "null" else f"{scoring_team_name}"
+            # 🛑 THE OWN GOAL TEXT FORMATTER
+            if event.get('detail') == 'Own Goal':
+                scorer_str = f"{scorer} (Own Goal)" if scorer and scorer != "null" else f"Own Goal ({conceding_team_name})"
+            else:
+                scorer_str = f"{scorer} ({scoring_team_name})" if scorer and scorer != "null" else f"{scoring_team_name}"
+                
             american_odds = f"+{int((scorer_odds - 1) * 100)}"
             
             h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
