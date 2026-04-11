@@ -101,40 +101,14 @@ def create_x_clients(consumer_key, consumer_secret, access_token, access_token_s
     )
     
     # 🛑 BULLETPROOF V1.1 API FIX
-    # Instantiate the handler with just the consumer keys first
     auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret)
-    # Then explicitly set the access tokens to avoid the callback_url positional trap
     auth.set_access_token(access_token, access_token_secret)
     
     api_v1 = tweepy.API(auth)
     
     return client, api_v1
 
-# MLB Client (Main Account)
-mlb_client, mlb_api_v1 = create_x_clients(
-    os.environ.get("X_API_KEY"), os.environ.get("X_API_SECRET"),
-    os.environ.get("X_ACCESS_TOKEN"), os.environ.get("X_ACCESS_TOKEN_SECRET")
-)
-
-# NBA Client (@DailyNBAlineups)
-nba_client, nba_api_v1 = create_x_clients(
-    os.environ.get("NBA_X_API_KEY"), os.environ.get("NBA_X_API_SECRET"),
-    os.environ.get("NBA_X_ACCESS_TOKEN"), os.environ.get("NBA_X_ACCESS_TOKEN_SECRET")
-)
-
-# Futbol Client (@FutbolStarting11 - Using existing SerieA Env Vars)
-futbol_client, futbol_api_v1 = create_x_clients(
-    os.environ.get("SERIEA_X_API_KEY"), os.environ.get("SERIEA_X_API_SECRET"),
-    os.environ.get("SERIEA_X_ACCESS_TOKEN"), os.environ.get("SERIEA_X_ACCESS_TOKEN_SECRET")
-)
-
-# International Friendlies Client
-friendly_client, friendly_api_v1 = create_x_clients(
-    os.environ.get("FRIENDLY_X_API_KEY"), os.environ.get("FRIENDLY_X_API_SECRET"),
-    os.environ.get("FRIENDLY_X_ACCESS_TOKEN"), os.environ.get("FRIENDLY_X_ACCESS_TOKEN_SECRET")
-)
-
-# Dynamic Clients Helper
+# Dynamic Clients Helper (Moved UP so core accounts can use it)
 def get_dynamic_clients(key):
     creds = auth_data.get(key, {})
     return create_x_clients(
@@ -142,6 +116,15 @@ def get_dynamic_clients(key):
         creds.get("access_token"), creds.get("access_token_secret")
     )
 
+# --- CORE ACCOUNTS ---
+mlb_client, mlb_api_v1 = get_dynamic_clients("mlb_x")
+nba_client, nba_api_v1 = get_dynamic_clients("nba_x")
+futbol_client, futbol_api_v1 = get_dynamic_clients("futbol_x")
+
+# (If/when Friendlies comes back online, just add "friendly_x" to your JSON!)
+friendly_client, friendly_api_v1 = get_dynamic_clients("friendly_x")
+
+# --- SOCCER SUB-ACCOUNTS ---
 championship_client, championship_api_v1 = get_dynamic_clients("championship_x")
 bundesliga_client, bundesliga_api_v1 = get_dynamic_clients("bundesliga_x")
 nwsl_client, nwsl_api_v1 = get_dynamic_clients("nwsl_x")
