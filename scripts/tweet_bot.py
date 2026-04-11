@@ -1463,17 +1463,17 @@ for target_date_str in futbol_dates_to_check:
             scoring_team_name = h_name if team_id == h_id else a_name
             conceding_team_name = a_name if team_id == h_id else h_name
             scorer = event.get('player')
-                
-                # NEW: If the API hasn't provided the player's name yet, skip and try again next minute
-                if not scorer or str(scorer).lower() == "null":
-                    continue
-                
-                # Since we know the scorer exists now, we can simplify the strings
-                if event.get('detail') == 'Own Goal':
-                    scorer_str = f"{scorer} (Own Goal)"
-                else:
-                    scorer_str = f"{scorer} ({scoring_team_name})"
-                
+            
+            # NEW: If the API hasn't provided the player's name yet, skip and try again next minute
+            if not scorer or str(scorer).lower() == "null":
+                continue
+            
+            # Since we know the scorer exists now, we can simplify the strings
+            if event.get('detail') == 'Own Goal':
+                scorer_str = f"{scorer} (Own Goal)"
+            else:
+                scorer_str = f"{scorer} ({scoring_team_name})"
+            
             american_odds = f"+{int((scorer_odds - 1) * 100)}"
             
             h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
