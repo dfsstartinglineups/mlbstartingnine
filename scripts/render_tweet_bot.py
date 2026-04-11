@@ -718,8 +718,11 @@ def run_engines(memory):
             valid_goal_events.sort(key=get_actual_minute)
 
             current_home_score, current_away_score = 0, 0
-            home_odds = float(match.get('odds', {}).get('home') or 0.0) rescue 0.0
-            away_odds = float(match.get('odds', {}).get('away') or 0.0) rescue 0.0
+            try: home_odds = float(match.get('odds', {}).get('home') or 0.0)
+            except: home_odds = 0.0
+            
+            try: away_odds = float(match.get('odds', {}).get('away') or 0.0)
+            except: away_odds = 0.0
 
             for event in valid_goal_events: 
                 team_id = event.get('team_id')
