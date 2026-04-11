@@ -59,6 +59,19 @@ def setup_bsky_client(account_key):
             print(f"❌ Failed to log into Bluesky for {account_key}: {e}")
     return None
 
+def check_fresh_memory_for_duplicate(target_key):
+    """Safely reads the log file directly from disk at the last possible second to prevent race conditions."""
+    try:
+        with open(LOG_FILE, 'r') as f:
+            fresh_mem = json.load(f)
+        for date_list in fresh_mem.values():
+            if target_key in date_list:
+                return True
+        return False
+    except Exception:
+        # If the file is temporarily locked or missing, assume False so the bot doesn't freeze
+        return False
+
 LEAGUE_CONFIG = {
     "mlb": {
         "league_name": "MLB ⚾",
@@ -478,6 +491,10 @@ for game in nba_data:
 
             # 3. Upload and Post
             try:
+                # 🛑 THE LAST MILLISECOND CHECK
+                if check_fresh_memory_for_duplicate(team_date_key):
+                    print(f"🛑 [RACE CONDITION PREVENTED] {team_name} was tweeted by another instance while Playwright was running!")
+                    continue
                 print("⬆️ Uploading NBA graphic to X servers...")
                 media = nba_api_v1.media_upload("nba_matchup.png")
                 
@@ -583,6 +600,11 @@ for game in games:
             alert_text = f"🚨 POSTPONED: The game between the {away_short} and {home_short} has been postponed due to {reason}.\n\n#{away_hash} #{home_hash} #MLB"
             
             print(f"🚨 ALERT TRIGGERED: {away_short} vs {home_short} Postponed!")
+
+            # 🛑 LAST SECOND CHECK
+            if check_fresh_memory_for_duplicate(postponed_key):
+                print(f"🛑 [RACE CONDITION PREVENTED] Postponement already tweeted!")
+                continue
             
             # Post to platforms
             try:
@@ -676,7 +698,7 @@ for game in games:
     home_odds_str = format_odds(raw_home_odds)
 
     # 🛑 NEW: Added alt_text to the parameters
-    def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alt_text, alert_header=None):
+    def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
         # 1. Build the lightweight text payload
         if alert_header:
             tweet_text = f"{alert_header}\n\n"
@@ -728,6 +750,10 @@ for game in games:
 
         # 3. Upload and Post
         try:
+            # 🛑 THE LAST MILLISECOND CHECK
+            if check_fresh_memory_for_duplicate(memory_key):
+                print(f"🛑 [RACE CONDITION PREVENTED] {team_short} was tweeted by another instance while Playwright was running!")
+                return False
             print("⬆️ Uploading MLB graphic to X servers...")
             media = mlb_api_v1.media_upload("mlb_matchup.png")
             
@@ -800,7 +826,7 @@ for game in games:
         if not previously_tweeted_keys:
             team_hash = team_short_ref.replace(" ", "")
             # 🛑 NEW: Passed mlb_alt_text
-            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, mlb_alt_text):
+            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, mlb_alt_text, full_key):
                 log_today.append(full_key)
                 tweeted_recently.append(full_key)
                 new_tweets_sent = True
@@ -848,7 +874,7 @@ for game in games:
 
             team_hash = team_short_ref.replace(" ", "")
             # Pass the odds variables here too!
-            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, mlb_alt_text, alert_header=alert_header):
+            if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_hash, team_o_ref, total_string, mlb_alt_text, full_key, alert_header=alert_header):
                 # Clean up old key to prevent duplicate tweets on the next run
                 for k in previously_tweeted_keys:
                     if k in log_today: log_today.remove(k)
@@ -1156,6 +1182,11 @@ for target_date_str in futbol_dates_to_check:
             # 2. Identify the correct clients for this specific league
             target_client = league_info.get("x_client") or futbol_client
             target_v1_client = league_info.get("v1_client") or futbol_api_v1
+
+            # 🛑 THE LAST MILLISECOND CHECK
+            if check_fresh_memory_for_duplicate(team_key):
+                print(f"🛑 [RACE CONDITION PREVENTED] {h_name} vs {a_name} was tweeted while Playwright was running!")
+                continue
 
             # 3. Upload the image using the correct V1.1 API
             print("⬆️ Uploading graphic to X servers...")
@@ -1477,6 +1508,11 @@ for target_date_str in futbol_dates_to_check:
             tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
             
             try:
+                # 🛑 THE LAST MILLISECOND CHECK
+                if check_fresh_memory_for_duplicate(event_key):
+                    print(f"🛑 [RACE CONDITION PREVENTED] Goal alert for {scoring_team_name} was just tweeted!")
+                    continue
+                
                 # Dynamic client reading from the dictionary
                 target_client = league_info.get("x_client") or futbol_client
                 
