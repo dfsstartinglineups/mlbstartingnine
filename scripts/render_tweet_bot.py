@@ -121,16 +121,29 @@ async def take_mlb_screenshot(game_pk, side, target_date):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+        
         url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
-        await page.goto(url)
+        
         try:
-            await page.locator("#lineup-container .player-row").nth(8).wait_for(timeout=15000)
+            # 1. Increase navigation timeout and wait for network to settle
+            await page.goto(url, wait_until="networkidle", timeout=30000)
+            
+            # 2. Strict Check: Wait up to 30s for the 9th batter to render
+            # This ensures we NEVER take a screenshot of a blank or partial lineup.
+            await page.locator("#lineup-container .player-row").nth(8).wait_for(timeout=30000)
+            
+            # 3. Tiny buffer for fonts/images to snap in
             await asyncio.sleep(2)
+            
             await page.locator("#capture-area").screenshot(path="mlb_matchup.png")
+            print("✅ MLB Screenshot saved!")
             await browser.close()
             return True
+            
         except Exception as e:
-            print(f"⚠️ MLB Players failed to load. Error: {e}")
+            # If it times out, we return False. 
+            # The bot will skip the tweet and try again on the next 60s loop.
+            print(f"⚠️ MLB Players failed to render within 30s. Aborting. Error: {e}")
             await browser.close()
             return False
 
