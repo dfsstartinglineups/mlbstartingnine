@@ -205,6 +205,8 @@ def fetch_initial_memory():
     except Exception as e:
         print(f"⚠️ Failed to fetch GitHub bridge: {e}")
         
+    if mem is None:
+        mem = {}
     return mem
 
 # ==========================================
@@ -845,33 +847,37 @@ def run_engines(memory):
 # ==========================================
 if __name__ == "__main__":
     print("🤖 Starting Publisher Bot (Render Persistent Engine)...")
-    if DRY_RUN:
-        print("🛑 DRY RUN MODE IS ACTIVE. No live tweets will be posted.")
-        print("👉 Change 'DRY_RUN' to 'False' in Render to go live.\n")
     
-    # Fetch initial state strictly outside the core loop
+    # 1. Fetch initial state
     persisted_memory = fetch_initial_memory()
+    
+    # 2. SEED FIREBASE: If Firebase is empty but we got GH data, save it now!
+    if firebase_admin._apps:
+        existing_fb = db.reference('tweet_log').get()
+        if not existing_fb and persisted_memory:
+            print("🌱 Seeding Firebase with legacy GitHub log...")
+            db.reference('tweet_log').set(persisted_memory)
+    
+    if persisted_memory is None:
+        persisted_memory = {}
     
     while True:
         try:
-            # ⏱️ START THE CLOCK
             loop_start_time = time.time()
             
-            # The memory gets passed in, updated, and passed back out
-            target_sleep_sec, persisted_memory = run_engines(persisted_memory)
+            # Run engines - we now capture the updated memory and the sleep time
+            target_sleep_sec, updated_memory = run_engines(persisted_memory)
+            persisted_memory = updated_memory
             
-            # ⏱️ STOP THE CLOCK
             loop_elapsed = time.time() - loop_start_time
             actual_sleep = max(0.0, target_sleep_sec - loop_elapsed)
             
             if actual_sleep > 0:
-                print(f"⏳ Loop took {loop_elapsed:.1f}s. Sleeping remaining {actual_sleep:.1f}s to hit target...")
+                print(f"⏳ Loop took {loop_elapsed:.1f}s. Sleeping {actual_sleep:.1f}s...")
                 time.sleep(actual_sleep)
-            else:
-                print(f"⚡ Loop took {loop_elapsed:.1f}s! (Exceeded {target_sleep_sec}s target). Restarting IMMEDIATELY!")
                 
         except Exception as e:
-            print(f"\n❌ Loop crashed: {e}. Restarting in 60s...")
-            # Fetch a fresh memory state in case the crash corrupted the local dict
+            print(f"\n❌ Loop crashed: {e}. Restarting loop in 60s...")
             time.sleep(60)
-            persisted_memory = fetch_initial_memory()
+            # CRITICAL: We DO NOT re-fetch memory here. 
+            # We keep the persisted_memory we already have in RAM.
