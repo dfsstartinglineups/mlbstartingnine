@@ -539,13 +539,13 @@ def run_engines(memory):
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             if os.path.exists("mlb_matchup.jpg"): os.remove("mlb_matchup.jpg")
             
-            # 🧹 FORCE GARBAGE COLLECTION
             # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
-                gc.collect()
-                try:
-                    ctypes.CDLL('libc.so.6').malloc_trim(0)
-                except Exception:
-                    pass
+            gc.collect()
+            try:
+                ctypes.CDLL('libc.so.6').malloc_trim(0)
+            except Exception:
+                pass
+                
             return True
 
     
