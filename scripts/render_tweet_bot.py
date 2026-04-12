@@ -686,7 +686,7 @@ def run_engines(memory):
         2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL"},
         45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup"},
         78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
-        254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+       # 254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
         253: {"name": "🇺🇸 MLS", "tag": "#MLS", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},
         3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague"},
         13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores"},
