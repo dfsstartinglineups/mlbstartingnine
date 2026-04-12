@@ -439,7 +439,9 @@ def run_engines(memory):
                     print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking NBA Tweet for {team_name}:")
                     print(f"      -> Text: {tweet_text[:80]}...")
                     print(f"      -> Image Generated: True | Alt: {nba_alt_text[:60]}...")
+                    upload_success = True # Treat dry runs as successful
                 else:
+                    upload_success = False
                     try:
                         media = nba_api_v1.media_upload("nba_matchup.png")
                         nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
@@ -452,22 +454,27 @@ def run_engines(memory):
                                 img_data = f.read()
                             config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
                             print(f"✅ Successfully posted {team_name} to Bluesky (Native JPEG)!")
+                            
+                        # If we made it here, no exceptions occurred!
+                        upload_success = True
                     except Exception as e:
                         print(f"❌ Failed to tweet {team_name}: {e}")
 
+                # ALWAYS clean up files
                 if os.path.exists("nba_matchup.png"): os.remove("nba_matchup.png")
                 if os.path.exists("nba_matchup.jpg"): os.remove("nba_matchup.jpg")
                 
-                log_today.append(team_date_key)
-                tweeted_recently.append(team_date_key)
-                memory[date_str] = log_today
-                new_tweets_sent = True
-                
-                # 🛑 KEEPING FIREBASE SYNC:
-                if firebase_admin._apps:
-                    db.reference('tweet_log').update({date_str: log_today})
+                # ONLY log to memory if the upload actually worked
+                if upload_success:
+                    log_today.append(team_date_key)
+                    tweeted_recently.append(team_date_key)
+                    memory[date_str] = log_today
+                    new_tweets_sent = True
                     
-                # 🧹 FORCE GARBAGE COLLECTION
+                    # 🛑 KEEPING FIREBASE SYNC:
+                    if firebase_admin._apps:
+                        db.reference('tweet_log').update({date_str: log_today})
+                    
                 # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
                 gc.collect()
                 try:
@@ -521,8 +528,9 @@ def run_engines(memory):
             print(f"      -> Text: {tweet_text[:80]}...")
             print(f"      -> Image Generated: True | Alt: {alt_text[:60]}...")
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
-            return True
+            return True # Tell the main loop it succeeded
         else:
+            upload_success = False
             try:
                 media = mlb_api_v1.media_upload("mlb_matchup.png")
                 mlb_api_v1.create_media_metadata(media.media_id, alt_text)
@@ -535,8 +543,13 @@ def run_engines(memory):
                         img_data = f.read()
                     config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
                     print(f"✅ Successfully posted {team_short} to Bluesky (Native JPEG)!")
-            except Exception as e: print(f"❌ Failed to tweet {team_short}: {e}")
+                    
+                # Mark as success if no crash happened
+                upload_success = True
+            except Exception as e: 
+                print(f"❌ Failed to tweet {team_short}: {e}")
             
+            # ALWAYS clean up
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             if os.path.exists("mlb_matchup.jpg"): os.remove("mlb_matchup.jpg")
             
@@ -547,7 +560,8 @@ def run_engines(memory):
             except Exception:
                 pass
                 
-            return True
+            # Return the actual status. If False, the main loop won't write to Firebase.
+            return upload_success
 
     
 
@@ -797,7 +811,9 @@ def run_engines(memory):
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking Futbol Lineup for {h_name}:")
                 print(f"      -> Text: {tweet_text[:80]}...")
+                upload_success = True # Treat dry runs as successful so the loop advances
             else:
+                upload_success = False
                 try:
                     media = target_v1_client.media_upload("temp_matchup.png")
                     target_v1_client.create_media_metadata(media.media_id, futbol_alt_text)
@@ -809,18 +825,25 @@ def run_engines(memory):
                             img_data = f.read()
                         target_bsky_client.send_image(text=bsky_tb, image=img_data, image_alt=futbol_alt_text)
                         print(f"✅ Successfully posted to Bluesky (Native JPEG)!")
-                except Exception as e: print(f"❌ Failed to tweet Futbol matchup: {e}")
+                    
+                    # If it makes it here without crashing, it was a success!
+                    upload_success = True
+                except Exception as e: 
+                    print(f"❌ Failed to tweet Futbol matchup: {e}")
 
+            # ALWAYS clean up the files to save hard drive space
             if os.path.exists("temp_matchup.png"): os.remove("temp_matchup.png")
             if os.path.exists("temp_matchup.jpg"): os.remove("temp_matchup.jpg")
             
-            log_target_date.append(team_key)
-            tweeted_recently.append(team_key)
-            new_tweets_sent = True
-            
-            # 🛑 KEEPING FIREBASE SYNC:
-            if firebase_admin._apps:
-                db.reference('tweet_log').update({target_date_str: log_target_date})
+            # ONLY update memory and Firebase if it actually uploaded
+            if upload_success:
+                log_target_date.append(team_key)
+                tweeted_recently.append(team_key)
+                new_tweets_sent = True
+                
+                # 🛑 KEEPING FIREBASE SYNC:
+                if firebase_admin._apps:
+                    db.reference('tweet_log').update({target_date_str: log_target_date})
                 
             # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
             gc.collect()
