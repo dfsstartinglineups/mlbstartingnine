@@ -114,6 +114,7 @@ ligue1_client, ligue1_api_v1 = get_dynamic_clients("ligue1_x")
 seriea_client, seriea_api_v1 = get_dynamic_clients("seriea_x")
 laliga_client, laliga_api_v1 = get_dynamic_clients("laliga_x")
 epl_client, epl_api_v1 = get_dynamic_clients("epl_x")
+argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 
 # ==========================================
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
