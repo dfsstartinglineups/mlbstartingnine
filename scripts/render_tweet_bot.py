@@ -15,6 +15,7 @@ from playwright.async_api import async_playwright
 import gc
 import subprocess
 import sys
+import ctypes
 
 # --- AUTOMATIC PLAYWRIGHT BROWSER INSTALL ---
 def ensure_browsers():
@@ -122,7 +123,17 @@ async def take_screenshot(fixture_id, target_date):
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            args=['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox', '--no-zygote']
+            args=[
+                '--disable-gpu', 
+                '--disable-dev-shm-usage', 
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--no-zygote',
+                '--single-process', # 🛑 MASSIVE MEMORY SAVER: Runs everything in 1 process
+                '--disable-site-isolation-trials', # Disables heavy security sandboxing
+                '--disable-features=IsolateOrigins,site-per-process',
+                '--js-flags="--max-old-space-size=50"' # 🛑 Limits JS engine to 50MB
+            ]
         )
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
         url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
@@ -149,7 +160,17 @@ async def take_mlb_screenshot(game_pk, side, target_date):
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            args=['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox', '--no-zygote']
+            args=[
+                '--disable-gpu', 
+                '--disable-dev-shm-usage', 
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--no-zygote',
+                '--single-process', # 🛑 MASSIVE MEMORY SAVER: Runs everything in 1 process
+                '--disable-site-isolation-trials', # Disables heavy security sandboxing
+                '--disable-features=IsolateOrigins,site-per-process',
+                '--js-flags="--max-old-space-size=50"' # 🛑 Limits JS engine to 50MB
+            ]
         )
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
         url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
@@ -176,7 +197,17 @@ async def take_nba_screenshot(team_abbr, side, target_date):
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            args=['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox', '--no-zygote']
+            args=[
+                '--disable-gpu', 
+                '--disable-dev-shm-usage', 
+                '--no-sandbox', 
+                '--disable-setuid-sandbox', 
+                '--no-zygote',
+                '--single-process', # 🛑 MASSIVE MEMORY SAVER: Runs everything in 1 process
+                '--disable-site-isolation-trials', # Disables heavy security sandboxing
+                '--disable-features=IsolateOrigins,site-per-process',
+                '--js-flags="--max-old-space-size=50"' # 🛑 Limits JS engine to 50MB
+            ]
         )
         page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
         url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
@@ -436,7 +467,12 @@ def run_engines(memory):
                     db.reference('tweet_log').update({date_str: log_today})
                     
                 # 🧹 FORCE GARBAGE COLLECTION
+                # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
                 gc.collect()
+                try:
+                    ctypes.CDLL('libc.so.6').malloc_trim(0)
+                except Exception:
+                    pass
 
     # ==========================================
     # MLB ENGINE
@@ -504,7 +540,12 @@ def run_engines(memory):
             if os.path.exists("mlb_matchup.jpg"): os.remove("mlb_matchup.jpg")
             
             # 🧹 FORCE GARBAGE COLLECTION
-            gc.collect()
+            # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
+                gc.collect()
+                try:
+                    ctypes.CDLL('libc.so.6').malloc_trim(0)
+                except Exception:
+                    pass
             return True
 
     
@@ -776,8 +817,12 @@ def run_engines(memory):
             if firebase_admin._apps:
                 db.reference('tweet_log').update({target_date_str: log_target_date})
                 
-            # 🧹 FORCE GARBAGE COLLECTION
+            # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
             gc.collect()
+            try:
+                ctypes.CDLL('libc.so.6').malloc_trim(0)
+            except Exception:
+                pass            
 
         # --- B. FUTBOL LIVE ALERTS ---
         live_futbol_data = {}
