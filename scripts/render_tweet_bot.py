@@ -694,7 +694,7 @@ def run_engines(memory):
         71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao"},
         128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional"},
         88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie"},
-        262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX"},
+        262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},
         94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga"},
         239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA"},
         188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague"},
