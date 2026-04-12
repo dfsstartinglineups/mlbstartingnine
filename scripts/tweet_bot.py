@@ -876,10 +876,10 @@ print("\n--- STARTING MULTI-LEAGUE FUTBOL ENGINE ---")
 
 # Define all leagues, their tags, and optionally their dedicated X client and URL
 FUTBOL_LEAGUES = {
-    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "base_url": "https://futbolstartingeleven.com/championship.html"},
+    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
     61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "base_url": "https://futbolstartingeleven.com/ligue1.html"}, 
     10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
-    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "base_url": "https://futbolstartingeleven.com/epl.html"},
+    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "base_url": "https://futbolstartingeleven.com/laliga.html"},
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
