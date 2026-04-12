@@ -12,8 +12,7 @@ import firebase_admin
 from firebase_admin import credentials, db
 import asyncio
 from playwright.async_api import async_playwright
-from PIL import Image
-import io
+import gc
 import subprocess
 import sys
 
@@ -121,88 +120,81 @@ epl_client, epl_api_v1 = get_dynamic_clients("epl_x")
 async def take_screenshot(fixture_id, target_date):
     print(f"📸 Booting headless browser for Fixture {fixture_id}...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox', '--no-zygote']
+        )
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
         url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
         
         try:
-            # 1. Wait for the network to settle
             await page.goto(url, wait_until="networkidle", timeout=30000)
-            
-            # 2. Strict Check: Wait up to 30s for the 22nd player to render!
-            # (11 away + 11 home = 22 players. Zero-indexed = 21)
             await page.locator(".player-node").nth(21).wait_for(timeout=30000)
-            
-            # 3. Buffer for images/fonts
             await asyncio.sleep(2)
             
-            await page.locator("#capture-area").screenshot(path="temp_matchup.png")
-            print("✅ Futbol Screenshot saved!")
+            capture_area = page.locator("#capture-area")
+            await capture_area.screenshot(path="temp_matchup.png", type="png")
+            await capture_area.screenshot(path="temp_matchup.jpg", type="jpeg", quality=70)
+            print("✅ Futbol Screenshots saved (PNG & JPEG)!")
             await browser.close()
             return True
             
         except Exception as e:
-            print(f"⚠️ Futbol Graphics failed to render within 30s. Aborting. Error: {e}")
+            print(f"⚠️ Futbol Graphics failed. Error: {e}")
             await browser.close()
             return False
 
 async def take_mlb_screenshot(game_pk, side, target_date):
     print(f"📸 Booting headless browser for MLB {game_pk} ({side})...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox', '--no-zygote']
+        )
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
-        
         url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
         
         try:
-            # 1. Increase navigation timeout and wait for network to settle
             await page.goto(url, wait_until="networkidle", timeout=30000)
-            
-            # 2. Strict Check: Wait up to 30s for the 9th batter to render
-            # This ensures we NEVER take a screenshot of a blank or partial lineup.
             await page.locator("#lineup-container .player-row").nth(8).wait_for(timeout=30000)
-            
-            # 3. Tiny buffer for fonts/images to snap in
             await asyncio.sleep(2)
             
-            await page.locator("#capture-area").screenshot(path="mlb_matchup.png")
-            print("✅ MLB Screenshot saved!")
+            capture_area = page.locator("#capture-area")
+            await capture_area.screenshot(path="mlb_matchup.png", type="png")
+            await capture_area.screenshot(path="mlb_matchup.jpg", type="jpeg", quality=70)
+            print("✅ MLB Screenshots saved (PNG & JPEG)!")
             await browser.close()
             return True
             
         except Exception as e:
-            # If it times out, we return False. 
-            # The bot will skip the tweet and try again on the next 60s loop.
-            print(f"⚠️ MLB Players failed to render within 30s. Aborting. Error: {e}")
+            print(f"⚠️ MLB Graphics failed. Error: {e}")
             await browser.close()
             return False
 
 async def take_nba_screenshot(team_abbr, side, target_date):
     print(f"📸 Booting headless browser for NBA {team_abbr} ({side})...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=['--disable-gpu', '--disable-dev-shm-usage', '--no-sandbox', '--disable-setuid-sandbox', '--no-zygote']
+        )
         page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
         url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
         
         try:
-            # 1. Increase navigation timeout and wait for network to settle
             await page.goto(url, wait_until="networkidle", timeout=30000)
-            
-            # 2. Strict Check: Wait up to 30s for the 5th player to render
-            # This ensures we NEVER take a screenshot of a partial 4-man lineup.
             await page.locator(".player-node").nth(4).wait_for(timeout=30000)
-            
-            # 3. Tiny buffer for fonts/images to snap in
             await asyncio.sleep(2) 
             
-            await page.locator("#capture-area").screenshot(path="nba_matchup.png")
-            print("✅ NBA Screenshot saved!")
+            capture_area = page.locator("#capture-area")
+            await capture_area.screenshot(path="nba_matchup.png", type="png")
+            await capture_area.screenshot(path="nba_matchup.jpg", type="jpeg", quality=70)
+            print("✅ NBA Screenshots saved (PNG & JPEG)!")
             await browser.close()
             return True
             
         except Exception as e:
-            # If it times out or only loads 3 players, we safely abort.
-            print(f"⚠️ NBA Graphics failed to render within 30s. Aborting. Error: {e}")
+            print(f"⚠️ NBA Graphics failed. Error: {e}")
             await browser.close()
             return False
 
