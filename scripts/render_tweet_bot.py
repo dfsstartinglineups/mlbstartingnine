@@ -416,24 +416,27 @@ def run_engines(memory):
                         
                         config = LEAGUE_CONFIG.get("nba")
                         if config and config.get("bsky_client"):
-                            with Image.open("nba_matchup.png") as img:
-                                rgb_img = img.convert('RGB')
-                                img_byte_arr = io.BytesIO()
-                                rgb_img.save(img_byte_arr, format='JPEG', quality=70)
-                                config["bsky_client"].send_image(text=bsky_tb, image=img_byte_arr.getvalue(), image_alt=nba_alt_text)
-                                print(f"✅ Successfully posted {team_name} to Bluesky!")
+                            with open("nba_matchup.jpg", "rb") as f:
+                                img_data = f.read()
+                            config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
+                            print(f"✅ Successfully posted {team_name} to Bluesky (Native JPEG)!")
                     except Exception as e:
                         print(f"❌ Failed to tweet {team_name}: {e}")
 
                 if os.path.exists("nba_matchup.png"): os.remove("nba_matchup.png")
+                if os.path.exists("nba_matchup.jpg"): os.remove("nba_matchup.jpg")
                 
                 log_today.append(team_date_key)
                 tweeted_recently.append(team_date_key)
                 memory[date_str] = log_today
                 new_tweets_sent = True
-                # 🛑 ADD THIS HERE:
+                
+                # 🛑 KEEPING FIREBASE SYNC:
                 if firebase_admin._apps:
                     db.reference('tweet_log').update({date_str: log_today})
+                    
+                # 🧹 FORCE GARBAGE COLLECTION
+                gc.collect()
 
     # ==========================================
     # MLB ENGINE
@@ -491,15 +494,17 @@ def run_engines(memory):
                 
                 config = LEAGUE_CONFIG.get("mlb")
                 if config and config.get("bsky_client"):
-                    with Image.open("mlb_matchup.png") as img:
-                        rgb_img = img.convert('RGB')
-                        img_byte_arr = io.BytesIO()
-                        rgb_img.save(img_byte_arr, format='JPEG', quality=70)
-                        config["bsky_client"].send_image(text=bsky_tb, image=img_byte_arr.getvalue(), image_alt=alt_text)
-                        print(f"✅ Successfully posted {team_short} to Bluesky!")
+                    with open("mlb_matchup.jpg", "rb") as f:
+                        img_data = f.read()
+                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
+                    print(f"✅ Successfully posted {team_short} to Bluesky (Native JPEG)!")
             except Exception as e: print(f"❌ Failed to tweet {team_short}: {e}")
             
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
+            if os.path.exists("mlb_matchup.jpg"): os.remove("mlb_matchup.jpg")
+            
+            # 🧹 FORCE GARBAGE COLLECTION
+            gc.collect()
             return True
 
     
@@ -754,20 +759,25 @@ def run_engines(memory):
                     
                     target_bsky_client = league_info.get("bsky_client")
                     if target_bsky_client:
-                        with Image.open("temp_matchup.png") as img:
-                            rgb_img = img.convert('RGB')
-                            img_byte_arr = io.BytesIO()
-                            rgb_img.save(img_byte_arr, format='JPEG', quality=70)
-                            target_bsky_client.send_image(text=bsky_tb, image=img_byte_arr.getvalue(), image_alt=futbol_alt_text)
+                        with open("temp_matchup.jpg", "rb") as f:
+                            img_data = f.read()
+                        target_bsky_client.send_image(text=bsky_tb, image=img_data, image_alt=futbol_alt_text)
+                        print(f"✅ Successfully posted to Bluesky (Native JPEG)!")
                 except Exception as e: print(f"❌ Failed to tweet Futbol matchup: {e}")
 
             if os.path.exists("temp_matchup.png"): os.remove("temp_matchup.png")
+            if os.path.exists("temp_matchup.jpg"): os.remove("temp_matchup.jpg")
+            
             log_target_date.append(team_key)
             tweeted_recently.append(team_key)
             new_tweets_sent = True
-            # 🛑 ADD THIS HERE:
+            
+            # 🛑 KEEPING FIREBASE SYNC:
             if firebase_admin._apps:
                 db.reference('tweet_log').update({target_date_str: log_target_date})
+                
+            # 🧹 FORCE GARBAGE COLLECTION
+            gc.collect()
 
         # --- B. FUTBOL LIVE ALERTS ---
         live_futbol_data = {}
