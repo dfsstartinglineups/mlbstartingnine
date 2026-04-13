@@ -698,39 +698,35 @@ def run_engines(memory):
     # FUTBOL ENGINE (Lineups & Live Alerts)
     # ==========================================
     FUTBOL_LEAGUES = {
+    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},    
+    78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},    
+    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+    13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+    71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+    128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations", "x_client": mls_client, "v1_client": mls_api_v1},    
+    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},    
+    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf", "x_client": mls_client, "v1_client": mls_api_v1},    
+    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},    
+    179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scotland", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+    45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},    
     40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
     61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "base_url": "https://futbolstartingeleven.com/ligue1.html"}, 
     10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
-    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "base_url": "https://futbolstartingeleven.com/laliga.html"},
-    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
-    45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup"},
-   # 40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship"},
-    78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},
-    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
-    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},
-  #  61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1"},
     3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
-    13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf"},
-    71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-    128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
     88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie" },
-    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},
     94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "portugal"},
-    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
     188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "australia"},
     203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "turkey"},
     144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#ProLeague", "url_slug": "belgium"},
-    179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scotland"},
     119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "denmark"},
-    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
     5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
-    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations"},
-    307: { "name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"}
-  #  10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl"}
-    #10:  {"name": "🌎 INTERNATIONALFriendlies", "tag": "#Friendly", "url_slug": "intl", "x_client": friendly_client, "v1_client": friendly_api_v1, "base_url": "https://futbolstartingeleven.com/friendlies.html"}
+    307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"}
 }
 
     INTL_FLAGS = {
