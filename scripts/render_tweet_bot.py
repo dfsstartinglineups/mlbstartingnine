@@ -936,12 +936,52 @@ def run_engines(memory):
                 event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{current_home_score if team_id == h_id else current_away_score}"
                 if event_key in tweeted_recently: continue
 
-                is_late, is_stoppage, is_equalizer = 75 <= event_time < 90, event_time >= 90, current_home_score == current_away_score
-                is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
+                is_late = 75 <= event_time < 90
+                is_stoppage = event_time >= 90
                 scorer_odds = home_odds if team_id == h_id else away_odds
-                is_standard_upset, is_massive_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00), is_go_ahead and (scorer_odds >= 7.00)
                 
-                scenario_key = None
+                # --- AGGREGATE ROUTER (Pipeline B) ---
+                first_leg = match.get("first_leg_goals")
+                if first_leg:
+                    # 1. Calculate Aggregate Scores
+                    agg_h_score = current_home_score + first_leg.get(str(h_id), 0)
+                    agg_a_score = current_away_score + first_leg.get(str(a_id), 0)
+                    
+                    # 2. Evaluate Aggregate Scenarios
+                    is_agg_equalizer = agg_h_score == agg_a_score
+                    is_agg_go_ahead = (team_id == h_id and agg_h_score - agg_a_score == 1) or (team_id == a_id and agg_a_score - agg_h_score == 1)
+                    
+                    # Is it a blowout/dagger? (Up by 2+ goals on aggregate)
+                    is_dagger = (team_id == h_id and agg_h_score - agg_a_score >= 2) or (team_id == a_id and agg_a_score - agg_h_score >= 2)
+                    
+                    # Consolation: They scored, but are still losing the tie.
+                    is_consolation = (team_id == h_id and agg_h_score < agg_a_score) or (team_id == a_id and agg_a_score < agg_h_score)
+
+                    scenario_key = None
+                    if is_stoppage and is_agg_go_ahead: scenario_key = "agg_stoppage_go_ahead"
+                    elif is_stoppage and is_agg_equalizer: scenario_key = "agg_stoppage_equalizer"
+                    elif is_late and is_agg_go_ahead: scenario_key = "agg_late_go_ahead"
+                    elif is_late and is_agg_equalizer: scenario_key = "agg_late_equalizer"
+                    elif is_late and is_dagger: scenario_key = "agg_dagger"
+                    elif is_stoppage and is_consolation: scenario_key = "agg_consolation"
+                    elif is_late and is_consolation: scenario_key = "agg_consolation"
+                    
+                # --- STANDARD ROUTER (Pipeline A) ---
+                else:
+                    is_equalizer = current_home_score == current_away_score
+                    is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
+                    is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
+                    is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
+                    
+                    scenario_key = None
+                    if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
+                    elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
+                    elif is_massive_upset: scenario_key = "massive_upset"
+                    elif is_standard_upset: scenario_key = "standard_upset"
+                    elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
+                    elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
+                    elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
+                    elif is_late and is_equalizer: scenario_key = "late_equalizer"
                 if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
                 elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
                 elif is_massive_upset: scenario_key = "massive_upset"
@@ -1076,20 +1116,82 @@ def run_engines(memory):
                             "A potential miracle in the making! {scoring_team_name} snatches a shock lead, leaving {conceding_team_name} desperate for a last-gasp response."
                         ],
                         "ctas": ["Witness the final frantic moments live:", "Don't miss the final whistle of this shocker. Live stats:", "See the post-goal chaos and live match center here:"]
+                    },
+                    "agg_late_equalizer": {
+                        "titles": ["🚨 AGGREGATE TIED LATE!", "🚨 THE TIE IS LEVEL!", "🚨 DRAMATIC AGGREGATE EQUALIZER!"],
+                        "blurbs": [
+                            "A massive goal from {scoring_team_name}! They have erased the deficit and the tournament tie is completely level as time winds down.",
+                            "{scoring_team_name} refuses to go quietly! They tie things up on aggregate, setting up a frantic finish against {conceding_team_name}.",
+                            "We are all square on aggregate! {scoring_team_name} claws their way back into the tie."
+                        ],
+                        "ctas": ["Who will find a winner? Follow the final push live:", "Track the closing minutes of this tie here:"]
+                    },
+                    "agg_late_go_ahead": {
+                        "titles": ["🚨 LATE AGGREGATE LEAD!", "🚨 ADVANTAGE: {scoring_team_name}!", "🚨 CLUTCH TOURNAMENT GOAL!"],
+                        "blurbs": [
+                            "A game-changing strike! {scoring_team_name} snatches the aggregate lead late in the 2nd leg.",
+                            "Heartbreak for {conceding_team_name} as {scoring_team_name} takes a crucial late lead in the tie!",
+                            "{scoring_team_name} steps up when it matters most, taking the aggregate advantage over {conceding_team_name}."
+                        ],
+                        "ctas": ["Can they hold on to advance? Follow live:", "Track the final minutes of this 2nd leg here:"]
+                    },
+                    "agg_stoppage_equalizer": {
+                        "titles": ["🚨 MIRACLE AT THE DEATH!", "🚨 STOPPAGE TIME AGGREGATE EQUALIZER!", "🚨 ABSOLUTE SCENES!"],
+                        "blurbs": [
+                            "You cannot write a better script! {scoring_team_name} scores deep in stoppage time to tie the aggregate score!",
+                            "A devastating blown lead for {conceding_team_name}! {scoring_team_name} forces a dramatic tie in the dying moments.",
+                            "Absolute madness! {scoring_team_name} climbs out of the grave to level the tie right at the end."
+                        ],
+                        "ctas": ["Are we heading to extra time? Follow live:", "Don't miss the post-goal chaos here:"]
+                    },
+                    "agg_stoppage_go_ahead": {
+                        "titles": ["🚨 STOPPAGE TIME TOURNAMENT THRILLER!", "🚨 A DAGGER AT THE DEATH!", "🚨 LATE HEARTBREAK!"],
+                        "blurbs": [
+                            "Heartbreak for {conceding_team_name}! {scoring_team_name} takes the aggregate lead in stoppage time.",
+                            "A staggering late dagger! {scoring_team_name} snatches the tie, leaving {conceding_team_name} with virtually no time to respond.",
+                            "They have won it at the death! {scoring_team_name} stuns {conceding_team_name} to take the aggregate advantage."
+                        ],
+                        "ctas": ["Can they survive the final whistle? Follow live:", "Watch the desperate final seconds unfold here:"]
+                    },
+                    "agg_dagger": {
+                        "titles": ["🚨 NAIL IN THE COFFIN!", "🚨 THE TIE IS SLIPPING AWAY!", "🚨 COMMANDING AGGREGATE LEAD!"],
+                        "blurbs": [
+                            "That might just do it! {scoring_team_name} extends their aggregate lead, putting the tie nearly out of reach for {conceding_team_name}.",
+                            "A devastating blow for {conceding_team_name}. {scoring_team_name} takes a commanding multi-goal lead on aggregate.",
+                            "{scoring_team_name} flexes their muscles, adding an insurance goal to all but secure their spot in the next round."
+                        ],
+                        "ctas": ["Track the remainder of the match live here:", "Follow the live pitch data and stats here:"]
+                    },
+                    "agg_consolation": {
+                        "titles": ["⚽ MATCH GOAL", "⚽ CONSOLATION STRIKE", "⚽ LATE MATCH LEAD"],
+                        "blurbs": [
+                            "{scoring_team_name} finds the back of the net on the day, but they still have a mountain to climb against {conceding_team_name} on aggregate.",
+                            "A goal for {scoring_team_name} rewards the live bettors, but {conceding_team_name} remains in complete control of the overall tie.",
+                            "{scoring_team_name} gets on the board, but they still heavily trail {conceding_team_name} on aggregate with time running out."
+                        ],
+                        "ctas": ["See the live match center and stats here:", "Follow the closing stages of the tie here:"]
                     }
                 }
 
-                title = random.choice(PHRASES[scenario_key]["titles"])
+                # Dynamically format titles specifically for the go-ahead variables
+                raw_title = random.choice(PHRASES[scenario_key]["titles"])
+                title = raw_title.format(scoring_team_name=scoring_team_name)
+                
                 blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
                 cta = random.choice(PHRASES[scenario_key]["ctas"])
                 
                 blurb = blurb_raw.format(scoring_team_name=scoring_team_name, conceding_team_name=conceding_team_name)
 
-                tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {current_home_score} - {current_away_score} {a_name}\n\n"
-                
-                if "upset" in scenario_key: tweet_text += f"📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\n"
-                
-                tweet_text += f"{blurb}\n\n"
+                # --- THE DUAL-SCORE FORMATTER ---
+                if scenario_key.startswith("agg_"):
+                    tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n"
+                    tweet_text += f"Today: {h_name} {current_home_score} - {current_away_score} {a_name}\n"
+                    tweet_text += f"Agg: {h_name} {agg_h_score} - {agg_a_score} {a_name}\n\n"
+                    tweet_text += f"{blurb}\n\n"
+                else:
+                    tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {current_home_score} - {current_away_score} {a_name}\n\n"
+                    if "upset" in scenario_key: tweet_text += f"📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\n"
+                    tweet_text += f"{blurb}\n\n"
                 
                 if random.randint(1, 100) <= 100:
                     tweet_text += f"{cta}\n⬇️\n{link}\n\n"
