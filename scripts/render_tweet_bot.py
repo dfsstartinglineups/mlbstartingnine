@@ -982,14 +982,7 @@ def run_engines(memory):
                     elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
                     elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
                     elif is_late and is_equalizer: scenario_key = "late_equalizer"
-                if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
-                elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
-                elif is_massive_upset: scenario_key = "massive_upset"
-                elif is_standard_upset: scenario_key = "standard_upset"
-                elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
-                elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
-                elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
-                elif is_late and is_equalizer: scenario_key = "late_equalizer"
+                
                 if not scenario_key: continue
 
                 if fixture_status in ['FT', 'AET', 'PEN']:
