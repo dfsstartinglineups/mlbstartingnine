@@ -580,7 +580,9 @@ def run_engines(memory):
                 if DRY_RUN:
                     print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking MLB Postponement for {away_short}:")
                     print(f"      -> Text: {alert_text}")
+                    upload_success = True # Treat dry runs as successful
                 else:
+                    upload_success = False
                     try:
                         mlb_client.create_tweet(text=alert_text)
                         config = LEAGUE_CONFIG.get("mlb")
@@ -589,15 +591,19 @@ def run_engines(memory):
                             bsky_tb.text(alert_text)
                             config["bsky_client"].send_post(bsky_tb)
                         print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short}!")
-                    except Exception as e: print(f"❌ Failed to tweet postponement: {e}")
+                        upload_success = True # Mark success if it didn't crash
+                    except Exception as e: 
+                        print(f"❌ Failed to tweet postponement: {e}")
                     
-                log_today.append(postponed_key)
-                tweeted_recently.append(postponed_key)
-                memory[date_str] = log_today
-                new_tweets_sent = True
-                # 🛑 ADD THIS HERE:
-                if firebase_admin._apps:
-                    db.reference('tweet_log').update({date_str: log_today})
+                # ONLY log to memory if the upload actually worked
+                if upload_success:
+                    log_today.append(postponed_key)
+                    tweeted_recently.append(postponed_key)
+                    memory[date_str] = log_today
+                    new_tweets_sent = True
+                    # 🛑 KEEPING FIREBASE SYNC:
+                    if firebase_admin._apps:
+                        db.reference('tweet_log').update({date_str: log_today})
             continue
         
         positions = {}
@@ -963,17 +969,23 @@ def run_engines(memory):
                 if DRY_RUN:
                     print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking Goal Alert for {scoring_team_name}:")
                     print(f"      -> Text: {tweet_text[:80]}...")
+                    upload_success = True # Treat dry runs as successful
                 else:
+                    upload_success = False
                     try:
                         target_client = league_info.get("x_client") or futbol_client
                         if target_client: target_client.create_tweet(text=tweet_text)
                         print(f"✅ [{league_info['name']}] Successfully tweeted ALERTS for {scoring_team_name}!")
-                    except Exception as e: print(f"❌ Failed to tweet ALERT: {e}")
+                        upload_success = True # Mark success if it didn't crash
+                    except Exception as e: 
+                        print(f"❌ Failed to tweet ALERT: {e}")
 
-                log_target_date.append(event_key)
-                tweeted_recently.append(event_key)
-                new_tweets_sent = True
-                memory[target_date_str] = log_target_date
+                # ONLY log to memory if the upload actually worked
+                if upload_success:
+                    log_target_date.append(event_key)
+                    tweeted_recently.append(event_key)
+                    new_tweets_sent = True
+                    memory[target_date_str] = log_target_date
 
     # ==========================================
     # FIREBASE SYNC (END OF LOOP)
