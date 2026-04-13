@@ -697,17 +697,19 @@ def run_engines(memory):
     # ==========================================
     # FUTBOL ENGINE (Lineups & Live Alerts)
     # ==========================================
-    # 143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
-    # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia"},
-    # 81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal"},
+    
+    # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia", "x_client": seriea_client, "v1_client": seriea_api_v1},
+    
     
     FUTBOL_LEAGUES = {
+    81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},    
     203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "turkey", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},
     144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#ProLeague", "url_slug": "belgium", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},
     119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "denmark", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},    
     88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},
     94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "portugal", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},    
     78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},        
+    143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey", "x_client": seriea_client, "v1_client": seriea_api_v1},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},    
     61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/ligue1.html"},     
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},    
