@@ -697,6 +697,10 @@ def run_engines(memory):
     # ==========================================
     # FUTBOL ENGINE (Lineups & Live Alerts)
     # ==========================================
+    # 143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey"},
+    # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia"},
+    # 81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal"},
+    
     FUTBOL_LEAGUES = {
     135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},    
     78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},    
