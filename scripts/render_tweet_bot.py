@@ -780,7 +780,13 @@ def run_engines(memory):
             odds_str = f"📊 Live Match Odds\n{h_name}: {odds.get('home', 'TBD')} | Draw: {odds.get('draw', 'TBD')} | {a_name}: {odds.get('away', 'TBD')}\nOver {odds.get('total', '2.5')}: {odds.get('over', 'TBD')} | Under {odds.get('total', '2.5')}: {odds.get('under', 'TBD')}"
             
             h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
-            base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
+            
+            # --- SMART LINK CONSTRUCTOR (Lineups) ---
+            if "base_url" in league_info:
+                full_link = f"{league_info['base_url']}?date={target_date_str}#lineup-{fixture_id}"
+            else:
+                slug = league_info.get("url_slug", "top")
+                full_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#lineup-{fixture_id}"
             
             chosen_title = random.choice([f"🚨 OFFICIAL STARTING XI: {league_info['name']}", f"⚽ {h_name} vs {a_name} starting lineups are out!"])
             h_rank = f"[{match['teams']['home']['rank']}] " if match['teams']['home'].get('rank') else ""
@@ -789,13 +795,13 @@ def run_engines(memory):
             a_rec = f"({match['teams']['away']['record']})" if match['teams']['away'].get('record') else ""
             
             header = f"{chosen_title}\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
-            link_text = f"📱 Live stats & scores: {base_url}#lineup-{fixture_id}"
+            link_text = f"📱 Live stats & scores: {full_link}"
             tags_text = f"{league_info['tag']} #{h_hash} #{a_hash}"
             tweet_text = "\n\n".join([header, link_text, odds_str, tags_text])
 
             bsky_tb = client_utils.TextBuilder()
             bsky_tb.text(header + "\n\n")
-            bsky_tb.link(link_text, base_url + f"#lineup-{fixture_id}")
+            bsky_tb.link(link_text, full_link)
             bsky_tb.text("\n\n" + odds_str + "\n\n" + tags_text)
 
             futbol_alt_text = f"Graphical tactical lineup card for {h_name} vs {a_name}."
@@ -957,8 +963,13 @@ def run_engines(memory):
 
                 american_odds = f"+{int((scorer_odds - 1) * 100)}"
                 h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
-                base_url = league_info.get("base_url", f"https://futbolstartingeleven.com/?league=top&date={target_date_str}")
-                link = f"{base_url}#goal-{fixture_id}"
+                
+                # --- SMART LINK CONSTRUCTOR (Goal Alerts) ---
+                if "base_url" in league_info:
+                    link = f"{league_info['base_url']}?date={target_date_str}#goal-{fixture_id}"
+                else:
+                    slug = league_info.get("url_slug", "top")
+                    link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#goal-{fixture_id}"
 
                 titles = {"late_equalizer": ["🚨 LATE EQUALIZER!", "🚨 DRAMATIC EQUALIZER!"], "late_go_ahead": ["🚨 LATE GO-AHEAD GOAL!", "🚨 CLUTCH MOMENT!"], "stoppage_equalizer": ["🚨 STOPPAGE TIME EQUALIZER!"], "stoppage_go_ahead": ["🚨 STOPPAGE TIME THRILLER!"], "standard_upset": ["⚠️ UPSET ALERT!"], "massive_upset": ["🚨🔥 MAJOR UPSET ALERT!"], "late_upset": ["🚨⚠️ LATE UPSET BREWING!"], "stoppage_upset": ["🚨🔥 STUNNER IN STOPPAGE TIME!"]}
                 
