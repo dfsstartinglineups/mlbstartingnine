@@ -1090,7 +1090,7 @@ def run_engines(memory):
                 
                 tweet_text += f"{blurb}\n\n"
                 
-                if random.randint(1, 100) <= 50:
+                if random.randint(1, 100) <= 100:
                     tweet_text += f"{cta}\n⬇️\n{link}\n\n"
                 
                 tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
