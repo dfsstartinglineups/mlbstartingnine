@@ -642,8 +642,6 @@ def run_engines(memory):
                                 print(f"⚠️ Bluesky attempt {attempt + 1} failed for {away_short} postponement: {e}")
                                 
                     upload_success = twitter_success or bsky_success
-                    except Exception as e: 
-                        print(f"❌ Failed to tweet postponement: {e}")
                     
                 # ONLY log to memory if the upload actually worked
                 if upload_success:
