@@ -607,9 +607,15 @@ def run_engines(memory):
             continue
         
         positions = {}
+        player_names_map = {} # <-- ADD THIS
         try:
             box_teams = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live").json().get('liveData', {}).get('boxscore', {}).get('teams', {})
             for pid, p_data in {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}.items():
+                
+                # <-- ADD THIS TO MAP IDs TO NAMES
+                person_id = str(p_data['person']['id'])
+                player_names_map[person_id] = p_data['person']['fullName'] 
+                
                 if p_data.get('position', {}).get('abbreviation'): positions[p_data['person']['id']] = p_data['position']['abbreviation']
                 elif p_data.get('allPositions'): positions[p_data['person']['id']] = p_data['allPositions'][0]['abbreviation']
         except: pass
@@ -682,7 +688,8 @@ def run_engines(memory):
 
                 if len(out_ids) == 0 and len(in_ids) == 0: alert_header = f"⚠️ {team_short_ref} LINEUP SHUFFLE: The batting order has changed."
                 else:
-                    out_names = [next((p.get('fullName', 'Unknown Player') for p in players_array if str(p['id']) == pid), 'Unknown') for pid in out_ids]
+                    # <-- FIX THE OUT NAMES HERE
+                    out_names = [player_names_map.get(str(pid), 'Unknown') for pid in out_ids]
                     in_names = [next((p.get('fullName', 'Unknown Player') for p in players_array if str(p['id']) == pid), 'Unknown') for pid in in_ids]
                     alert_header = f"🚨 {team_short_ref} LATE SCRATCH\nOUT: {', '.join(out_names) if out_names else 'None'}\nIN: {', '.join(in_names) if in_names else 'None'}"
 
