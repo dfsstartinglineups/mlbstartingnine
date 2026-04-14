@@ -441,24 +441,39 @@ def run_engines(memory):
                     print(f"      -> Image Generated: True | Alt: {nba_alt_text[:60]}...")
                     upload_success = True # Treat dry runs as successful
                 else:
-                    upload_success = False
-                    try:
-                        media = nba_api_v1.media_upload("nba_matchup.png")
-                        nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
-                        nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                        print(f"✅ Successfully tweeted {team_name} NBA lineup graphic!")
-                        
-                        config = LEAGUE_CONFIG.get("nba")
-                        if config and config.get("bsky_client"):
-                            with open("nba_matchup.jpg", "rb") as f:
-                                img_data = f.read()
-                            config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
-                            print(f"✅ Successfully posted {team_name} to Bluesky (Native JPEG)!")
+                    twitter_success = False
+                    bsky_success = False
+                    
+                    # 1. Post to Twitter Safely (Max 2 Attempts)
+                    for attempt in range(2):
+                        try:
+                            if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                            media = nba_api_v1.media_upload("nba_matchup.png")
+                            nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
+                            nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                            print(f"✅ Successfully tweeted {team_name} NBA lineup graphic!")
+                            twitter_success = True
+                            break # Success! Break out of the retry loop.
+                        except Exception as e:
+                            print(f"⚠️ X.com attempt {attempt + 1} failed for {team_name}: {e}")
                             
-                        # If we made it here, no exceptions occurred!
-                        upload_success = True
-                    except Exception as e:
-                        print(f"❌ Failed to tweet {team_name}: {e}")
+                    # 2. Post to Bluesky Safely (Max 2 Attempts)
+                    config = LEAGUE_CONFIG.get("nba")
+                    if config and config.get("bsky_client"):
+                        for attempt in range(2):
+                            try:
+                                if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                                with open("nba_matchup.jpg", "rb") as f:
+                                    img_data = f.read()
+                                config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
+                                print(f"✅ Successfully posted {team_name} to Bluesky (Native JPEG)!")
+                                bsky_success = True
+                                break # Success! Break out of the retry loop.
+                            except Exception as e:
+                                print(f"⚠️ Bluesky attempt {attempt + 1} failed for {team_name}: {e}")
+
+                    # 3. Memory Lock: If EITHER platform worked, consider the job done so we don't spam.
+                    upload_success = twitter_success or bsky_success
 
                 # ALWAYS clean up files
                 if os.path.exists("nba_matchup.png"): os.remove("nba_matchup.png")
@@ -530,24 +545,39 @@ def run_engines(memory):
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             return True # Tell the main loop it succeeded
         else:
-            upload_success = False
-            try:
-                media = mlb_api_v1.media_upload("mlb_matchup.png")
-                mlb_api_v1.create_media_metadata(media.media_id, alt_text)
-                mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                print(f"✅ Successfully tweeted {team_short} MLB lineup graphic!")
+            twitter_success = False
+            bsky_success = False
+            
+            # 1. Post to Twitter Safely (Max 2 Attempts)
+            for attempt in range(2):
+                try:
+                    if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                    media = mlb_api_v1.media_upload("mlb_matchup.png")
+                    mlb_api_v1.create_media_metadata(media.media_id, alt_text)
+                    mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    print(f"✅ Successfully tweeted {team_short} MLB lineup graphic!")
+                    twitter_success = True
+                    break # Success! Break out of the retry loop.
+                except Exception as e: 
+                    print(f"⚠️ X.com attempt {attempt + 1} failed for {team_short}: {e}")
                 
-                config = LEAGUE_CONFIG.get("mlb")
-                if config and config.get("bsky_client"):
-                    with open("mlb_matchup.jpg", "rb") as f:
-                        img_data = f.read()
-                    config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
-                    print(f"✅ Successfully posted {team_short} to Bluesky (Native JPEG)!")
-                    
-                # Mark as success if no crash happened
-                upload_success = True
-            except Exception as e: 
-                print(f"❌ Failed to tweet {team_short}: {e}")
+            # 2. Post to Bluesky Safely (Max 2 Attempts)
+            config = LEAGUE_CONFIG.get("mlb")
+            if config and config.get("bsky_client"):
+                for attempt in range(2):
+                    try:
+                        if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                        with open("mlb_matchup.jpg", "rb") as f:
+                            img_data = f.read()
+                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
+                        print(f"✅ Successfully posted {team_short} to Bluesky (Native JPEG)!")
+                        bsky_success = True
+                        break # Success! Break out of the retry loop.
+                    except Exception as e:
+                        print(f"⚠️ Bluesky attempt {attempt + 1} failed for {team_short}: {e}")
+
+            # 3. Memory Lock: If EITHER platform worked, consider the job done so we don't spam.
+            upload_success = twitter_success or bsky_success
             
             # ALWAYS clean up
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
