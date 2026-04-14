@@ -612,16 +612,36 @@ def run_engines(memory):
                     print(f"      -> Text: {alert_text}")
                     upload_success = True # Treat dry runs as successful
                 else:
-                    upload_success = False
-                    try:
-                        mlb_client.create_tweet(text=alert_text)
-                        config = LEAGUE_CONFIG.get("mlb")
-                        if config and config.get("bsky_client"):
-                            bsky_tb = client_utils.TextBuilder()
-                            bsky_tb.text(alert_text)
-                            config["bsky_client"].send_post(bsky_tb)
-                        print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short}!")
-                        upload_success = True # Mark success if it didn't crash
+                    twitter_success = False
+                    bsky_success = False
+                    
+                    # 1. Post to Twitter Safely
+                    for attempt in range(2):
+                        try:
+                            if attempt == 1: time.sleep(3)
+                            mlb_client.create_tweet(text=alert_text)
+                            print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short} to X!")
+                            twitter_success = True
+                            break
+                        except Exception as e: 
+                            print(f"⚠️ X.com attempt {attempt + 1} failed for {away_short} postponement: {e}")
+
+                    # 2. Post to Bluesky Safely
+                    config = LEAGUE_CONFIG.get("mlb")
+                    if config and config.get("bsky_client"):
+                        for attempt in range(2):
+                            try:
+                                if attempt == 1: time.sleep(3)
+                                bsky_tb = client_utils.TextBuilder()
+                                bsky_tb.text(alert_text)
+                                config["bsky_client"].send_post(bsky_tb)
+                                print(f"✅ Successfully posted postponement for {away_short} to Bluesky!")
+                                bsky_success = True
+                                break
+                            except Exception as e:
+                                print(f"⚠️ Bluesky attempt {attempt + 1} failed for {away_short} postponement: {e}")
+                                
+                    upload_success = twitter_success or bsky_success
                     except Exception as e: 
                         print(f"❌ Failed to tweet postponement: {e}")
                     
