@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8-Bit Live Baseball</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        :root {
+            --turf-green: #2d8a4e;
+            --dirt-brown: #c88141;
+            --arcade-blue: #0000a8;
+            --arcade-yellow: #f8f800;
+            --arcade-white: #fcfcfc;
+        }
+
+        body {
+            background-color: #111;
+            color: var(--arcade-white);
+            font-family: 'Press Start 2P', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-container {
+            width: 800px;
+            background-color: var(--turf-green);
+            border: 8px solid var(--arcade-white);
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        /* --- SCOREBOARD TOP --- */
+        #scoreboard {
+            background-color: var(--arcade-blue);
+            border: 4px solid var(--arcade-white);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .team-block {
+            text-align: center;
+            font-size: 24px;
+            line-height: 1.5;
+        }
+
+        .score-number {
+            color: var(--arcade-yellow);
+            font-size: 32px;
+            margin-top: 10px;
+        }
+
+        .inning-block {
+            text-align: center;
+            font-size: 16px;
+            color: var(--arcade-yellow);
+            line-height: 1.8;
+        }
+
+        /* --- FIELD & BASES --- */
+        #field-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 30px;
+            padding: 0 40px;
+        }
+
+        #bases-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            transform: rotate(45deg); /* Turns squares into diamonds */
+        }
+
+        .base {
+            width: 35px;
+            height: 35px;
+            background-color: var(--dirt-brown);
+            border: 4px solid var(--arcade-white);
+            position: absolute;
+            transition: background-color 0.2s;
+        }
+
+        .base.occupied {
+            background-color: var(--arcade-yellow);
+        }
+
+        /* Position the bases on the diamond */
+        #base-1 { bottom: 0; right: 0; }
+        #base-2 { top: 0; right: 0; }
+        #base-3 { top: 0; left: 0; }
+        #home-plate { bottom: 0; left: 0; background-color: var(--arcade-white); border-radius: 50% 50% 0 50%; }
+
+        /* --- MATCHUP STATS --- */
+        #matchup-block {
+            font-size: 14px;
+            line-height: 2;
+        }
+
+        .highlight {
+            color: var(--arcade-yellow);
+        }
+
+        /* --- PLAY-BY-PLAY TICKER --- */
+        #play-ticker {
+            background-color: #000;
+            border: 4px solid var(--arcade-white);
+            padding: 15px;
+            font-size: 12px;
+            line-height: 1.6;
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        
+        <div id="scoreboard">
+            <div class="team-block">
+                <div>AWAY</div>
+                <div id="away-score" class="score-number">0</div>
+            </div>
+            <div class="inning-block">
+                <div id="inning-state">TOP 1</div>
+                <div>OUTS: <span id="outs-count">0</span></div>
+                <div>COUNT: <span id="pitch-count">0-0</span></div>
+            </div>
+            <div class="team-block">
+                <div>HOME</div>
+                <div id="home-score" class="score-number">0</div>
+            </div>
+        </div>
+
+        <div id="field-display">
+            <div id="matchup-block">
+                <div>PITCHING: <br><span id="pitcher-name" class="highlight">WAITING...</span></div>
+                <br>
+                <div>BATTING: <br><span id="batter-name" class="highlight">WAITING...</span></div>
+            </div>
+
+            <div id="bases-container">
+                <div id="base-2" class="base"></div>
+                <div id="base-3" class="base"></div>
+                <div id="base-1" class="base"></div>
+                <div id="home-plate" class="base"></div>
+            </div>
+        </div>
+
+        <div id="play-ticker">
+            > <span id="last-event" style="margin-left: 10px;">CONNECTING TO SERVER...</span>
+        </div>
+
+    </div>
+
+    <script>
+        // 1. Initialize Firebase (No API key needed for read-only access to an open DB, 
+        // but add yours here if your database rules require it)
+        const firebaseConfig = {
+            databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com/"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.database();
+        const GAME_PK = "824777"; 
+        
+        // 2. Create the Realtime Listener
+        const gameRef = db.ref(`mlb_live_games/${GAME_PK}`);
+
+        gameRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            
+            if (data) {
+                // Update Score
+                document.getElementById('away-score').innerText = data.score.away;
+                document.getElementById('home-score').innerText = data.score.home;
+                
+                // Update Inning & Count
+                document.getElementById('inning-state').innerText = `${data.inning.half.toUpperCase()} ${data.inning.number}`;
+                document.getElementById('outs-count').innerText = data.count.outs;
+                document.getElementById('pitch-count').innerText = `${data.count.balls}-${data.count.strikes}`;
+                
+                // Update Matchup
+                document.getElementById('pitcher-name').innerText = data.matchup.pitcher.toUpperCase();
+                document.getElementById('batter-name').innerText = data.matchup.batter.toUpperCase();
+                
+                // Update Play Ticker
+                document.getElementById('last-event').innerText = data.last_event.toUpperCase();
+
+                // Update Bases (Toggles the 'occupied' CSS class which turns the base yellow)
+                document.getElementById('base-1').classList.toggle('occupied', data.bases.first);
+                document.getElementById('base-2').classList.toggle('occupied', data.bases.second);
+                document.getElementById('base-3').classList.toggle('occupied', data.bases.third);
+            } else {
+                document.getElementById('last-event').innerText = "NO LIVE DATA FOUND FOR THIS GAME.";
+            }
+        }, (error) => {
+            console.error("Firebase read failed: ", error);
+            document.getElementById('last-event').innerText = "DATABASE CONNECTION ERROR.";
+        });
+    </script>
+</body>
+</html>
