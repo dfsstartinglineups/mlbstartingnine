@@ -28,11 +28,12 @@
             margin: 0;
         }
 
+        /* --- Update the Container path --- */
         #game-container {
             width: 800px;
             height: 600px; 
-            background-color: #2d8a4e; /* Fallback turf green so you can see the layout without the image */
-            background-image: url('stadium_images/fenway_8bit.png'); /* Updated Path! */
+            background-color: #2d8a4e; /* Fallback turf color so you can test without image */
+            background-image: url('stadium_images/fenway_8bit.png'); /* Look inside stadium_images/ */
             background-size: cover;
             background-position: center;
             border: 8px solid var(--arcade-white);
@@ -41,21 +42,33 @@
             overflow: hidden;
         }
 
-        /* --- THE BASEBALL --- */
+        /* --- THE PITCHING ANIMATION --- */
         #baseball {
             position: absolute;
-            width: 8px;
+            width: 8px;  /* Tiny 8-bit square */
             height: 8px;
-            background-color: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 5px rgba(255,255,255,0.8);
-            /* Starting position: The Pitcher's Mound */
-            top: 40%;
+            background-color: #fff; /* White ball */
+            border-radius: 50%; /* Make it round (modern, but looks better) */
+            
+            /* Define the animation parameters */
+            transition: top 0.4s linear, left 0.4s linear, opacity 0.1s;
+            z-index: 15; /* Sits above turf, below score */
+            opacity: 0; /* Hidden initially */
+        }
+
+        /* Position 1: The Pitcher's Mound (Approx Center of screen) */
+        .on-mound {
+            top: 45%; 
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0; /* Hidden until a pitch is thrown */
-            z-index: 15;
-            transition: top 0.4s linear, left 0.4s linear, opacity 0.1s;
+            opacity: 1 !important;
+        }
+
+        /* Position 2: Home Plate (Bottom center, near play ticker) */
+        .at-plate {
+            top: 88% !important; /* Move down toward play ticker */
+            left: 50% !important;
+            opacity: 1 !important;
         }
 
         /* Where the ball ends up: Home Plate */
@@ -179,7 +192,7 @@
                 <div id="home-plate" class="base"></div>
             </div>
         </div>
-        <div id="baseball"></div>
+        <div id="baseball" class="on-mound"></div>
         <div id="play-ticker">
             > <span id="last-event" style="margin-left: 10px;">CONNECTING TO SERVER...</span>
         </div>
@@ -187,8 +200,9 @@
     </div>
 
     <script>
-        // 1. Initialize Firebase (No API key needed for read-only access to an open DB, 
-        // but add yours here if your database rules require it)
+        // ========================================================
+        // 1. FIREBASE CONFIG & INITIALIZATION
+        // ========================================================
         const firebaseConfig = {
             databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com/"
         };
@@ -198,35 +212,75 @@
         }
 
         const db = firebase.database();
-        const GAME_PK = "824777"; 
+        const GAME_PK = "824777"; // Tigers vs Red Sox (Fenway Park)
         
-        // 2. Create the Realtime Listener
+        // References to UI elements for animation
+        const baseballEl = document.getElementById('baseball');
+
+        // State Tracking (To detect when a pitch occurs)
+        let previousCountString = "";
+
+
+        // ========================================================
+        // 2. THE PITCH ANIMATION ENGINE
+        // ========================================================
+        function animatePitch() {
+            // Safety: Don't animate if the ball div doesn't exist
+            if (!baseballEl) return;
+            
+            console.log("⚾ PITCH THROWN!");
+
+            // Move the ball instantly to the mound (in case it got reset)
+            baseballEl.className = 'on-mound';
+
+            // Wait 50ms, then start the linear slide to home plate
+            setTimeout(() => {
+                baseballEl.className = 'at-plate';
+            }, 50);
+
+            // Wait 400ms (matching CSS transition), hide the ball, 
+            // and snap it back to the mound for the next pitch.
+            setTimeout(() => {
+                baseballEl.className = 'on-mound';
+            }, 410); 
+        }
+
+
+        // ========================================================
+        // 3. REALTIME DATA LISTENER
+        // ========================================================
         const gameRef = db.ref(`mlb_live_games/${GAME_PK}`);
 
         gameRef.on('value', (snapshot) => {
             const data = snapshot.val();
             
             if (data) {
-                // Update Score
+                // Determine if a pitch was just thrown by comparing counts
+                const currentCountString = `${data.count.balls}-${data.count.strikes}-${data.count.outs}`;
+
+                // Trigger animation only if the count has changed (and it's not the first load)
+                if (previousCountString && currentCountString !== previousCountString) {
+                    animatePitch();
+                }
+
+                // Update the state tracker
+                previousCountString = currentCountString;
+
+                // --- Standard UI Updates ---
                 document.getElementById('away-score').innerText = data.score.away;
                 document.getElementById('home-score').innerText = data.score.home;
-                
-                // Update Inning & Count
                 document.getElementById('inning-state').innerText = `${data.inning.half.toUpperCase()} ${data.inning.number}`;
                 document.getElementById('outs-count').innerText = data.count.outs;
                 document.getElementById('pitch-count').innerText = `${data.count.balls}-${data.count.strikes}`;
-                
-                // Update Matchup
                 document.getElementById('pitcher-name').innerText = data.matchup.pitcher.toUpperCase();
                 document.getElementById('batter-name').innerText = data.matchup.batter.toUpperCase();
-                
-                // Update Play Ticker
                 document.getElementById('last-event').innerText = data.last_event.toUpperCase();
 
-                // Update Bases (Toggles the 'occupied' CSS class which turns the base yellow)
+                // Toggle base runner occupied status
                 document.getElementById('base-1').classList.toggle('occupied', data.bases.first);
                 document.getElementById('base-2').classList.toggle('occupied', data.bases.second);
                 document.getElementById('base-3').classList.toggle('occupied', data.bases.third);
+
             } else {
                 document.getElementById('last-event').innerText = "NO LIVE DATA FOUND FOR THIS GAME.";
             }
