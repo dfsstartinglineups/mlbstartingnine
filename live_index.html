@@ -28,18 +28,41 @@
             margin: 0;
         }
 
-        /* The main stadium window */
         #game-container {
             width: 800px;
-            height: 600px; /* Fixed height to match a background image */
-            background-color: #2d8a4e; /* Fallback turf color */
-            background-image: url('fenway_8bit.png'); /* We will add this asset next! */
+            height: 600px; 
+            background-color: #2d8a4e; /* Fallback turf green so you can see the layout without the image */
+            background-image: url('stadium_images/fenway_8bit.png'); /* Updated Path! */
             background-size: cover;
             background-position: center;
             border: 8px solid var(--arcade-white);
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
+        }
+
+        /* --- THE BASEBALL --- */
+        #baseball {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 5px rgba(255,255,255,0.8);
+            /* Starting position: The Pitcher's Mound */
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0; /* Hidden until a pitch is thrown */
+            z-index: 15;
+            transition: top 0.4s linear, left 0.4s linear, opacity 0.1s;
+        }
+
+        /* Where the ball ends up: Home Plate */
+        .pitch-thrown {
+            top: 85% !important; /* Adjust this percentage to match where home plate sits on your background */
+            left: 50% !important;
+            opacity: 1 !important;
         }
 
         /* --- SCOREBOARD (Moved to Center Field) --- */
@@ -156,7 +179,7 @@
                 <div id="home-plate" class="base"></div>
             </div>
         </div>
-
+        <div id="baseball"></div>
         <div id="play-ticker">
             > <span id="last-event" style="margin-left: 10px;">CONNECTING TO SERVER...</span>
         </div>
