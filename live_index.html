@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>8-Bit Live Baseball</title>
-    
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
-    :root {
+        :root {
             --arcade-blue: #0000a8;
             --arcade-yellow: #f8f800;
             --arcade-white: #fcfcfc;
@@ -28,59 +27,52 @@
             margin: 0;
         }
 
-        /* --- Update the Container path --- */
         #game-container {
             width: 800px;
             height: 600px; 
-            background-color: #2d8a4e; /* Fallback turf color so you can test without image */
-            background-image: url('stadium_images/fenway_8bit.png'); /* Look inside stadium_images/ */
-            background-size: cover;
-            background-position: center;
             border: 8px solid var(--arcade-white);
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
         }
 
-        /* --- THE PITCHING ANIMATION --- */
-        #baseball {
+        /* --- CAMERA 1: PITCHING VIEW --- */
+        #pitching-camera {
             position: absolute;
-            width: 8px;  /* Tiny 8-bit square */
-            height: 8px;
-            background-color: #fff; /* White ball */
-            border-radius: 50%; /* Make it round (modern, but looks better) */
-            
-            /* Define the animation parameters */
-            transition: top 0.4s linear, left 0.4s linear, opacity 0.1s;
-            z-index: 15; /* Sits above turf, below score */
-            opacity: 0; /* Hidden initially */
+            width: 100%;
+            height: 100%;
+            background-color: #2d8a4e;
+            background-image: url('stadium_images/pitching_view.jpg'); /* The new close-up image */
+            background-size: cover;
+            background-position: center;
+            display: block; /* Visible by default */
+            z-index: 1;
         }
 
-        /* Position 1: The Pitcher's Mound (Approx Center of screen) */
-        .on-mound {
-            top: 45%; 
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 1 !important;
+        /* --- CAMERA 2: FIELDING VIEW --- */
+        #fielding-camera {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #2d8a4e;
+            background-image: url('stadium_images/fenway_8bit.jpg'); /* The wide stadium image */
+            background-size: cover;
+            background-position: center;
+            display: none; /* Hidden by default */
+            z-index: 1;
         }
 
-        /* Position 2: Home Plate (Bottom center, near play ticker) */
-        .at-plate {
-            top: 88% !important; /* Move down toward play ticker */
-            left: 50% !important;
-            opacity: 1 !important;
+        /* --- UI ELEMENTS (These sit on top of whichever camera is active) --- */
+        #ui-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none; /* Lets clicks pass through to the background if needed */
         }
 
-        /* Where the ball ends up: Home Plate */
-        .pitch-thrown {
-            top: 85% !important; /* Adjust this percentage to match where home plate sits on your background */
-            left: 50% !important;
-            opacity: 1 !important;
-        }
-
-        /* --- SCOREBOARD (Moved to Center Field) --- */
         #scoreboard {
-            background-color: rgba(0, 0, 168, 0.9); /* Slight transparency to see the wall behind it */
+            background-color: rgba(0, 0, 168, 0.9); 
             border: 4px solid var(--arcade-white);
             padding: 10px 20px;
             display: flex;
@@ -91,14 +83,12 @@
             left: 50%;
             transform: translateX(-50%);
             width: 85%;
-            z-index: 10;
         }
 
         .team-block { text-align: center; font-size: 18px; line-height: 1.5; }
         .score-number { color: var(--arcade-yellow); font-size: 28px; margin-top: 5px; }
         .inning-block { text-align: center; font-size: 12px; color: var(--arcade-yellow); line-height: 1.8; }
 
-        /* --- MATCHUP STATS (Pinned to Bottom Left) --- */
         #matchup-block {
             position: absolute;
             bottom: 80px; 
@@ -108,11 +98,9 @@
             padding: 10px;
             font-size: 10px;
             line-height: 1.8;
-            z-index: 10;
         }
         .highlight { color: var(--arcade-yellow); }
 
-        /* --- FIELD & BASES (Pinned to Bottom Right) --- */
         #bases-container {
             position: absolute;
             bottom: 100px;
@@ -120,7 +108,6 @@
             width: 80px;
             height: 80px;
             transform: rotate(45deg);
-            z-index: 10;
         }
 
         .base {
@@ -131,15 +118,12 @@
             position: absolute;
             transition: background-color 0.2s;
         }
-
         .base.occupied { background-color: var(--arcade-yellow); }
-
         #base-1 { bottom: 0; right: 0; }
         #base-2 { top: 0; right: 0; }
         #base-3 { top: 0; left: 0; }
         #home-plate { bottom: 0; left: 0; background-color: var(--arcade-white); }
 
-        /* --- PLAY-BY-PLAY TICKER (Pinned to Bottom) --- */
         #play-ticker {
             position: absolute;
             bottom: 0;
@@ -154,31 +138,67 @@
             height: 45px;
             display: flex;
             align-items: center;
-            z-index: 20;
         }
-        </style>
+
+        /* --- THE PITCHING ANIMATION (Now tailored for the close-up view) --- */
+        #baseball {
+            position: absolute;
+            width: 12px;  /* Slightly larger for the close up view */
+            height: 12px;
+            background-color: #fff;
+            border-radius: 50%; 
+            transition: top 0.4s linear, left 0.4s linear, width 0.4s, height 0.4s, opacity 0.1s;
+            opacity: 0; 
+        }
+
+        /* Starts at the pitcher (Bottom center of the close-up view) */
+        .on-mound {
+            top: 80%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px; /* Ball looks bigger closer to camera */
+            height: 16px;
+            opacity: 1 !important;
+        }
+
+        /* Ends at home plate (Top center of the close-up view) */
+        .at-plate {
+            top: 30% !important; 
+            left: 50% !important; /* We will make this dynamic later based on strike zone data! */
+            width: 6px !important; /* Ball gets smaller as it flies away */
+            height: 6px !important;
+            opacity: 1 !important;
+        }
+    </style>
 </head>
 <body>
 
     <div id="game-container">
         
-        <div id="scoreboard">
-            <div class="team-block">
-                <div>AWAY</div>
-                <div id="away-score" class="score-number">0</div>
-            </div>
-            <div class="inning-block">
-                <div id="inning-state">TOP 1</div>
-                <div>OUTS: <span id="outs-count">0</span></div>
-                <div>COUNT: <span id="pitch-count">0-0</span></div>
-            </div>
-            <div class="team-block">
-                <div>HOME</div>
-                <div id="home-score" class="score-number">0</div>
-            </div>
+        <div id="pitching-camera">
+            <div id="baseball" class="on-mound"></div>
         </div>
 
-        <div id="field-display">
+        <div id="fielding-camera">
+            </div>
+
+        <div id="ui-layer">
+            <div id="scoreboard">
+                <div class="team-block">
+                    <div>AWAY</div>
+                    <div id="away-score" class="score-number">0</div>
+                </div>
+                <div class="inning-block">
+                    <div id="inning-state">TOP 1</div>
+                    <div>OUTS: <span id="outs-count">0</span></div>
+                    <div>COUNT: <span id="pitch-count">0-0</span></div>
+                </div>
+                <div class="team-block">
+                    <div>HOME</div>
+                    <div id="home-score" class="score-number">0</div>
+                </div>
+            </div>
+
             <div id="matchup-block">
                 <div>PITCHING: <br><span id="pitcher-name" class="highlight">WAITING...</span></div>
                 <br>
@@ -191,103 +211,17 @@
                 <div id="base-1" class="base"></div>
                 <div id="home-plate" class="base"></div>
             </div>
-        </div>
-        <div id="baseball" class="on-mound"></div>
-        <div id="play-ticker">
-            > <span id="last-event" style="margin-left: 10px;">CONNECTING TO SERVER...</span>
+
+            <div id="play-ticker">
+                > <span id="last-event" style="margin-left: 10px;">CONNECTING TO SERVER...</span>
+            </div>
         </div>
 
     </div>
 
     <script>
-        // ========================================================
-        // 1. FIREBASE CONFIG & INITIALIZATION
-        // ========================================================
-        const firebaseConfig = {
-            databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com/"
-        };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-
-        const db = firebase.database();
-        const GAME_PK = "823475"; // Tigers vs Red Sox (Fenway Park)
-        
-        // References to UI elements for animation
-        const baseballEl = document.getElementById('baseball');
-
-        // State Tracking (To detect when a pitch occurs)
-        let previousCountString = "";
-
-
-        // ========================================================
-        // 2. THE PITCH ANIMATION ENGINE
-        // ========================================================
-        function animatePitch() {
-            // Safety: Don't animate if the ball div doesn't exist
-            if (!baseballEl) return;
-            
-            console.log("⚾ PITCH THROWN!");
-
-            // Move the ball instantly to the mound (in case it got reset)
-            baseballEl.className = 'on-mound';
-
-            // Wait 50ms, then start the linear slide to home plate
-            setTimeout(() => {
-                baseballEl.className = 'at-plate';
-            }, 50);
-
-            // Wait 400ms (matching CSS transition), hide the ball, 
-            // and snap it back to the mound for the next pitch.
-            setTimeout(() => {
-                baseballEl.className = 'on-mound';
-            }, 410); 
-        }
-
-
-        // ========================================================
-        // 3. REALTIME DATA LISTENER
-        // ========================================================
-        const gameRef = db.ref(`mlb_live_games/${GAME_PK}`);
-
-        gameRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            
-            if (data) {
-                // Determine if a pitch was just thrown by comparing counts
-                const currentCountString = `${data.count.balls}-${data.count.strikes}-${data.count.outs}`;
-
-                // Trigger animation only if the count has changed (and it's not the first load)
-                if (previousCountString && currentCountString !== previousCountString) {
-                    animatePitch();
-                }
-
-                // Update the state tracker
-                previousCountString = currentCountString;
-
-                // --- Standard UI Updates ---
-                document.getElementById('away-score').innerText = data.score.away;
-                document.getElementById('home-score').innerText = data.score.home;
-                document.getElementById('inning-state').innerText = `${data.inning.half.toUpperCase()} ${data.inning.number}`;
-                document.getElementById('outs-count').innerText = data.count.outs;
-                document.getElementById('pitch-count').innerText = `${data.count.balls}-${data.count.strikes}`;
-                document.getElementById('pitcher-name').innerText = data.matchup.pitcher.toUpperCase();
-                document.getElementById('batter-name').innerText = data.matchup.batter.toUpperCase();
-                document.getElementById('last-event').innerText = data.last_event.toUpperCase();
-
-                // Toggle base runner occupied status
-                document.getElementById('base-1').classList.toggle('occupied', data.bases.first);
-                document.getElementById('base-2').classList.toggle('occupied', data.bases.second);
-                document.getElementById('base-3').classList.toggle('occupied', data.bases.third);
-
-            } else {
-                document.getElementById('last-event').innerText = "NO LIVE DATA FOUND FOR THIS GAME.";
-            }
-        }, (error) => {
-            console.error("Firebase read failed: ", error);
-            document.getElementById('last-event').innerText = "DATABASE CONNECTION ERROR.";
-        });
+        // (Keep your existing Firebase JS logic down here for now!)
+        // In the next step, we will add the JS logic to switch cameras when the ball is hit.
     </script>
 </body>
 </html>
