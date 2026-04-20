@@ -81,7 +81,6 @@
         #batter-container {
             position: absolute;
             top: 50%; 
-            left: 36%; 
             width: 30px;
             height: 60px;
             z-index: 4;
@@ -112,13 +111,14 @@
             top: 20px;
             left: 13px;
             transform-origin: top center;
-            transform: rotate(-30deg); 
             transition: transform 0.08s linear; 
             z-index: 5;
             border: 1px solid black;
         }
-        .swing-righty #bat { transform: rotate(110deg); }
-        .swing-lefty #bat { transform: rotate(-110deg); }
+        
+        /* UPDATED SWING CLASSES */
+        .swing-lefty #bat { transform: rotate(110deg) !important; }
+        .swing-righty #bat { transform: rotate(-110deg) !important; }
 
         /* --- FIELDERS --- */
         .fielder {
@@ -130,7 +130,6 @@
             transform: translate(-50%, -50%);
             border: 2px solid var(--arcade-white);
         }
-        /* RE-MAPPED TO MATCH THE PROVIDED INFIELD SCREENSHOT */
         #LF { background-color: #0f0; left: 20%; top: 55%; }
         #CF { background-color: #0f0; left: 50%; top: 50%; }
         #RF { background-color: #0f0; left: 80%; top: 55%; }
@@ -293,7 +292,6 @@
             document.getElementById('1B').style.left = '72%'; document.getElementById('1B').style.top = '76%';
         }
 
-        // --- PHASE 2: PHYSICS & THROWING ANIMATION ---
         function simulateHit(hitX, hitY, eventText) {
             pView.style.opacity = "0";
             fView.style.opacity = "1";
@@ -316,7 +314,6 @@
                 targetTop = 40 + ((hitY - 20) / 180) * 45; 
             }
 
-            // Who gets the ball?
             let closestFielder = 'CF';
             if (targetTop > 65) { 
                 if (targetLeft < 34) closestFielder = '3B';
@@ -328,7 +325,6 @@
                 else if (targetLeft > 62) closestFielder = 'RF';
             }
 
-            // Move fielder to the ball
             setTimeout(() => {
                 let fielderTop = targetTop;
                 if (!isOut && isGrounder && targetTop > 65) fielderTop -= 3; 
@@ -336,12 +332,10 @@
                 document.getElementById(closestFielder).style.left = `${targetLeft}%`;
             }, 100); 
 
-            // Calculate when the ball arrives in the glove
-            let arriveTime = 1200; // Line drive
+            let arriveTime = 1200; 
             if (isFly) arriveTime = 1500;
             if (isGrounder) arriveTime = 2000;
 
-            // Animate the hit
             setTimeout(() => {
                 if (isFly) {
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
@@ -374,20 +368,17 @@
                 }
             }, 50);
 
-            // THE THROWING PHASE
             setTimeout(() => {
-                let throwTargetTop = 68;  // Default: throw back to 2nd Base area
+                let throwTargetTop = 68;  
                 let throwTargetLeft = 50; 
                 let receivingFielder = 'SS';
 
-                // Ground out logic (Throw to 1st base bag)
                 if (isGrounder && isOut) {
                     throwTargetTop = 78; 
                     throwTargetLeft = 72;
                     receivingFielder = '1B';
                 }
 
-                // If the fielder who caught it is the same one supposed to receive it (e.g. 1B unassisted grounder)
                 if (closestFielder === receivingFielder && isGrounder && isOut) {
                     document.getElementById(closestFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(closestFielder).style.left = `${throwTargetLeft}%`;
@@ -397,11 +388,9 @@
                         ball.style.left = `${throwTargetLeft}%`;
                     }, 100);
                 } else {
-                    // Move the receiver to the base
                     document.getElementById(receivingFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(receivingFielder).style.left = `${throwTargetLeft}%`;
                     
-                    // Throw the ball after a brief transfer time in the glove
                     setTimeout(() => {
                         ball.style.transition = "all 0.5s linear";
                         ball.style.top = `${throwTargetTop}%`;
@@ -410,7 +399,6 @@
                 }
             }, arriveTime + 50);
 
-            // Cleanup extended to allow throw to complete
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFielders();
@@ -426,12 +414,14 @@
             batterContainer.style.opacity = "1";
             batterContainer.className = ''; 
 
+            // FIX: Pitcher's POV mirroring.
+            // Lefties stand on the 1B side (pitcher's left). Righties stand on 3B side (pitcher's right).
             if (batSide === "L") {
-                batterContainer.style.left = "62%"; 
-                document.getElementById('bat').style.transform = "rotate(30deg)";
-            } else {
-                batterContainer.style.left = "36%"; 
+                batterContainer.style.left = "36%"; // 1B side
                 document.getElementById('bat').style.transform = "rotate(-30deg)";
+            } else {
+                batterContainer.style.left = "62%"; // 3B side
+                document.getElementById('bat').style.transform = "rotate(30deg)";
             }
 
             ball.style.transition = "none";
