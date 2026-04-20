@@ -82,12 +82,10 @@
             height: 14px;
             position: absolute;
             z-index: 3;
-            /* SLOWED DOWN: Fielders now take 1.5s to reach the ball */
             transition: all 1.5s ease-out; 
             transform: translate(-50%, -50%);
             border: 2px solid var(--arcade-white);
         }
-        /* OUTFIELDERS LOWERED INTO THE GRASS */
         #LF { background-color: #0f0; left: 20%; top: 55%; }
         #CF { background-color: #0f0; left: 50%; top: 50%; }
         #RF { background-color: #0f0; left: 80%; top: 55%; }
@@ -142,6 +140,8 @@
             padding: 8px;
             font-size: 10px;
             line-height: 2;
+            /* Added min-width so full names don't squeeze weirdly */
+            min-width: 200px; 
         }
 
         #bases-diamond {
@@ -183,7 +183,6 @@
 <body>
 
     <div id="game-container">
-        
         <div id="pitching-view" class="camera">
             <div id="strike-zone-overlay">
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
@@ -206,13 +205,13 @@
 
         <div id="ui-layer">
             <div id="scoreboard">
-                <div class="score-box">AWAY<span id="away-pts" class="big-num">0</span></div>
+                <div class="score-box"><span id="away-team">AWY</span><span id="away-pts" class="big-num">0</span></div>
                 <div class="score-box" style="font-size: 10px; color: var(--arcade-yellow);">
                     <span id="inn-display">WAITING...</span><br>
                     OUTS: <span id="outs-display">0</span><br>
                     <span id="count-display">0-0</span>
                 </div>
-                <div class="score-box">HOME<span id="home-pts" class="big-num">0</span></div>
+                <div class="score-box"><span id="home-team">HOM</span><span id="home-pts" class="big-num">0</span></div>
             </div>
 
             <div id="matchup-card">
@@ -257,12 +256,10 @@
             fView.style.opacity = "1";
             szOverlay.style.opacity = "0";
 
-            // Determine what type of play this is based on API text
             const isGrounder = eventText.includes('GROUND');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('HOME RUN');
             const isOut = eventText.includes('OUT');
 
-            // Reset ball position
             ball.style.transition = "none";
             ball.style.top = "85%"; 
             ball.style.left = "50%";
@@ -276,7 +273,6 @@
                 targetTop = 40 + ((hitY - 20) / 180) * 45; 
             }
 
-            // Determine which fielder is closest
             let closestFielder = 'CF';
             if (targetTop > 65) { 
                 if (targetLeft < 38) closestFielder = '3B';
@@ -288,10 +284,8 @@
                 else if (targetLeft > 62) closestFielder = 'RF';
             }
 
-            // Start Fielder moving to the ball
             setTimeout(() => {
                 let fielderTop = targetTop;
-                // If it is a base hit past the infielder, make them miss the ball slightly
                 if (!isOut && isGrounder && targetTop > 65) {
                     fielderTop -= 3; 
                 }
@@ -299,38 +293,31 @@
                 document.getElementById(closestFielder).style.left = `${targetLeft}%`;
             }, 100); 
 
-            // Execute Hit Physics
             setTimeout(() => {
                 if (isFly) {
-                    // Fly Ball Physics: Huge arc, slow hang time
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
-                    const apexTop = targetTop - 25; // Goes up high into the sky
+                    const apexTop = targetTop - 25; 
 
-                    // Launch up
                     ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
                     ball.style.top = `${apexTop}%`;
                     ball.style.left = `${apexLeft}%`;
-                    ball.style.transform = "translate(-50%, -50%) scale(2.5)"; // Ball gets bigger
+                    ball.style.transform = "translate(-50%, -50%) scale(2.5)"; 
 
-                    // Fall down into glove/grass
                     setTimeout(() => {
                         ball.style.transition = "all 1.5s cubic-bezier(0.5, 0, 0.75, 0)";
                         ball.style.top = `${targetTop}%`;
                         ball.style.left = `${targetLeft}%`;
-                        ball.style.transform = "translate(-50%, -50%) scale(1)"; // Back to normal size
+                        ball.style.transform = "translate(-50%, -50%) scale(1)"; 
                     }, 1500);
 
                 } else if (isGrounder) {
-                    // Ground Ball Physics: Fast initial bounce, slow roll
                     const midLeft = 50 + (targetLeft - 50) * 0.4;
-                    const midTop = 85 + (targetTop - 85) * 0.4; // Bounces 40% of the way there
+                    const midTop = 85 + (targetTop - 85) * 0.4; 
 
-                    // Fast hop
                     ball.style.transition = "all 0.6s ease-out";
                     ball.style.top = `${midTop}%`;
                     ball.style.left = `${midLeft}%`;
 
-                    // Slow roll to fielder
                     setTimeout(() => {
                         ball.style.transition = "all 1.4s ease-out"; 
                         ball.style.top = `${targetTop}%`;
@@ -338,19 +325,16 @@
                     }, 600);
 
                 } else {
-                    // Line Drive Physics: Fast and straight
                     ball.style.transition = "all 1.2s linear";
                     ball.style.top = `${targetTop}%`;
                     ball.style.left = `${targetLeft}%`;
                 }
-
             }, 50);
 
-            // Cleanup
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFielders();
-            }, 4000); // Gives enough time for the longest fly ball to finish
+            }, 4000); 
         }
 
         // --- PHASE 1: PITCHING ANIMATION ---
@@ -412,13 +396,22 @@
                 lastTimestamp = data.timestamp;
             }
 
+            // --- UPDATED TEXT MAPPINGS HERE ---
+            if (data.teams) {
+                document.getElementById('away-team').innerText = data.teams.away.toUpperCase();
+                document.getElementById('home-team').innerText = data.teams.home.toUpperCase();
+            }
+            
             document.getElementById('away-pts').innerText = data.score.away;
             document.getElementById('home-pts').innerText = data.score.home;
             document.getElementById('inn-display').innerText = `${data.inning.half} ${data.inning.number}`.toUpperCase();
             document.getElementById('outs-display').innerText = data.count.outs;
             document.getElementById('count-display').innerText = `${data.count.balls}-${data.count.strikes}`;
-            document.getElementById('p-name').innerText = data.matchup.pitcher.split(' ').pop().toUpperCase();
-            document.getElementById('b-name').innerText = data.matchup.batter.split(' ').pop().toUpperCase();
+            
+            // Replaced the `.split().pop()` to show FULL names
+            document.getElementById('p-name').innerText = data.matchup.pitcher.toUpperCase();
+            document.getElementById('b-name').innerText = data.matchup.batter.toUpperCase();
+            
             document.getElementById('event-text').innerText = data.last_event.toUpperCase();
 
             document.getElementById('b1').classList.toggle('occupied', data.bases.first);
