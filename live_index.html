@@ -57,45 +57,13 @@
         }
         .zone-cell { border: 1px solid rgba(0, 255, 255, 0.2); }
 
-        /* --- --- THE TRUE BATTER SPRITE (NEW!) --- --- */
-        #batter-sprite {
-            position: absolute;
-            top: 48%; /* Adjusted to stand on Home Plate */
-            width: 80px;  /* Width of ONE single frame */
-            height: 120px; /* Height of the sprite */
-            z-index: 4;
-            opacity: 0; /* Hidden initially, triggered by JS */
-            
-            /* EMBEDDED SPRITE SHEET (image_26.png) */
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAB4CAYAAAB2bMshAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAEnQAABJ0Ad5mH3gAAAUySURBVHhe7Z0xjixHEIZbXwByBvAEX5eAl4ByA8gZOBKAnIEjZ+C8b84A5AzgCbkEf5eAlkByAsgZOBKAnAE8uReN7Znp6dmZ6unZnrE9P4re6Z7qnuqe6r57vWq7mO0D8A4+fXre/r88H4+f7YFfXp6P5+N2O+/7eT5un/Pz/P5jG7eL+X4pY6C4AByYl/v2vW8Hh//nNsb1fN2/3wI9H4/vH9u47Wb3+5WNAWp9AdgwLw/te75vD6e/X7Yx7ufr/n4L5Pz4649tbHb/v7LRObW+AGyYl4f2uTwfD6f/n7YxbvXr+X4L4Lx+u+12//+z0Tm1vgDsmJeH9v5c9s//vUf6uM2v5/v9Fvx8XPbbtY3bfvb5fmdjo3NqvQDsmJeH7fW4Pdunw+H9f5eN8V+/vF9f/w8P+78f23725bV6ANgwL7X5vN5vd1P6/WUbP5+vx9f/u8P+/8f93o9vv24vALXN8/S4Pdunw+H9f5eN8Z///Lrf//Y5f/74fvv0fXv9KxoD9GJeHtvrYXs+74d//9W57fWv7+/n9/v7uN/55//5Y/v2fXv7U7X++B9uRj757Xj+7bW6uD2b/4ffb9+31v77X8/H/f5Pfvvr63/b7P3x//YmZvtBf90A7I49n49vX6v15/N5v5z//fN7P5/35f//fP/4//f3+L/Pdvf799X6X//Nf90A7I79+eX77X95H34+H9//vTzeP//7v5en+//P94/7v3///fX+8b/vTcz2A/66AepO9u28Hff7U304/O+v7fPxvF/+f3/v799X+/8f+/W8H6/H7eL//e/X+zX+ugFpB4/bfrv8/U4fDr/7azs/fP7263m/P5/f7//kN98+f7/9p//pTcz2A/66AZpM9uP9uB+vx+3if/u/5ffb+X/P3//8+fX9//hTNRmOAnVnPh6v7S/v5+Py5/uPbfz4+fnm+fnt//PHz/v//PPH+8f/vbW6/f4/XOfU+n7Wf7gep78//71f/nx//L+vj/fX737f94//9/3//fvf//oGqMlkP+v77fb18nr8//95f/5vj4/7P9//3z//b/efv7X94//+W53/9H+4T6v1f+5X29/u//D//uN+P//z//76+P//9vv5+L9/f7//H//Xf7f/9MdpMtnP+Xp7Pu7z7b/X5+Py/fH5ff9///O///Wv//H5Wv/5+2p9//n/9Cdmsv3FbP85/A6+9X//4z7df78ft+f5//v95/m/Pfb/Pv+P/X8+nt///7XWv/3n7/Tf0wT1Jvvt/fG5PRz//O/v8+v5e39vH/8Pv3v4///+3vb/P5+/5///+/Xf9H+XkY8+7WwPPDwf27hvD6cPh//9//x8fPw//+/59Xzb7f//8/fbt5//53+X7df+0/bT7W//P/73/ft9f/+5//+//D8/fv7X9+P//f79//+P7e//X26388f/bU7//S/X2e6MfvfS/+H5fP4f//f6fHx///Y9fv/W6//+n9879W//f7m5idm+Y7Yf8Mff//Tbe5fvf+f///X3X+f34//+/fN9//+PP//Pfv59/r///+5P1frb5+FOfm90//+fXb7/v3+fH5+//fp4fXv+9un++//9fP/v//vj8fv77ev59b+/j9u3P/fX9u/U+/O///+3P/fzffv6d/z//v75//359f/+T//z+f3Xvv3P//X//K/f//Ofv+P///pff30D9GJ/93j5f98/vvf//P/rv/Pj9Xp///7//v/r//5//L//P+f7X6v94//u9f66Ac9e9uG//3//fP/9//z///59Xo9///+f/+v//p///7//n99v//+P79+X9tUNM9vD//Xf//b///n//P/7X1e7w67/z//v//fP//T///9+Px9P//v//vTzffv///P5v99v///P+/Wl/+4X6wGqZ/fH5fP9//3w/P99v///Pz/ff//8//j/9fv//f/rv/Pj/ffv///H9+3v9MdpMtsPsPsPsPsPsPsPsPsPsPsP4D8X6p9GAnW9Y9sPsPsPsPsPsPsPsPsPsPsP0D8S6h7OAnY9Q9sPsPsPsPsPsPsPsPsPsPsP4D8T6p9FAvY=')
-
-        }
-        
-        /* NEW KEYFRAMES - Maps to base image standing on left, facing right (perfect for lefty) */
-        @keyframes swingLefty {
-            100% { background-position: -320px 0; } /* Shift left to show all 4 frames (4 * 80px) */
-        }
-        
-        /* Flipped animation logic for Righties */
-        @keyframes swingRighty {
-            100% { background-position: -320px 0; } 
-        }
-
-        /* --- THE TRIGGER CLASSES --- */
-        .is-swinging {
-            /* Play once over 0.3s, instantly jumping through 4 frames, don't repeat */
-            animation: swingLefty 0.3s steps(4) forwards; 
-        }
-
-        /* Logic to Orient the static sprite on the correct side */
-        .orient-lefty {
-            left: 36%;
-            transform: scaleX(1); /* Base image faces right */
-        }
-        .orient-righty {
-            left: 62%;
-            transform: scaleX(-1); /* Flip horizontally to face left */
-        }
+        /* --- THE BATTER (PITCHING VIEW) --- */
+        #batter-container { position: absolute; top: 50%; left: 36%; width: 30px; height: 60px; z-index: 4; }
+        #batter-head { width: 14px; height: 14px; background-color: var(--skin-tone); position: absolute; top: 0; left: 8px; border: 2px solid black; }
+        #batter-body { width: 20px; height: 40px; background-color: var(--arcade-white); position: absolute; top: 14px; left: 5px; border: 2px solid black; }
+        #bat { width: 4px; height: 35px; background-color: var(--arcade-yellow); position: absolute; top: 20px; left: 13px; transform-origin: top center; transform: rotate(-30deg); transition: transform 0.08s linear; z-index: 5; border: 1px solid black; }
+        .swing-lefty #bat { transform: rotate(110deg) !important; }
+        .swing-righty #bat { transform: rotate(-110deg) !important; }
 
         /* --- FIELD BASES --- */
         .field-base { position: absolute; width: 12px; height: 12px; background-color: var(--arcade-white); transform: translate(-50%, -50%) rotate(45deg); z-index: 2; }
@@ -129,9 +97,7 @@
 
     <div id="game-container">
         <div id="pitching-view" class="camera">
-            
-            <div id="batter-sprite"></div>
-
+            <div id="batter-container"><div id="bat"></div><div id="batter-head"></div><div id="batter-body"></div></div>
             <div id="strike-zone-overlay">
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
@@ -179,7 +145,7 @@
         const pView = document.getElementById('pitching-view');
         const fView = document.getElementById('fielding-view');
         const szOverlay = document.getElementById('strike-zone-overlay');
-        const batterSprite = document.getElementById('batter-sprite');
+        const batterContainer = document.getElementById('batter-container');
         
         let lastTimestamp = null;
         let currentBasesState = { first: false, second: false, third: false };
@@ -236,7 +202,7 @@
 
         function simulateWalk() {
             pView.style.opacity = "0"; fView.style.opacity = "1";
-            szOverlay.style.opacity = "0"; batterSprite.style.opacity = "0"; 
+            szOverlay.style.opacity = "0"; batterContainer.style.opacity = "0"; 
 
             let force1 = currentBasesState.first;
             let force2 = force1 && currentBasesState.second;
@@ -255,7 +221,7 @@
 
         function simulateHit(hitX, hitY, eventText) {
             pView.style.opacity = "0"; fView.style.opacity = "1";
-            szOverlay.style.opacity = "0"; batterSprite.style.opacity = "0"; 
+            szOverlay.style.opacity = "0"; batterContainer.style.opacity = "0"; 
 
             const isHomeRun = eventText.includes('HOME RUN');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('LIN') && !isHomeRun;
@@ -394,11 +360,13 @@
         // --- PITCHING ANIMATION ---
         function runPitchAnimation(isInPlay, pX, pZ, hitX, hitY, eventText, batSide, isWalk) {
             pView.style.opacity = "1"; fView.style.opacity = "0";
-            szOverlay.style.opacity = "1"; batterSprite.style.opacity = "1"; 
-            
-            // NEW: Reset swing animation, then apply lefty/righty positioning
-            batterSprite.classList.remove('is-swinging'); 
-            batterSprite.className = batSide === "L" ? "orient-lefty" : "orient-righty";
+            szOverlay.style.opacity = "1"; batterContainer.style.opacity = "1"; batterContainer.className = ''; 
+
+            if (batSide === "L") {
+                batterContainer.style.left = "36%"; document.getElementById('bat').style.transform = "rotate(-30deg)";
+            } else {
+                batterContainer.style.left = "62%"; document.getElementById('bat').style.transform = "rotate(30deg)";
+            }
 
             ball.style.transition = "none"; ball.style.opacity = "1";
             ball.style.top = "90%"; ball.style.left = "50%";
@@ -417,9 +385,8 @@
                 ball.style.top = `${targetTop}%`; ball.style.left = `${targetLeft}%`;
                 ball.style.width = "8px"; ball.style.height = "8px";
                 
-                // NEW: Trigger the True Sprite Swing Animation!
                 if (didSwing) {
-                    setTimeout(() => { batterSprite.classList.add("is-swinging"); }, 300); 
+                    setTimeout(() => { batterContainer.classList.add(batSide === "L" ? "swing-lefty" : "swing-righty"); }, 320); 
                 }
                 
                 if (isInPlay) {
@@ -428,8 +395,7 @@
                     setTimeout(() => { simulateWalk(); }, 600);
                 } else {
                     setTimeout(() => {
-                        ball.style.opacity = "0"; szOverlay.style.opacity = "0";
-                        batterSprite.classList.remove('is-swinging'); // Reset after pitch
+                        ball.style.opacity = "0"; szOverlay.style.opacity = "0"; batterContainer.className = ''; 
                     }, 1500);
                 }
             }, 50);
@@ -464,6 +430,16 @@
                 lastTimestamp = data.timestamp;
                 currentBasesState = data.bases || { first: false, second: false, third: false };
                 updateUI(data);
+                
+                // NEW: Instantly place the batter on the correct side on page load
+                const batSide = data.matchup && data.matchup.bat_side ? data.matchup.bat_side : "R";
+                if (batSide === "L") {
+                    batterContainer.style.left = "36%"; document.getElementById('bat').style.transform = "rotate(-30deg)";
+                } else {
+                    batterContainer.style.left = "62%"; document.getElementById('bat').style.transform = "rotate(30deg)";
+                }
+                batterContainer.style.opacity = "1";
+                
                 return;
             }
 
