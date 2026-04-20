@@ -76,32 +76,31 @@
         }
         .zone-cell { border: 1px solid rgba(0, 255, 255, 0.2); }
 
-        /* --- FIELDERS (Only visible when fielding view is active) --- */
+        /* --- FIELDERS (DROPPED DOWN INTO THE ACTUAL FIELD) --- */
         .fielder {
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             position: absolute;
             z-index: 3;
-            transition: all 0.3s ease-out; /* Fielder run speed */
+            transition: all 0.5s ease-out; 
             transform: translate(-50%, -50%);
-            border: 1px solid var(--arcade-white);
+            border: 2px solid var(--arcade-white);
         }
-        /* Starting Positions on the 800x600 grid */
-        #SS { background-color: var(--arcade-blue); left: 35%; top: 60%; }
-        #2B { background-color: var(--arcade-blue); left: 65%; top: 60%; }
-        #3B { background-color: var(--arcade-blue); left: 25%; top: 75%; }
-        #1B { background-color: var(--arcade-blue); left: 75%; top: 75%; }
-        #CF { background-color: #0f0; left: 50%; top: 30%; }
-        #LF { background-color: #0f0; left: 20%; top: 35%; }
-        #RF { background-color: #0f0; left: 80%; top: 35%; }
+        #LF { background-color: #0f0; left: 20%; top: 52%; }
+        #CF { background-color: #0f0; left: 50%; top: 45%; }
+        #RF { background-color: #0f0; left: 80%; top: 52%; }
+        #3B { background-color: var(--arcade-blue); left: 32%; top: 72%; }
+        #SS { background-color: var(--arcade-blue); left: 42%; top: 68%; }
+        #2B { background-color: var(--arcade-blue); left: 58%; top: 68%; }
+        #1B { background-color: var(--arcade-blue); left: 68%; top: 72%; }
 
         /* --- THE BALL --- */
         #baseball {
             position: absolute;
             background: white;
             border-radius: 50%;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             z-index: 5;
             opacity: 0;
             transform: translate(-50%, -50%);
@@ -192,13 +191,13 @@
         </div>
 
         <div id="fielding-view" class="camera">
+            <div class="fielder" id="LF"></div>
+            <div class="fielder" id="CF"></div>
+            <div class="fielder" id="RF"></div>
+            <div class="fielder" id="3B"></div>
             <div class="fielder" id="SS"></div>
             <div class="fielder" id="2B"></div>
-            <div class="fielder" id="3B"></div>
             <div class="fielder" id="1B"></div>
-            <div class="fielder" id="CF"></div>
-            <div class="fielder" id="LF"></div>
-            <div class="fielder" id="RF"></div>
         </div>
 
         <div id="baseball"></div>
@@ -232,7 +231,7 @@
         const firebaseConfig = { databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const GAME_PK = "823475"; // Update to your game PK!
+        const GAME_PK = "823475"; 
 
         const ball = document.getElementById('baseball');
         const pView = document.getElementById('pitching-view');
@@ -240,20 +239,18 @@
         const szOverlay = document.getElementById('strike-zone-overlay');
         let lastTimestamp = null;
 
-        // Reset fielders to starting positions
         function resetFielders() {
-            document.getElementById('SS').style.left = '35%'; document.getElementById('SS').style.top = '60%';
-            document.getElementById('2B').style.left = '65%'; document.getElementById('2B').style.top = '60%';
-            document.getElementById('3B').style.left = '25%'; document.getElementById('3B').style.top = '75%';
-            document.getElementById('1B').style.left = '75%'; document.getElementById('1B').style.top = '75%';
-            document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '30%';
-            document.getElementById('LF').style.left = '20%'; document.getElementById('LF').style.top = '35%';
-            document.getElementById('RF').style.left = '80%'; document.getElementById('RF').style.top = '35%';
+            document.getElementById('LF').style.left = '20%'; document.getElementById('LF').style.top = '52%';
+            document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '45%';
+            document.getElementById('RF').style.left = '80%'; document.getElementById('RF').style.top = '52%';
+            document.getElementById('3B').style.left = '32%'; document.getElementById('3B').style.top = '72%';
+            document.getElementById('SS').style.left = '42%'; document.getElementById('SS').style.top = '68%';
+            document.getElementById('2B').style.left = '58%'; document.getElementById('2B').style.top = '68%';
+            document.getElementById('1B').style.left = '68%'; document.getElementById('1B').style.top = '72%';
         }
 
-        // --- PHASE 2: FIELDING HIT ANIMATION ---
-        function simulateHit() {
-            // Cut to Fielding Camera
+        // --- PHASE 2: TRUE MLB FIELDING COORDINATES ---
+        function simulateHit(hitX, hitY) {
             pView.style.opacity = "0";
             fView.style.opacity = "1";
             szOverlay.style.opacity = "0";
@@ -262,52 +259,57 @@
             ball.style.transition = "none";
             ball.style.top = "85%"; 
             ball.style.left = "50%";
-            ball.style.width = "8px";
-            ball.style.height = "8px";
 
-            // Randomize hit trajectory (Left field to Right field)
-            const targetLeft = 15 + (Math.random() * 70); // 15% to 85% width
-            const targetTop = 20 + (Math.random() * 40);  // 20% to 60% height (outfield/infield)
+            // Map API coordX (0 to 250) to CSS Left (10% to 90%)
+            // Map API coordY (20 to 200) to CSS Top (40% to 85%)
+            let targetLeft = 50;
+            let targetTop = 60; // Defaults if API is missing
+
+            if (hitX !== null && hitX !== undefined && hitY !== null && hitY !== undefined) {
+                targetLeft = (hitX / 250) * 100;
+                
+                // Y-axis logic: Smaller Y is deeper center field. 
+                // We map Y=20 to Top=40%, and Y=200 to Top=85%
+                targetTop = 40 + ((hitY - 20) / 180) * 45; 
+            }
 
             setTimeout(() => {
-                // Ball flies into field
-                ball.style.transition = "all 1s cubic-bezier(0.25, 1, 0.5, 1)"; // Decelerates like a hit ball
+                // Ball flies to the exact MLB coordinate!
+                ball.style.transition = "all 1s cubic-bezier(0.25, 1, 0.5, 1)";
                 ball.style.top = `${targetTop}%`;
                 ball.style.left = `${targetLeft}%`;
 
-                // Determine which fielder is closest
+                // Move the closest fielder
                 let closestFielder = 'CF';
-                if (targetTop > 45) { // Infield
-                    if (targetLeft < 45) closestFielder = 'SS';
-                    else if (targetLeft < 55) closestFielder = Math.random() > 0.5 ? 'SS' : '2B';
-                    else closestFielder = '2B';
-                } else { // Outfield
-                    if (targetLeft < 35) closestFielder = 'LF';
-                    else if (targetLeft > 65) closestFielder = 'RF';
+                if (targetTop > 65) { 
+                    if (targetLeft < 38) closestFielder = '3B';
+                    else if (targetLeft < 50) closestFielder = 'SS';
+                    else if (targetLeft < 62) closestFielder = '2B';
+                    else closestFielder = '1B';
+                } else { 
+                    if (targetLeft < 38) closestFielder = 'LF';
+                    else if (targetLeft > 62) closestFielder = 'RF';
                 }
 
-                // Move the chosen fielder to the ball
                 setTimeout(() => {
                     document.getElementById(closestFielder).style.top = `${targetTop}%`;
                     document.getElementById(closestFielder).style.left = `${targetLeft}%`;
-                }, 100); // Slight reaction delay
+                }, 100); 
 
             }, 50);
 
-            // Cleanup after play ends
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFielders();
-            }, 3000); // 3 seconds to show fielding play
+            }, 3000); 
         }
 
         // --- PHASE 1: PITCHING ANIMATION ---
-        function runPitchAnimation(isInPlay, pX, pZ) {
+        function runPitchAnimation(isInPlay, pX, pZ, hitX, hitY) {
             pView.style.opacity = "1";
             fView.style.opacity = "0";
             szOverlay.style.opacity = "1";
 
-            // Reset ball to Pitcher
             ball.style.transition = "none";
             ball.style.opacity = "1";
             ball.style.top = "90%";
@@ -315,15 +317,13 @@
             ball.style.width = "16px";
             ball.style.height = "16px";
 
-            // Map Coordinates
             let targetLeft = 50; 
             let targetTop = 58;  
             if (pX !== undefined && pX !== null && pZ !== undefined && pZ !== null) {
-                targetLeft = 50 - (pX * 6); // Subtracted because camera is Pitcher POV!
+                targetLeft = 50 - (pX * 6); 
                 targetTop = 75 - (pZ * 7); 
             }
 
-            // Animate Pitch
             setTimeout(() => {
                 ball.style.transition = "all 0.4s linear";
                 ball.style.top = `${targetTop}%`; 
@@ -331,13 +331,11 @@
                 ball.style.width = "8px";
                 ball.style.height = "8px";
                 
-                // If it's a hit, hand off to Phase 2
                 if (isInPlay) {
                     setTimeout(() => {
-                        simulateHit();
-                    }, 400); // Trigger hit exactly as pitch reaches plate
+                        simulateHit(hitX, hitY); // Pass true hit coords
+                    }, 400); 
                 } else {
-                    // Standard pitch cleanup
                     setTimeout(() => {
                         ball.style.opacity = "0";
                         szOverlay.style.opacity = "0";
@@ -355,12 +353,13 @@
                 const inPlay = data.last_event.toUpperCase().includes("IN PLAY");
                 const pX = data.pitch_location ? data.pitch_location.pX : null;
                 const pZ = data.pitch_location ? data.pitch_location.pZ : null;
+                const hitX = data.hit_location ? data.hit_location.x : null;
+                const hitY = data.hit_location ? data.hit_location.y : null;
                 
-                runPitchAnimation(inPlay, pX, pZ);
+                runPitchAnimation(inPlay, pX, pZ, hitX, hitY);
                 lastTimestamp = data.timestamp;
             }
 
-            // Update UI
             document.getElementById('away-pts').innerText = data.score.away;
             document.getElementById('home-pts').innerText = data.score.home;
             document.getElementById('inn-display').innerText = `${data.inning.half} ${data.inning.number}`.toUpperCase();
