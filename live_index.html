@@ -235,10 +235,10 @@
             let targetTop = 58;  
             
             if (pX !== undefined && pX !== null && pZ !== undefined && pZ !== null) {
-                // pX: 0 is center. A 1 ft movement maps to ~6% screen width.
-                targetLeft = 50 + (pX * 6); 
-                // pZ: Middle of zone is ~2.5 ft. CSS Top 58% is center. 
-                // Height goes up, CSS Top goes down, so we subtract.
+                // FLIPPED: We subtract because the camera is from the pitcher's POV!
+                targetLeft = 50 - (pX * 6); 
+                
+                // Height stays the same (subtracting because CSS top goes down)
                 targetTop = 75 - (pZ * 7); 
             }
 
