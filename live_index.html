@@ -13,6 +13,7 @@
             --arcade-blue: #0000a8;
             --arcade-yellow: #f8f800;
             --arcade-white: #fcfcfc;
+            --arcade-red: #d80000;
             --dirt-brown: #c88141;
             --skin-tone: #ffcc99;
             --strike-zone-cyan: rgba(0, 255, 255, 0.6);
@@ -77,7 +78,7 @@
         }
         .zone-cell { border: 1px solid rgba(0, 255, 255, 0.2); }
 
-        /* --- THE BATTER --- */
+        /* --- THE BATTER (PITCHING VIEW) --- */
         #batter-container {
             position: absolute;
             top: 50%; 
@@ -86,39 +87,35 @@
             z-index: 4;
         }
         #batter-head {
-            width: 14px;
-            height: 14px;
-            background-color: var(--skin-tone);
-            position: absolute;
-            top: 0;
-            left: 8px;
-            border: 2px solid black;
+            width: 14px; height: 14px; background-color: var(--skin-tone);
+            position: absolute; top: 0; left: 8px; border: 2px solid black;
         }
         #batter-body {
-            width: 20px;
-            height: 40px;
-            background-color: var(--arcade-white);
-            position: absolute;
-            top: 14px;
-            left: 5px;
-            border: 2px solid black;
+            width: 20px; height: 40px; background-color: var(--arcade-white);
+            position: absolute; top: 14px; left: 5px; border: 2px solid black;
         }
         #bat {
-            width: 4px;
-            height: 35px;
-            background-color: var(--arcade-yellow);
-            position: absolute;
-            top: 20px;
-            left: 13px;
-            transform-origin: top center;
-            transition: transform 0.08s linear; 
-            z-index: 5;
-            border: 1px solid black;
+            width: 4px; height: 35px; background-color: var(--arcade-yellow);
+            position: absolute; top: 20px; left: 13px; transform-origin: top center;
+            transition: transform 0.08s linear; z-index: 5; border: 1px solid black;
         }
-        
-        /* UPDATED SWING CLASSES */
         .swing-lefty #bat { transform: rotate(110deg) !important; }
         .swing-righty #bat { transform: rotate(-110deg) !important; }
+
+        /* --- FIELD BASES --- */
+        .field-base {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--arcade-white);
+            transform: translate(-50%, -50%) rotate(45deg);
+            z-index: 2;
+        }
+        /* Base coordinates mapped from your drawing */
+        #bag-1B { left: 68%; top: 68%; }
+        #bag-2B { left: 50%; top: 61%; }
+        #bag-3B { left: 32%; top: 68%; }
+        #bag-HP { left: 50%; top: 85%; }
 
         /* --- FIELDERS --- */
         .fielder {
@@ -131,12 +128,30 @@
             border: 2px solid var(--arcade-white);
         }
         #LF { background-color: #0f0; left: 20%; top: 55%; }
-        #CF { background-color: #0f0; left: 50%; top: 50%; }
+        #CF { background-color: #0f0; left: 50%; top: 48%; }
         #RF { background-color: #0f0; left: 80%; top: 55%; }
-        #3B { background-color: var(--arcade-blue); left: 28%; top: 76%; }
-        #SS { background-color: var(--arcade-blue); left: 40%; top: 70%; }
-        #2B { background-color: var(--arcade-blue); left: 60%; top: 70%; }
-        #1B { background-color: var(--arcade-blue); left: 72%; top: 76%; }
+        /* Infielders mapped to your drawing */
+        #3B { background-color: var(--arcade-blue); left: 38%; top: 66%; }
+        #SS { background-color: var(--arcade-blue); left: 44%; top: 62%; }
+        #2B { background-color: var(--arcade-blue); left: 56%; top: 62%; }
+        #1B { background-color: var(--arcade-blue); left: 62%; top: 66%; }
+        /* Pitcher and Catcher */
+        #P { background-color: var(--arcade-blue); left: 50%; top: 72%; }
+        #C { background-color: var(--arcade-red); left: 50%; top: 88%; }
+
+        /* --- RUNNERS --- */
+        .runner {
+            width: 12px;
+            height: 12px;
+            position: absolute;
+            z-index: 4;
+            background-color: var(--arcade-red);
+            border: 2px solid var(--arcade-yellow);
+            transform: translate(-50%, -50%);
+            opacity: 0; /* Hidden by default */
+            /* 4 seconds to run base-to-base */
+            transition: all 4s linear; 
+        }
 
         /* --- THE BALL --- */
         #baseball {
@@ -151,53 +166,25 @@
         }
 
         /* --- UI OVERLAY --- */
-        #ui-layer {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            pointer-events: none;
-        }
+        #ui-layer { position: absolute; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
         #scoreboard {
-            background-color: rgba(0, 0, 168, 0.9);
-            border: 4px solid var(--arcade-white);
-            padding: 10px;
-            display: flex;
-            justify-content: space-around;
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            box-sizing: border-box;
+            background-color: rgba(0, 0, 168, 0.9); border: 4px solid var(--arcade-white);
+            padding: 10px; display: flex; justify-content: space-around;
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            width: 90%; box-sizing: border-box;
         }
         .score-box { text-align: center; font-size: 14px; }
         .big-num { color: var(--arcade-yellow); font-size: 24px; display: block; margin-top: 5px; }
         #matchup-card {
-            position: absolute;
-            bottom: 70px;
-            left: 20px;
-            background: rgba(0,0,0,0.8);
-            border: 2px solid white;
-            padding: 8px;
-            font-size: 10px;
-            line-height: 2;
-            min-width: 200px; 
+            position: absolute; bottom: 70px; left: 20px; background: rgba(0,0,0,0.8);
+            border: 2px solid white; padding: 8px; font-size: 10px; line-height: 2; min-width: 200px; 
         }
         #bases-diamond {
-            position: absolute;
-            bottom: 80px;
-            right: 40px;
-            width: 60px;
-            height: 60px;
-            transform: rotate(45deg);
+            position: absolute; bottom: 80px; right: 40px; width: 60px; height: 60px; transform: rotate(45deg);
         }
         .base {
-            width: 18px;
-            height: 18px;
-            background: var(--dirt-brown);
-            border: 2px solid white;
-            position: absolute;
+            width: 18px; height: 18px; background: var(--dirt-brown);
+            border: 2px solid white; position: absolute;
         }
         .occupied { background: var(--arcade-yellow) !important; }
         #b2 { top: 0; left: 0; }
@@ -205,17 +192,9 @@
         #hp { bottom: 0; right: 0; background: var(--arcade-white); }
         #b3 { bottom: 0; left: 0; }
         #ticker {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 45px;
-            background: black;
-            border-top: 4px solid white;
-            display: flex;
-            align-items: center;
-            padding-left: 20px;
-            font-size: 12px;
-            box-sizing: border-box;
+            position: absolute; bottom: 0; width: 100%; height: 45px; background: black;
+            border-top: 4px solid white; display: flex; align-items: center;
+            padding-left: 20px; font-size: 12px; box-sizing: border-box;
         }
     </style>
 </head>
@@ -236,6 +215,16 @@
         </div>
 
         <div id="fielding-view" class="camera">
+            <div class="field-base" id="bag-1B"></div>
+            <div class="field-base" id="bag-2B"></div>
+            <div class="field-base" id="bag-3B"></div>
+            <div class="field-base" id="bag-HP"></div>
+
+            <div class="runner" id="runner-batter"></div>
+            <div class="runner" id="runner-1st"></div>
+            <div class="runner" id="runner-2nd"></div>
+            <div class="runner" id="runner-3rd"></div>
+
             <div class="fielder" id="LF"></div>
             <div class="fielder" id="CF"></div>
             <div class="fielder" id="RF"></div>
@@ -243,6 +232,8 @@
             <div class="fielder" id="SS"></div>
             <div class="fielder" id="2B"></div>
             <div class="fielder" id="1B"></div>
+            <div class="fielder" id="P"></div>
+            <div class="fielder" id="C"></div>
         </div>
 
         <div id="baseball"></div>
@@ -281,22 +272,87 @@
         const szOverlay = document.getElementById('strike-zone-overlay');
         const batterContainer = document.getElementById('batter-container');
         let lastTimestamp = null;
+        let currentBasesState = { first: false, second: false, third: false };
 
-        function resetFielders() {
+        // Base Coordinates for Runners and Throws
+        const COORDS = {
+            HP: { left: 50, top: 85 },
+            B1: { left: 68, top: 68 },
+            B2: { left: 50, top: 61 },
+            B3: { left: 32, top: 68 }
+        };
+
+        function resetFieldersAndRunners() {
+            // Reset Fielders
             document.getElementById('LF').style.left = '20%'; document.getElementById('LF').style.top = '55%';
-            document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '50%';
+            document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '48%';
             document.getElementById('RF').style.left = '80%'; document.getElementById('RF').style.top = '55%';
-            document.getElementById('3B').style.left = '28%'; document.getElementById('3B').style.top = '76%';
-            document.getElementById('SS').style.left = '40%'; document.getElementById('SS').style.top = '70%';
-            document.getElementById('2B').style.left = '60%'; document.getElementById('2B').style.top = '70%';
-            document.getElementById('1B').style.left = '72%'; document.getElementById('1B').style.top = '76%';
+            document.getElementById('3B').style.left = '38%'; document.getElementById('3B').style.top = '66%';
+            document.getElementById('SS').style.left = '44%'; document.getElementById('SS').style.top = '62%';
+            document.getElementById('2B').style.left = '56%'; document.getElementById('2B').style.top = '62%';
+            document.getElementById('1B').style.left = '62%'; document.getElementById('1B').style.top = '66%';
+            document.getElementById('P').style.left = '50%'; document.getElementById('P').style.top = '72%';
+            document.getElementById('C').style.left = '50%'; document.getElementById('C').style.top = '88%';
+
+            // Hide and Reset Runners
+            const runners = ['runner-batter', 'runner-1st', 'runner-2nd', 'runner-3rd'];
+            runners.forEach(id => {
+                const el = document.getElementById(id);
+                el.style.transition = 'none';
+                el.style.opacity = '0';
+            });
         }
 
+        function animateRunners() {
+            // Batter runs Home -> 1st
+            const rBatter = document.getElementById('runner-batter');
+            rBatter.style.left = `${COORDS.HP.left}%`; rBatter.style.top = `${COORDS.HP.top}%`;
+            rBatter.style.opacity = '1';
+            
+            setTimeout(() => {
+                rBatter.style.transition = "all 4s linear";
+                rBatter.style.left = `${COORDS.B1.left}%`; rBatter.style.top = `${COORDS.B1.top}%`;
+            }, 50);
+
+            // Advance existing runners
+            if (currentBasesState.first) {
+                const r1 = document.getElementById('runner-1st');
+                r1.style.left = `${COORDS.B1.left}%`; r1.style.top = `${COORDS.B1.top}%`;
+                r1.style.opacity = '1';
+                setTimeout(() => {
+                    r1.style.transition = "all 4s linear";
+                    r1.style.left = `${COORDS.B2.left}%`; r1.style.top = `${COORDS.B2.top}%`;
+                }, 50);
+            }
+            if (currentBasesState.second) {
+                const r2 = document.getElementById('runner-2nd');
+                r2.style.left = `${COORDS.B2.left}%`; r2.style.top = `${COORDS.B2.top}%`;
+                r2.style.opacity = '1';
+                setTimeout(() => {
+                    r2.style.transition = "all 4s linear";
+                    r2.style.left = `${COORDS.B3.left}%`; r2.style.top = `${COORDS.B3.top}%`;
+                }, 50);
+            }
+            if (currentBasesState.third) {
+                const r3 = document.getElementById('runner-3rd');
+                r3.style.left = `${COORDS.B3.left}%`; r3.style.top = `${COORDS.B3.top}%`;
+                r3.style.opacity = '1';
+                setTimeout(() => {
+                    r3.style.transition = "all 4s linear";
+                    r3.style.left = `${COORDS.HP.left}%`; r3.style.top = `${COORDS.HP.top}%`;
+                }, 50);
+            }
+        }
+
+        // --- PHASE 2: PHYSICS & THROWING ANIMATION ---
         function simulateHit(hitX, hitY, eventText) {
             pView.style.opacity = "0";
             fView.style.opacity = "1";
             szOverlay.style.opacity = "0";
             batterContainer.style.opacity = "0"; 
+
+            // Trigger runners!
+            animateRunners();
 
             const isGrounder = eventText.includes('GROUND');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('HOME RUN');
@@ -314,20 +370,22 @@
                 targetTop = 40 + ((hitY - 20) / 180) * 45; 
             }
 
+            // Determine closest fielder
             let closestFielder = 'CF';
-            if (targetTop > 65) { 
-                if (targetLeft < 34) closestFielder = '3B';
+            if (targetTop > 60) { 
+                if (targetLeft < 41) closestFielder = '3B';
                 else if (targetLeft < 50) closestFielder = 'SS';
-                else if (targetLeft < 66) closestFielder = '2B';
+                else if (targetLeft < 59) closestFielder = '2B';
                 else closestFielder = '1B';
             } else { 
                 if (targetLeft < 38) closestFielder = 'LF';
                 else if (targetLeft > 62) closestFielder = 'RF';
             }
 
+            // Move fielder to the ball
             setTimeout(() => {
                 let fielderTop = targetTop;
-                if (!isOut && isGrounder && targetTop > 65) fielderTop -= 3; 
+                if (!isOut && isGrounder && targetTop > 60) fielderTop -= 3; // Miss ball on base hit
                 document.getElementById(closestFielder).style.top = `${fielderTop}%`;
                 document.getElementById(closestFielder).style.left = `${targetLeft}%`;
             }, 100); 
@@ -336,6 +394,7 @@
             if (isFly) arriveTime = 1500;
             if (isGrounder) arriveTime = 2000;
 
+            // Animate the hit
             setTimeout(() => {
                 if (isFly) {
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
@@ -368,18 +427,21 @@
                 }
             }, 50);
 
+            // THE THROWING PHASE
             setTimeout(() => {
-                let throwTargetTop = 68;  
-                let throwTargetLeft = 50; 
+                let throwTargetTop = COORDS.B2.top;  
+                let throwTargetLeft = COORDS.B2.left; 
                 let receivingFielder = 'SS';
 
+                // Ground out logic (Throw to 1st base bag)
                 if (isGrounder && isOut) {
-                    throwTargetTop = 78; 
-                    throwTargetLeft = 72;
+                    throwTargetTop = COORDS.B1.top; 
+                    throwTargetLeft = COORDS.B1.left;
                     receivingFielder = '1B';
                 }
 
                 if (closestFielder === receivingFielder && isGrounder && isOut) {
+                    // Unassisted groundout
                     document.getElementById(closestFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(closestFielder).style.left = `${throwTargetLeft}%`;
                     setTimeout(() => {
@@ -388,9 +450,11 @@
                         ball.style.left = `${throwTargetLeft}%`;
                     }, 100);
                 } else {
+                    // Send receiver to the physical bag
                     document.getElementById(receivingFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(receivingFielder).style.left = `${throwTargetLeft}%`;
                     
+                    // Throw the ball to the bag
                     setTimeout(() => {
                         ball.style.transition = "all 0.5s linear";
                         ball.style.top = `${throwTargetTop}%`;
@@ -399,10 +463,11 @@
                 }
             }, arriveTime + 50);
 
+            // Cleanup
             setTimeout(() => {
                 ball.style.opacity = "0";
-                resetFielders();
-            }, arriveTime + 1500); 
+                resetFieldersAndRunners();
+            }, arriveTime + 2000); // Give enough time for throw and run to finish
         }
 
         // --- PHASE 1: PITCHING ANIMATION ---
@@ -414,13 +479,11 @@
             batterContainer.style.opacity = "1";
             batterContainer.className = ''; 
 
-            // FIX: Pitcher's POV mirroring.
-            // Lefties stand on the 1B side (pitcher's left). Righties stand on 3B side (pitcher's right).
             if (batSide === "L") {
-                batterContainer.style.left = "36%"; // 1B side
+                batterContainer.style.left = "36%"; 
                 document.getElementById('bat').style.transform = "rotate(-30deg)";
             } else {
-                batterContainer.style.left = "62%"; // 3B side
+                batterContainer.style.left = "62%"; 
                 document.getElementById('bat').style.transform = "rotate(30deg)";
             }
 
@@ -472,6 +535,11 @@
         db.ref(`mlb_live_games/${GAME_PK}`).on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
+
+            // Keep track of current bases for running logic
+            if (data.bases) {
+                currentBasesState = data.bases;
+            }
 
             if (data.timestamp !== lastTimestamp) {
                 const eventText = data.last_event.toUpperCase();
