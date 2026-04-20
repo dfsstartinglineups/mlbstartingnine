@@ -76,19 +76,21 @@
         }
         .zone-cell { border: 1px solid rgba(0, 255, 255, 0.2); }
 
-        /* --- FIELDERS (DROPPED DOWN INTO THE ACTUAL FIELD) --- */
+        /* --- FIELDERS --- */
         .fielder {
             width: 14px;
             height: 14px;
             position: absolute;
             z-index: 3;
-            transition: all 0.5s ease-out; 
+            /* SLOWED DOWN: Fielders now take 1.5s to reach the ball */
+            transition: all 1.5s ease-out; 
             transform: translate(-50%, -50%);
             border: 2px solid var(--arcade-white);
         }
-        #LF { background-color: #0f0; left: 20%; top: 52%; }
-        #CF { background-color: #0f0; left: 50%; top: 45%; }
-        #RF { background-color: #0f0; left: 80%; top: 52%; }
+        /* OUTFIELDERS LOWERED INTO THE GRASS */
+        #LF { background-color: #0f0; left: 20%; top: 55%; }
+        #CF { background-color: #0f0; left: 50%; top: 50%; }
+        #RF { background-color: #0f0; left: 80%; top: 55%; }
         #3B { background-color: var(--arcade-blue); left: 32%; top: 72%; }
         #SS { background-color: var(--arcade-blue); left: 42%; top: 68%; }
         #2B { background-color: var(--arcade-blue); left: 58%; top: 68%; }
@@ -103,7 +105,7 @@
             height: 12px;
             z-index: 5;
             opacity: 0;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(1);
         }
 
         /* --- UI OVERLAY --- */
@@ -240,72 +242,119 @@
         let lastTimestamp = null;
 
         function resetFielders() {
-            document.getElementById('LF').style.left = '20%'; document.getElementById('LF').style.top = '52%';
-            document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '45%';
-            document.getElementById('RF').style.left = '80%'; document.getElementById('RF').style.top = '52%';
+            document.getElementById('LF').style.left = '20%'; document.getElementById('LF').style.top = '55%';
+            document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '50%';
+            document.getElementById('RF').style.left = '80%'; document.getElementById('RF').style.top = '55%';
             document.getElementById('3B').style.left = '32%'; document.getElementById('3B').style.top = '72%';
             document.getElementById('SS').style.left = '42%'; document.getElementById('SS').style.top = '68%';
             document.getElementById('2B').style.left = '58%'; document.getElementById('2B').style.top = '68%';
             document.getElementById('1B').style.left = '68%'; document.getElementById('1B').style.top = '72%';
         }
 
-        // --- PHASE 2: TRUE MLB FIELDING COORDINATES ---
-        function simulateHit(hitX, hitY) {
+        // --- PHASE 2: PHYSICS-BASED HIT ANIMATION ---
+        function simulateHit(hitX, hitY, eventText) {
             pView.style.opacity = "0";
             fView.style.opacity = "1";
             szOverlay.style.opacity = "0";
 
-            // Snap ball to home plate in wide view
+            // Determine what type of play this is based on API text
+            const isGrounder = eventText.includes('GROUND');
+            const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('HOME RUN');
+            const isOut = eventText.includes('OUT');
+
+            // Reset ball position
             ball.style.transition = "none";
             ball.style.top = "85%"; 
             ball.style.left = "50%";
+            ball.style.transform = "translate(-50%, -50%) scale(1)";
 
-            // Map API coordX (0 to 250) to CSS Left (10% to 90%)
-            // Map API coordY (20 to 200) to CSS Top (40% to 85%)
             let targetLeft = 50;
-            let targetTop = 60; // Defaults if API is missing
+            let targetTop = 60; 
 
             if (hitX !== null && hitX !== undefined && hitY !== null && hitY !== undefined) {
                 targetLeft = (hitX / 250) * 100;
-                
-                // Y-axis logic: Smaller Y is deeper center field. 
-                // We map Y=20 to Top=40%, and Y=200 to Top=85%
                 targetTop = 40 + ((hitY - 20) / 180) * 45; 
             }
 
+            // Determine which fielder is closest
+            let closestFielder = 'CF';
+            if (targetTop > 65) { 
+                if (targetLeft < 38) closestFielder = '3B';
+                else if (targetLeft < 50) closestFielder = 'SS';
+                else if (targetLeft < 62) closestFielder = '2B';
+                else closestFielder = '1B';
+            } else { 
+                if (targetLeft < 38) closestFielder = 'LF';
+                else if (targetLeft > 62) closestFielder = 'RF';
+            }
+
+            // Start Fielder moving to the ball
             setTimeout(() => {
-                // Ball flies to the exact MLB coordinate!
-                ball.style.transition = "all 1s cubic-bezier(0.25, 1, 0.5, 1)";
-                ball.style.top = `${targetTop}%`;
-                ball.style.left = `${targetLeft}%`;
-
-                // Move the closest fielder
-                let closestFielder = 'CF';
-                if (targetTop > 65) { 
-                    if (targetLeft < 38) closestFielder = '3B';
-                    else if (targetLeft < 50) closestFielder = 'SS';
-                    else if (targetLeft < 62) closestFielder = '2B';
-                    else closestFielder = '1B';
-                } else { 
-                    if (targetLeft < 38) closestFielder = 'LF';
-                    else if (targetLeft > 62) closestFielder = 'RF';
+                let fielderTop = targetTop;
+                // If it is a base hit past the infielder, make them miss the ball slightly
+                if (!isOut && isGrounder && targetTop > 65) {
+                    fielderTop -= 3; 
                 }
+                document.getElementById(closestFielder).style.top = `${fielderTop}%`;
+                document.getElementById(closestFielder).style.left = `${targetLeft}%`;
+            }, 100); 
 
-                setTimeout(() => {
-                    document.getElementById(closestFielder).style.top = `${targetTop}%`;
-                    document.getElementById(closestFielder).style.left = `${targetLeft}%`;
-                }, 100); 
+            // Execute Hit Physics
+            setTimeout(() => {
+                if (isFly) {
+                    // Fly Ball Physics: Huge arc, slow hang time
+                    const apexLeft = 50 + (targetLeft - 50) * 0.5;
+                    const apexTop = targetTop - 25; // Goes up high into the sky
+
+                    // Launch up
+                    ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
+                    ball.style.top = `${apexTop}%`;
+                    ball.style.left = `${apexLeft}%`;
+                    ball.style.transform = "translate(-50%, -50%) scale(2.5)"; // Ball gets bigger
+
+                    // Fall down into glove/grass
+                    setTimeout(() => {
+                        ball.style.transition = "all 1.5s cubic-bezier(0.5, 0, 0.75, 0)";
+                        ball.style.top = `${targetTop}%`;
+                        ball.style.left = `${targetLeft}%`;
+                        ball.style.transform = "translate(-50%, -50%) scale(1)"; // Back to normal size
+                    }, 1500);
+
+                } else if (isGrounder) {
+                    // Ground Ball Physics: Fast initial bounce, slow roll
+                    const midLeft = 50 + (targetLeft - 50) * 0.4;
+                    const midTop = 85 + (targetTop - 85) * 0.4; // Bounces 40% of the way there
+
+                    // Fast hop
+                    ball.style.transition = "all 0.6s ease-out";
+                    ball.style.top = `${midTop}%`;
+                    ball.style.left = `${midLeft}%`;
+
+                    // Slow roll to fielder
+                    setTimeout(() => {
+                        ball.style.transition = "all 1.4s ease-out"; 
+                        ball.style.top = `${targetTop}%`;
+                        ball.style.left = `${targetLeft}%`;
+                    }, 600);
+
+                } else {
+                    // Line Drive Physics: Fast and straight
+                    ball.style.transition = "all 1.2s linear";
+                    ball.style.top = `${targetTop}%`;
+                    ball.style.left = `${targetLeft}%`;
+                }
 
             }, 50);
 
+            // Cleanup
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFielders();
-            }, 3000); 
+            }, 4000); // Gives enough time for the longest fly ball to finish
         }
 
         // --- PHASE 1: PITCHING ANIMATION ---
-        function runPitchAnimation(isInPlay, pX, pZ, hitX, hitY) {
+        function runPitchAnimation(isInPlay, pX, pZ, hitX, hitY, eventText) {
             pView.style.opacity = "1";
             fView.style.opacity = "0";
             szOverlay.style.opacity = "1";
@@ -316,6 +365,7 @@
             ball.style.left = "50%";
             ball.style.width = "16px";
             ball.style.height = "16px";
+            ball.style.transform = "translate(-50%, -50%) scale(1)";
 
             let targetLeft = 50; 
             let targetTop = 58;  
@@ -333,7 +383,7 @@
                 
                 if (isInPlay) {
                     setTimeout(() => {
-                        simulateHit(hitX, hitY); // Pass true hit coords
+                        simulateHit(hitX, hitY, eventText); 
                     }, 400); 
                 } else {
                     setTimeout(() => {
@@ -350,13 +400,15 @@
             if (!data) return;
 
             if (data.timestamp !== lastTimestamp) {
-                const inPlay = data.last_event.toUpperCase().includes("IN PLAY");
+                const eventText = data.last_event.toUpperCase();
+                const inPlay = eventText.includes("IN PLAY") || eventText.includes("OUT") || eventText.includes("SINGLE") || eventText.includes("DOUBLE") || eventText.includes("HOME RUN") || eventText.includes("TRIPLE") || eventText.includes("ERROR") || eventText.includes("FIELDERS CHOICE");
+                
                 const pX = data.pitch_location ? data.pitch_location.pX : null;
                 const pZ = data.pitch_location ? data.pitch_location.pZ : null;
                 const hitX = data.hit_location ? data.hit_location.x : null;
                 const hitY = data.hit_location ? data.hit_location.y : null;
                 
-                runPitchAnimation(inPlay, pX, pZ, hitX, hitY);
+                runPitchAnimation(inPlay, pX, pZ, hitX, hitY, eventText);
                 lastTimestamp = data.timestamp;
             }
 
