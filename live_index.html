@@ -225,7 +225,6 @@
 
             const isHomeRun = eventText.includes('HOME RUN');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('LIN') && !isHomeRun;
-            // Safer Out Detection (prevents logic from treating "Strikeout" as a fieldable play)
             const isStrikeout = eventText.includes('STRIKEOUT');
             const isOut = eventText.includes('OUT') && !isStrikeout; 
             const isGrounder = eventText.includes('GROUND') || (!isFly && !isHomeRun && !eventText.includes('STRIKE'));
@@ -442,7 +441,12 @@
                 const isStrikeout = eventText.includes("STRIKEOUT");
                 const isWalk = eventText.includes("WALK");
                 
-                // Excludes Strikeouts, Pickoffs, and Caught Stealing from "In Play" animation triggers
+                // FIXED: Extract variables FIRST
+                const pX = data.pitch_location ? data.pitch_location.pX : null;
+                const pZ = data.pitch_location ? data.pitch_location.pZ : null;
+                const hitX = data.hit_location ? data.hit_location.x : null;
+                const hitY = data.hit_location ? data.hit_location.y : null;
+                
                 const inPlay = (hitX !== null && hitY !== null) || 
                                eventText.includes("SINGLE") || 
                                eventText.includes("DOUBLE") || 
@@ -451,10 +455,6 @@
                                eventText.includes("ERROR") || 
                                (eventText.includes("OUT") && !isStrikeout && !eventText.includes("CAUGHT") && !eventText.includes("PICKOFF"));
 
-                const pX = data.pitch_location ? data.pitch_location.pX : null;
-                const pZ = data.pitch_location ? data.pitch_location.pZ : null;
-                const hitX = data.hit_location ? data.hit_location.x : null;
-                const hitY = data.hit_location ? data.hit_location.y : null;
                 const batSide = data.matchup && data.matchup.bat_side ? data.matchup.bat_side : "R";
                 
                 runPitchAnimation(inPlay, pX, pZ, hitX, hitY, eventText, batSide, isWalk);
