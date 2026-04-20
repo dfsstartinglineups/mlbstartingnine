@@ -81,7 +81,6 @@
         #batter-container {
             position: absolute;
             top: 50%; 
-            /* Defaults to left side for Right-Handed Batter */
             left: 36%; 
             width: 30px;
             height: 60px;
@@ -113,17 +112,13 @@
             top: 20px;
             left: 13px;
             transform-origin: top center;
-            /* Resting position pointing up and back */
             transform: rotate(-30deg); 
-            transition: transform 0.08s linear; /* Very fast swing */
+            transition: transform 0.08s linear; 
             z-index: 5;
             border: 1px solid black;
         }
-
-        /* Swing Classes applied via JS */
         .swing-righty #bat { transform: rotate(110deg); }
         .swing-lefty #bat { transform: rotate(-110deg); }
-
 
         /* --- FIELDERS --- */
         .fielder {
@@ -135,13 +130,14 @@
             transform: translate(-50%, -50%);
             border: 2px solid var(--arcade-white);
         }
+        /* RE-MAPPED TO MATCH THE PROVIDED INFIELD SCREENSHOT */
         #LF { background-color: #0f0; left: 20%; top: 55%; }
         #CF { background-color: #0f0; left: 50%; top: 50%; }
         #RF { background-color: #0f0; left: 80%; top: 55%; }
-        #3B { background-color: var(--arcade-blue); left: 32%; top: 72%; }
-        #SS { background-color: var(--arcade-blue); left: 42%; top: 68%; }
-        #2B { background-color: var(--arcade-blue); left: 58%; top: 68%; }
-        #1B { background-color: var(--arcade-blue); left: 68%; top: 72%; }
+        #3B { background-color: var(--arcade-blue); left: 28%; top: 76%; }
+        #SS { background-color: var(--arcade-blue); left: 40%; top: 70%; }
+        #2B { background-color: var(--arcade-blue); left: 60%; top: 70%; }
+        #1B { background-color: var(--arcade-blue); left: 72%; top: 76%; }
 
         /* --- THE BALL --- */
         #baseball {
@@ -163,7 +159,6 @@
             z-index: 10;
             pointer-events: none;
         }
-
         #scoreboard {
             background-color: rgba(0, 0, 168, 0.9);
             border: 4px solid var(--arcade-white);
@@ -179,7 +174,6 @@
         }
         .score-box { text-align: center; font-size: 14px; }
         .big-num { color: var(--arcade-yellow); font-size: 24px; display: block; margin-top: 5px; }
-
         #matchup-card {
             position: absolute;
             bottom: 70px;
@@ -191,7 +185,6 @@
             line-height: 2;
             min-width: 200px; 
         }
-
         #bases-diamond {
             position: absolute;
             bottom: 80px;
@@ -212,7 +205,6 @@
         #b1 { top: 0; right: 0; }
         #hp { bottom: 0; right: 0; background: var(--arcade-white); }
         #b3 { bottom: 0; left: 0; }
-
         #ticker {
             position: absolute;
             bottom: 0;
@@ -231,15 +223,12 @@
 <body>
 
     <div id="game-container">
-        
         <div id="pitching-view" class="camera">
-            
             <div id="batter-container">
                 <div id="bat"></div>
                 <div id="batter-head"></div>
                 <div id="batter-body"></div>
             </div>
-
             <div id="strike-zone-overlay">
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
@@ -269,17 +258,14 @@
                 </div>
                 <div class="score-box"><span id="home-team">HOM</span><span id="home-pts" class="big-num">0</span></div>
             </div>
-
             <div id="matchup-card">
                 P: <span id="p-name" style="color: var(--arcade-yellow);">---</span><br>
                 B: <span id="b-name" style="color: var(--arcade-yellow);">---</span>
             </div>
-
             <div id="bases-diamond">
                 <div id="b2" class="base"></div><div id="b3" class="base"></div>
                 <div id="b1" class="base"></div><div id="hp" class="base"></div>
             </div>
-
             <div id="ticker">> <span id="event-text">CONNECTING...</span></div>
         </div>
     </div>
@@ -301,19 +287,18 @@
             document.getElementById('LF').style.left = '20%'; document.getElementById('LF').style.top = '55%';
             document.getElementById('CF').style.left = '50%'; document.getElementById('CF').style.top = '50%';
             document.getElementById('RF').style.left = '80%'; document.getElementById('RF').style.top = '55%';
-            document.getElementById('3B').style.left = '32%'; document.getElementById('3B').style.top = '72%';
-            document.getElementById('SS').style.left = '42%'; document.getElementById('SS').style.top = '68%';
-            document.getElementById('2B').style.left = '58%'; document.getElementById('2B').style.top = '68%';
-            document.getElementById('1B').style.left = '68%'; document.getElementById('1B').style.top = '72%';
+            document.getElementById('3B').style.left = '28%'; document.getElementById('3B').style.top = '76%';
+            document.getElementById('SS').style.left = '40%'; document.getElementById('SS').style.top = '70%';
+            document.getElementById('2B').style.left = '60%'; document.getElementById('2B').style.top = '70%';
+            document.getElementById('1B').style.left = '72%'; document.getElementById('1B').style.top = '76%';
         }
 
-        // --- PHASE 2: PHYSICS-BASED HIT ANIMATION ---
+        // --- PHASE 2: PHYSICS & THROWING ANIMATION ---
         function simulateHit(hitX, hitY, eventText) {
             pView.style.opacity = "0";
             fView.style.opacity = "1";
             szOverlay.style.opacity = "0";
-            
-            batterContainer.style.opacity = "0"; // Hide batter during fielding
+            batterContainer.style.opacity = "0"; 
 
             const isGrounder = eventText.includes('GROUND');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('HOME RUN');
@@ -326,63 +311,62 @@
 
             let targetLeft = 50;
             let targetTop = 60; 
-
             if (hitX !== null && hitX !== undefined && hitY !== null && hitY !== undefined) {
                 targetLeft = (hitX / 250) * 100;
                 targetTop = 40 + ((hitY - 20) / 180) * 45; 
             }
 
+            // Who gets the ball?
             let closestFielder = 'CF';
             if (targetTop > 65) { 
-                if (targetLeft < 38) closestFielder = '3B';
+                if (targetLeft < 34) closestFielder = '3B';
                 else if (targetLeft < 50) closestFielder = 'SS';
-                else if (targetLeft < 62) closestFielder = '2B';
+                else if (targetLeft < 66) closestFielder = '2B';
                 else closestFielder = '1B';
             } else { 
                 if (targetLeft < 38) closestFielder = 'LF';
                 else if (targetLeft > 62) closestFielder = 'RF';
             }
 
+            // Move fielder to the ball
             setTimeout(() => {
                 let fielderTop = targetTop;
-                if (!isOut && isGrounder && targetTop > 65) {
-                    fielderTop -= 3; 
-                }
+                if (!isOut && isGrounder && targetTop > 65) fielderTop -= 3; 
                 document.getElementById(closestFielder).style.top = `${fielderTop}%`;
                 document.getElementById(closestFielder).style.left = `${targetLeft}%`;
             }, 100); 
 
+            // Calculate when the ball arrives in the glove
+            let arriveTime = 1200; // Line drive
+            if (isFly) arriveTime = 1500;
+            if (isGrounder) arriveTime = 2000;
+
+            // Animate the hit
             setTimeout(() => {
                 if (isFly) {
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
                     const apexTop = targetTop - 25; 
-
                     ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
                     ball.style.top = `${apexTop}%`;
                     ball.style.left = `${apexLeft}%`;
                     ball.style.transform = "translate(-50%, -50%) scale(2.5)"; 
-
                     setTimeout(() => {
                         ball.style.transition = "all 1.5s cubic-bezier(0.5, 0, 0.75, 0)";
                         ball.style.top = `${targetTop}%`;
                         ball.style.left = `${targetLeft}%`;
                         ball.style.transform = "translate(-50%, -50%) scale(1)"; 
                     }, 1500);
-
                 } else if (isGrounder) {
                     const midLeft = 50 + (targetLeft - 50) * 0.4;
                     const midTop = 85 + (targetTop - 85) * 0.4; 
-
                     ball.style.transition = "all 0.6s ease-out";
                     ball.style.top = `${midTop}%`;
                     ball.style.left = `${midLeft}%`;
-
                     setTimeout(() => {
                         ball.style.transition = "all 1.4s ease-out"; 
                         ball.style.top = `${targetTop}%`;
                         ball.style.left = `${targetLeft}%`;
                     }, 600);
-
                 } else {
                     ball.style.transition = "all 1.2s linear";
                     ball.style.top = `${targetTop}%`;
@@ -390,10 +374,47 @@
                 }
             }, 50);
 
+            // THE THROWING PHASE
+            setTimeout(() => {
+                let throwTargetTop = 68;  // Default: throw back to 2nd Base area
+                let throwTargetLeft = 50; 
+                let receivingFielder = 'SS';
+
+                // Ground out logic (Throw to 1st base bag)
+                if (isGrounder && isOut) {
+                    throwTargetTop = 78; 
+                    throwTargetLeft = 72;
+                    receivingFielder = '1B';
+                }
+
+                // If the fielder who caught it is the same one supposed to receive it (e.g. 1B unassisted grounder)
+                if (closestFielder === receivingFielder && isGrounder && isOut) {
+                    document.getElementById(closestFielder).style.top = `${throwTargetTop}%`;
+                    document.getElementById(closestFielder).style.left = `${throwTargetLeft}%`;
+                    setTimeout(() => {
+                        ball.style.transition = "all 0.5s linear";
+                        ball.style.top = `${throwTargetTop}%`;
+                        ball.style.left = `${throwTargetLeft}%`;
+                    }, 100);
+                } else {
+                    // Move the receiver to the base
+                    document.getElementById(receivingFielder).style.top = `${throwTargetTop}%`;
+                    document.getElementById(receivingFielder).style.left = `${throwTargetLeft}%`;
+                    
+                    // Throw the ball after a brief transfer time in the glove
+                    setTimeout(() => {
+                        ball.style.transition = "all 0.5s linear";
+                        ball.style.top = `${throwTargetTop}%`;
+                        ball.style.left = `${throwTargetLeft}%`;
+                    }, 400);
+                }
+            }, arriveTime + 50);
+
+            // Cleanup extended to allow throw to complete
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFielders();
-            }, 4000); 
+            }, arriveTime + 1500); 
         }
 
         // --- PHASE 1: PITCHING ANIMATION ---
@@ -402,16 +423,14 @@
             fView.style.opacity = "0";
             szOverlay.style.opacity = "1";
             
-            // Make sure batter is visible and bat is resting
             batterContainer.style.opacity = "1";
             batterContainer.className = ''; 
 
-            // Position Batter based on handedness
             if (batSide === "L") {
-                batterContainer.style.left = "62%"; // Right side of screen for Lefty
-                document.getElementById('bat').style.transform = "rotate(30deg)"; // Rest on opposite shoulder
+                batterContainer.style.left = "62%"; 
+                document.getElementById('bat').style.transform = "rotate(30deg)";
             } else {
-                batterContainer.style.left = "36%"; // Left side of screen for Righty
+                batterContainer.style.left = "36%"; 
                 document.getElementById('bat').style.transform = "rotate(-30deg)";
             }
 
@@ -430,7 +449,6 @@
                 targetTop = 75 - (pZ * 7); 
             }
 
-            // Determine if a swing should happen
             const didSwing = eventText.includes("SWINGING") || eventText.includes("FOUL") || eventText.includes("IN PLAY") || eventText.includes("HIT") || eventText.includes("MISS");
 
             setTimeout(() => {
@@ -440,7 +458,6 @@
                 ball.style.width = "8px";
                 ball.style.height = "8px";
                 
-                // Swing timing: Trigger right before ball crosses plate
                 if (didSwing) {
                     setTimeout(() => {
                         batterContainer.classList.add(batSide === "L" ? "swing-lefty" : "swing-righty");
@@ -455,7 +472,7 @@
                     setTimeout(() => {
                         ball.style.opacity = "0";
                         szOverlay.style.opacity = "0";
-                        batterContainer.className = ''; // Reset swing
+                        batterContainer.className = ''; 
                     }, 1500);
                 }
             }, 50);
@@ -475,7 +492,6 @@
                 const hitX = data.hit_location ? data.hit_location.x : null;
                 const hitY = data.hit_location ? data.hit_location.y : null;
                 
-                // Pass bat side down into the function (default to R if missing)
                 const batSide = data.matchup && data.matchup.bat_side ? data.matchup.bat_side : "R";
                 
                 runPitchAnimation(inPlay, pX, pZ, hitX, hitY, eventText, batSide);
