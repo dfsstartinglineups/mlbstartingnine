@@ -174,7 +174,6 @@
             });
         }
 
-        // --- FIXED: RUNNER ANIMATION WITH RENDER DELAY ---
         function moveRunner(runnerId, currentIdx, basesToMove, timePerBase) {
             if (basesToMove <= 0) return;
             let nextIdx = currentIdx + 1;
@@ -182,7 +181,6 @@
 
             const el = document.getElementById(runnerId);
             
-            // Snap to start position if currently hidden
             if (el.style.opacity === '0' || el.style.opacity === '') {
                 el.style.transition = 'none';
                 el.style.left = `${COORDS[currentIdx].left}%`;
@@ -190,15 +188,13 @@
                 el.style.opacity = '1';
             }
 
-            // A tiny timeout forces the browser to draw the sprite at Home Plate 
-            // BEFORE triggering the transition to 1st Base
             setTimeout(() => {
                 el.style.transition = `all ${timePerBase}ms linear`;
                 el.style.left = `${COORDS[nextIdx].left}%`;
                 el.style.top = `${COORDS[nextIdx].top}%`;
 
                 setTimeout(() => {
-                    if (nextIdx === 4) el.style.opacity = '0'; // Hide when reaching home
+                    if (nextIdx === 4) el.style.opacity = '0'; 
                     moveRunner(runnerId, nextIdx, basesToMove - 1, timePerBase);
                 }, timePerBase);
             }, 50); 
@@ -228,7 +224,7 @@
             szOverlay.style.opacity = "0"; batterContainer.style.opacity = "0"; 
 
             const isHomeRun = eventText.includes('HOME RUN');
-            const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('LIN') || isHomeRun;
+            const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('LIN') && !isHomeRun;
             const isOut = eventText.includes('OUT');
             const isGrounder = eventText.includes('GROUND') || (!isFly && !isHomeRun && !eventText.includes('STRIKE'));
 
@@ -238,7 +234,7 @@
             else if (eventText.includes('DOUBLE')) basesToRun = 2;
             else if (eventText.includes('TRIPLE')) basesToRun = 3;
             else if (isHomeRun) basesToRun = 4;
-            else if (isOut && !isFly) basesToRun = 1; // Batter runs on groundouts!
+            else if (isOut && !isFly) basesToRun = 1; 
             else if (eventText.includes('ERROR') || eventText.includes('CHOICE')) basesToRun = 1;
 
             if (basesToRun > 0) moveRunner('runner-batter', 0, basesToRun, 1000);
@@ -250,7 +246,6 @@
             ball.style.transition = "none"; ball.style.top = "85%"; ball.style.left = "50%";
             ball.style.transform = "translate(-50%, -50%) scale(1)";
 
-            // FIXED: Map MLB coordX (0-250) into Fair Territory (20% to 80% screen width)
             let targetLeft = 50; let targetTop = 60; 
             if (hitX !== null && hitX !== undefined && hitY !== null && hitY !== undefined) {
                 targetLeft = 20 + (hitX / 250) * 60; 
@@ -270,9 +265,14 @@
                 else if (targetLeft > 62) closestFielder = 'RF';
             }
 
+            // Move fielder to the ball (with Warning Track logic for Home Runs)
             setTimeout(() => {
                 let fielderTop = targetTop;
-                if (!isOut && isGrounder && targetTop > 60) fielderTop -= 3; 
+                if (isHomeRun) {
+                    fielderTop = 50; // Force them to stop at the wall and look up!
+                } else if (!isOut && isGrounder && targetTop > 60) {
+                    fielderTop -= 3; // Let base hits roll past infielders slightly
+                }
                 document.getElementById(closestFielder).style.top = `${fielderTop}%`;
                 document.getElementById(closestFielder).style.left = `${targetLeft}%`;
             }, 100); 
@@ -281,8 +281,25 @@
             if (isFly || isHomeRun) arriveTime = 1500;
             if (isGrounder) arriveTime = 2000;
 
+            // NEW: Home Run Animation
             setTimeout(() => {
-                if (isFly || isHomeRun) {
+                if (isHomeRun) {
+                    const apexLeft = 50 + (targetLeft - 50) * 0.5;
+                    // Launch the ball WAY out of the screen (top: -10%) and make it huge
+                    ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
+                    ball.style.top = `-10%`; 
+                    ball.style.left = `${apexLeft}%`;
+                    ball.style.transform = "translate(-50%, -50%) scale(3)"; 
+                    setTimeout(() => {
+                        // Let it drop down into the bleachers and look tiny
+                        ball.style.transition = "all 1.5s ease-in";
+                        ball.style.top = `${targetTop}%`; 
+                        ball.style.left = `${targetLeft}%`;
+                        ball.style.transform = "translate(-50%, -50%) scale(0.5)"; 
+                    }, 1500);
+
+                } else if (isFly) {
+                    // Regular Fly Ball
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
                     ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
                     ball.style.top = `${targetTop - 25}%`; ball.style.left = `${apexLeft}%`;
@@ -309,25 +326,23 @@
 
             // 3. TARGETED THROWING PHASE
             setTimeout(() => {
-                if (isHomeRun) return; 
+                if (isHomeRun) return; // You don't throw the ball back on a homer!
 
                 let throwTargetTop = COORDS[2].top;  
                 let throwTargetLeft = COORDS[2].left; 
                 let receivingFielder = 'SS';
 
-                // FIXED: Throw Logic Priority
                 if (eventText.includes('DOUBLE PLAY')) {
-                    throwTargetTop = COORDS[2].top; throwTargetLeft = COORDS[2].left; receivingFielder = 'SS'; // Target 2B for DP
+                    throwTargetTop = COORDS[2].top; throwTargetLeft = COORDS[2].left; receivingFielder = 'SS'; 
                 } else if (eventText.includes('DOUBLE')) {
-                    throwTargetTop = COORDS[3].top; throwTargetLeft = COORDS[3].left; receivingFielder = '3B'; // Target 3B
+                    throwTargetTop = COORDS[3].top; throwTargetLeft = COORDS[3].left; receivingFielder = '3B'; 
                 } else if (eventText.includes('TRIPLE')) {
-                    throwTargetTop = COORDS[0].top; throwTargetLeft = COORDS[0].left; receivingFielder = 'C';  // Target Home
+                    throwTargetTop = COORDS[0].top; throwTargetLeft = COORDS[0].left; receivingFielder = 'C';  
                 } else if (isOut && !isFly) {
-                    throwTargetTop = COORDS[1].top; throwTargetLeft = COORDS[1].left; receivingFielder = '1B'; // Target 1st for Groundout
+                    throwTargetTop = COORDS[1].top; throwTargetLeft = COORDS[1].left; receivingFielder = '1B'; 
                 }
 
                 if (closestFielder === receivingFielder && isOut && !isFly) {
-                    // Fielder takes it to the bag themselves
                     document.getElementById(closestFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(closestFielder).style.left = `${throwTargetLeft}%`;
                     setTimeout(() => {
@@ -335,7 +350,6 @@
                         ball.style.top = `${throwTargetTop}%`; ball.style.left = `${throwTargetLeft}%`;
                     }, 100);
                 } else {
-                    // Throw the ball
                     document.getElementById(receivingFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(receivingFielder).style.left = `${throwTargetLeft}%`;
                     setTimeout(() => {
@@ -345,11 +359,14 @@
                 }
             }, arriveTime + 50);
 
+            // Longer camera delay for HRs so the runner can reach home!
+            const cleanupDelay = isHomeRun ? 4500 : arriveTime + 2500;
+
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFieldersAndRunners();
                 pView.style.opacity = "1"; fView.style.opacity = "0"; 
-            }, arriveTime + 2500); 
+            }, cleanupDelay); 
         }
 
         // --- PITCHING ANIMATION ---
