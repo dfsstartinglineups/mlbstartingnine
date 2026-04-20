@@ -174,7 +174,7 @@
             });
         }
 
-        // --- NEW: DYNAMIC BASE RUNNING ---
+        // --- FIXED: RUNNER ANIMATION WITH RENDER DELAY ---
         function moveRunner(runnerId, currentIdx, basesToMove, timePerBase) {
             if (basesToMove <= 0) return;
             let nextIdx = currentIdx + 1;
@@ -188,24 +188,26 @@
                 el.style.left = `${COORDS[currentIdx].left}%`;
                 el.style.top = `${COORDS[currentIdx].top}%`;
                 el.style.opacity = '1';
-                void el.offsetWidth; // Force CSS reflow
             }
 
-            el.style.transition = `all ${timePerBase}ms linear`;
-            el.style.left = `${COORDS[nextIdx].left}%`;
-            el.style.top = `${COORDS[nextIdx].top}%`;
-
+            // A tiny timeout forces the browser to draw the sprite at Home Plate 
+            // BEFORE triggering the transition to 1st Base
             setTimeout(() => {
-                if (nextIdx === 4) el.style.opacity = '0'; // Hide when reaching home
-                moveRunner(runnerId, nextIdx, basesToMove - 1, timePerBase);
-            }, timePerBase);
+                el.style.transition = `all ${timePerBase}ms linear`;
+                el.style.left = `${COORDS[nextIdx].left}%`;
+                el.style.top = `${COORDS[nextIdx].top}%`;
+
+                setTimeout(() => {
+                    if (nextIdx === 4) el.style.opacity = '0'; // Hide when reaching home
+                    moveRunner(runnerId, nextIdx, basesToMove - 1, timePerBase);
+                }, timePerBase);
+            }, 50); 
         }
 
         function simulateWalk() {
             pView.style.opacity = "0"; fView.style.opacity = "1";
             szOverlay.style.opacity = "0"; batterContainer.style.opacity = "0"; 
 
-            // Calculate Forced Runners
             let force1 = currentBasesState.first;
             let force2 = force1 && currentBasesState.second;
             let force3 = force2 && currentBasesState.third;
@@ -225,35 +227,38 @@
             pView.style.opacity = "0"; fView.style.opacity = "1";
             szOverlay.style.opacity = "0"; batterContainer.style.opacity = "0"; 
 
-            const isGrounder = eventText.includes('GROUND');
-            const isFly = eventText.includes('FLY') || eventText.includes('POP');
-            const isOut = eventText.includes('OUT');
             const isHomeRun = eventText.includes('HOME RUN');
+            const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('LIN') || isHomeRun;
+            const isOut = eventText.includes('OUT');
+            const isGrounder = eventText.includes('GROUND') || (!isFly && !isHomeRun && !eventText.includes('STRIKE'));
 
-            // 1. DETERMINE BASES TO RUN
+            // 1. RUN THE BASES
             let basesToRun = 0;
             if (eventText.includes('SINGLE')) basesToRun = 1;
             else if (eventText.includes('DOUBLE')) basesToRun = 2;
             else if (eventText.includes('TRIPLE')) basesToRun = 3;
             else if (isHomeRun) basesToRun = 4;
-            else if (isGrounder || eventText.includes('ERROR') || eventText.includes('CHOICE')) basesToRun = 1;
+            else if (isOut && !isFly) basesToRun = 1; // Batter runs on groundouts!
+            else if (eventText.includes('ERROR') || eventText.includes('CHOICE')) basesToRun = 1;
 
             if (basesToRun > 0) moveRunner('runner-batter', 0, basesToRun, 1000);
             if (currentBasesState.first) moveRunner('runner-1st', 1, basesToRun, 1000);
             if (currentBasesState.second) moveRunner('runner-2nd', 2, basesToRun, 1000);
             if (currentBasesState.third) moveRunner('runner-3rd', 3, basesToRun, 1000);
 
-            // 2. BALL PHYSICS
+            // 2. BALL PHYSICS & TRAJECTORY
             ball.style.transition = "none"; ball.style.top = "85%"; ball.style.left = "50%";
             ball.style.transform = "translate(-50%, -50%) scale(1)";
 
+            // FIXED: Map MLB coordX (0-250) into Fair Territory (20% to 80% screen width)
             let targetLeft = 50; let targetTop = 60; 
             if (hitX !== null && hitX !== undefined && hitY !== null && hitY !== undefined) {
-                targetLeft = (hitX / 250) * 100;
+                targetLeft = 20 + (hitX / 250) * 60; 
                 targetTop = 40 + ((hitY - 20) / 180) * 45; 
             }
-            if (isHomeRun) targetTop = 25; // Force over the wall
+            if (isHomeRun) targetTop = 25; 
 
+            // Who gets the ball?
             let closestFielder = 'CF';
             if (targetTop > 60) { 
                 if (targetLeft < 41) closestFielder = '3B';
@@ -304,21 +309,25 @@
 
             // 3. TARGETED THROWING PHASE
             setTimeout(() => {
-                if (isHomeRun) return; // Skip throwing on homers
+                if (isHomeRun) return; 
 
                 let throwTargetTop = COORDS[2].top;  
                 let throwTargetLeft = COORDS[2].left; 
                 let receivingFielder = 'SS';
 
-                if (eventText.includes('DOUBLE')) {
-                    throwTargetTop = COORDS[3].top; throwTargetLeft = COORDS[3].left; receivingFielder = '3B';
+                // FIXED: Throw Logic Priority
+                if (eventText.includes('DOUBLE PLAY')) {
+                    throwTargetTop = COORDS[2].top; throwTargetLeft = COORDS[2].left; receivingFielder = 'SS'; // Target 2B for DP
+                } else if (eventText.includes('DOUBLE')) {
+                    throwTargetTop = COORDS[3].top; throwTargetLeft = COORDS[3].left; receivingFielder = '3B'; // Target 3B
                 } else if (eventText.includes('TRIPLE')) {
-                    throwTargetTop = COORDS[0].top; throwTargetLeft = COORDS[0].left; receivingFielder = 'C';
-                } else if (isGrounder && isOut) {
-                    throwTargetTop = COORDS[1].top; throwTargetLeft = COORDS[1].left; receivingFielder = '1B';
+                    throwTargetTop = COORDS[0].top; throwTargetLeft = COORDS[0].left; receivingFielder = 'C';  // Target Home
+                } else if (isOut && !isFly) {
+                    throwTargetTop = COORDS[1].top; throwTargetLeft = COORDS[1].left; receivingFielder = '1B'; // Target 1st for Groundout
                 }
 
-                if (closestFielder === receivingFielder && isGrounder && isOut) {
+                if (closestFielder === receivingFielder && isOut && !isFly) {
+                    // Fielder takes it to the bag themselves
                     document.getElementById(closestFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(closestFielder).style.left = `${throwTargetLeft}%`;
                     setTimeout(() => {
@@ -326,6 +335,7 @@
                         ball.style.top = `${throwTargetTop}%`; ball.style.left = `${throwTargetLeft}%`;
                     }, 100);
                 } else {
+                    // Throw the ball
                     document.getElementById(receivingFielder).style.top = `${throwTargetTop}%`;
                     document.getElementById(receivingFielder).style.left = `${throwTargetLeft}%`;
                     setTimeout(() => {
@@ -338,7 +348,7 @@
             setTimeout(() => {
                 ball.style.opacity = "0";
                 resetFieldersAndRunners();
-                pView.style.opacity = "1"; fView.style.opacity = "0"; // Reset Camera
+                pView.style.opacity = "1"; fView.style.opacity = "0"; 
             }, arriveTime + 2500); 
         }
 
@@ -386,7 +396,7 @@
             }, 50);
         }
 
-        // --- UPDATE UI FUNCTION (Delayed to prevent spoiling!) ---
+        // --- UPDATE UI FUNCTION ---
         function updateUI(data) {
             if (data.teams) {
                 document.getElementById('away-team').innerText = data.teams.away.toUpperCase();
@@ -411,7 +421,6 @@
             const data = snapshot.val();
             if (!data) return;
 
-            // Prevent ghost animations on first page load
             if (lastTimestamp === null) {
                 lastTimestamp = data.timestamp;
                 currentBasesState = data.bases || { first: false, second: false, third: false };
@@ -433,7 +442,6 @@
                 runPitchAnimation(inPlay, pX, pZ, hitX, hitY, eventText, batSide, isWalk);
                 lastTimestamp = data.timestamp;
 
-                // DELAY THE SCOREBOARD UPDATE so we don't spoil the play!
                 setTimeout(() => {
                     updateUI(data);
                     currentBasesState = data.bases || { first: false, second: false, third: false };
