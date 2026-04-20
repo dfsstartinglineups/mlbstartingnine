@@ -14,6 +14,7 @@
             --arcade-yellow: #f8f800;
             --arcade-white: #fcfcfc;
             --dirt-brown: #c88141;
+            --skin-tone: #ffcc99;
             --strike-zone-cyan: rgba(0, 255, 255, 0.6);
         }
 
@@ -75,6 +76,54 @@
             opacity: 0; 
         }
         .zone-cell { border: 1px solid rgba(0, 255, 255, 0.2); }
+
+        /* --- THE BATTER --- */
+        #batter-container {
+            position: absolute;
+            top: 50%; 
+            /* Defaults to left side for Right-Handed Batter */
+            left: 36%; 
+            width: 30px;
+            height: 60px;
+            z-index: 4;
+        }
+        #batter-head {
+            width: 14px;
+            height: 14px;
+            background-color: var(--skin-tone);
+            position: absolute;
+            top: 0;
+            left: 8px;
+            border: 2px solid black;
+        }
+        #batter-body {
+            width: 20px;
+            height: 40px;
+            background-color: var(--arcade-white);
+            position: absolute;
+            top: 14px;
+            left: 5px;
+            border: 2px solid black;
+        }
+        #bat {
+            width: 4px;
+            height: 35px;
+            background-color: var(--arcade-yellow);
+            position: absolute;
+            top: 20px;
+            left: 13px;
+            transform-origin: top center;
+            /* Resting position pointing up and back */
+            transform: rotate(-30deg); 
+            transition: transform 0.08s linear; /* Very fast swing */
+            z-index: 5;
+            border: 1px solid black;
+        }
+
+        /* Swing Classes applied via JS */
+        .swing-righty #bat { transform: rotate(110deg); }
+        .swing-lefty #bat { transform: rotate(-110deg); }
+
 
         /* --- FIELDERS --- */
         .fielder {
@@ -140,7 +189,6 @@
             padding: 8px;
             font-size: 10px;
             line-height: 2;
-            /* Added min-width so full names don't squeeze weirdly */
             min-width: 200px; 
         }
 
@@ -183,7 +231,15 @@
 <body>
 
     <div id="game-container">
+        
         <div id="pitching-view" class="camera">
+            
+            <div id="batter-container">
+                <div id="bat"></div>
+                <div id="batter-head"></div>
+                <div id="batter-body"></div>
+            </div>
+
             <div id="strike-zone-overlay">
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
                 <div class="zone-cell"></div><div class="zone-cell"></div><div class="zone-cell"></div>
@@ -238,6 +294,7 @@
         const pView = document.getElementById('pitching-view');
         const fView = document.getElementById('fielding-view');
         const szOverlay = document.getElementById('strike-zone-overlay');
+        const batterContainer = document.getElementById('batter-container');
         let lastTimestamp = null;
 
         function resetFielders() {
@@ -255,6 +312,8 @@
             pView.style.opacity = "0";
             fView.style.opacity = "1";
             szOverlay.style.opacity = "0";
+            
+            batterContainer.style.opacity = "0"; // Hide batter during fielding
 
             const isGrounder = eventText.includes('GROUND');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('HOME RUN');
@@ -338,10 +397,23 @@
         }
 
         // --- PHASE 1: PITCHING ANIMATION ---
-        function runPitchAnimation(isInPlay, pX, pZ, hitX, hitY, eventText) {
+        function runPitchAnimation(isInPlay, pX, pZ, hitX, hitY, eventText, batSide) {
             pView.style.opacity = "1";
             fView.style.opacity = "0";
             szOverlay.style.opacity = "1";
+            
+            // Make sure batter is visible and bat is resting
+            batterContainer.style.opacity = "1";
+            batterContainer.className = ''; 
+
+            // Position Batter based on handedness
+            if (batSide === "L") {
+                batterContainer.style.left = "62%"; // Right side of screen for Lefty
+                document.getElementById('bat').style.transform = "rotate(30deg)"; // Rest on opposite shoulder
+            } else {
+                batterContainer.style.left = "36%"; // Left side of screen for Righty
+                document.getElementById('bat').style.transform = "rotate(-30deg)";
+            }
 
             ball.style.transition = "none";
             ball.style.opacity = "1";
@@ -358,12 +430,22 @@
                 targetTop = 75 - (pZ * 7); 
             }
 
+            // Determine if a swing should happen
+            const didSwing = eventText.includes("SWINGING") || eventText.includes("FOUL") || eventText.includes("IN PLAY") || eventText.includes("HIT") || eventText.includes("MISS");
+
             setTimeout(() => {
                 ball.style.transition = "all 0.4s linear";
                 ball.style.top = `${targetTop}%`; 
                 ball.style.left = `${targetLeft}%`;
                 ball.style.width = "8px";
                 ball.style.height = "8px";
+                
+                // Swing timing: Trigger right before ball crosses plate
+                if (didSwing) {
+                    setTimeout(() => {
+                        batterContainer.classList.add(batSide === "L" ? "swing-lefty" : "swing-righty");
+                    }, 320); 
+                }
                 
                 if (isInPlay) {
                     setTimeout(() => {
@@ -373,6 +455,7 @@
                     setTimeout(() => {
                         ball.style.opacity = "0";
                         szOverlay.style.opacity = "0";
+                        batterContainer.className = ''; // Reset swing
                     }, 1500);
                 }
             }, 50);
@@ -392,11 +475,13 @@
                 const hitX = data.hit_location ? data.hit_location.x : null;
                 const hitY = data.hit_location ? data.hit_location.y : null;
                 
-                runPitchAnimation(inPlay, pX, pZ, hitX, hitY, eventText);
+                // Pass bat side down into the function (default to R if missing)
+                const batSide = data.matchup && data.matchup.bat_side ? data.matchup.bat_side : "R";
+                
+                runPitchAnimation(inPlay, pX, pZ, hitX, hitY, eventText, batSide);
                 lastTimestamp = data.timestamp;
             }
 
-            // --- UPDATED TEXT MAPPINGS HERE ---
             if (data.teams) {
                 document.getElementById('away-team').innerText = data.teams.away.toUpperCase();
                 document.getElementById('home-team').innerText = data.teams.home.toUpperCase();
@@ -408,7 +493,6 @@
             document.getElementById('outs-display').innerText = data.count.outs;
             document.getElementById('count-display').innerText = `${data.count.balls}-${data.count.strikes}`;
             
-            // Replaced the `.split().pop()` to show FULL names
             document.getElementById('p-name').innerText = data.matchup.pitcher.toUpperCase();
             document.getElementById('b-name').innerText = data.matchup.batter.toUpperCase();
             
