@@ -143,10 +143,11 @@
             position: absolute;
         }
         .occupied { background: var(--arcade-yellow) !important; }
-        #b1 { bottom: 0; right: 0; }
-        #b2 { top: 0; right: 0; }
-        #b3 { top: 0; left: 0; }
-        #hp { bottom: 0; left: 0; background: white; }
+        /* --- NEW CORRECTED BASE POSITIONS --- */
+        #b2 { top: 0; left: 0; }       /* Rotates to the Top tip */
+        #b1 { top: 0; right: 0; }      /* Rotates to the Right tip */
+        #hp { bottom: 0; right: 0; background: var(--arcade-white); } /* Rotates to the Bottom tip */
+        #b3 { bottom: 0; left: 0; }    /* Rotates to the Left tip */
 
         #ticker {
             position: absolute;
