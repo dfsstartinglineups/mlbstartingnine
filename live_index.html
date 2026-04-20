@@ -54,7 +54,7 @@
         }
 
         #fielding-view {
-            background-image: url('stadium_images/fenway_8bit.png'); /* Set to .png */
+            background-image: url('stadium_images/fenway_8bit.png');
             z-index: 2;
             opacity: 0;
         }
@@ -62,18 +62,17 @@
         /* --- CSS STRIKE ZONE BOX --- */
         #strike-zone-overlay {
             position: absolute;
-            /* Positioned right over the plate area of your pitching_view.jpg */
-            top: 68%; 
+            top: 58%; /* Center of the box */
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 100px;
-            height: 130px;
-            border: 3px solid var(--strike-zone-cyan);
+            width: 70px;
+            height: 90px;
+            border: 2px solid var(--strike-zone-cyan);
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 1fr 1fr 1fr;
             z-index: 4;
-            opacity: 0; /* Hidden until pitch occurs */
+            opacity: 0; 
             transition: opacity 0.2s;
         }
 
@@ -216,13 +215,13 @@
 
         let lastTimestamp = null;
 
-        function runPitchAnimation(isInPlay) {
-            // Reset to Pitching Cam
+        function runPitchAnimation(isInPlay, pX, pZ) {
+            // Setup Camera and Zone
             pView.style.opacity = "1";
             fView.style.opacity = "0";
-            szOverlay.style.opacity = "1"; // Show strike zone
+            szOverlay.style.opacity = "1";
 
-            // Ball starts at mound (bottom of screen in this perspective)
+            // Ball starts at pitcher's mound
             ball.style.transition = "none";
             ball.style.opacity = "1";
             ball.style.top = "90%";
@@ -230,13 +229,27 @@
             ball.style.width = "16px";
             ball.style.height = "16px";
 
+            // Map API feet coordinates to Screen CSS Percentages
+            let targetLeft = 50; 
+            let targetTop = 58;  
+            
+            if (pX !== undefined && pX !== null && pZ !== undefined && pZ !== null) {
+                // pX: 0 is center. A 1 ft movement maps to ~6% screen width.
+                targetLeft = 50 + (pX * 6); 
+                // pZ: Middle of zone is ~2.5 ft. CSS Top 58% is center. 
+                // Height goes up, CSS Top goes down, so we subtract.
+                targetTop = 75 - (pZ * 7); 
+            }
+
+            // Animate Pitch
             setTimeout(() => {
                 ball.style.transition = "all 0.5s linear";
-                // Ball flies UP toward the plate/strike zone
-                ball.style.top = "70%"; 
+                ball.style.top = `${targetTop}%`; 
+                ball.style.left = `${targetLeft}%`;
                 ball.style.width = "8px";
                 ball.style.height = "8px";
                 
+                // Animate Hit
                 if (isInPlay) {
                     setTimeout(() => {
                         pView.style.opacity = "0";
@@ -250,7 +263,7 @@
                 }
             }, 50);
 
-            // Hide ball and hide strike zone after event
+            // Reset
             setTimeout(() => {
                 ball.style.opacity = "0";
                 szOverlay.style.opacity = "0";
@@ -263,10 +276,16 @@
 
             if (data.timestamp !== lastTimestamp) {
                 const inPlay = data.last_event.toUpperCase().includes("IN PLAY");
-                runPitchAnimation(inPlay);
+                
+                // Grab the tracking data
+                const pX = data.pitch_location ? data.pitch_location.pX : null;
+                const pZ = data.pitch_location ? data.pitch_location.pZ : null;
+                
+                runPitchAnimation(inPlay, pX, pZ);
                 lastTimestamp = data.timestamp;
             }
 
+            // UI Data Mapping
             document.getElementById('away-pts').innerText = data.score.away;
             document.getElementById('home-pts').innerText = data.score.home;
             document.getElementById('inn-display').innerText = `${data.inning.half} ${data.inning.number}`.toUpperCase();
@@ -276,6 +295,7 @@
             document.getElementById('b-name').innerText = data.matchup.batter.split(' ').pop().toUpperCase();
             document.getElementById('event-text').innerText = data.last_event.toUpperCase();
 
+            // Bases Mapping
             document.getElementById('b1').classList.toggle('occupied', data.bases.first);
             document.getElementById('b2').classList.toggle('occupied', data.bases.second);
             document.getElementById('b3').classList.toggle('occupied', data.bases.third);
