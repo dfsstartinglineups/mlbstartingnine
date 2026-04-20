@@ -151,11 +151,11 @@
         let currentBasesState = { first: false, second: false, third: false };
 
         const COORDS = [
-            { left: 50, top: 85 }, // 0: Home Plate
-            { left: 68, top: 68 }, // 1: 1st Base
-            { left: 50, top: 61 }, // 2: 2nd Base
-            { left: 32, top: 68 }, // 3: 3rd Base
-            { left: 50, top: 85 }  // 4: Home Plate (Score)
+            { left: 50, top: 85 }, 
+            { left: 68, top: 68 }, 
+            { left: 50, top: 61 }, 
+            { left: 32, top: 68 }, 
+            { left: 50, top: 85 }  
         ];
 
         function resetFieldersAndRunners() {
@@ -225,7 +225,9 @@
 
             const isHomeRun = eventText.includes('HOME RUN');
             const isFly = eventText.includes('FLY') || eventText.includes('POP') || eventText.includes('LIN') && !isHomeRun;
-            const isOut = eventText.includes('OUT');
+            // Safer Out Detection (prevents logic from treating "Strikeout" as a fieldable play)
+            const isStrikeout = eventText.includes('STRIKEOUT');
+            const isOut = eventText.includes('OUT') && !isStrikeout; 
             const isGrounder = eventText.includes('GROUND') || (!isFly && !isHomeRun && !eventText.includes('STRIKE'));
 
             // 1. RUN THE BASES
@@ -253,7 +255,6 @@
             }
             if (isHomeRun) targetTop = 25; 
 
-            // Who gets the ball?
             let closestFielder = 'CF';
             if (targetTop > 60) { 
                 if (targetLeft < 41) closestFielder = '3B';
@@ -265,13 +266,12 @@
                 else if (targetLeft > 62) closestFielder = 'RF';
             }
 
-            // Move fielder to the ball (with Warning Track logic for Home Runs)
             setTimeout(() => {
                 let fielderTop = targetTop;
                 if (isHomeRun) {
-                    fielderTop = 50; // Force them to stop at the wall and look up!
+                    fielderTop = 50; 
                 } else if (!isOut && isGrounder && targetTop > 60) {
-                    fielderTop -= 3; // Let base hits roll past infielders slightly
+                    fielderTop -= 3; 
                 }
                 document.getElementById(closestFielder).style.top = `${fielderTop}%`;
                 document.getElementById(closestFielder).style.left = `${targetLeft}%`;
@@ -281,25 +281,18 @@
             if (isFly || isHomeRun) arriveTime = 1500;
             if (isGrounder) arriveTime = 2000;
 
-            // NEW: Home Run Animation
             setTimeout(() => {
                 if (isHomeRun) {
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
-                    // Launch the ball WAY out of the screen (top: -10%) and make it huge
                     ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
-                    ball.style.top = `-10%`; 
-                    ball.style.left = `${apexLeft}%`;
+                    ball.style.top = `-10%`; ball.style.left = `${apexLeft}%`;
                     ball.style.transform = "translate(-50%, -50%) scale(3)"; 
                     setTimeout(() => {
-                        // Let it drop down into the bleachers and look tiny
                         ball.style.transition = "all 1.5s ease-in";
-                        ball.style.top = `${targetTop}%`; 
-                        ball.style.left = `${targetLeft}%`;
+                        ball.style.top = `${targetTop}%`; ball.style.left = `${targetLeft}%`;
                         ball.style.transform = "translate(-50%, -50%) scale(0.5)"; 
                     }, 1500);
-
                 } else if (isFly) {
-                    // Regular Fly Ball
                     const apexLeft = 50 + (targetLeft - 50) * 0.5;
                     ball.style.transition = "all 1.5s cubic-bezier(0.25, 1, 0.5, 1)";
                     ball.style.top = `${targetTop - 25}%`; ball.style.left = `${apexLeft}%`;
@@ -326,7 +319,7 @@
 
             // 3. TARGETED THROWING PHASE
             setTimeout(() => {
-                if (isHomeRun) return; // You don't throw the ball back on a homer!
+                if (isHomeRun) return; 
 
                 let throwTargetTop = COORDS[2].top;  
                 let throwTargetLeft = COORDS[2].left; 
@@ -359,7 +352,6 @@
                 }
             }, arriveTime + 50);
 
-            // Longer camera delay for HRs so the runner can reach home!
             const cleanupDelay = isHomeRun ? 4500 : arriveTime + 2500;
 
             setTimeout(() => {
@@ -447,8 +439,17 @@
 
             if (data.timestamp !== lastTimestamp) {
                 const eventText = data.last_event.toUpperCase();
-                const inPlay = eventText.includes("IN PLAY") || eventText.includes("OUT") || eventText.includes("SINGLE") || eventText.includes("DOUBLE") || eventText.includes("HOME RUN") || eventText.includes("TRIPLE") || eventText.includes("ERROR") || eventText.includes("CHOICE");
+                const isStrikeout = eventText.includes("STRIKEOUT");
                 const isWalk = eventText.includes("WALK");
+                
+                // Excludes Strikeouts, Pickoffs, and Caught Stealing from "In Play" animation triggers
+                const inPlay = (hitX !== null && hitY !== null) || 
+                               eventText.includes("SINGLE") || 
+                               eventText.includes("DOUBLE") || 
+                               eventText.includes("TRIPLE") || 
+                               eventText.includes("HOME RUN") || 
+                               eventText.includes("ERROR") || 
+                               (eventText.includes("OUT") && !isStrikeout && !eventText.includes("CAUGHT") && !eventText.includes("PICKOFF"));
 
                 const pX = data.pitch_location ? data.pitch_location.pX : null;
                 const pZ = data.pitch_location ? data.pitch_location.pZ : null;
