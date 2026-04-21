@@ -1156,7 +1156,7 @@ function createGameCard(data, platform, selectedSlate) {
             return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 42px; font-size: 0.70rem;">TBD</div>`;
         }
         const pidStr = String(pitcherObj.id);
-        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, ip: "0.0", era: "-", k: 0 };
+        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, era: "-", k: 0 };
         
         let playerName = pitcherObj.fullName || pitcherObj.name;
         let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
@@ -1177,7 +1177,7 @@ function createGameCard(data, platform, selectedSlate) {
                     ${handText}
                     <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</span>
                 </div>
-                <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.ip || "0.0"} IP • ${pStats.era} • ${pStats.k || 0}K</span>
+                <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
             </div>
         </div>`;
     };
@@ -1281,7 +1281,7 @@ function createGameCard(data, platform, selectedSlate) {
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
             const viewSplits = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} • ${pSplit.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}: ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} • ${pSplit.hr} HR</span>`;
 
             // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
