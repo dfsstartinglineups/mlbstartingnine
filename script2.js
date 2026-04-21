@@ -833,7 +833,7 @@ function renderGames(isSilentRefresh = false) {
     let expandedCardIds = [];
     let listViewScrollPositions = {}; 
 
-     {
+     if (isSilentRefresh) {
         scrollY = window.scrollY;
         
         // Capture Top Plays Tab
@@ -1215,6 +1215,29 @@ function createGameCard(data, platform, selectedSlate) {
             </div>
         </div>
     `;
+
+    // ==========================================
+    // --- STATE-AWARE TAB RIBBON ---
+    // ==========================================
+    // Check if there is a saved state for this specific game, otherwise default
+    window.ACTIVE_GAME_TABS = window.ACTIVE_GAME_TABS || {};
+    const activeTab = window.ACTIVE_GAME_TABS[game.gamePk] || 'default';
+
+    const getBtnClass = (tabName) => activeTab === tabName ? 'active btn-primary text-white' : 'btn-outline-secondary text-muted';
+    const getViewClass = (tabName) => activeTab === tabName ? '' : 'd-none';
+
+    const tabsHtml = `
+        <div class="d-flex justify-content-center align-items-center gap-2 my-2 px-2 pb-2 border-bottom w-100">
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('season')}" style="font-size: 0.65rem;" data-tab="season" onclick="switchGameTab('${game.gamePk}', 'season', this)">SEASON</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('vsp')}" style="font-size: 0.65rem;" data-tab="vsp" onclick="switchGameTab('${game.gamePk}', 'vsp', this)">VS P</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('splits')}" style="font-size: 0.65rem;" data-tab="splits" onclick="switchGameTab('${game.gamePk}', 'splits', this)">SPLITS</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('fd')}" style="font-size: 0.65rem;" data-tab="fd" onclick="switchGameTab('${game.gamePk}', 'fd', this)">FD</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('dk')}" style="font-size: 0.65rem;" data-tab="dk" onclick="switchGameTab('${game.gamePk}', 'dk', this)">DK</button>
+        </div>
+    `;
+
+
+    
     // ==========================================
     // --- TWO-LINE LINEUP BUILDER ---
     // ==========================================
@@ -1385,26 +1408,7 @@ function createGameCard(data, platform, selectedSlate) {
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span><span class="text-muted" style="margin: 0 3px;">•</span>K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
-    // ==========================================
-    // --- STATE-AWARE TAB RIBBON ---
-    // ==========================================
-    // Check if there is a saved state for this specific game, otherwise default
-    window.ACTIVE_GAME_TABS = window.ACTIVE_GAME_TABS || {};
-    const activeTab = window.ACTIVE_GAME_TABS[game.gamePk] || 'default';
-
-    const getBtnClass = (tabName) => activeTab === tabName ? 'active btn-primary text-white' : 'btn-outline-secondary text-muted';
-    const getViewClass = (tabName) => activeTab === tabName ? '' : 'd-none';
-
-    const tabsHtml = `
-        <div class="d-flex justify-content-center align-items-center gap-2 my-2 px-2 pb-2 border-bottom w-100">
-            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('season')}" style="font-size: 0.65rem;" data-tab="season" onclick="switchGameTab('${game.gamePk}', 'season', this)">SEASON</button>
-            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('vsp')}" style="font-size: 0.65rem;" data-tab="vsp" onclick="switchGameTab('${game.gamePk}', 'vsp', this)">VS P</button>
-            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('splits')}" style="font-size: 0.65rem;" data-tab="splits" onclick="switchGameTab('${game.gamePk}', 'splits', this)">SPLITS</button>
-            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('fd')}" style="font-size: 0.65rem;" data-tab="fd" onclick="switchGameTab('${game.gamePk}', 'fd', this)">FD</button>
-            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('dk')}" style="font-size: 0.65rem;" data-tab="dk" onclick="switchGameTab('${game.gamePk}', 'dk', this)">DK</button>
-        </div>
-    `;
-
+    
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
