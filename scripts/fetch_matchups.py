@@ -838,15 +838,17 @@ def main():
                 if batter_id not in game_deep_stats:
                     game_deep_stats[batter_id] = {"name": batter_name}
                     
-                # 1. Fetch Splits (Only if missing from memory)
-                if "split_vL" not in game_deep_stats[batter_id]:
+                # 1. Fetch Splits & Season (Only if missing from memory)
+                if "split_vL" not in game_deep_stats[batter_id] or "season" not in game_deep_stats[batter_id]:
                     if batter_id not in run_cache_splits:
                         run_cache_splits[batter_id] = {
-                            "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
-                            "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                            "split_vL": game_deep_stats.get(batter_id, {}).get("split_vL") or fetch_combined_splits(session, batter_id, 'vl'), 
+                            "split_vR": game_deep_stats.get(batter_id, {}).get("split_vR") or fetch_combined_splits(session, batter_id, 'vr'),
+                            "season": game_deep_stats.get(batter_id, {}).get("season") or fetch_season_stats(session, batter_id, group_type="hitting")
                         }
                     game_deep_stats[batter_id]["split_vL"] = run_cache_splits[batter_id]["split_vL"]
                     game_deep_stats[batter_id]["split_vR"] = run_cache_splits[batter_id]["split_vR"]
+                    game_deep_stats[batter_id]["season"] = run_cache_splits[batter_id]["season"]
                     
                 # 2. Fetch BvP (Refetch automatically if the Pitcher changed)
                 current_bvp = game_deep_stats[batter_id].get("bvp", {})
