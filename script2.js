@@ -1099,65 +1099,107 @@ function createGameCard(data, platform, selectedSlate) {
 
     let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
 
+    
+        // --- TEAM RECORDS ---
+    const awayWins = game.teams.away.leagueRecord?.wins || 0;
+    const awayLosses = game.teams.away.leagueRecord?.losses || 0;
+    const homeWins = game.teams.home.leagueRecord?.wins || 0;
+    const homeLosses = game.teams.home.leagueRecord?.losses || 0;
+    
+    const awayRecordHtml = `<span class="text-muted fw-normal ms-1" style="font-size: 0.70rem;">(${awayWins}-${awayLosses})</span>`;
+    const homeRecordHtml = `<span class="text-muted fw-normal me-1" style="font-size: 0.70rem;">(${homeWins}-${homeLosses})</span>`;
+
+    // --- PITCHER HEADER BUILDER ---
+    const buildPitcherHeader = (pitcherObj, isAway, mlOdds) => {
+        if (!pitcherObj || !pitcherObj.id) {
+            return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 38px; font-size: 0.70rem;">TBD</div>`;
+        }
+        const pidStr = String(pitcherObj.id);
+        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, era: "-" };
+        
+        let playerName = pitcherObj.fullName || pitcherObj.name;
+        let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
+        
+        const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${pidStr}/headshot/67/current`;
+        const photoHtml = `<img src="${photoUrl}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;">`;
+        
+        if (isAway) {
+            return `
+            <div class="d-flex align-items-center justify-content-between bg-light rounded p-1 border w-100">
+                <div class="d-flex align-items-center text-truncate pe-1">
+                    <div class="me-1">${photoHtml}</div>
+                    <div class="d-flex flex-column lh-1 text-truncate">
+                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
+                        <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} ERA</span>
+                    </div>
+                </div>
+                <div>${mlOdds}</div>
+            </div>`;
+        } else {
+            return `
+            <div class="d-flex align-items-center justify-content-between bg-light rounded p-1 border w-100">
+                <div>${mlOdds}</div>
+                <div class="d-flex align-items-center text-truncate ps-1 justify-content-end text-end">
+                    <div class="d-flex flex-column lh-1 text-truncate">
+                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
+                        <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} ERA</span>
+                    </div>
+                    <div class="ms-1">${photoHtml}</div>
+                </div>
+            </div>`;
+        }
+    };
+
     const newHeaderHtml = `
-        <div class="d-flex justify-content-between align-items-center mb-1 w-100 mt-2 px-1" style="font-size: 0.95rem; font-weight: bold; letter-spacing: -0.3px;">
-            <div class="d-flex align-items-center text-start text-truncate" style="width: 48%;">
-                <img src="${awayLogo}" alt="${awayName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
-                <span class="text-truncate">${awayName} ${mlAway}</span>
+        <div class="d-flex justify-content-between w-100 mt-2 px-1">
+            <div class="d-flex flex-column" style="width: 48%;">
+                <div class="d-flex align-items-center text-truncate mb-1">
+                    <img src="${awayLogo}" style="height: 24px; width: 24px; margin-right: 6px; flex-shrink: 0;">
+                    <span class="fw-bold text-truncate" style="font-size: 0.95rem;">${awayName}</span>
+                    ${awayRecordHtml}
+                </div>
+                ${buildPitcherHeader(awayPitcherObj, true, mlAway)}
             </div>
-            <div class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.85rem; width: 4%;">@</div>
-            <div class="d-flex align-items-center justify-content-end text-end text-truncate" style="width: 48%;">
-                <img src="${homeLogo}" alt="${homeName}" style="height: 30px; width: 30px; margin-right: 6px; flex-shrink: 0;">
-                <span class="text-truncate">${homeName} ${mlHome}</span>
+
+            <div class="d-flex flex-column" style="width: 48%;">
+                <div class="d-flex align-items-center justify-content-end text-truncate mb-1">
+                    ${homeRecordHtml}
+                    <span class="fw-bold text-truncate" style="font-size: 0.95rem;">${homeName}</span>
+                    <img src="${homeLogo}" style="height: 24px; width: 24px; margin-left: 6px; flex-shrink: 0;">
+                </div>
+                ${buildPitcherHeader(homePitcherObj, false, mlHome)}
             </div>
         </div>
     `;
-
     // ==========================================
     // --- NEW OVERHAULED LINEUP BUILDER ---
     // ==========================================
-    const buildLineupList = (playersArray, opposingPitcherHand, startingPitcherObj, ownPitcherHand) => {
+    const buildLineupList = (playersArray) => {
         let displayArray = playersArray ? [...playersArray] : [];
-        
-        // INJECT PITCHER AT THE TOP
-        if (startingPitcherObj) {
-            const pitcherWithOrder = { ...startingPitcherObj, order: "P" };
-            if (displayArray.length === 0 || displayArray[0].order !== "P") {
-                displayArray.unshift(pitcherWithOrder);
-            }
-        }
         
         if (displayArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         
         const listItems = displayArray.map((p, index) => {
             let playerName = p.fullName || p.name;
-            
-            // Re-introduce the logic to create "G. Henderson"
-            let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
-            
             const pidStr = String(p.id);
 
-            // Fetch handedness
-            let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
+            let batCode = handDict[pidStr] || "";
             const handText = batCode ? `<span class="text-muted fw-bold" style="font-size:0.60rem;">(${batCode})</span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
-            const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
-            const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
-            const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
+            const prefixText = gamePos ? gamePos : `${p.order || index}.`;
             
-            // SMALLER PLAYER HEADSHOT (26px)
             const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
             const photoHtml = `<img src="${photoUrl}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
 
-            // HANDEDNESS BEFORE NAME, SMALLER FONT (0.70rem)
+            // Removed the dynamic abbreviation logic here so our overflow helper can handle it gracefully!
             return `
-                <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="${rowHighlight}; min-height: 36px;">
-                    <span class="${prefixColor} fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
+                <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="min-height: 36px;">
+                    <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${photoHtml}
                     <div class="d-flex align-items-center text-truncate flex-grow-1">
                         ${handText}
-                        <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</span>
+                        <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${p.shortName || p.boxscoreName || p.useName || playerName}">${playerName}</span>
                     </div>
                 </li>`;
         }).join('');
