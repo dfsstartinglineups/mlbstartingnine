@@ -765,6 +765,23 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     </div>`;
 }
 
+function adjustOverflowingNames() {
+    // Give the browser a microsecond to calculate the true pixel widths
+    requestAnimationFrame(() => {
+        document.querySelectorAll('.batter-name').forEach(el => {
+            // If the text wants to take up more space than the box allows...
+            if (el.scrollWidth > el.clientWidth) {
+                const shortName = el.getAttribute('data-shortname');
+                
+                // Swap the full name for the short name!
+                if (shortName && shortName !== el.textContent) {
+                    el.textContent = shortName;
+                }
+            }
+        });
+    });
+}
+
 // ==========================================
 // 4. RENDERING ENGINE
 // ==========================================
@@ -876,6 +893,8 @@ function renderGames(isSilentRefresh = false) {
     });
 
     sortedGames.forEach(item => container.appendChild(createGameCard(item, platform, selectedSlate)));
+
+    adjustOverflowingNames();
 
     // --- 2. RESTORE STATE (Only if silently refreshing) ---
     if (isSilentRefresh) {
@@ -1112,6 +1131,10 @@ function createGameCard(data, platform, selectedSlate) {
         
         const listItems = displayArray.map((p, index) => {
             let playerName = p.fullName || p.name;
+            
+            // Re-introduce the logic to create "G. Henderson"
+            let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
+            
             const pidStr = String(p.id);
 
             // Fetch handedness
@@ -1134,7 +1157,7 @@ function createGameCard(data, platform, selectedSlate) {
                     ${photoHtml}
                     <div class="d-flex align-items-center text-truncate flex-grow-1">
                         ${handText}
-                        <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}">${playerName}</span>
+                        <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</span>
                     </div>
                 </li>`;
         }).join('');
