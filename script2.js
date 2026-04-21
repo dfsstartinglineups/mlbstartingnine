@@ -1058,10 +1058,10 @@ function createGameCard(data, platform, selectedSlate) {
             const awayOutcome = h2hMarket.outcomes.find(o => o.name === awayNameFull);
             const homeOutcome = h2hMarket.outcomes.find(o => o.name === homeNameFull);
             if (awayOutcome && awayOutcome.price) {
-                mlAway = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${awayOutcome.price > 0 ? '+'+awayOutcome.price : awayOutcome.price}</span>`;
+                mlAway = `<div class="badge bg-light text-dark border" style="font-size: 0.60rem; padding: 2px 4px; font-family: monospace;">${awayOutcome.price > 0 ? '+'+awayOutcome.price : awayOutcome.price}</div>`;
             }
             if (homeOutcome && homeOutcome.price) {
-                mlHome = `<span class="badge bg-light text-dark border ms-1" style="font-size: 0.70rem; vertical-align: middle;">${homeOutcome.price > 0 ? '+'+homeOutcome.price : homeOutcome.price}</span>`;
+                mlHome = `<div class="badge bg-light text-dark border" style="font-size: 0.60rem; padding: 2px 4px; font-family: monospace;">${homeOutcome.price > 0 ? '+'+homeOutcome.price : homeOutcome.price}</div>`;
             }
         }
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
@@ -1153,7 +1153,7 @@ function createGameCard(data, platform, selectedSlate) {
     // --- PITCHER HEADER BUILDER ---
     const buildPitcherHeader = (pitcherObj, mlOdds, pHand) => {
         if (!pitcherObj || !pitcherObj.id) {
-            return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 38px; font-size: 0.70rem;">TBD</div>`;
+            return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 42px; font-size: 0.70rem;">TBD</div>`;
         }
         const pidStr = String(pitcherObj.id);
         const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, era: "-", k: 0 };
@@ -1161,23 +1161,24 @@ function createGameCard(data, platform, selectedSlate) {
         let playerName = pitcherObj.fullName || pitcherObj.name;
         let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
         
+        // Shrunk photo to 24px to leave room for the odds badge underneath
         const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${pidStr}/headshot/67/current`;
-        const photoHtml = `<img src="${photoUrl}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;">`;
+        const photoHtml = `<img src="${photoUrl}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-bottom: 2px;">`;
         
         const handText = pHand ? `<span class="text-muted fw-bold me-1" style="font-size:0.65rem;">(${pHand})</span>` : "";
 
         return `
-        <div class="d-flex align-items-center bg-light rounded p-1 border w-100">
-            <div class="me-2 flex-shrink-0">${photoHtml}</div>
-            <div class="d-flex flex-column lh-1 text-truncate w-100">
-                <div class="d-flex align-items-center justify-content-between w-100">
-                    <div class="d-flex align-items-center text-truncate pe-1">
-                        ${handText}
-                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
-                    </div>
-                    <div class="flex-shrink-0">${mlOdds}</div>
+        <div class="d-flex align-items-center bg-light rounded p-1 border w-100" style="min-height: 44px;">
+            <div class="d-flex flex-column align-items-center justify-content-center me-2 flex-shrink-0" style="width: 32px;">
+                ${photoHtml}
+                ${mlOdds}
+            </div>
+            <div class="d-flex flex-column justify-content-center text-truncate w-100">
+                <div class="d-flex align-items-center text-truncate w-100">
+                    ${handText}
+                    <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</span>
                 </div>
-                <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
+                <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
             </div>
         </div>`;
     };
@@ -1236,7 +1237,7 @@ function createGameCard(data, platform, selectedSlate) {
         const listItems = displayArray.map((p, index) => {
             const pidStr = String(p.id);
             let playerName = p.fullName || p.name;
-            let shortName = p.shortName || p.boxscoreName || p.useName || playerName; 
+            let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
 
             let batCode = handDict[pidStr] || "";
             const handText = batCode ? `<span class="text-muted fw-bold" style="font-size:0.60rem;">(${batCode})</span>` : "";
@@ -1247,21 +1248,20 @@ function createGameCard(data, platform, selectedSlate) {
             const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
             const photoHtml = `<img src="${photoUrl}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
 
-            // Helper for the top line of the STAT tabs (Position + Hand + Name... NO photo)
             const topLineHtml = `
                 <div class="d-flex align-items-center text-truncate w-100" style="padding-bottom: 2px;">
                     <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${handText}
-                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${shortName}">${playerName}</span>
+                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</span>
                 </div>`;
 
-            // --- 1. DEFAULT VIEW (Has Position + Photo) ---
+            // --- 1. DEFAULT VIEW ---
             const viewDefault = `
                 <div class="d-flex align-items-center w-100">
                     <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${photoHtml}
                     ${handText}
-                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${shortName}">${playerName}</span>
+                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</span>
                 </div>`;
 
             // --- 2. SEASON VIEW ---
@@ -1310,10 +1310,10 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="text-success fw-bold">${dkVal > 0 ? parseFloat(dkVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
-            // The main wrapper is now clean! The photo and prefix logic are safely inside the specific views.
+            // FIX: Note the lh-sm class instead of lh-1!
             return `
                 <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="min-height: 36px;">
-                    <div class="d-flex align-items-center flex-grow-1 text-truncate w-100 lh-1">
+                    <div class="d-flex align-items-center flex-grow-1 text-truncate w-100 lh-sm">
                         <div class="player-view view-default align-items-center w-100 ${getViewClass('default')}">${viewDefault}</div>
                         <div class="player-view view-season flex-column justify-content-center w-100 ${getViewClass('season')}">${viewSeason}</div>
                         <div class="player-view view-vsp flex-column justify-content-center w-100 ${getViewClass('vsp')}">${viewVsP}</div>
