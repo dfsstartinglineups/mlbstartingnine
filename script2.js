@@ -1281,7 +1281,7 @@ function createGameCard(data, platform, selectedSlate) {
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
             const viewSplits = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}:${splitHits}-${pSplit.ab}•${pSplit.avg}•${pSplit.ops}•${pSplit.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}: ${splitHits}-${pSplit.ab}•${pSplit.avg}•${pSplit.ops}•${pSplit.hr} HR</span>`;
 
             // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
