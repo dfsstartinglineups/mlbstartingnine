@@ -1106,11 +1106,13 @@ function createGameCard(data, platform, selectedSlate) {
     const homeWins = game.teams.home.leagueRecord?.wins || 0;
     const homeLosses = game.teams.home.leagueRecord?.losses || 0;
     
+    // Both records now use ms-1 (margin-start) to give a small space after the team name
     const awayRecordHtml = `<span class="text-muted fw-normal ms-1" style="font-size: 0.70rem;">(${awayWins}-${awayLosses})</span>`;
-    const homeRecordHtml = `<span class="text-muted fw-normal me-1" style="font-size: 0.70rem;">(${homeWins}-${homeLosses})</span>`;
+    const homeRecordHtml = `<span class="text-muted fw-normal ms-1" style="font-size: 0.70rem;">(${homeWins}-${homeLosses})</span>`;
 
     // --- PITCHER HEADER BUILDER ---
-    const buildPitcherHeader = (pitcherObj, isAway, mlOdds) => {
+    // Removed the 'isAway' parameter since both sides use the exact same layout now
+    const buildPitcherHeader = (pitcherObj, mlOdds) => {
         if (!pitcherObj || !pitcherObj.id) {
             return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 38px; font-size: 0.70rem;">TBD</div>`;
         }
@@ -1123,31 +1125,17 @@ function createGameCard(data, platform, selectedSlate) {
         const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${pidStr}/headshot/67/current`;
         const photoHtml = `<img src="${photoUrl}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;">`;
         
-        if (isAway) {
-            return `
-            <div class="d-flex align-items-center justify-content-between bg-light rounded p-1 border w-100">
-                <div class="d-flex align-items-center text-truncate pe-1">
-                    <div class="me-1">${photoHtml}</div>
-                    <div class="d-flex flex-column lh-1 text-truncate">
-                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
-                        <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} ERA</span>
-                    </div>
+        return `
+        <div class="d-flex align-items-center justify-content-between bg-light rounded p-1 border w-100">
+            <div class="d-flex align-items-center text-truncate pe-1">
+                <div class="me-1">${photoHtml}</div>
+                <div class="d-flex flex-column lh-1 text-truncate">
+                    <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
+                    <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} ERA</span>
                 </div>
-                <div>${mlOdds}</div>
-            </div>`;
-        } else {
-            return `
-            <div class="d-flex align-items-center justify-content-between bg-light rounded p-1 border w-100">
-                <div>${mlOdds}</div>
-                <div class="d-flex align-items-center text-truncate ps-1 justify-content-end text-end">
-                    <div class="d-flex flex-column lh-1 text-truncate">
-                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
-                        <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} ERA</span>
-                    </div>
-                    <div class="ms-1">${photoHtml}</div>
-                </div>
-            </div>`;
-        }
+            </div>
+            <div>${mlOdds}</div>
+        </div>`;
     };
 
     const newHeaderHtml = `
@@ -1158,16 +1146,16 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="fw-bold text-truncate" style="font-size: 0.95rem;">${awayName}</span>
                     ${awayRecordHtml}
                 </div>
-                ${buildPitcherHeader(awayPitcherObj, true, mlAway)}
+                ${buildPitcherHeader(awayPitcherObj, mlAway)}
             </div>
 
             <div class="d-flex flex-column" style="width: 48%;">
-                <div class="d-flex align-items-center justify-content-end text-truncate mb-1">
-                    ${homeRecordHtml}
+                <div class="d-flex align-items-center text-truncate mb-1">
+                    <img src="${homeLogo}" style="height: 24px; width: 24px; margin-right: 6px; flex-shrink: 0;">
                     <span class="fw-bold text-truncate" style="font-size: 0.95rem;">${homeName}</span>
-                    <img src="${homeLogo}" style="height: 24px; width: 24px; margin-left: 6px; flex-shrink: 0;">
+                    ${homeRecordHtml}
                 </div>
-                ${buildPitcherHeader(homePitcherObj, false, mlHome)}
+                ${buildPitcherHeader(homePitcherObj, mlHome)}
             </div>
         </div>
     `;
