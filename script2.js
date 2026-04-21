@@ -1267,13 +1267,13 @@ function createGameCard(data, platform, selectedSlate) {
             const sStats = deepStats[pidStr]?.season || { avg: '-', ops: '-', hr: 0 };
             const viewSeason = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
+                <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</div>`;
 
             // --- 3. VS P VIEW ---
             const bvp = deepStats[pidStr]?.bvp || { hits: 0, ab: 0, avg: '-', ops: '-', hr: 0 };
             const viewVsP = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
+                <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</div>`;
 
             // --- 4. SPLITS VIEW ---
             const split = opposingPitcherHand === 'L' ? deepStats[pidStr]?.split_vL : deepStats[pidStr]?.split_vR;
@@ -1281,7 +1281,7 @@ function createGameCard(data, platform, selectedSlate) {
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
             const viewSplits = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}: ${splitHits}-${pSplit.ab}•${pSplit.avg}•${pSplit.ops}•${pSplit.hr} HR</span>`;
+                <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}: ${splitHits}-${pSplit.ab}•${pSplit.avg}•${pSplit.ops}•${pSplit.hr} HR</div>`;
 
             // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
