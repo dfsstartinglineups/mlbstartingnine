@@ -580,6 +580,12 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     let allHR = []; 
     
     filteredGames.forEach(game => {
+        // --- NEW: SKIP POSTPONED/CANCELLED GAMES FOR TOP PLAYS ---
+        const gameState = game.gameRaw?.status?.detailedState || '';
+        if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(gameState)) {
+            return; // Skip this iteration, keeping these players off the leaderboard
+        }
+        // ---------------------------------------------------------
         const pl = game.gameRaw?.teams || {}; 
         const awayAbbr = pl.away?.team?.abbreviation || pl.away?.team?.name?.substring(0,3).toUpperCase();
         const homeAbbr = pl.home?.team?.abbreviation || pl.home?.team?.name?.substring(0,3).toUpperCase();
@@ -835,10 +841,37 @@ function renderGames(isSilentRefresh = false) {
     }
 
     let sortedGames = [...filteredGames].sort((a, b) => {
-        const isFinalA = a.gameRaw.status.abstractGameState === 'Final';
-        const isFinalB = b.gameRaw.status.abstractGameState === 'Final';
-        if (isFinalA && !isFinalB) return 1; 
-        if (!isFinalA && isFinalB) return -1; 
+        // 1. Define Helper to get status weight
+        const getStatusWeight = (item) => {
+            const status = item.gameRaw.status?.abstractGameState;
+            const detailed = item.gameRaw.status?.detailedState || "";
+            
+            // Extract the current inning and half
+            const inning = item.gameRaw.linescore?.currentInning || 0;
+            const half = item.gameRaw.linescore?.inningHalf || "";
+
+            if (status === "Final") return 2; // Bottom
+            
+            if (status === "Live" || detailed.includes("In Progress")) {
+                // If the game is in warmups (0) or Top of the 1st, keep it grouped with Pre-Game
+                if (inning === 0 || (inning === 1 && half === 'Top')) {
+                    return 0; 
+                }
+                return 1; // Middle (Truly Live from Bottom 1st onward)
+            }
+            
+            return 0; // Top (Upcoming / Scheduled / Preview)
+        };
+
+        const weightA = getStatusWeight(a);
+        const weightB = getStatusWeight(b);
+
+        // 2. Primary Sort: By Status Weight (Upcoming -> Live -> Final)
+        if (weightA !== weightB) {
+            return weightA - weightB;
+        }
+
+        // 3. Secondary Sort: Sort by Game Start Time within those groups
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
