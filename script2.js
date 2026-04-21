@@ -983,7 +983,7 @@ function renderGames(isSilentRefresh = false) {
         });
 
         // NEW: Restore Active Game Tabs (Safely after the DOM is fully painted)
-        requestAnimationFrame(() => {
+        setTimeout(() => {
             Object.keys(window.ACTIVE_GAME_TABS || {}).forEach(gamePk => {
                 const targetView = window.ACTIVE_GAME_TABS[gamePk];
                 
@@ -992,19 +992,19 @@ function renderGames(isSilentRefresh = false) {
                     const card = document.getElementById(`game-${gamePk}`);
                     if (card) {
                         const btn = card.querySelector(`.tab-btn[data-tab="${targetView}"]`);
-                        if (btn) {
-                            // Re-trigger the switch to snap the view back open!
+                        // Ensure the button exists and isn't already active before triggering
+                        if (btn && !btn.classList.contains('active')) {
                             window.switchGameTab(gamePk, targetView, btn);
                         }
                     }
                 }
             });
-        });
+        }, 50); // 50ms delay guarantees the HTML is fully rendered before clicking
 
         // Restore main window Scroll Position seamlessly
         window.scrollTo(0, scrollY);
     }
-} // <-- This should be the final closing bracket of your renderGames function!
+} // <-- Final closing bracket of renderGames
 
 function createGameCard(data, platform, selectedSlate) {
     const game = data.gameRaw;
