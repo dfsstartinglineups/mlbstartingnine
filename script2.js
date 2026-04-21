@@ -982,24 +982,7 @@ function renderGames(isSilentRefresh = false) {
             }
         });
 
-        // NEW: Restore Active Game Tabs (Safely after the DOM is fully painted)
-        setTimeout(() => {
-            Object.keys(window.ACTIVE_GAME_TABS || {}).forEach(gamePk => {
-                const targetView = window.ACTIVE_GAME_TABS[gamePk];
-                
-                // If they had a specific tab open (and didn't toggle it back to default)
-                if (targetView && targetView !== 'default') {
-                    const card = document.getElementById(`game-${gamePk}`);
-                    if (card) {
-                        const btn = card.querySelector(`.tab-btn[data-tab="${targetView}"]`);
-                        // Ensure the button exists and isn't already active before triggering
-                        if (btn && !btn.classList.contains('active')) {
-                            window.switchGameTab(gamePk, targetView, btn);
-                        }
-                    }
-                }
-            });
-        }, 50); // 50ms delay guarantees the HTML is fully rendered before clicking
+        
 
         // Restore main window Scroll Position seamlessly
         window.scrollTo(0, scrollY);
@@ -1233,7 +1216,7 @@ function createGameCard(data, platform, selectedSlate) {
         </div>
     `;
     // ==========================================
-    // --- NEW OVERHAULED LINEUP BUILDER ---
+    // --- TWO-LINE LINEUP BUILDER ---
     // ==========================================
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         let displayArray = playersArray ? [...playersArray] : [];
@@ -1242,7 +1225,7 @@ function createGameCard(data, platform, selectedSlate) {
         const listItems = displayArray.map((p, index) => {
             const pidStr = String(p.id);
             let playerName = p.fullName || p.name;
-            let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
+            let shortName = p.shortName || p.boxscoreName || p.useName || playerName; // For overflow
 
             let batCode = handDict[pidStr] || "";
             const handText = batCode ? `<span class="text-muted fw-bold" style="font-size:0.60rem;">(${batCode})</span>` : "";
@@ -1253,33 +1236,39 @@ function createGameCard(data, platform, selectedSlate) {
             const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
             const photoHtml = `<img src="${photoUrl}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
 
-            // --- 1. DEFAULT VIEW (Photo & Position safely inside!) ---
+            // Helper to build the top line (Full Name) so we don't repeat it
+            const topLineHtml = `
+                <div class="d-flex align-items-center text-truncate w-100" style="padding-bottom: 2px;">
+                    ${handText}
+                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${shortName}">${playerName}</span>
+                </div>`;
+
+            // --- 1. DEFAULT VIEW (Single Line) ---
             const viewDefault = `
-                <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
-                ${photoHtml}
-                ${handText}
-                <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${p.shortName || p.boxscoreName || p.useName || playerName}">${playerName}</span>
-            `;
+                <div class="d-flex align-items-center w-100">
+                    ${handText}
+                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${shortName}">${playerName}</span>
+                </div>`;
 
             // --- 2. SEASON VIEW ---
             const sStats = deepStats[pidStr]?.season || { avg: '-', ops: '-', hr: 0 };
             const viewSeason = `
-                <span class="fw-bold text-dark text-truncate" style="font-size: 0.70rem; width: 85px;">${abbrName}</span>
-                <span class="text-muted ms-auto text-end" style="font-size: 0.65rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
+                ${topLineHtml}
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
 
             // --- 3. VS P VIEW ---
             const bvp = deepStats[pidStr]?.bvp || { hits: 0, ab: 0, avg: '-', ops: '-', hr: 0 };
             const viewVsP = `
-                <span class="fw-bold text-dark text-truncate" style="font-size: 0.70rem; width: 85px;">${abbrName}</span>
-                <span class="text-muted ms-auto text-end" style="font-size: 0.65rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
+                ${topLineHtml}
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
 
             // --- 4. SPLITS VIEW ---
             const split = opposingPitcherHand === 'L' ? deepStats[pidStr]?.split_vL : deepStats[pidStr]?.split_vR;
             const pSplit = split || { ab: 0, avg: '-', ops: '-', hr: 0 };
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
             const viewSplits = `
-                <span class="fw-bold text-dark text-truncate" style="font-size: 0.70rem; width: 85px;">${abbrName}</span>
-                <span class="text-muted ms-auto text-end" style="font-size: 0.65rem;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} OPS • ${pSplit.hr} HR</span>`;
+                ${topLineHtml}
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} OPS • ${pSplit.hr} HR</span>`;
 
             // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
@@ -1287,11 +1276,11 @@ function createGameCard(data, platform, selectedSlate) {
             const fdVal = selectedSlate === 'all' ? (p.value || 0) : (p.fd_slates?.[selectedSlate]?.value || 0);
             const fdSalStr = fdSal > 0 ? '$' + (fdSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewFd = `
-                <span class="fw-bold text-dark text-truncate" style="font-size: 0.70rem; width: 85px;">${abbrName}</span>
-                <div class="ms-auto d-flex gap-2 text-end text-muted" style="font-size: 0.65rem;">
-                    <span style="width: 30px;">${fdSalStr}</span> 
-                    <span class="text-primary fw-bold" style="width: 25px;">${fdProj > 0 ? fdProj.toFixed(1) : '-'}</span> 
-                    <span class="text-success fw-bold" style="width: 25px;">${fdVal > 0 ? fdVal.toFixed(1) + 'x' : '-'}</span>
+                ${topLineHtml}
+                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
+                    <span style="min-width: 26px;">${fdSalStr}</span> 
+                    <span class="text-primary fw-bold" style="min-width: 22px;">${fdProj > 0 ? fdProj.toFixed(1) : '-'}</span> 
+                    <span class="text-success fw-bold">${fdVal > 0 ? fdVal.toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
             // --- 6. DK VIEW ---
@@ -1300,23 +1289,25 @@ function createGameCard(data, platform, selectedSlate) {
             const dkVal = selectedSlate === 'all' ? (p.dk_value || 0) : (p.dk_slates?.[selectedSlate]?.value || 0);
             const dkSalStr = dkSal > 0 ? '$' + (dkSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewDk = `
-                <span class="fw-bold text-dark text-truncate" style="font-size: 0.70rem; width: 85px;">${abbrName}</span>
-                <div class="ms-auto d-flex gap-2 text-end text-muted" style="font-size: 0.65rem;">
-                    <span style="width: 30px;">${dkSalStr}</span> 
-                    <span class="text-primary fw-bold" style="width: 25px;">${dkProj > 0 ? dkProj.toFixed(1) : '-'}</span> 
-                    <span class="text-success fw-bold" style="width: 25px;">${dkVal > 0 ? dkVal.toFixed(1) + 'x' : '-'}</span>
+                ${topLineHtml}
+                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
+                    <span style="min-width: 26px;">${dkSalStr}</span> 
+                    <span class="text-primary fw-bold" style="min-width: 22px;">${dkProj > 0 ? dkProj.toFixed(1) : '-'}</span> 
+                    <span class="text-success fw-bold">${dkVal > 0 ? dkVal.toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
-            // Removed the prefix, photo, and hand logic from the wrapper itself!
             return `
                 <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="min-height: 36px;">
-                    <div class="d-flex align-items-center flex-grow-1 text-truncate w-100">
-                        <div class="player-view view-default d-flex align-items-center w-100">${viewDefault}</div>
-                        <div class="player-view view-season d-none d-flex align-items-center w-100">${viewSeason}</div>
-                        <div class="player-view view-vsp d-none d-flex align-items-center w-100">${viewVsP}</div>
-                        <div class="player-view view-splits d-none d-flex align-items-center w-100">${viewSplits}</div>
-                        <div class="player-view view-fd d-none d-flex align-items-center w-100">${viewFd}</div>
-                        <div class="player-view view-dk d-none d-flex align-items-center w-100">${viewDk}</div>
+                    <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
+                    ${photoHtml}
+                    
+                    <div class="d-flex align-items-center flex-grow-1 text-truncate w-100 lh-1">
+                        <div class="player-view view-default align-items-center w-100 ${getViewClass('default')}">${viewDefault}</div>
+                        <div class="player-view view-season flex-column justify-content-center w-100 ${getViewClass('season')}">${viewSeason}</div>
+                        <div class="player-view view-vsp flex-column justify-content-center w-100 ${getViewClass('vsp')}">${viewVsP}</div>
+                        <div class="player-view view-splits flex-column justify-content-center w-100 ${getViewClass('splits')}">${viewSplits}</div>
+                        <div class="player-view view-fd flex-column justify-content-center w-100 ${getViewClass('fd')}">${viewFd}</div>
+                        <div class="player-view view-dk flex-column justify-content-center w-100 ${getViewClass('dk')}">${viewDk}</div>
                     </div>
                 </li>`;
         }).join('');
@@ -1395,15 +1386,22 @@ function createGameCard(data, platform, selectedSlate) {
     }
 
     // ==========================================
-    // --- NEW INTERACTIVE BUTTON RIBBON ---
+    // --- STATE-AWARE TAB RIBBON ---
     // ==========================================
+    // Check if there is a saved state for this specific game, otherwise default
+    window.ACTIVE_GAME_TABS = window.ACTIVE_GAME_TABS || {};
+    const activeTab = window.ACTIVE_GAME_TABS[game.gamePk] || 'default';
+
+    const getBtnClass = (tabName) => activeTab === tabName ? 'active btn-primary text-white' : 'btn-outline-secondary text-muted';
+    const getViewClass = (tabName) => activeTab === tabName ? '' : 'd-none';
+
     const tabsHtml = `
         <div class="d-flex justify-content-center align-items-center gap-2 my-2 px-2 pb-2 border-bottom w-100">
-            <button class="btn btn-sm btn-outline-secondary text-muted fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1" style="font-size: 0.65rem;" data-tab="season" onclick="switchGameTab('${game.gamePk}', 'season', this)">SEASON</button>
-            <button class="btn btn-sm btn-outline-secondary text-muted fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1" style="font-size: 0.65rem;" data-tab="vsp" onclick="switchGameTab('${game.gamePk}', 'vsp', this)">VS P</button>
-            <button class="btn btn-sm btn-outline-secondary text-muted fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1" style="font-size: 0.65rem;" data-tab="splits" onclick="switchGameTab('${game.gamePk}', 'splits', this)">SPLITS</button>
-            <button class="btn btn-sm btn-outline-secondary text-muted fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1" style="font-size: 0.65rem;" data-tab="fd" onclick="switchGameTab('${game.gamePk}', 'fd', this)">FD</button>
-            <button class="btn btn-sm btn-outline-secondary text-muted fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1" style="font-size: 0.65rem;" data-tab="dk" onclick="switchGameTab('${game.gamePk}', 'dk', this)">DK</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('season')}" style="font-size: 0.65rem;" data-tab="season" onclick="switchGameTab('${game.gamePk}', 'season', this)">SEASON</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('vsp')}" style="font-size: 0.65rem;" data-tab="vsp" onclick="switchGameTab('${game.gamePk}', 'vsp', this)">VS P</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('splits')}" style="font-size: 0.65rem;" data-tab="splits" onclick="switchGameTab('${game.gamePk}', 'splits', this)">SPLITS</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('fd')}" style="font-size: 0.65rem;" data-tab="fd" onclick="switchGameTab('${game.gamePk}', 'fd', this)">FD</button>
+            <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 ${getBtnClass('dk')}" style="font-size: 0.65rem;" data-tab="dk" onclick="switchGameTab('${game.gamePk}', 'dk', this)">DK</button>
         </div>
     `;
 
