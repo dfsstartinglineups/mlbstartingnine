@@ -1111,31 +1111,30 @@ function createGameCard(data, platform, selectedSlate) {
         if (displayArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
         
         const listItems = displayArray.map((p, index) => {
-            // Full name is now requested!
             let playerName = p.fullName || p.name;
             const pidStr = String(p.id);
 
             // Fetch handedness
             let batCode = p.order === "P" ? ownPitcherHand : (handDict[pidStr] || "");
-            const handText = batCode ? `<span class="text-muted fw-bold" style="font-size:0.6rem;">(${batCode})</span>` : "";
+            const handText = batCode ? `<span class="text-muted fw-bold" style="font-size:0.60rem;">(${batCode})</span>` : "";
             
             const gamePos = (data.gamePositions && data.gamePositions[pidStr]) ? data.gamePositions[pidStr] : "";
             const prefixText = p.order === "P" ? "P" : (gamePos ? gamePos : `${p.order || index}.`);
             const prefixColor = p.order === "P" ? "text-primary" : "text-muted";
             const rowHighlight = p.order === "P" ? "background-color: #f4f8fb;" : "";
             
-            // NEW: Player Headshot
+            // SMALLER PLAYER HEADSHOT (26px)
             const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
-            const photoHtml = `<img src="${photoUrl}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 8px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
+            const photoHtml = `<img src="${photoUrl}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
 
-            // Removed click events and hidden stats rows
+            // HANDEDNESS BEFORE NAME, SMALLER FONT (0.70rem)
             return `
-                <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="${rowHighlight}; min-height: 40px;">
-                    <span class="${prefixColor} fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 6px;">${prefixText}</span>
+                <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="${rowHighlight}; min-height: 36px;">
+                    <span class="${prefixColor} fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${photoHtml}
                     <div class="d-flex align-items-center text-truncate flex-grow-1">
-                        <span class="batter-name fw-bold text-dark text-truncate me-1" style="font-size: 0.8rem;" title="${playerName}">${playerName}</span>
                         ${handText}
+                        <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}">${playerName}</span>
                     </div>
                 </li>`;
         }).join('');
@@ -1214,29 +1213,15 @@ function createGameCard(data, platform, selectedSlate) {
     }
 
     // ==========================================
-    // --- NEW: TABBED RIBBON NAV ---
+    // --- NEW: SINGLE TABBED RIBBON NAV ---
     // ==========================================
-    // Dynamic text for the "VS Hand" tab based on the opposing pitcher's handedness
-    const awayVsHandText = `VS ${homePitcherHand}HP`;
-    const homeVsHandText = `VS ${awayPitcherHand}HP`;
-
-    // Note: The click events will be wired up later! For now, they are visual placeholders.
     const tabsHtml = `
         <div class="d-flex w-100 border-top border-bottom bg-light">
-            <div class="d-flex w-50 border-end">
-                <div class="w-100 text-center py-2 fw-bold text-primary border-bottom border-primary border-2" style="font-size: 0.65rem; cursor: pointer;">SEASON</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">VS P</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">${awayVsHandText}</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">FD</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">DK</div>
-            </div>
-            <div class="d-flex w-50">
-                <div class="w-100 text-center py-2 fw-bold text-primary border-bottom border-primary border-2" style="font-size: 0.65rem; cursor: pointer;">SEASON</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">VS P</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">${homeVsHandText}</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">FD</div>
-                <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">DK</div>
-            </div>
+            <div class="w-100 text-center py-2 fw-bold text-primary border-bottom border-primary border-2" style="font-size: 0.65rem; cursor: pointer;">SEASON</div>
+            <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">VS P</div>
+            <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">SPLITS</div>
+            <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">FD</div>
+            <div class="w-100 text-center py-2 fw-bold text-muted" style="font-size: 0.65rem; cursor: pointer;">DK</div>
         </div>
     `;
 
