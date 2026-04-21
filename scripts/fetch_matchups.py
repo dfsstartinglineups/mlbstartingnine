@@ -28,7 +28,7 @@ os.makedirs(DAILY_FILES_DIR, exist_ok=True)
 
 # --- API TRACKING ---
 API_CALL_TRACKER = {
-    "schedule": 0, "odds": 0, "live_feed": 0, "bvp": 0, "splits": 0, "bbm_csv": 0
+    "schedule": 0, "odds": 0, "live_feed": 0, "bvp": 0, "splits": 0, "bbm_csv": 0, "season_stats": 0
 }
 
 GLOBAL_SLATES = {'fanduel': {}, 'draftkings': {}}
@@ -435,6 +435,48 @@ def fetch_combined_splits(session, person_id, hand_code, group_type="hitting"):
     split_label = "LHP" if hand_code == 'vl' else "RHP" if group_type == "hitting" else "LHB" if hand_code == 'vl' else "RHB"
     return {"split_type": split_label, "ab": ab, "hr": hr, "k": k, "bb": bb, "avg": avg_str, "ops": ops_str}
 
+
+def fetch_season_stats(session, person_id, group_type="hitting"):
+    global API_CALL_TRACKER
+    API_CALL_TRACKER["season_stats"] += 1
+    
+    current_year = datetime.utcnow().year
+    url = f"https://statsapi.mlb.com/api/v1/people/{person_id}/stats?stats=season&group={group_type}&gameType=R&season={current_year}"
+    
+    default_hit = {"ab": 0, "hits": 0, "hr": 0, "rbi": 0, "sb": 0, "avg": "-", "obp": "-", "ops": "-"}
+    default_pit = {"ip": "0.0", "w": 0, "l": 0, "era": "-", "whip": "-", "k": 0}
+    
+    try:
+        res = session.get(url, timeout=10).json()
+        stats_list = res.get('stats', [])
+        if stats_list and len(stats_list) > 0:
+            splits = stats_list[0].get('splits', [])
+            if splits:
+                stat = splits[0].get('stat', {})
+                if group_type == "hitting":
+                    return {
+                        "ab": stat.get('atBats', 0),
+                        "hits": stat.get('hits', 0),
+                        "hr": stat.get('homeRuns', 0),
+                        "rbi": stat.get('rbi', 0),
+                        "sb": stat.get('stolenBases', 0),
+                        "avg": stat.get('avg', '-'),
+                        "obp": stat.get('obp', '-'),
+                        "ops": stat.get('ops', '-')
+                    }
+                else:
+                    return {
+                        "ip": stat.get('inningsPitched', '0.0'),
+                        "w": stat.get('wins', 0),
+                        "l": stat.get('losses', 0),
+                        "era": stat.get('era', '-'),
+                        "whip": stat.get('whip', '-'),
+                        "k": stat.get('strikeOuts', 0)
+                    }
+    except Exception:
+        pass
+
+    return default_hit if group_type == "hitting" else default_pit
 # ==========================================
 # --- MAIN SCRIPT LOGIC ---
 # ==========================================
@@ -661,20 +703,22 @@ def main():
             home_starter_id = str(home_starter.get('id')) if home_starter else None
             
             for p_id, p_data in [(away_starter_id, away_starter), (home_starter_id, home_starter)]:
-                if p_id and p_id not in game_deep_stats:
+                if p_id and (p_id not in game_deep_stats or "season" not in game_deep_stats[p_id]):
                     # Check our script memory first
                     if p_id not in run_cache_splits:
-                        print(f"   [NEW] Fetching Pitcher Splits for {p_data['fullName']}...")
+                        print(f"   [NEW] Fetching Pitcher Splits & Season Stats for {p_data['fullName']}...")
                         run_cache_splits[p_id] = {
-                            "split_vL": fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
-                            "split_vR": fetch_combined_splits(session, p_id, 'vr', group_type="pitching")
+                            "split_vL": game_deep_stats.get(p_id, {}).get("split_vL") or fetch_combined_splits(session, p_id, 'vl', group_type="pitching"),
+                            "split_vR": game_deep_stats.get(p_id, {}).get("split_vR") or fetch_combined_splits(session, p_id, 'vr', group_type="pitching"),
+                            "season": game_deep_stats.get(p_id, {}).get("season") or fetch_season_stats(session, p_id, group_type="pitching")
                         }
                     
                     game_deep_stats[p_id] = {
                         "name": p_data['fullName'], 
                         "is_pitcher": True,
                         "split_vL": run_cache_splits[p_id]["split_vL"],
-                        "split_vR": run_cache_splits[p_id]["split_vR"]
+                        "split_vR": run_cache_splits[p_id]["split_vR"],
+                        "season": run_cache_splits[p_id]["season"]
                     }
 
             # --- CRITICAL FIX: BULK FETCH HANDEDNESS FOR ALL PLAYERS ---
@@ -755,15 +799,17 @@ def main():
                 if batter_id not in game_deep_stats:
                     game_deep_stats[batter_id] = {"name": batter_name}
                     
-                # 1. Fetch Splits (Only if missing from memory)
-                if "split_vL" not in game_deep_stats[batter_id]:
+                # 1. Fetch Splits & Season (Only if missing from memory)
+                if "split_vL" not in game_deep_stats[batter_id] or "season" not in game_deep_stats[batter_id]:
                     if batter_id not in run_cache_splits:
                         run_cache_splits[batter_id] = {
-                            "split_vL": fetch_combined_splits(session, batter_id, 'vl'), 
-                            "split_vR": fetch_combined_splits(session, batter_id, 'vr')
+                            "split_vL": game_deep_stats.get(batter_id, {}).get("split_vL") or fetch_combined_splits(session, batter_id, 'vl'), 
+                            "split_vR": game_deep_stats.get(batter_id, {}).get("split_vR") or fetch_combined_splits(session, batter_id, 'vr'),
+                            "season": game_deep_stats.get(batter_id, {}).get("season") or fetch_season_stats(session, batter_id, group_type="hitting")
                         }
                     game_deep_stats[batter_id]["split_vL"] = run_cache_splits[batter_id]["split_vL"]
                     game_deep_stats[batter_id]["split_vR"] = run_cache_splits[batter_id]["split_vR"]
+                    game_deep_stats[batter_id]["season"] = run_cache_splits[batter_id]["season"]
                     
                 # 2. Fetch BvP (Refetch automatically if the Pitcher changed)
                 current_bvp = game_deep_stats[batter_id].get("bvp", {})
