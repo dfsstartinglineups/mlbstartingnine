@@ -1151,13 +1151,12 @@ function createGameCard(data, platform, selectedSlate) {
     const homeRecordHtml = `<span class="text-muted fw-normal ms-1" style="font-size: 0.70rem;">(${homeWins}-${homeLosses})</span>`;
 
     // --- PITCHER HEADER BUILDER ---
-    // Removed the 'isAway' parameter since both sides use the exact same layout now
-    const buildPitcherHeader = (pitcherObj, mlOdds) => {
+    const buildPitcherHeader = (pitcherObj, mlOdds, pHand) => {
         if (!pitcherObj || !pitcherObj.id) {
             return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 38px; font-size: 0.70rem;">TBD</div>`;
         }
         const pidStr = String(pitcherObj.id);
-        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, era: "-" };
+        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, era: "-", k: 0 };
         
         let playerName = pitcherObj.fullName || pitcherObj.name;
         let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
@@ -1165,16 +1164,21 @@ function createGameCard(data, platform, selectedSlate) {
         const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${pidStr}/headshot/67/current`;
         const photoHtml = `<img src="${photoUrl}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;">`;
         
+        const handText = pHand ? `<span class="text-muted fw-bold me-1" style="font-size:0.65rem;">(${pHand})</span>` : "";
+
         return `
-        <div class="d-flex align-items-center justify-content-between bg-light rounded p-1 border w-100">
-            <div class="d-flex align-items-center text-truncate pe-1">
-                <div class="me-1">${photoHtml}</div>
-                <div class="d-flex flex-column lh-1 text-truncate">
-                    <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
-                    <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} ERA</span>
+        <div class="d-flex align-items-center bg-light rounded p-1 border w-100">
+            <div class="me-2 flex-shrink-0">${photoHtml}</div>
+            <div class="d-flex flex-column lh-1 text-truncate w-100">
+                <div class="d-flex align-items-center justify-content-between w-100">
+                    <div class="d-flex align-items-center text-truncate pe-1">
+                        ${handText}
+                        <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;">${abbrName}</span>
+                    </div>
+                    <div class="flex-shrink-0">${mlOdds}</div>
                 </div>
+                <span class="text-muted mt-1" style="font-size: 0.65rem;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
             </div>
-            <div>${mlOdds}</div>
         </div>`;
     };
 
@@ -1186,7 +1190,7 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="fw-bold text-truncate" style="font-size: 0.95rem;">${awayName}</span>
                     ${awayRecordHtml}
                 </div>
-                ${buildPitcherHeader(awayPitcherObj, mlAway)}
+                ${buildPitcherHeader(awayPitcherObj, mlAway, awayPitcherHand)}
             </div>
 
             <div class="d-flex flex-column" style="width: 48%;">
@@ -1195,7 +1199,7 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="fw-bold text-truncate" style="font-size: 0.95rem;">${homeName}</span>
                     ${homeRecordHtml}
                 </div>
-                ${buildPitcherHeader(homePitcherObj, mlHome)}
+                ${buildPitcherHeader(homePitcherObj, mlHome, homePitcherHand)}
             </div>
         </div>
     `;
@@ -1232,7 +1236,7 @@ function createGameCard(data, platform, selectedSlate) {
         const listItems = displayArray.map((p, index) => {
             const pidStr = String(p.id);
             let playerName = p.fullName || p.name;
-            let shortName = p.shortName || p.boxscoreName || p.useName || playerName; // For overflow
+            let shortName = p.shortName || p.boxscoreName || p.useName || playerName; 
 
             let batCode = handDict[pidStr] || "";
             const handText = batCode ? `<span class="text-muted fw-bold" style="font-size:0.60rem;">(${batCode})</span>` : "";
@@ -1243,16 +1247,19 @@ function createGameCard(data, platform, selectedSlate) {
             const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
             const photoHtml = `<img src="${photoUrl}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
 
-            // Helper to build the top line (Full Name) so we don't repeat it
+            // Helper for the top line of the STAT tabs (Position + Hand + Name... NO photo)
             const topLineHtml = `
                 <div class="d-flex align-items-center text-truncate w-100" style="padding-bottom: 2px;">
+                    <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${handText}
                     <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${shortName}">${playerName}</span>
                 </div>`;
 
-            // --- 1. DEFAULT VIEW (Single Line) ---
+            // --- 1. DEFAULT VIEW (Has Position + Photo) ---
             const viewDefault = `
                 <div class="d-flex align-items-center w-100">
+                    <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
+                    ${photoHtml}
                     ${handText}
                     <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${shortName}">${playerName}</span>
                 </div>`;
@@ -1261,13 +1268,13 @@ function createGameCard(data, platform, selectedSlate) {
             const sStats = deepStats[pidStr]?.season || { avg: '-', ops: '-', hr: 0 };
             const viewSeason = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
 
             // --- 3. VS P VIEW ---
             const bvp = deepStats[pidStr]?.bvp || { hits: 0, ab: 0, avg: '-', ops: '-', hr: 0 };
             const viewVsP = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
 
             // --- 4. SPLITS VIEW ---
             const split = opposingPitcherHand === 'L' ? deepStats[pidStr]?.split_vL : deepStats[pidStr]?.split_vR;
@@ -1275,7 +1282,7 @@ function createGameCard(data, platform, selectedSlate) {
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
             const viewSplits = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} OPS • ${pSplit.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} OPS • ${pSplit.hr} HR</span>`;
 
             // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
@@ -1284,10 +1291,10 @@ function createGameCard(data, platform, selectedSlate) {
             const fdSalStr = fdSal > 0 ? '$' + (fdSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewFd = `
                 ${topLineHtml}
-                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
+                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">
                     <span style="min-width: 26px;">${fdSalStr}</span> 
-                    <span class="text-primary fw-bold" style="min-width: 22px;">${fdProj > 0 ? fdProj.toFixed(1) : '-'}</span> 
-                    <span class="text-success fw-bold">${fdVal > 0 ? fdVal.toFixed(1) + 'x' : '-'}</span>
+                    <span class="text-primary fw-bold" style="min-width: 22px;">${fdProj > 0 ? parseFloat(fdProj).toFixed(1) : '-'}</span> 
+                    <span class="text-success fw-bold">${fdVal > 0 ? parseFloat(fdVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
             // --- 6. DK VIEW ---
@@ -1297,17 +1304,15 @@ function createGameCard(data, platform, selectedSlate) {
             const dkSalStr = dkSal > 0 ? '$' + (dkSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewDk = `
                 ${topLineHtml}
-                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
+                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">
                     <span style="min-width: 26px;">${dkSalStr}</span> 
-                    <span class="text-primary fw-bold" style="min-width: 22px;">${dkProj > 0 ? dkProj.toFixed(1) : '-'}</span> 
-                    <span class="text-success fw-bold">${dkVal > 0 ? dkVal.toFixed(1) + 'x' : '-'}</span>
+                    <span class="text-primary fw-bold" style="min-width: 22px;">${dkProj > 0 ? parseFloat(dkProj).toFixed(1) : '-'}</span> 
+                    <span class="text-success fw-bold">${dkVal > 0 ? parseFloat(dkVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
+            // The main wrapper is now clean! The photo and prefix logic are safely inside the specific views.
             return `
                 <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="min-height: 36px;">
-                    <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
-                    ${photoHtml}
-                    
                     <div class="d-flex align-items-center flex-grow-1 text-truncate w-100 lh-1">
                         <div class="player-view view-default align-items-center w-100 ${getViewClass('default')}">${viewDefault}</div>
                         <div class="player-view view-season flex-column justify-content-center w-100 ${getViewClass('season')}">${viewSeason}</div>
