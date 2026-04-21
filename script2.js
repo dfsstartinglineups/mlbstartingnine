@@ -1265,8 +1265,8 @@ function createGameCard(data, platform, selectedSlate) {
     const awayBanner = getStatusBanner('away', isAwayOfficial, awayPlayers.length > 0);
     const homeBanner = getStatusBanner('home', isHomeOfficial, homePlayers.length > 0);
     
-    const awayLineupHtml = buildLineupList(awayPlayers, homePitcherHand, awayPitcherObj, awayPitcherHand);
-    const homeLineupHtml = buildLineupList(homePlayers, awayPitcherHand, homePitcherObj, homePitcherHand);
+    const awayLineupHtml = buildLineupList(awayPlayers);
+    const homeLineupHtml = buildLineupList(homePlayers);
 
     let displayUmpire = hpUmpire !== "TBD" && hpUmpire.includes(' ') ? `${hpUmpire.split(' ')[0].charAt(0)}. ${hpUmpire.split(' ').slice(1).join(' ')}` : hpUmpire;
     let umpString = `<span class="text-dark fw-bold">${displayUmpire}</span>`;
