@@ -1156,12 +1156,11 @@ function createGameCard(data, platform, selectedSlate) {
             return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 42px; font-size: 0.70rem;">TBD</div>`;
         }
         const pidStr = String(pitcherObj.id);
-        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, era: "-", k: 0 };
+        const pStats = deepStats[pidStr]?.season || { w: 0, l: 0, ip: "0.0", era: "-", k: 0 };
         
         let playerName = pitcherObj.fullName || pitcherObj.name;
         let abbrName = playerName.includes(' ') ? `${playerName.split(' ')[0].charAt(0)}. ${playerName.split(' ').slice(1).join(' ')}` : playerName;
         
-        // Shrunk photo to 24px to leave room for the odds badge underneath
         const photoUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${pidStr}/headshot/67/current`;
         const photoHtml = `<img src="${photoUrl}" style="width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-bottom: 2px;">`;
         
@@ -1178,7 +1177,7 @@ function createGameCard(data, platform, selectedSlate) {
                     ${handText}
                     <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</span>
                 </div>
-                <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
+                <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.ip || "0.0"} IP • ${pStats.era} • ${pStats.k || 0}K</span>
             </div>
         </div>`;
     };
@@ -1268,13 +1267,13 @@ function createGameCard(data, platform, selectedSlate) {
             const sStats = deepStats[pidStr]?.season || { avg: '-', ops: '-', hr: 0 };
             const viewSeason = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</span>`;
 
             // --- 3. VS P VIEW ---
             const bvp = deepStats[pidStr]?.bvp || { hits: 0, ab: 0, avg: '-', ops: '-', hr: 0 };
             const viewVsP = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</span>`;
 
             // --- 4. SPLITS VIEW ---
             const split = opposingPitcherHand === 'L' ? deepStats[pidStr]?.split_vL : deepStats[pidStr]?.split_vR;
@@ -1282,7 +1281,7 @@ function createGameCard(data, platform, selectedSlate) {
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
             const viewSplits = `
                 ${topLineHtml}
-                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} OPS • ${pSplit.hr} HR</span>`;
+                <span class="text-muted text-truncate w-100" style="font-size: 0.60rem;">vs ${opposingPitcherHand} • ${splitHits}-${pSplit.ab} • ${pSplit.avg} • ${pSplit.ops} • ${pSplit.hr} HR</span>`;
 
             // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
@@ -1291,10 +1290,10 @@ function createGameCard(data, platform, selectedSlate) {
             const fdSalStr = fdSal > 0 ? '$' + (fdSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewFd = `
                 ${topLineHtml}
-                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">
-                    <span style="min-width: 26px;">${fdSalStr}</span> 
-                    <span class="text-primary fw-bold" style="min-width: 22px;">${fdProj > 0 ? parseFloat(fdProj).toFixed(1) : '-'}</span> 
-                    <span class="text-success fw-bold">${fdVal > 0 ? parseFloat(fdVal).toFixed(1) + 'x' : '-'}</span>
+                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
+                    <span>${fdSalStr}</span> 
+                    <span class="text-primary fw-bold">Proj: ${fdProj > 0 ? parseFloat(fdProj).toFixed(1) : '-'}</span> 
+                    <span class="text-success fw-bold">Value: ${fdVal > 0 ? parseFloat(fdVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
             // --- 6. DK VIEW ---
@@ -1304,10 +1303,10 @@ function createGameCard(data, platform, selectedSlate) {
             const dkSalStr = dkSal > 0 ? '$' + (dkSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewDk = `
                 ${topLineHtml}
-                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem; padding-left: 26px;">
-                    <span style="min-width: 26px;">${dkSalStr}</span> 
-                    <span class="text-primary fw-bold" style="min-width: 22px;">${dkProj > 0 ? parseFloat(dkProj).toFixed(1) : '-'}</span> 
-                    <span class="text-success fw-bold">${dkVal > 0 ? parseFloat(dkVal).toFixed(1) + 'x' : '-'}</span>
+                <div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
+                    <span>${dkSalStr}</span> 
+                    <span class="text-primary fw-bold">Proj: ${dkProj > 0 ? parseFloat(dkProj).toFixed(1) : '-'}</span> 
+                    <span class="text-success fw-bold">Value: ${dkVal > 0 ? parseFloat(dkVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
             // FIX: Note the lh-sm class instead of lh-1!
