@@ -953,36 +953,18 @@ function renderGames(isSilentRefresh = false) {
 
     // --- 2. RESTORE STATE (Only if silently refreshing) ---
     if (isSilentRefresh) {
-        // Restore Top Plays Tab (Positional Button state is handled by window.CURRENT_TOP_PLAYS_POS globally)
+        // Restore Top Plays Tab
         const newActiveTab = document.querySelector(`.leaderboard-tab[data-tab="${activeTopPlaysTab}"]`);
         if (newActiveTab) {
-            window.setTopPlaysTab(newActiveTab); // This also triggers the redraw
+            window.setTopPlaysTab(newActiveTab); 
         } else {
-            window.updateTopPlaysView(); // Failsafe
+            window.updateTopPlaysView(); 
         }
 
         // Restore inner scroll positions for Top Plays lists
         Object.keys(listViewScrollPositions).forEach(id => {
             const listEl = document.getElementById(id);
             if (listEl) listEl.scrollTop = listViewScrollPositions[id];
-        });
-
-        // NEW: Restore Active Game Tabs!
-        Object.keys(window.ACTIVE_GAME_TABS || {}).forEach(gamePk => {
-            const targetView = window.ACTIVE_GAME_TABS[gamePk];
-            
-            // If they had a specific tab open (and didn't toggle it back to default)
-            if (targetView && targetView !== 'default') {
-                const card = document.getElementById(`game-${gamePk}`);
-                if (card) {
-                    // Find the button associated with that view
-                    const btn = card.querySelector(`.tab-btn[data-tab="${targetView}"]`);
-                    if (btn) {
-                        // Re-trigger the switch to snap the view back open!
-                        window.switchGameTab(gamePk, targetView, btn);
-                    }
-                }
-            }
         });
 
         // Restore Expanded Players
@@ -1000,11 +982,29 @@ function renderGames(isSilentRefresh = false) {
             }
         });
 
+        // NEW: Restore Active Game Tabs (Safely after the DOM is fully painted)
+        requestAnimationFrame(() => {
+            Object.keys(window.ACTIVE_GAME_TABS || {}).forEach(gamePk => {
+                const targetView = window.ACTIVE_GAME_TABS[gamePk];
+                
+                // If they had a specific tab open (and didn't toggle it back to default)
+                if (targetView && targetView !== 'default') {
+                    const card = document.getElementById(`game-${gamePk}`);
+                    if (card) {
+                        const btn = card.querySelector(`.tab-btn[data-tab="${targetView}"]`);
+                        if (btn) {
+                            // Re-trigger the switch to snap the view back open!
+                            window.switchGameTab(gamePk, targetView, btn);
+                        }
+                    }
+                }
+            });
+        });
+
         // Restore main window Scroll Position seamlessly
         window.scrollTo(0, scrollY);
     }
-    // ------------------------------------------------------
-}
+} // <-- This should be the final closing bracket of your renderGames function!
 
 function createGameCard(data, platform, selectedSlate) {
     const game = data.gameRaw;
