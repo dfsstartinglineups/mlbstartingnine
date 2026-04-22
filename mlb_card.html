@@ -410,8 +410,9 @@
             }
             globalTargetDate = targetDate;
 
-            try {
-                const res = await fetch(`${BASE_API_URL}/schedule?sportId=1&date=${targetDate}&hydrate=probablePitcher,lineups`);
+            try {  
+                const timestamp = new Date().getTime();
+                const res = await fetch(`${BASE_API_URL}/schedule?sportId=1&date=${targetDate}&hydrate=probablePitcher,lineups&v=${timestamp}`);
                 const data = await res.json();
                 
                 if (data.dates && data.dates.length > 0) {
