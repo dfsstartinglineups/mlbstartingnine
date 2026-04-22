@@ -1,5 +1,5 @@
 {
-    "last_updated": "Apr 22, 02:36 PM ET",
+    "last_updated": "Apr 22, 02:38 PM ET",
     "slates": {
         "fanduel": [
             {
@@ -93,12 +93,12 @@
                 "gameDate": "2026-04-22T16:10:00Z",
                 "officialDate": "2026-04-22",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -109,10 +109,11 @@
                         },
                         "leagueRecord": {
                             "wins": 14,
-                            "losses": 9,
-                            "pct": ".609"
+                            "losses": 10,
+                            "pct": ".583"
                         },
                         "score": 1,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 681517,
                             "fullName": "Kyle Leahy",
@@ -173,11 +174,12 @@
                             "link": "/api/v1/teams/146"
                         },
                         "leagueRecord": {
-                            "wins": 11,
+                            "wins": 12,
                             "losses": 13,
-                            "pct": ".458"
+                            "pct": ".480"
                         },
                         "score": 4,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 676083,
                             "fullName": "Janson Junk",
@@ -379,7 +381,7 @@
                                 "runs": 1,
                                 "hits": 1,
                                 "errors": 0,
-                                "leftOnBase": 0
+                                "leftOnBase": 1
                             }
                         }
                     ],
@@ -394,7 +396,7 @@
                             "runs": 1,
                             "hits": 4,
                             "errors": 1,
-                            "leftOnBase": 4
+                            "leftOnBase": 5
                         }
                     },
                     "defense": {
@@ -658,55 +660,6 @@
                             "strikeZoneTop": 3.174,
                             "strikeZoneBottom": 1.602
                         },
-                        "first": {
-                            "id": 669357,
-                            "fullName": "Nolan Gorman",
-                            "link": "/api/v1/people/669357",
-                            "firstName": "Nolan",
-                            "lastName": "Gorman",
-                            "primaryNumber": "16",
-                            "birthDate": "2000-05-10",
-                            "currentAge": 25,
-                            "birthCity": "Phoenix",
-                            "birthStateProvince": "AZ",
-                            "birthCountry": "USA",
-                            "height": "6' 0\"",
-                            "weight": 225,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "4",
-                                "name": "Second Base",
-                                "type": "Infielder",
-                                "abbreviation": "2B"
-                            },
-                            "useName": "Nolan",
-                            "useLastName": "Gorman",
-                            "middleName": "Brian",
-                            "boxscoreName": "Gorman",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": false,
-                            "draftYear": 2018,
-                            "mlbDebutDate": "2022-05-20",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Nolan Gorman",
-                            "nameSlug": "nolan-gorman-669357",
-                            "firstLastName": "Nolan Gorman",
-                            "lastFirstName": "Gorman, Nolan",
-                            "lastInitName": "Gorman, N",
-                            "initLastName": "N Gorman",
-                            "fullFMLName": "Nolan Brian Gorman",
-                            "fullLFMName": "Gorman, Nolan Brian",
-                            "strikeZoneTop": 3.217,
-                            "strikeZoneBottom": 1.624
-                        },
                         "pitcher": {
                             "id": 681676,
                             "fullName": "Ryan Fernandez",
@@ -764,8 +717,8 @@
                         }
                     },
                     "balls": 3,
-                    "strikes": 2,
-                    "outs": 2
+                    "strikes": 3,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 4169,
@@ -775,6 +728,7 @@
                 "content": {
                     "link": "/api/v1/game/823878/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
@@ -3428,11 +3382,11 @@
                     }
                 },
                 "linescore": {
-                    "currentInning": 5,
-                    "currentInningOrdinal": "5th",
-                    "inningState": "End",
-                    "inningHalf": "Bottom",
-                    "isTopInning": false,
+                    "currentInning": 6,
+                    "currentInningOrdinal": "6th",
+                    "inningState": "Top",
+                    "inningHalf": "Top",
+                    "isTopInning": true,
                     "scheduledInnings": 9,
                     "innings": [
                         {
@@ -3510,6 +3464,20 @@
                             },
                             "away": {
                                 "runs": 0,
+                                "hits": 0,
+                                "errors": 0,
+                                "leftOnBase": 0
+                            }
+                        },
+                        {
+                            "num": 6,
+                            "ordinalNum": "6th",
+                            "home": {
+                                "hits": 0,
+                                "errors": 0,
+                                "leftOnBase": 0
+                            },
+                            "away": {
                                 "hits": 0,
                                 "errors": 0,
                                 "leftOnBase": 0
@@ -3850,9 +3818,9 @@
                             "link": "/api/v1/teams/117"
                         }
                     },
-                    "balls": 0,
-                    "strikes": 3,
-                    "outs": 3
+                    "balls": 1,
+                    "strikes": 1,
+                    "outs": 0
                 },
                 "venue": {
                     "id": 5,
@@ -6902,54 +6870,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 682829,
-                            "fullName": "Elly De La Cruz",
-                            "link": "/api/v1/people/682829",
-                            "firstName": "Elly",
-                            "lastName": "De La Cruz",
-                            "primaryNumber": "44",
-                            "birthDate": "2002-01-11",
-                            "currentAge": 24,
-                            "birthCity": "Sabana Grande de Boya",
-                            "birthCountry": "Dominican Republic",
-                            "height": "6' 6\"",
-                            "weight": 200,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "6",
-                                "name": "Shortstop",
-                                "type": "Infielder",
-                                "abbreviation": "SS"
-                            },
-                            "useName": "Elly",
-                            "useLastName": "De La Cruz",
-                            "middleName": "Antonio",
-                            "boxscoreName": "De La Cruz, E",
-                            "gender": "M",
-                            "nameMatrilineal": "Sanchez",
-                            "isPlayer": true,
-                            "isVerified": false,
-                            "mlbDebutDate": "2023-06-06",
-                            "batSide": {
-                                "code": "S",
-                                "description": "Switch"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Elly De La Cruz",
-                            "nameSlug": "elly-de-la-cruz-682829",
-                            "firstLastName": "Elly De La Cruz",
-                            "lastFirstName": "De La Cruz, Elly",
-                            "lastInitName": "De La Cruz, E",
-                            "initLastName": "E De La Cruz",
-                            "fullFMLName": "Elly Antonio De La Cruz",
-                            "fullLFMName": "De La Cruz, Elly Antonio",
-                            "strikeZoneTop": 3.46,
-                            "strikeZoneBottom": 1.746
-                        },
-                        "onDeck": {
                             "id": 701398,
                             "fullName": "Sal Stewart",
                             "link": "/api/v1/people/701398",
@@ -6998,7 +6918,7 @@
                             "strikeZoneTop": 3.239,
                             "strikeZoneBottom": 1.635
                         },
-                        "inHole": {
+                        "onDeck": {
                             "id": 553993,
                             "fullName": "Eugenio Su\u00e1rez",
                             "link": "/api/v1/people/553993",
@@ -7046,6 +6966,55 @@
                             "fullLFMName": "Su\u00e1rez, Eugenio Alejandro",
                             "strikeZoneTop": 3.171,
                             "strikeZoneBottom": 1.6
+                        },
+                        "inHole": {
+                            "id": 663993,
+                            "fullName": "Nathaniel Lowe",
+                            "link": "/api/v1/people/663993",
+                            "firstName": "David",
+                            "lastName": "Lowe",
+                            "primaryNumber": "31",
+                            "birthDate": "1995-07-07",
+                            "currentAge": 30,
+                            "birthCity": "Norfolk",
+                            "birthStateProvince": "VA",
+                            "birthCountry": "USA",
+                            "height": "6' 4\"",
+                            "weight": 220,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "3",
+                                "name": "First Base",
+                                "type": "Infielder",
+                                "abbreviation": "1B"
+                            },
+                            "useName": "Nathaniel",
+                            "useLastName": "Lowe",
+                            "middleName": "Nathaniel",
+                            "boxscoreName": "Lowe, N",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2016,
+                            "mlbDebutDate": "2019-04-29",
+                            "batSide": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Nathaniel Lowe",
+                            "nameSlug": "nathaniel-lowe-663993",
+                            "firstLastName": "Nathaniel Lowe",
+                            "lastFirstName": "Lowe, Nathaniel",
+                            "lastInitName": "Lowe, N",
+                            "initLastName": "N Lowe",
+                            "fullFMLName": "David Nathaniel Lowe",
+                            "fullLFMName": "Lowe, David Nathaniel",
+                            "strikeZoneTop": 3.367,
+                            "strikeZoneBottom": 1.699
                         },
                         "pitcher": {
                             "id": 683175,
@@ -7096,7 +7065,7 @@
                             "strikeZoneTop": 3.299,
                             "strikeZoneBottom": 1.665
                         },
-                        "battingOrder": 3,
+                        "battingOrder": 4,
                         "team": {
                             "id": 113,
                             "name": "Cincinnati Reds",
@@ -7104,8 +7073,8 @@
                         }
                     },
                     "balls": 0,
-                    "strikes": 0,
-                    "outs": 0
+                    "strikes": 1,
+                    "outs": 1
                 },
                 "venue": {
                     "id": 12,
@@ -9730,7 +9699,7 @@
                 "linescore": {
                     "currentInning": 2,
                     "currentInningOrdinal": "2nd",
-                    "inningState": "Bottom",
+                    "inningState": "End",
                     "inningHalf": "Bottom",
                     "isTopInning": false,
                     "scheduledInnings": 9,
@@ -9755,9 +9724,10 @@
                             "num": 2,
                             "ordinalNum": "2nd",
                             "home": {
+                                "runs": 0,
                                 "hits": 0,
                                 "errors": 0,
-                                "leftOnBase": 0
+                                "leftOnBase": 1
                             },
                             "away": {
                                 "runs": 0,
@@ -9772,7 +9742,7 @@
                             "runs": 1,
                             "hits": 1,
                             "errors": 0,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         },
                         "away": {
                             "runs": 2,
@@ -9782,318 +9752,6 @@
                         }
                     },
                     "defense": {
-                        "pitcher": {
-                            "id": 605135,
-                            "fullName": "Chris Bassitt",
-                            "link": "/api/v1/people/605135",
-                            "firstName": "Christopher",
-                            "lastName": "Bassitt",
-                            "primaryNumber": "40",
-                            "birthDate": "1989-02-22",
-                            "currentAge": 37,
-                            "birthCity": "Toledo",
-                            "birthStateProvince": "OH",
-                            "birthCountry": "USA",
-                            "height": "6' 5\"",
-                            "weight": 220,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "1",
-                                "name": "Pitcher",
-                                "type": "Pitcher",
-                                "abbreviation": "P"
-                            },
-                            "useName": "Chris",
-                            "useLastName": "Bassitt",
-                            "middleName": "M.",
-                            "boxscoreName": "Bassitt",
-                            "nickName": "C Bass",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2011,
-                            "mlbDebutDate": "2014-08-30",
-                            "batSide": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Chris Bassitt",
-                            "nameSlug": "chris-bassitt-605135",
-                            "firstLastName": "Chris Bassitt",
-                            "lastFirstName": "Bassitt, Chris",
-                            "lastInitName": "Bassitt, C",
-                            "initLastName": "C Bassitt",
-                            "fullFMLName": "Christopher M. Bassitt",
-                            "fullLFMName": "Bassitt, Christopher M.",
-                            "strikeZoneTop": 3.433,
-                            "strikeZoneBottom": 1.733
-                        },
-                        "catcher": {
-                            "id": 694212,
-                            "fullName": "Samuel Basallo",
-                            "link": "/api/v1/people/694212"
-                        },
-                        "first": {
-                            "id": 624413,
-                            "fullName": "Pete Alonso",
-                            "link": "/api/v1/people/624413"
-                        },
-                        "second": {
-                            "id": 669236,
-                            "fullName": "Jeremiah Jackson",
-                            "link": "/api/v1/people/669236"
-                        },
-                        "third": {
-                            "id": 691723,
-                            "fullName": "Coby Mayo",
-                            "link": "/api/v1/people/691723"
-                        },
-                        "shortstop": {
-                            "id": 683002,
-                            "fullName": "Gunnar Henderson",
-                            "link": "/api/v1/people/683002"
-                        },
-                        "left": {
-                            "id": 681297,
-                            "fullName": "Colton Cowser",
-                            "link": "/api/v1/people/681297"
-                        },
-                        "center": {
-                            "id": 665750,
-                            "fullName": "Leody Taveras",
-                            "link": "/api/v1/people/665750"
-                        },
-                        "right": {
-                            "id": 687637,
-                            "fullName": "Dylan Beavers",
-                            "link": "/api/v1/people/687637"
-                        },
-                        "batter": {
-                            "id": 691723,
-                            "fullName": "Coby Mayo",
-                            "link": "/api/v1/people/691723"
-                        },
-                        "onDeck": {
-                            "id": 683002,
-                            "fullName": "Gunnar Henderson",
-                            "link": "/api/v1/people/683002"
-                        },
-                        "inHole": {
-                            "id": 621493,
-                            "fullName": "Taylor Ward",
-                            "link": "/api/v1/people/621493"
-                        },
-                        "battingOrder": 9,
-                        "team": {
-                            "id": 110,
-                            "name": "Baltimore Orioles",
-                            "link": "/api/v1/teams/110"
-                        }
-                    },
-                    "offense": {
-                        "batter": {
-                            "id": 695506,
-                            "fullName": "Jac Caglianone",
-                            "link": "/api/v1/people/695506",
-                            "firstName": "Jeffrey",
-                            "lastName": "Caglianone",
-                            "primaryNumber": "14",
-                            "birthDate": "2003-02-09",
-                            "currentAge": 23,
-                            "birthCity": "Tampa",
-                            "birthStateProvince": "FL",
-                            "birthCountry": "USA",
-                            "height": "6' 4\"",
-                            "weight": 250,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "9",
-                                "name": "Outfielder",
-                                "type": "Outfielder",
-                                "abbreviation": "RF"
-                            },
-                            "useName": "Jac",
-                            "useLastName": "Caglianone",
-                            "middleName": "Alan",
-                            "boxscoreName": "Caglianone",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2024,
-                            "pronunciation": "cag-lee-ohn",
-                            "mlbDebutDate": "2025-06-03",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "nameFirstLast": "Jac Caglianone",
-                            "nameSlug": "jac-caglianone-695506",
-                            "firstLastName": "Jac Caglianone",
-                            "lastFirstName": "Caglianone, Jac",
-                            "lastInitName": "Caglianone, J",
-                            "initLastName": "J Caglianone",
-                            "fullFMLName": "Jeffrey Alan Caglianone",
-                            "fullLFMName": "Caglianone, Jeffrey Alan",
-                            "strikeZoneTop": 3.402,
-                            "strikeZoneBottom": 1.717
-                        },
-                        "onDeck": {
-                            "id": 657041,
-                            "fullName": "Lane Thomas",
-                            "link": "/api/v1/people/657041",
-                            "firstName": "Lane",
-                            "lastName": "Thomas",
-                            "primaryNumber": "15",
-                            "birthDate": "1995-08-23",
-                            "currentAge": 30,
-                            "birthCity": "Knoxville",
-                            "birthStateProvince": "TN",
-                            "birthCountry": "USA",
-                            "height": "5' 11\"",
-                            "weight": 195,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "8",
-                                "name": "Outfielder",
-                                "type": "Outfielder",
-                                "abbreviation": "CF"
-                            },
-                            "useName": "Lane",
-                            "useLastName": "Thomas",
-                            "middleName": "Michael",
-                            "boxscoreName": "Thomas, L",
-                            "nickName": "Laner",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2014,
-                            "mlbDebutDate": "2019-04-17",
-                            "batSide": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Lane Thomas",
-                            "nameSlug": "lane-thomas-657041",
-                            "firstLastName": "Lane Thomas",
-                            "lastFirstName": "Thomas, Lane",
-                            "lastInitName": "Thomas, L",
-                            "initLastName": "L Thomas",
-                            "fullFMLName": "Lane Michael Thomas",
-                            "fullLFMName": "Thomas, Lane Michael",
-                            "strikeZoneTop": 3.146,
-                            "strikeZoneBottom": 1.588
-                        },
-                        "inHole": {
-                            "id": 664728,
-                            "fullName": "Kyle Isbel",
-                            "link": "/api/v1/people/664728",
-                            "firstName": "Kyle",
-                            "lastName": "Isbel",
-                            "primaryNumber": "28",
-                            "birthDate": "1997-03-03",
-                            "currentAge": 29,
-                            "birthCity": "Fontana",
-                            "birthStateProvince": "CA",
-                            "birthCountry": "USA",
-                            "height": "5' 10\"",
-                            "weight": 190,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "8",
-                                "name": "Outfielder",
-                                "type": "Outfielder",
-                                "abbreviation": "CF"
-                            },
-                            "useName": "Kyle",
-                            "useLastName": "Isbel",
-                            "middleName": "Grant",
-                            "boxscoreName": "Isbel",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2018,
-                            "pronunciation": "IZZ-bell",
-                            "mlbDebutDate": "2021-04-01",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Kyle Isbel",
-                            "nameSlug": "kyle-isbel-664728",
-                            "firstLastName": "Kyle Isbel",
-                            "lastFirstName": "Isbel, Kyle",
-                            "lastInitName": "Isbel, K",
-                            "initLastName": "K Isbel",
-                            "fullFMLName": "Kyle Grant Isbel",
-                            "fullLFMName": "Isbel, Kyle Grant",
-                            "strikeZoneTop": 3.114,
-                            "strikeZoneBottom": 1.571
-                        },
-                        "second": {
-                            "id": 695600,
-                            "fullName": "Carter Jensen",
-                            "link": "/api/v1/people/695600",
-                            "firstName": "Carter",
-                            "lastName": "Jensen",
-                            "primaryNumber": "22",
-                            "birthDate": "2003-07-03",
-                            "currentAge": 22,
-                            "birthCity": "Kansas City",
-                            "birthStateProvince": "MO",
-                            "birthCountry": "USA",
-                            "height": "6' 0\"",
-                            "weight": 210,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "2",
-                                "name": "Catcher",
-                                "type": "Catcher",
-                                "abbreviation": "C"
-                            },
-                            "useName": "Carter",
-                            "useLastName": "Jensen",
-                            "middleName": "James",
-                            "boxscoreName": "Jensen",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2021,
-                            "mlbDebutDate": "2025-09-02",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Carter Jensen",
-                            "nameSlug": "carter-jensen-695600",
-                            "firstLastName": "Carter Jensen",
-                            "lastFirstName": "Jensen, Carter",
-                            "lastInitName": "Jensen, C",
-                            "initLastName": "C Jensen",
-                            "fullFMLName": "Carter James Jensen",
-                            "fullLFMName": "Jensen, Carter James",
-                            "strikeZoneTop": 3.19,
-                            "strikeZoneBottom": 1.61
-                        },
                         "pitcher": {
                             "id": 608379,
                             "fullName": "Michael Wacha",
@@ -10145,16 +9803,276 @@
                             "strikeZoneTop": 3.478,
                             "strikeZoneBottom": 1.755
                         },
-                        "battingOrder": 7,
+                        "catcher": {
+                            "id": 695600,
+                            "fullName": "Carter Jensen",
+                            "link": "/api/v1/people/695600"
+                        },
+                        "first": {
+                            "id": 686469,
+                            "fullName": "Vinnie Pasquantino",
+                            "link": "/api/v1/people/686469"
+                        },
+                        "second": {
+                            "id": 686681,
+                            "fullName": "Michael Massey",
+                            "link": "/api/v1/people/686681"
+                        },
+                        "third": {
+                            "id": 672580,
+                            "fullName": "Maikel Garcia",
+                            "link": "/api/v1/people/672580"
+                        },
+                        "shortstop": {
+                            "id": 677951,
+                            "fullName": "Bobby Witt Jr.",
+                            "link": "/api/v1/people/677951"
+                        },
+                        "left": {
+                            "id": 657041,
+                            "fullName": "Lane Thomas",
+                            "link": "/api/v1/people/657041"
+                        },
+                        "center": {
+                            "id": 664728,
+                            "fullName": "Kyle Isbel",
+                            "link": "/api/v1/people/664728"
+                        },
+                        "right": {
+                            "id": 695506,
+                            "fullName": "Jac Caglianone",
+                            "link": "/api/v1/people/695506"
+                        },
+                        "batter": {
+                            "id": 664728,
+                            "fullName": "Kyle Isbel",
+                            "link": "/api/v1/people/664728"
+                        },
+                        "onDeck": {
+                            "id": 672580,
+                            "fullName": "Maikel Garcia",
+                            "link": "/api/v1/people/672580"
+                        },
+                        "inHole": {
+                            "id": 677951,
+                            "fullName": "Bobby Witt Jr.",
+                            "link": "/api/v1/people/677951"
+                        },
+                        "battingOrder": 9,
                         "team": {
                             "id": 118,
                             "name": "Kansas City Royals",
                             "link": "/api/v1/teams/118"
                         }
                     },
+                    "offense": {
+                        "batter": {
+                            "id": 691723,
+                            "fullName": "Coby Mayo",
+                            "link": "/api/v1/people/691723",
+                            "firstName": "Coby",
+                            "lastName": "Mayo",
+                            "primaryNumber": "16",
+                            "birthDate": "2001-12-10",
+                            "currentAge": 24,
+                            "birthCity": "Coral Springs",
+                            "birthStateProvince": "FL",
+                            "birthCountry": "USA",
+                            "height": "6' 5\"",
+                            "weight": 225,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "3",
+                                "name": "First Base",
+                                "type": "Infielder",
+                                "abbreviation": "1B"
+                            },
+                            "useName": "Coby",
+                            "useLastName": "Mayo",
+                            "middleName": "Gerald",
+                            "boxscoreName": "Mayo",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2020,
+                            "mlbDebutDate": "2024-08-02",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Coby Mayo",
+                            "nameSlug": "coby-mayo-691723",
+                            "firstLastName": "Coby Mayo",
+                            "lastFirstName": "Mayo, Coby",
+                            "lastInitName": "Mayo, C",
+                            "initLastName": "C Mayo",
+                            "fullFMLName": "Coby Gerald Mayo",
+                            "fullLFMName": "Mayo, Coby Gerald",
+                            "strikeZoneTop": 3.41,
+                            "strikeZoneBottom": 1.72
+                        },
+                        "onDeck": {
+                            "id": 683002,
+                            "fullName": "Gunnar Henderson",
+                            "link": "/api/v1/people/683002",
+                            "firstName": "Gunnar",
+                            "lastName": "Henderson",
+                            "primaryNumber": "2",
+                            "birthDate": "2001-06-29",
+                            "currentAge": 24,
+                            "birthCity": "Montgomery",
+                            "birthStateProvince": "AL",
+                            "birthCountry": "USA",
+                            "height": "6' 3\"",
+                            "weight": 230,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "6",
+                                "name": "Shortstop",
+                                "type": "Infielder",
+                                "abbreviation": "SS"
+                            },
+                            "useName": "Gunnar",
+                            "useLastName": "Henderson",
+                            "middleName": "Randal",
+                            "boxscoreName": "Henderson",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2019,
+                            "mlbDebutDate": "2022-08-31",
+                            "batSide": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Gunnar Henderson",
+                            "nameSlug": "gunnar-henderson-683002",
+                            "firstLastName": "Gunnar Henderson",
+                            "lastFirstName": "Henderson, Gunnar",
+                            "lastInitName": "Henderson, G",
+                            "initLastName": "G Henderson",
+                            "fullFMLName": "Gunnar Randal Henderson",
+                            "fullLFMName": "Henderson, Gunnar Randal",
+                            "strikeZoneTop": 3.33,
+                            "strikeZoneBottom": 1.68
+                        },
+                        "inHole": {
+                            "id": 621493,
+                            "fullName": "Taylor Ward",
+                            "link": "/api/v1/people/621493",
+                            "firstName": "Joseph",
+                            "lastName": "Ward",
+                            "primaryNumber": "3",
+                            "birthDate": "1993-12-14",
+                            "currentAge": 32,
+                            "birthCity": "Dayton",
+                            "birthStateProvince": "OH",
+                            "birthCountry": "USA",
+                            "height": "6' 0\"",
+                            "weight": 205,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "7",
+                                "name": "Outfielder",
+                                "type": "Outfielder",
+                                "abbreviation": "LF"
+                            },
+                            "useName": "Taylor",
+                            "useLastName": "Ward",
+                            "middleName": "Taylor",
+                            "boxscoreName": "Ward",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2015,
+                            "mlbDebutDate": "2018-08-14",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Taylor Ward",
+                            "nameSlug": "taylor-ward-621493",
+                            "firstLastName": "Taylor Ward",
+                            "lastFirstName": "Ward, Taylor",
+                            "lastInitName": "Ward, T",
+                            "initLastName": "T Ward",
+                            "fullFMLName": "Joseph Taylor Ward",
+                            "fullLFMName": "Ward, Joseph Taylor",
+                            "strikeZoneTop": 3.19,
+                            "strikeZoneBottom": 1.61
+                        },
+                        "pitcher": {
+                            "id": 605135,
+                            "fullName": "Chris Bassitt",
+                            "link": "/api/v1/people/605135",
+                            "firstName": "Christopher",
+                            "lastName": "Bassitt",
+                            "primaryNumber": "40",
+                            "birthDate": "1989-02-22",
+                            "currentAge": 37,
+                            "birthCity": "Toledo",
+                            "birthStateProvince": "OH",
+                            "birthCountry": "USA",
+                            "height": "6' 5\"",
+                            "weight": 220,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "1",
+                                "name": "Pitcher",
+                                "type": "Pitcher",
+                                "abbreviation": "P"
+                            },
+                            "useName": "Chris",
+                            "useLastName": "Bassitt",
+                            "middleName": "M.",
+                            "boxscoreName": "Bassitt",
+                            "nickName": "C Bass",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2011,
+                            "mlbDebutDate": "2014-08-30",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Chris Bassitt",
+                            "nameSlug": "chris-bassitt-605135",
+                            "firstLastName": "Chris Bassitt",
+                            "lastFirstName": "Bassitt, Chris",
+                            "lastInitName": "Bassitt, C",
+                            "initLastName": "C Bassitt",
+                            "fullFMLName": "Christopher M. Bassitt",
+                            "fullLFMName": "Bassitt, Christopher M.",
+                            "strikeZoneTop": 3.433,
+                            "strikeZoneBottom": 1.733
+                        },
+                        "battingOrder": 9,
+                        "team": {
+                            "id": 110,
+                            "name": "Baltimore Orioles",
+                            "link": "/api/v1/teams/110"
+                        }
+                    },
                     "balls": 1,
                     "strikes": 0,
-                    "outs": 2
+                    "outs": 3
                 },
                 "venue": {
                     "id": 7,
@@ -10215,15 +10133,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 8800,
-                                    "proj": 8.5,
-                                    "value": 0.97
-                                },
                                 "23AAE": {
                                     "salary": 4800,
                                     "proj": 8.5,
                                     "value": 1.78
+                                },
+                                "23B78": {
+                                    "salary": 8800,
+                                    "proj": 8.5,
+                                    "value": 0.97
                                 }
                             },
                             "fd_positions": "3B/2B",
@@ -10261,15 +10179,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 9600,
-                                    "proj": 10.5,
-                                    "value": 1.09
-                                },
                                 "23AAE": {
                                     "salary": 6000,
                                     "proj": 10.5,
                                     "value": 1.75
+                                },
+                                "23B78": {
+                                    "salary": 9600,
+                                    "proj": 10.5,
+                                    "value": 1.09
                                 }
                             },
                             "fd_positions": "SS",
@@ -10307,15 +10225,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 8200,
-                                    "proj": 8.5,
-                                    "value": 1.04
-                                },
                                 "23AAE": {
                                     "salary": 4100,
                                     "proj": 8.5,
                                     "value": 2.08
+                                },
+                                "23B78": {
+                                    "salary": 8200,
+                                    "proj": 8.5,
+                                    "value": 1.04
                                 }
                             },
                             "fd_positions": "1B",
@@ -10353,15 +10271,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 6600,
-                                    "proj": 7.6,
-                                    "value": 1.15
-                                },
                                 "23AAE": {
                                     "salary": 3400,
                                     "proj": 7.6,
                                     "value": 2.23
+                                },
+                                "23B78": {
+                                    "salary": 6600,
+                                    "proj": 7.6,
+                                    "value": 1.15
                                 }
                             },
                             "fd_positions": "C/1B",
@@ -10399,15 +10317,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 7600,
-                                    "proj": 7.7,
-                                    "value": 1.01
-                                },
                                 "23AAE": {
                                     "salary": 3800,
                                     "proj": 7.7,
                                     "value": 2.03
+                                },
+                                "23B78": {
+                                    "salary": 7600,
+                                    "proj": 7.7,
+                                    "value": 1.01
                                 }
                             },
                             "fd_positions": "C",
@@ -10445,15 +10363,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 4400,
-                                    "proj": 5.9,
-                                    "value": 1.33
-                                },
                                 "23AAE": {
                                     "salary": 2400,
                                     "proj": 5.9,
                                     "value": 2.44
+                                },
+                                "23B78": {
+                                    "salary": 4400,
+                                    "proj": 5.9,
+                                    "value": 1.33
                                 }
                             },
                             "fd_positions": "2B/OF",
@@ -10491,15 +10409,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 5800,
-                                    "proj": 7.3,
-                                    "value": 1.26
-                                },
                                 "23AAE": {
                                     "salary": 2800,
                                     "proj": 7.3,
                                     "value": 2.61
+                                },
+                                "23B78": {
+                                    "salary": 5800,
+                                    "proj": 7.3,
+                                    "value": 1.26
                                 }
                             },
                             "fd_positions": "1B/OF",
@@ -10537,15 +10455,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 3200,
-                                    "proj": 6.9,
-                                    "value": 2.15
-                                },
                                 "23AAE": {
                                     "salary": 2100,
                                     "proj": 6.9,
                                     "value": 3.28
+                                },
+                                "23B78": {
+                                    "salary": 3200,
+                                    "proj": 6.9,
+                                    "value": 2.15
                                 }
                             },
                             "fd_positions": "OF",
@@ -10583,15 +10501,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 5200,
-                                    "proj": 5.9,
-                                    "value": 1.13
-                                },
                                 "23AAE": {
                                     "salary": 2600,
                                     "proj": 5.9,
                                     "value": 2.27
+                                },
+                                "23B78": {
+                                    "salary": 5200,
+                                    "proj": 5.9,
+                                    "value": 1.13
                                 }
                             },
                             "fd_positions": "OF",
@@ -10631,15 +10549,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 9800,
-                                    "proj": 10.2,
-                                    "value": 1.04
-                                },
                                 "23AAE": {
                                     "salary": 6100,
                                     "proj": 10.2,
                                     "value": 1.67
+                                },
+                                "23B78": {
+                                    "salary": 9800,
+                                    "proj": 10.2,
+                                    "value": 1.04
                                 }
                             },
                             "fd_positions": "SS",
@@ -10677,15 +10595,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 8600,
-                                    "proj": 8.5,
-                                    "value": 0.99
-                                },
                                 "23AAE": {
                                     "salary": 4600,
                                     "proj": 8.5,
                                     "value": 1.85
+                                },
+                                "23B78": {
+                                    "salary": 8600,
+                                    "proj": 8.5,
+                                    "value": 0.99
                                 }
                             },
                             "fd_positions": "OF",
@@ -10723,15 +10641,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 6200,
-                                    "proj": 4.9,
-                                    "value": 0.79
-                                },
                                 "23AAE": {
                                     "salary": 3100,
                                     "proj": 4.9,
                                     "value": 1.58
+                                },
+                                "23B78": {
+                                    "salary": 6200,
+                                    "proj": 4.9,
+                                    "value": 0.79
                                 }
                             },
                             "fd_positions": "OF",
@@ -10769,15 +10687,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 9000,
-                                    "proj": 8.4,
-                                    "value": 0.93
-                                },
                                 "23AAE": {
                                     "salary": 5000,
                                     "proj": 8.4,
                                     "value": 1.68
+                                },
+                                "23B78": {
+                                    "salary": 9000,
+                                    "proj": 8.4,
+                                    "value": 0.93
                                 }
                             },
                             "fd_positions": "1B",
@@ -10815,15 +10733,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 7200,
-                                    "proj": 6.4,
-                                    "value": 0.89
-                                },
                                 "23AAE": {
                                     "salary": 3700,
                                     "proj": 6.4,
                                     "value": 1.73
+                                },
+                                "23B78": {
+                                    "salary": 7200,
+                                    "proj": 6.4,
+                                    "value": 0.89
                                 }
                             },
                             "fd_positions": "C",
@@ -10861,15 +10779,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 6000,
-                                    "proj": 6.8,
-                                    "value": 1.13
-                                },
                                 "23AAE": {
                                     "salary": 2900,
                                     "proj": 6.8,
                                     "value": 2.34
+                                },
+                                "23B78": {
+                                    "salary": 6000,
+                                    "proj": 6.8,
+                                    "value": 1.13
                                 }
                             },
                             "fd_positions": "OF",
@@ -10907,15 +10825,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 7000,
-                                    "proj": 6.6,
-                                    "value": 0.95
-                                },
                                 "23AAE": {
                                     "salary": 3600,
                                     "proj": 6.6,
                                     "value": 1.84
+                                },
+                                "23B78": {
+                                    "salary": 7000,
+                                    "proj": 6.6,
+                                    "value": 0.95
                                 }
                             },
                             "fd_positions": "2B/OF",
@@ -10953,15 +10871,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 5600,
-                                    "proj": 6.7,
-                                    "value": 1.2
-                                },
                                 "23AAE": {
                                     "salary": 2800,
                                     "proj": 6.7,
                                     "value": 2.4
+                                },
+                                "23B78": {
+                                    "salary": 5600,
+                                    "proj": 6.7,
+                                    "value": 1.2
                                 }
                             },
                             "fd_positions": "OF",
@@ -10999,15 +10917,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 4200,
-                                    "proj": 5.6,
-                                    "value": 1.34
-                                },
                                 "23AAE": {
                                     "salary": 2400,
                                     "proj": 5.6,
                                     "value": 2.35
+                                },
+                                "23B78": {
+                                    "salary": 4200,
+                                    "proj": 5.6,
+                                    "value": 1.34
                                 }
                             },
                             "fd_positions": "3B/1B",
@@ -11042,15 +10960,15 @@
                             }
                         },
                         "dk_slates": {
-                            "23B78": {
-                                "salary": 10400,
-                                "proj": 10.3,
-                                "value": 0.99
-                            },
                             "23AAE": {
                                 "salary": 6800,
                                 "proj": 10.3,
                                 "value": 1.51
+                            },
+                            "23B78": {
+                                "salary": 10400,
+                                "proj": 10.3,
+                                "value": 0.99
                             }
                         },
                         "fd_positions": "P",
@@ -11081,15 +10999,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 9800,
-                                    "proj": 10.2,
-                                    "value": 1.04
-                                },
                                 "23AAE": {
                                     "salary": 6100,
                                     "proj": 10.2,
                                     "value": 1.67
+                                },
+                                "23B78": {
+                                    "salary": 9800,
+                                    "proj": 10.2,
+                                    "value": 1.04
                                 }
                             },
                             "fd_positions": "SS",
@@ -11119,15 +11037,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 8600,
-                                    "proj": 8.5,
-                                    "value": 0.99
-                                },
                                 "23AAE": {
                                     "salary": 4600,
                                     "proj": 8.5,
                                     "value": 1.85
+                                },
+                                "23B78": {
+                                    "salary": 8600,
+                                    "proj": 8.5,
+                                    "value": 0.99
                                 }
                             },
                             "fd_positions": "OF",
@@ -11157,15 +11075,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 6200,
-                                    "proj": 4.9,
-                                    "value": 0.79
-                                },
                                 "23AAE": {
                                     "salary": 3100,
                                     "proj": 4.9,
                                     "value": 1.58
+                                },
+                                "23B78": {
+                                    "salary": 6200,
+                                    "proj": 4.9,
+                                    "value": 0.79
                                 }
                             },
                             "fd_positions": "OF",
@@ -11195,15 +11113,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 9000,
-                                    "proj": 8.4,
-                                    "value": 0.93
-                                },
                                 "23AAE": {
                                     "salary": 5000,
                                     "proj": 8.4,
                                     "value": 1.68
+                                },
+                                "23B78": {
+                                    "salary": 9000,
+                                    "proj": 8.4,
+                                    "value": 0.93
                                 }
                             },
                             "fd_positions": "1B",
@@ -11233,15 +11151,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 7200,
-                                    "proj": 6.4,
-                                    "value": 0.89
-                                },
                                 "23AAE": {
                                     "salary": 3700,
                                     "proj": 6.4,
                                     "value": 1.73
+                                },
+                                "23B78": {
+                                    "salary": 7200,
+                                    "proj": 6.4,
+                                    "value": 0.89
                                 }
                             },
                             "fd_positions": "C",
@@ -11271,15 +11189,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 6000,
-                                    "proj": 6.8,
-                                    "value": 1.13
-                                },
                                 "23AAE": {
                                     "salary": 2900,
                                     "proj": 6.8,
                                     "value": 2.34
+                                },
+                                "23B78": {
+                                    "salary": 6000,
+                                    "proj": 6.8,
+                                    "value": 1.13
                                 }
                             },
                             "fd_positions": "OF",
@@ -11309,15 +11227,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 7000,
-                                    "proj": 6.6,
-                                    "value": 0.95
-                                },
                                 "23AAE": {
                                     "salary": 3600,
                                     "proj": 6.6,
                                     "value": 1.84
+                                },
+                                "23B78": {
+                                    "salary": 7000,
+                                    "proj": 6.6,
+                                    "value": 0.95
                                 }
                             },
                             "fd_positions": "2B/OF",
@@ -11347,15 +11265,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 5600,
-                                    "proj": 6.7,
-                                    "value": 1.2
-                                },
                                 "23AAE": {
                                     "salary": 2800,
                                     "proj": 6.7,
                                     "value": 2.4
+                                },
+                                "23B78": {
+                                    "salary": 5600,
+                                    "proj": 6.7,
+                                    "value": 1.2
                                 }
                             },
                             "fd_positions": "OF",
@@ -11385,15 +11303,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 4200,
-                                    "proj": 5.6,
-                                    "value": 1.34
-                                },
                                 "23AAE": {
                                     "salary": 2400,
                                     "proj": 5.6,
                                     "value": 2.35
+                                },
+                                "23B78": {
+                                    "salary": 4200,
+                                    "proj": 5.6,
+                                    "value": 1.34
                                 }
                             },
                             "fd_positions": "3B/1B",
@@ -11425,15 +11343,15 @@
                             }
                         },
                         "dk_slates": {
-                            "23B78": {
-                                "salary": 11000,
-                                "proj": 13.9,
-                                "value": 1.26
-                            },
                             "23AAE": {
                                 "salary": 7800,
                                 "proj": 13.9,
                                 "value": 1.78
+                            },
+                            "23B78": {
+                                "salary": 11000,
+                                "proj": 13.9,
+                                "value": 1.26
                             }
                         },
                         "fd_positions": "P",
@@ -11464,15 +11382,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 8800,
-                                    "proj": 8.5,
-                                    "value": 0.97
-                                },
                                 "23AAE": {
                                     "salary": 4800,
                                     "proj": 8.5,
                                     "value": 1.78
+                                },
+                                "23B78": {
+                                    "salary": 8800,
+                                    "proj": 8.5,
+                                    "value": 0.97
                                 }
                             },
                             "fd_positions": "3B/2B",
@@ -11502,15 +11420,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 9600,
-                                    "proj": 10.5,
-                                    "value": 1.09
-                                },
                                 "23AAE": {
                                     "salary": 6000,
                                     "proj": 10.5,
                                     "value": 1.75
+                                },
+                                "23B78": {
+                                    "salary": 9600,
+                                    "proj": 10.5,
+                                    "value": 1.09
                                 }
                             },
                             "fd_positions": "SS",
@@ -11540,15 +11458,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 8200,
-                                    "proj": 8.5,
-                                    "value": 1.04
-                                },
                                 "23AAE": {
                                     "salary": 4100,
                                     "proj": 8.5,
                                     "value": 2.08
+                                },
+                                "23B78": {
+                                    "salary": 8200,
+                                    "proj": 8.5,
+                                    "value": 1.04
                                 }
                             },
                             "fd_positions": "1B",
@@ -11578,15 +11496,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 6600,
-                                    "proj": 7.6,
-                                    "value": 1.15
-                                },
                                 "23AAE": {
                                     "salary": 3400,
                                     "proj": 7.6,
                                     "value": 2.23
+                                },
+                                "23B78": {
+                                    "salary": 6600,
+                                    "proj": 7.6,
+                                    "value": 1.15
                                 }
                             },
                             "fd_positions": "C/1B",
@@ -11616,15 +11534,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 7600,
-                                    "proj": 7.7,
-                                    "value": 1.01
-                                },
                                 "23AAE": {
                                     "salary": 3800,
                                     "proj": 7.7,
                                     "value": 2.03
+                                },
+                                "23B78": {
+                                    "salary": 7600,
+                                    "proj": 7.7,
+                                    "value": 1.01
                                 }
                             },
                             "fd_positions": "C",
@@ -11654,15 +11572,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 4400,
-                                    "proj": 5.9,
-                                    "value": 1.33
-                                },
                                 "23AAE": {
                                     "salary": 2400,
                                     "proj": 5.9,
                                     "value": 2.44
+                                },
+                                "23B78": {
+                                    "salary": 4400,
+                                    "proj": 5.9,
+                                    "value": 1.33
                                 }
                             },
                             "fd_positions": "2B/OF",
@@ -11692,15 +11610,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 5800,
-                                    "proj": 7.3,
-                                    "value": 1.26
-                                },
                                 "23AAE": {
                                     "salary": 2800,
                                     "proj": 7.3,
                                     "value": 2.61
+                                },
+                                "23B78": {
+                                    "salary": 5800,
+                                    "proj": 7.3,
+                                    "value": 1.26
                                 }
                             },
                             "fd_positions": "1B/OF",
@@ -11730,15 +11648,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 3200,
-                                    "proj": 6.9,
-                                    "value": 2.15
-                                },
                                 "23AAE": {
                                     "salary": 2100,
                                     "proj": 6.9,
                                     "value": 3.28
+                                },
+                                "23B78": {
+                                    "salary": 3200,
+                                    "proj": 6.9,
+                                    "value": 2.15
                                 }
                             },
                             "fd_positions": "OF",
@@ -11768,15 +11686,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B78": {
-                                    "salary": 5200,
-                                    "proj": 5.9,
-                                    "value": 1.13
-                                },
                                 "23AAE": {
                                     "salary": 2600,
                                     "proj": 5.9,
                                     "value": 2.27
+                                },
+                                "23B78": {
+                                    "salary": 5200,
+                                    "proj": 5.9,
+                                    "value": 1.13
                                 }
                             },
                             "fd_positions": "OF",
@@ -22675,16 +22593,16 @@
                     },
                     "defense": {
                         "team": {
-                            "id": 147,
-                            "name": "New York Yankees",
-                            "link": "/api/v1/teams/147"
+                            "id": 111,
+                            "name": "Boston Red Sox",
+                            "link": "/api/v1/teams/111"
                         }
                     },
                     "offense": {
                         "team": {
-                            "id": 111,
-                            "name": "Boston Red Sox",
-                            "link": "/api/v1/teams/111"
+                            "id": 147,
+                            "name": "New York Yankees",
+                            "link": "/api/v1/teams/147"
                         }
                     }
                 },
@@ -22741,15 +22659,15 @@
                             }
                         },
                         "dk_slates": {
-                            "23BC7": {
-                                "salary": 11600,
-                                "proj": 16.6,
-                                "value": 1.43
-                            },
                             "23AAF": {
                                 "salary": 9700,
                                 "proj": 16.6,
                                 "value": 1.71
+                            },
+                            "23BC7": {
+                                "salary": 11600,
+                                "proj": 16.6,
+                                "value": 1.43
                             }
                         },
                         "fd_positions": "P",
@@ -22786,15 +22704,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 10000,
-                                    "proj": 10.7,
-                                    "value": 1.07
-                                },
                                 "23AAF": {
                                     "salary": 6600,
                                     "proj": 10.7,
                                     "value": 1.62
+                                },
+                                "23BC7": {
+                                    "salary": 10000,
+                                    "proj": 10.7,
+                                    "value": 1.07
                                 }
                             },
                             "fd_positions": "OF",
@@ -22824,15 +22742,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 7600,
-                                    "proj": 7.7,
-                                    "value": 1.01
-                                },
                                 "23AAF": {
                                     "salary": 4500,
                                     "proj": 7.7,
                                     "value": 1.7
+                                },
+                                "23BC7": {
+                                    "salary": 7600,
+                                    "proj": 7.7,
+                                    "value": 1.01
                                 }
                             },
                             "fd_positions": "OF/1B",
@@ -22862,15 +22780,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 7800,
-                                    "proj": 7.4,
-                                    "value": 0.95
-                                },
                                 "23AAF": {
                                     "salary": 4600,
                                     "proj": 7.4,
                                     "value": 1.62
+                                },
+                                "23BC7": {
+                                    "salary": 7800,
+                                    "proj": 7.4,
+                                    "value": 0.95
                                 }
                             },
                             "fd_positions": "OF",
@@ -22900,15 +22818,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 6200,
-                                    "proj": 6.4,
-                                    "value": 1.04
-                                },
                                 "23AAF": {
                                     "salary": 3400,
                                     "proj": 6.4,
                                     "value": 1.89
+                                },
+                                "23BC7": {
+                                    "salary": 6200,
+                                    "proj": 6.4,
+                                    "value": 1.04
                                 }
                             },
                             "fd_positions": "2B/3B",
@@ -22938,15 +22856,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 7000,
-                                    "proj": 5.6,
-                                    "value": 0.8
-                                },
                                 "23AAF": {
                                     "salary": 4200,
                                     "proj": 5.6,
                                     "value": 1.33
+                                },
+                                "23BC7": {
+                                    "salary": 7000,
+                                    "proj": 5.6,
+                                    "value": 0.8
                                 }
                             },
                             "fd_positions": "2B/3B",
@@ -22976,15 +22894,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 4200,
-                                    "proj": 1.5,
-                                    "value": 0.36
-                                },
                                 "23AAF": {
                                     "salary": 2200,
                                     "proj": 1.5,
                                     "value": 0.68
+                                },
+                                "23BC7": {
+                                    "salary": 4200,
+                                    "proj": 1.5,
+                                    "value": 0.36
                                 }
                             },
                             "fd_positions": "OF",
@@ -23014,15 +22932,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 5600,
-                                    "proj": 6.7,
-                                    "value": 1.2
-                                },
                                 "23AAF": {
                                     "salary": 2800,
                                     "proj": 6.7,
                                     "value": 2.41
+                                },
+                                "23BC7": {
+                                    "salary": 5600,
+                                    "proj": 6.7,
+                                    "value": 1.2
                                 }
                             },
                             "fd_positions": "SS/2B",
@@ -23052,15 +22970,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 5400,
-                                    "proj": 5.0,
-                                    "value": 0.93
-                                },
                                 "23AAF": {
                                     "salary": 2700,
                                     "proj": 5.0,
                                     "value": 1.85
+                                },
+                                "23BC7": {
+                                    "salary": 5400,
+                                    "proj": 5.0,
+                                    "value": 0.93
                                 }
                             },
                             "fd_positions": "C",
@@ -23092,15 +23010,15 @@
                             }
                         },
                         "dk_slates": {
-                            "23BC7": {
-                                "salary": 10800,
-                                "proj": 14.5,
-                                "value": 1.34
-                            },
                             "23AAF": {
                                 "salary": 8000,
                                 "proj": 14.5,
                                 "value": 1.81
+                            },
+                            "23BC7": {
+                                "salary": 10800,
+                                "proj": 14.5,
+                                "value": 1.34
                             }
                         },
                         "fd_positions": "P",
@@ -23131,15 +23049,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 8800,
-                                    "proj": 7.8,
-                                    "value": 0.89
-                                },
                                 "23AAF": {
                                     "salary": 5500,
                                     "proj": 7.8,
                                     "value": 1.42
+                                },
+                                "23BC7": {
+                                    "salary": 8800,
+                                    "proj": 7.8,
+                                    "value": 0.89
                                 }
                             },
                             "fd_positions": "OF",
@@ -23169,15 +23087,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 6800,
-                                    "proj": 6.9,
-                                    "value": 1.02
-                                },
                                 "23AAF": {
                                     "salary": 3900,
                                     "proj": 6.9,
                                     "value": 1.77
+                                },
+                                "23BC7": {
+                                    "salary": 6800,
+                                    "proj": 6.9,
+                                    "value": 1.02
                                 }
                             },
                             "fd_positions": "SS",
@@ -23213,15 +23131,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 7200,
-                                    "proj": 7.6,
-                                    "value": 1.06
-                                },
                                 "23AAF": {
                                     "salary": 4400,
                                     "proj": 7.6,
                                     "value": 1.73
+                                },
+                                "23BC7": {
+                                    "salary": 7200,
+                                    "proj": 7.6,
+                                    "value": 1.06
                                 }
                             },
                             "fd_positions": "C/1B",
@@ -23251,15 +23169,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 5000,
-                                    "proj": 5.6,
-                                    "value": 1.12
-                                },
                                 "23AAF": {
                                     "salary": 2400,
                                     "proj": 5.6,
                                     "value": 2.33
+                                },
+                                "23BC7": {
+                                    "salary": 5000,
+                                    "proj": 5.6,
+                                    "value": 1.12
                                 }
                             },
                             "fd_positions": "3B/2B",
@@ -23289,15 +23207,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 8200,
-                                    "proj": 6.6,
-                                    "value": 0.81
-                                },
                                 "23AAF": {
                                     "salary": 4700,
                                     "proj": 6.6,
                                     "value": 1.41
+                                },
+                                "23BC7": {
+                                    "salary": 8200,
+                                    "proj": 6.6,
+                                    "value": 0.81
                                 }
                             },
                             "fd_positions": "OF",
@@ -23327,15 +23245,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 3000,
-                                    "proj": 5.1,
-                                    "value": 1.71
-                                },
                                 "23AAF": {
                                     "salary": 2000,
                                     "proj": 5.1,
                                     "value": 2.56
+                                },
+                                "23BC7": {
+                                    "salary": 3000,
+                                    "proj": 5.1,
+                                    "value": 1.71
                                 }
                             },
                             "fd_positions": "SS/3B",
@@ -23371,15 +23289,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BC7": {
-                                    "salary": 5800,
-                                    "proj": 6.3,
-                                    "value": 1.09
-                                },
                                 "23AAF": {
                                     "salary": 3000,
                                     "proj": 6.3,
                                     "value": 2.1
+                                },
+                                "23BC7": {
+                                    "salary": 5800,
+                                    "proj": 6.3,
+                                    "value": 1.09
                                 }
                             },
                             "fd_positions": "OF/2B",
@@ -24445,12 +24363,12 @@
                                 "proj": 21.9,
                                 "value": 3.0
                             },
-                            "1F93B": {
+                            "1F93E": {
                                 "salary": 7300,
                                 "proj": 21.9,
                                 "value": 3.0
                             },
-                            "1F93E": {
+                            "1F93B": {
                                 "salary": 7300,
                                 "proj": 21.9,
                                 "value": 3.0
@@ -24484,12 +24402,12 @@
                                     "proj": 9.9,
                                     "value": 3.41
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2900,
                                     "proj": 9.9,
                                     "value": 3.41
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2900,
                                     "proj": 9.9,
                                     "value": 3.41
@@ -24522,12 +24440,12 @@
                                     "proj": 7.8,
                                     "value": 2.89
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 7.8,
                                     "value": 2.89
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 7.8,
                                     "value": 2.89
@@ -24560,12 +24478,12 @@
                                     "proj": 7.5,
                                     "value": 2.69
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 7.5,
                                     "value": 2.69
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 7.5,
                                     "value": 2.69
@@ -24598,12 +24516,12 @@
                                     "proj": 8.1,
                                     "value": 2.44
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3300,
                                     "proj": 8.1,
                                     "value": 2.44
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3300,
                                     "proj": 8.1,
                                     "value": 2.44
@@ -24636,12 +24554,12 @@
                                     "proj": 7.9,
                                     "value": 2.92
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 7.9,
                                     "value": 2.92
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 7.9,
                                     "value": 2.92
@@ -24674,12 +24592,12 @@
                                     "proj": 2.0,
                                     "value": 0.71
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 2.0,
                                     "value": 0.71
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 2.0,
                                     "value": 0.71
@@ -24712,12 +24630,12 @@
                                     "proj": 7.8,
                                     "value": 2.88
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 7.8,
                                     "value": 2.88
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 7.8,
                                     "value": 2.88
@@ -24750,12 +24668,12 @@
                                     "proj": 6.4,
                                     "value": 2.45
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 6.4,
                                     "value": 2.45
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 6.4,
                                     "value": 2.45
@@ -24796,12 +24714,12 @@
                                 "proj": 22.4,
                                 "value": 2.55
                             },
-                            "1F93B": {
+                            "1F93E": {
                                 "salary": 8800,
                                 "proj": 22.4,
                                 "value": 2.55
                             },
-                            "1F93E": {
+                            "1F93B": {
                                 "salary": 8800,
                                 "proj": 22.4,
                                 "value": 2.55
@@ -24835,12 +24753,12 @@
                                     "proj": 11.0,
                                     "value": 3.93
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 11.0,
                                     "value": 3.93
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 11.0,
                                     "value": 3.93
@@ -24873,12 +24791,12 @@
                                     "proj": 8.7,
                                     "value": 3.23
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 8.7,
                                     "value": 3.23
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 8.7,
                                     "value": 3.23
@@ -24911,12 +24829,12 @@
                                     "proj": 9.9,
                                     "value": 3.42
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2900,
                                     "proj": 9.9,
                                     "value": 3.42
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2900,
                                     "proj": 9.9,
                                     "value": 3.42
@@ -24949,12 +24867,12 @@
                                     "proj": 8.5,
                                     "value": 3.27
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 8.5,
                                     "value": 3.27
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 8.5,
                                     "value": 3.27
@@ -24987,12 +24905,12 @@
                                     "proj": 8.9,
                                     "value": 3.57
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2500,
                                     "proj": 8.9,
                                     "value": 3.57
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2500,
                                     "proj": 8.9,
                                     "value": 3.57
@@ -25025,12 +24943,12 @@
                                     "proj": 8.5,
                                     "value": 3.03
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 8.5,
                                     "value": 3.03
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 8.5,
                                     "value": 3.03
@@ -25063,12 +24981,12 @@
                                     "proj": 7.5,
                                     "value": 2.98
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2500,
                                     "proj": 7.5,
                                     "value": 2.98
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2500,
                                     "proj": 7.5,
                                     "value": 2.98
@@ -25107,12 +25025,12 @@
                                     "proj": 8.0,
                                     "value": 3.49
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2300,
                                     "proj": 8.0,
                                     "value": 3.49
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2300,
                                     "proj": 8.0,
                                     "value": 3.49
@@ -26194,12 +26112,12 @@
                                 "proj": 3.6,
                                 "value": 0.66
                             },
-                            "1F93B": {
+                            "1F93E": {
                                 "salary": 5500,
                                 "proj": 3.6,
                                 "value": 0.66
                             },
-                            "1F93E": {
+                            "1F93B": {
                                 "salary": 5500,
                                 "proj": 3.6,
                                 "value": 0.66
@@ -26233,12 +26151,12 @@
                                     "proj": 11.1,
                                     "value": 3.7
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3000,
                                     "proj": 11.1,
                                     "value": 3.7
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3000,
                                     "proj": 11.1,
                                     "value": 3.7
@@ -26271,12 +26189,12 @@
                                     "proj": 9.9,
                                     "value": 2.69
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3700,
                                     "proj": 9.9,
                                     "value": 2.69
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3700,
                                     "proj": 9.9,
                                     "value": 2.69
@@ -26309,12 +26227,12 @@
                                     "proj": 10.0,
                                     "value": 3.03
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3300,
                                     "proj": 10.0,
                                     "value": 3.03
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3300,
                                     "proj": 10.0,
                                     "value": 3.03
@@ -26347,12 +26265,12 @@
                                     "proj": 9.5,
                                     "value": 3.51
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 9.5,
                                     "value": 3.51
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 9.5,
                                     "value": 3.51
@@ -26385,12 +26303,12 @@
                                     "proj": 8.6,
                                     "value": 3.18
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 8.6,
                                     "value": 3.18
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 8.6,
                                     "value": 3.18
@@ -26423,12 +26341,12 @@
                                     "proj": 8.7,
                                     "value": 3.33
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 8.7,
                                     "value": 3.33
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 8.7,
                                     "value": 3.33
@@ -26461,12 +26379,12 @@
                                     "proj": 8.0,
                                     "value": 3.31
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2400,
                                     "proj": 8.0,
                                     "value": 3.31
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2400,
                                     "proj": 8.0,
                                     "value": 3.31
@@ -26499,12 +26417,12 @@
                                     "proj": 7.3,
                                     "value": 2.9
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2500,
                                     "proj": 7.3,
                                     "value": 2.9
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2500,
                                     "proj": 7.3,
                                     "value": 2.9
@@ -26537,12 +26455,12 @@
                                     "proj": 7.6,
                                     "value": 2.72
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 7.6,
                                     "value": 2.72
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 7.6,
                                     "value": 2.72
@@ -26577,12 +26495,12 @@
                                 "proj": 30.1,
                                 "value": 3.13
                             },
-                            "1F93B": {
+                            "1F93E": {
                                 "salary": 9600,
                                 "proj": 30.1,
                                 "value": 3.13
                             },
-                            "1F93E": {
+                            "1F93B": {
                                 "salary": 9600,
                                 "proj": 30.1,
                                 "value": 3.13
@@ -26616,12 +26534,12 @@
                                     "proj": 13.0,
                                     "value": 3.5
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3700,
                                     "proj": 13.0,
                                     "value": 3.5
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3700,
                                     "proj": 13.0,
                                     "value": 3.5
@@ -26654,12 +26572,12 @@
                                     "proj": 12.3,
                                     "value": 4.41
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 12.3,
                                     "value": 4.41
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 12.3,
                                     "value": 4.41
@@ -26692,12 +26610,12 @@
                                     "proj": 12.8,
                                     "value": 4.59
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 12.8,
                                     "value": 4.59
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 12.8,
                                     "value": 4.59
@@ -26730,12 +26648,12 @@
                                     "proj": 13.0,
                                     "value": 3.82
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3400,
                                     "proj": 13.0,
                                     "value": 3.82
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3400,
                                     "proj": 13.0,
                                     "value": 3.82
@@ -26768,12 +26686,12 @@
                                     "proj": 8.7,
                                     "value": 3.0
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2900,
                                     "proj": 8.7,
                                     "value": 3.0
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2900,
                                     "proj": 8.7,
                                     "value": 3.0
@@ -26806,12 +26724,12 @@
                                     "proj": 8.7,
                                     "value": 2.55
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3400,
                                     "proj": 8.7,
                                     "value": 2.55
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3400,
                                     "proj": 8.7,
                                     "value": 2.55
@@ -26844,12 +26762,12 @@
                                     "proj": 2.0,
                                     "value": 0.76
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 2.0,
                                     "value": 0.76
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 2.0,
                                     "value": 0.76
@@ -26882,12 +26800,12 @@
                                     "proj": 9.6,
                                     "value": 3.41
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 9.6,
                                     "value": 3.41
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 9.6,
                                     "value": 3.41
@@ -27974,24 +27892,24 @@
                                 "proj": 28.2,
                                 "value": 2.88
                             },
-                            "1F93B": {
+                            "1F93E": {
                                 "salary": 9800,
                                 "proj": 28.2,
                                 "value": 2.88
                             },
-                            "1F93E": {
+                            "1F93B": {
                                 "salary": 9800,
                                 "proj": 28.2,
                                 "value": 2.88
                             }
                         },
                         "dk_slates": {
-                            "23BCA": {
+                            "23AAF": {
                                 "salary": 8200,
                                 "proj": 15.6,
                                 "value": 1.9
                             },
-                            "23AAF": {
+                            "23BCA": {
                                 "salary": 8200,
                                 "proj": 15.6,
                                 "value": 1.9
@@ -28018,24 +27936,24 @@
                                     "proj": 11.9,
                                     "value": 2.9
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 4100,
                                     "proj": 11.9,
                                     "value": 2.9
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 4100,
                                     "proj": 11.9,
                                     "value": 2.9
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 6300,
                                     "proj": 9.1,
                                     "value": 1.44
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 6300,
                                     "proj": 9.1,
                                     "value": 1.44
@@ -28061,24 +27979,24 @@
                                     "proj": 11.0,
                                     "value": 2.83
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3900,
                                     "proj": 11.0,
                                     "value": 2.83
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3900,
                                     "proj": 11.0,
                                     "value": 2.83
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5600,
                                     "proj": 8.5,
                                     "value": 1.52
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5600,
                                     "proj": 8.5,
                                     "value": 1.52
@@ -28104,24 +28022,24 @@
                                     "proj": 9.7,
                                     "value": 2.77
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3500,
                                     "proj": 9.7,
                                     "value": 2.77
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3500,
                                     "proj": 9.7,
                                     "value": 2.77
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4500,
                                     "proj": 7.4,
                                     "value": 1.64
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4500,
                                     "proj": 7.4,
                                     "value": 1.64
@@ -28147,24 +28065,24 @@
                                     "proj": 9.6,
                                     "value": 2.73
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3500,
                                     "proj": 9.6,
                                     "value": 2.73
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3500,
                                     "proj": 9.6,
                                     "value": 2.73
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4900,
                                     "proj": 7.3,
                                     "value": 1.49
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4900,
                                     "proj": 7.3,
                                     "value": 1.49
@@ -28190,24 +28108,24 @@
                                     "proj": 8.1,
                                     "value": 3.13
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 8.1,
                                     "value": 3.13
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 8.1,
                                     "value": 3.13
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2400,
                                     "proj": 6.2,
                                     "value": 2.59
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2400,
                                     "proj": 6.2,
                                     "value": 2.59
@@ -28233,24 +28151,24 @@
                                     "proj": 8.6,
                                     "value": 3.29
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 8.6,
                                     "value": 3.29
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 8.6,
                                     "value": 3.29
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2600,
                                     "proj": 6.5,
                                     "value": 2.5
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2600,
                                     "proj": 6.5,
                                     "value": 2.5
@@ -28276,24 +28194,24 @@
                                     "proj": 8.1,
                                     "value": 2.88
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2800,
                                     "proj": 8.1,
                                     "value": 2.88
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2800,
                                     "proj": 8.1,
                                     "value": 2.88
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3100,
                                     "proj": 6.2,
                                     "value": 2.0
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3100,
                                     "proj": 6.2,
                                     "value": 2.0
@@ -28319,24 +28237,24 @@
                                     "proj": 8.1,
                                     "value": 2.99
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 8.1,
                                     "value": 2.99
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 8.1,
                                     "value": 2.99
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2900,
                                     "proj": 6.2,
                                     "value": 2.12
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2900,
                                     "proj": 6.2,
                                     "value": 2.12
@@ -28370,24 +28288,24 @@
                                 "proj": 27.7,
                                 "value": 3.22
                             },
-                            "1F93B": {
+                            "1F93E": {
                                 "salary": 8600,
                                 "proj": 27.7,
                                 "value": 3.22
                             },
-                            "1F93E": {
+                            "1F93B": {
                                 "salary": 8600,
                                 "proj": 27.7,
                                 "value": 3.22
                             }
                         },
                         "dk_slates": {
-                            "23BCA": {
+                            "23AAF": {
                                 "salary": 8800,
                                 "proj": 15.3,
                                 "value": 1.74
                             },
-                            "23AAF": {
+                            "23BCA": {
                                 "salary": 8800,
                                 "proj": 15.3,
                                 "value": 1.74
@@ -28414,24 +28332,24 @@
                                     "proj": 9.8,
                                     "value": 2.87
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3400,
                                     "proj": 9.8,
                                     "value": 2.87
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3400,
                                     "proj": 9.8,
                                     "value": 2.87
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5200,
                                     "proj": 7.4,
                                     "value": 1.43
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5200,
                                     "proj": 7.4,
                                     "value": 1.43
@@ -28457,24 +28375,24 @@
                                     "proj": 8.1,
                                     "value": 3.01
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 8.1,
                                     "value": 3.01
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 8.1,
                                     "value": 3.01
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4000,
                                     "proj": 6.3,
                                     "value": 1.58
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4000,
                                     "proj": 6.3,
                                     "value": 1.58
@@ -28500,24 +28418,24 @@
                                     "proj": 10.5,
                                     "value": 3.1
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3400,
                                     "proj": 10.5,
                                     "value": 3.1
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3400,
                                     "proj": 10.5,
                                     "value": 3.1
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5300,
                                     "proj": 8.1,
                                     "value": 1.53
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5300,
                                     "proj": 8.1,
                                     "value": 1.53
@@ -28543,24 +28461,24 @@
                                     "proj": 8.6,
                                     "value": 2.77
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 3100,
                                     "proj": 8.6,
                                     "value": 2.77
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 3100,
                                     "proj": 8.6,
                                     "value": 2.77
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4200,
                                     "proj": 6.6,
                                     "value": 1.57
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4200,
                                     "proj": 6.6,
                                     "value": 1.57
@@ -28586,24 +28504,24 @@
                                     "proj": 8.2,
                                     "value": 3.28
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2500,
                                     "proj": 8.2,
                                     "value": 3.28
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2500,
                                     "proj": 8.2,
                                     "value": 3.28
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2800,
                                     "proj": 6.3,
                                     "value": 2.25
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2800,
                                     "proj": 6.3,
                                     "value": 2.25
@@ -28629,24 +28547,24 @@
                                     "proj": 8.0,
                                     "value": 3.06
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2600,
                                     "proj": 8.0,
                                     "value": 3.06
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2600,
                                     "proj": 8.0,
                                     "value": 3.06
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3000,
                                     "proj": 6.1,
                                     "value": 2.04
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3000,
                                     "proj": 6.1,
                                     "value": 2.04
@@ -28672,24 +28590,24 @@
                                     "proj": 6.9,
                                     "value": 2.99
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2300,
                                     "proj": 6.9,
                                     "value": 2.99
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2300,
                                     "proj": 6.9,
                                     "value": 2.99
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2700,
                                     "proj": 5.3,
                                     "value": 1.96
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2700,
                                     "proj": 5.3,
                                     "value": 1.96
@@ -28715,24 +28633,24 @@
                                     "proj": 8.2,
                                     "value": 3.03
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 8.2,
                                     "value": 3.03
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 8.2,
                                     "value": 3.03
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3100,
                                     "proj": 6.3,
                                     "value": 2.03
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3100,
                                     "proj": 6.3,
                                     "value": 2.03
@@ -28758,24 +28676,24 @@
                                     "proj": 7.8,
                                     "value": 2.9
                                 },
-                                "1F93B": {
+                                "1F93E": {
                                     "salary": 2700,
                                     "proj": 7.8,
                                     "value": 2.9
                                 },
-                                "1F93E": {
+                                "1F93B": {
                                     "salary": 2700,
                                     "proj": 7.8,
                                     "value": 2.9
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2400,
                                     "proj": 6.1,
                                     "value": 2.55
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2400,
                                     "proj": 6.1,
                                     "value": 2.55
@@ -29852,12 +29770,12 @@
                             }
                         },
                         "dk_slates": {
-                            "23BCA": {
+                            "23AAF": {
                                 "salary": 7500,
                                 "proj": 9.7,
                                 "value": 1.29
                             },
-                            "23AAF": {
+                            "23BCA": {
                                 "salary": 7500,
                                 "proj": 9.7,
                                 "value": 1.29
@@ -29896,12 +29814,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5000,
                                     "proj": 9.8,
                                     "value": 1.97
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5000,
                                     "proj": 9.8,
                                     "value": 1.97
@@ -29939,12 +29857,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5800,
                                     "proj": 11.6,
                                     "value": 2.0
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5800,
                                     "proj": 11.6,
                                     "value": 2.0
@@ -29982,12 +29900,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5300,
                                     "proj": 10.8,
                                     "value": 2.04
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5300,
                                     "proj": 10.8,
                                     "value": 2.04
@@ -30025,12 +29943,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 5100,
                                     "proj": 9.8,
                                     "value": 1.93
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 5100,
                                     "proj": 9.8,
                                     "value": 1.93
@@ -30068,12 +29986,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4400,
                                     "proj": 8.9,
                                     "value": 2.03
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4400,
                                     "proj": 8.9,
                                     "value": 2.03
@@ -30111,12 +30029,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4300,
                                     "proj": 7.8,
                                     "value": 1.81
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4300,
                                     "proj": 7.8,
                                     "value": 1.81
@@ -30154,12 +30072,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 2700,
                                     "proj": 5.6,
                                     "value": 2.07
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 2700,
                                     "proj": 5.6,
                                     "value": 2.07
@@ -30197,12 +30115,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3100,
                                     "proj": 7.2,
                                     "value": 2.32
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3100,
                                     "proj": 7.2,
                                     "value": 2.32
@@ -30240,12 +30158,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3600,
                                     "proj": 7.6,
                                     "value": 2.12
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3600,
                                     "proj": 7.6,
                                     "value": 2.12
@@ -30280,12 +30198,12 @@
                             }
                         },
                         "dk_slates": {
-                            "23BCA": {
+                            "23AAF": {
                                 "salary": 6100,
                                 "proj": 5.0,
                                 "value": 0.82
                             },
-                            "23AAF": {
+                            "23BCA": {
                                 "salary": 6100,
                                 "proj": 5.0,
                                 "value": 0.82
@@ -30324,12 +30242,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3800,
                                     "proj": 7.5,
                                     "value": 1.97
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3800,
                                     "proj": 7.5,
                                     "value": 1.97
@@ -30367,12 +30285,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4100,
                                     "proj": 6.5,
                                     "value": 1.59
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4100,
                                     "proj": 6.5,
                                     "value": 1.59
@@ -30410,12 +30328,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3900,
                                     "proj": 8.9,
                                     "value": 2.28
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3900,
                                     "proj": 8.9,
                                     "value": 2.28
@@ -30453,12 +30371,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4600,
                                     "proj": 8.7,
                                     "value": 1.89
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4600,
                                     "proj": 8.7,
                                     "value": 1.89
@@ -30496,12 +30414,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3400,
                                     "proj": 7.1,
                                     "value": 2.09
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3400,
                                     "proj": 7.1,
                                     "value": 2.09
@@ -30539,12 +30457,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 4100,
                                     "proj": 7.8,
                                     "value": 1.9
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 4100,
                                     "proj": 7.8,
                                     "value": 1.9
@@ -30582,12 +30500,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3600,
                                     "proj": 7.1,
                                     "value": 1.97
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3600,
                                     "proj": 7.1,
                                     "value": 1.97
@@ -30631,12 +30549,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23BCA": {
+                                "23AAF": {
                                     "salary": 3200,
                                     "proj": 6.4,
                                     "value": 2.0
                                 },
-                                "23AAF": {
+                                "23BCA": {
                                     "salary": 3200,
                                     "proj": 6.4,
                                     "value": 2.0
@@ -31647,16 +31565,16 @@
                     },
                     "defense": {
                         "team": {
-                            "id": 145,
-                            "name": "Chicago White Sox",
-                            "link": "/api/v1/teams/145"
+                            "id": 109,
+                            "name": "Arizona Diamondbacks",
+                            "link": "/api/v1/teams/109"
                         }
                     },
                     "offense": {
                         "team": {
-                            "id": 109,
-                            "name": "Arizona Diamondbacks",
-                            "link": "/api/v1/teams/109"
+                            "id": 145,
+                            "name": "Chicago White Sox",
+                            "link": "/api/v1/teams/145"
                         }
                     }
                 },
@@ -31718,12 +31636,12 @@
                             }
                         },
                         "dk_slates": {
-                            "23B7E": {
+                            "23AAF": {
                                 "salary": 7000,
                                 "proj": 9.1,
                                 "value": 1.3
                             },
-                            "23AAF": {
+                            "23B7E": {
                                 "salary": 7000,
                                 "proj": 9.1,
                                 "value": 1.3
@@ -31762,12 +31680,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 3200,
                                     "proj": 6.3,
                                     "value": 1.96
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 3200,
                                     "proj": 6.3,
                                     "value": 1.96
@@ -31805,12 +31723,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 4100,
                                     "proj": 6.8,
                                     "value": 1.67
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 4100,
                                     "proj": 6.8,
                                     "value": 1.67
@@ -31848,12 +31766,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 4700,
                                     "proj": 8.3,
                                     "value": 1.77
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 4700,
                                     "proj": 8.3,
                                     "value": 1.77
@@ -31891,12 +31809,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 3100,
                                     "proj": 6.9,
                                     "value": 2.23
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 3100,
                                     "proj": 6.9,
                                     "value": 2.23
@@ -31934,12 +31852,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2500,
                                     "proj": 6.2,
                                     "value": 2.48
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2500,
                                     "proj": 6.2,
                                     "value": 2.48
@@ -31977,12 +31895,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 4300,
                                     "proj": 7.2,
                                     "value": 1.67
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 4300,
                                     "proj": 7.2,
                                     "value": 1.67
@@ -32020,12 +31938,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2200,
                                     "proj": 6.5,
                                     "value": 2.95
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2200,
                                     "proj": 6.5,
                                     "value": 2.95
@@ -32063,12 +31981,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2300,
                                     "proj": 6.5,
                                     "value": 2.83
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2300,
                                     "proj": 6.5,
                                     "value": 2.83
@@ -32106,12 +32024,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2400,
                                     "proj": 4.8,
                                     "value": 2.0
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2400,
                                     "proj": 4.8,
                                     "value": 2.0
@@ -32151,12 +32069,12 @@
                             }
                         },
                         "dk_slates": {
-                            "23B7E": {
+                            "23AAF": {
                                 "salary": 8400,
                                 "proj": 12.9,
                                 "value": 1.54
                             },
-                            "23AAF": {
+                            "23B7E": {
                                 "salary": 8400,
                                 "proj": 12.9,
                                 "value": 1.54
@@ -32195,12 +32113,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 5500,
                                     "proj": 9.4,
                                     "value": 1.71
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 5500,
                                     "proj": 9.4,
                                     "value": 1.71
@@ -32238,12 +32156,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 6200,
                                     "proj": 10.2,
                                     "value": 1.65
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 6200,
                                     "proj": 10.2,
                                     "value": 1.65
@@ -32281,12 +32199,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 4200,
                                     "proj": 9.0,
                                     "value": 2.14
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 4200,
                                     "proj": 9.0,
                                     "value": 2.14
@@ -32324,12 +32242,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 3000,
                                     "proj": 7.8,
                                     "value": 2.59
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 3000,
                                     "proj": 7.8,
                                     "value": 2.59
@@ -32367,12 +32285,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 3200,
                                     "proj": 6.2,
                                     "value": 1.94
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 3200,
                                     "proj": 6.2,
                                     "value": 1.94
@@ -32410,12 +32328,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2000,
                                     "proj": 6.4,
                                     "value": 3.2
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2000,
                                     "proj": 6.4,
                                     "value": 3.2
@@ -32453,12 +32371,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2400,
                                     "proj": 5.6,
                                     "value": 2.33
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2400,
                                     "proj": 5.6,
                                     "value": 2.33
@@ -32502,12 +32420,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7E": {
+                                "23AAF": {
                                     "salary": 2100,
                                     "proj": 6.3,
                                     "value": 3.0
                                 },
-                                "23AAF": {
+                                "23B7E": {
                                     "salary": 2100,
                                     "proj": 6.3,
                                     "value": 3.0
@@ -33519,16 +33437,16 @@
                     },
                     "defense": {
                         "team": {
-                            "id": 119,
-                            "name": "Los Angeles Dodgers",
-                            "link": "/api/v1/teams/119"
+                            "id": 137,
+                            "name": "San Francisco Giants",
+                            "link": "/api/v1/teams/137"
                         }
                     },
                     "offense": {
                         "team": {
-                            "id": 137,
-                            "name": "San Francisco Giants",
-                            "link": "/api/v1/teams/137"
+                            "id": 119,
+                            "name": "Los Angeles Dodgers",
+                            "link": "/api/v1/teams/119"
                         }
                     }
                 },
@@ -33590,20 +33508,20 @@
                             }
                         },
                         "dk_slates": {
-                            "23B7F": {
-                                "salary": 11800,
+                            "23AAF": {
+                                "salary": 10100,
                                 "proj": 19.4,
-                                "value": 1.64
+                                "value": 1.92
                             },
                             "23B7E": {
                                 "salary": 10100,
                                 "proj": 19.4,
                                 "value": 1.92
                             },
-                            "23AAF": {
-                                "salary": 10100,
+                            "23B7F": {
+                                "salary": 11800,
                                 "proj": 19.4,
-                                "value": 1.92
+                                "value": 1.64
                             }
                         },
                         "fd_positions": "P",
@@ -33666,20 +33584,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 9600,
+                                "23AAF": {
+                                    "salary": 6000,
                                     "proj": 9.4,
-                                    "value": 0.97
+                                    "value": 1.56
                                 },
                                 "23B7E": {
                                     "salary": 6000,
                                     "proj": 9.4,
                                     "value": 1.56
                                 },
-                                "23AAF": {
-                                    "salary": 6000,
+                                "23B7F": {
+                                    "salary": 9600,
                                     "proj": 9.4,
-                                    "value": 1.56
+                                    "value": 0.97
                                 }
                             },
                             "fd_positions": "OF",
@@ -33719,20 +33637,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 6800,
+                                "23AAF": {
+                                    "salary": 4300,
                                     "proj": 7.5,
-                                    "value": 1.1
+                                    "value": 1.74
                                 },
                                 "23B7E": {
                                     "salary": 4300,
                                     "proj": 7.5,
                                     "value": 1.74
                                 },
-                                "23AAF": {
-                                    "salary": 4300,
+                                "23B7F": {
+                                    "salary": 6800,
                                     "proj": 7.5,
-                                    "value": 1.74
+                                    "value": 1.1
                                 }
                             },
                             "fd_positions": "C",
@@ -33772,20 +33690,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 7400,
+                                "23AAF": {
+                                    "salary": 5800,
                                     "proj": 9.1,
-                                    "value": 1.23
+                                    "value": 1.57
                                 },
                                 "23B7E": {
                                     "salary": 5800,
                                     "proj": 9.1,
                                     "value": 1.57
                                 },
-                                "23AAF": {
-                                    "salary": 5800,
+                                "23B7F": {
+                                    "salary": 7400,
                                     "proj": 9.1,
-                                    "value": 1.57
+                                    "value": 1.23
                                 }
                             },
                             "fd_positions": "1B",
@@ -33825,20 +33743,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 8400,
+                                "23AAF": {
+                                    "salary": 5000,
                                     "proj": 7.1,
-                                    "value": 0.84
+                                    "value": 1.41
                                 },
                                 "23B7E": {
                                     "salary": 5000,
                                     "proj": 7.1,
                                     "value": 1.41
                                 },
-                                "23AAF": {
-                                    "salary": 5000,
+                                "23B7F": {
+                                    "salary": 8400,
                                     "proj": 7.1,
-                                    "value": 1.41
+                                    "value": 0.84
                                 }
                             },
                             "fd_positions": "OF",
@@ -33878,20 +33796,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 7400,
+                                "23AAF": {
+                                    "salary": 4700,
                                     "proj": 6.6,
-                                    "value": 0.89
+                                    "value": 1.4
                                 },
                                 "23B7E": {
                                     "salary": 4700,
                                     "proj": 6.6,
                                     "value": 1.4
                                 },
-                                "23AAF": {
-                                    "salary": 4700,
+                                "23B7F": {
+                                    "salary": 7400,
                                     "proj": 6.6,
-                                    "value": 1.4
+                                    "value": 0.89
                                 }
                             },
                             "fd_positions": "3B",
@@ -33931,20 +33849,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 8800,
+                                "23AAF": {
+                                    "salary": 5100,
                                     "proj": 7.5,
-                                    "value": 0.85
+                                    "value": 1.47
                                 },
                                 "23B7E": {
                                     "salary": 5100,
                                     "proj": 7.5,
                                     "value": 1.47
                                 },
-                                "23AAF": {
-                                    "salary": 5100,
+                                "23B7F": {
+                                    "salary": 8800,
                                     "proj": 7.5,
-                                    "value": 1.47
+                                    "value": 0.85
                                 }
                             },
                             "fd_positions": "OF",
@@ -33984,20 +33902,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 5200,
+                                "23AAF": {
+                                    "salary": 2700,
                                     "proj": 5.6,
-                                    "value": 1.08
+                                    "value": 2.07
                                 },
                                 "23B7E": {
                                     "salary": 2700,
                                     "proj": 5.6,
                                     "value": 2.07
                                 },
-                                "23AAF": {
-                                    "salary": 2700,
+                                "23B7F": {
+                                    "salary": 5200,
                                     "proj": 5.6,
-                                    "value": 2.07
+                                    "value": 1.08
                                 }
                             },
                             "fd_positions": "2B/SS",
@@ -34037,20 +33955,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 5800,
+                                "23AAF": {
+                                    "salary": 3100,
                                     "proj": 4.8,
-                                    "value": 0.83
+                                    "value": 1.55
                                 },
                                 "23B7E": {
                                     "salary": 3100,
                                     "proj": 4.8,
                                     "value": 1.55
                                 },
-                                "23AAF": {
-                                    "salary": 3100,
+                                "23B7F": {
+                                    "salary": 5800,
                                     "proj": 4.8,
-                                    "value": 1.55
+                                    "value": 0.83
                                 }
                             },
                             "fd_positions": "2B/3B",
@@ -34087,20 +34005,20 @@
                             }
                         },
                         "dk_slates": {
-                            "23B7F": {
-                                "salary": 10800,
+                            "23AAF": {
+                                "salary": 7200,
                                 "proj": 10.9,
-                                "value": 1.01
+                                "value": 1.51
                             },
                             "23B7E": {
                                 "salary": 7200,
                                 "proj": 10.9,
                                 "value": 1.51
                             },
-                            "23AAF": {
-                                "salary": 7200,
+                            "23B7F": {
+                                "salary": 10800,
                                 "proj": 10.9,
-                                "value": 1.51
+                                "value": 1.01
                             }
                         },
                         "fd_positions": "P",
@@ -34141,20 +34059,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 7800,
+                                "23AAF": {
+                                    "salary": 4700,
                                     "proj": 6.6,
-                                    "value": 0.85
+                                    "value": 1.4
                                 },
                                 "23B7E": {
                                     "salary": 4700,
                                     "proj": 6.6,
                                     "value": 1.4
                                 },
-                                "23AAF": {
-                                    "salary": 4700,
+                                "23B7F": {
+                                    "salary": 7800,
                                     "proj": 6.6,
-                                    "value": 1.4
+                                    "value": 0.85
                                 }
                             },
                             "fd_positions": "SS",
@@ -34194,20 +34112,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 7000,
+                                "23AAF": {
+                                    "salary": 4500,
                                     "proj": 5.9,
-                                    "value": 0.85
+                                    "value": 1.32
                                 },
                                 "23B7E": {
                                     "salary": 4500,
                                     "proj": 5.9,
                                     "value": 1.32
                                 },
-                                "23AAF": {
-                                    "salary": 4500,
+                                "23B7F": {
+                                    "salary": 7000,
                                     "proj": 5.9,
-                                    "value": 1.32
+                                    "value": 0.85
                                 }
                             },
                             "fd_positions": "1B/2B",
@@ -34247,20 +34165,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 8200,
+                                "23AAF": {
+                                    "salary": 4800,
                                     "proj": 6.0,
-                                    "value": 0.73
+                                    "value": 1.25
                                 },
                                 "23B7E": {
                                     "salary": 4800,
                                     "proj": 6.0,
                                     "value": 1.25
                                 },
-                                "23AAF": {
-                                    "salary": 4800,
+                                "23B7F": {
+                                    "salary": 8200,
                                     "proj": 6.0,
-                                    "value": 1.25
+                                    "value": 0.73
                                 }
                             },
                             "fd_positions": "3B",
@@ -34300,20 +34218,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 9200,
+                                "23AAF": {
+                                    "salary": 5400,
                                     "proj": 6.4,
-                                    "value": 0.7
+                                    "value": 1.19
                                 },
                                 "23B7E": {
                                     "salary": 5400,
                                     "proj": 6.4,
                                     "value": 1.19
                                 },
-                                "23AAF": {
-                                    "salary": 5400,
+                                "23B7F": {
+                                    "salary": 9200,
                                     "proj": 6.4,
-                                    "value": 1.19
+                                    "value": 0.7
                                 }
                             },
                             "fd_positions": "3B/1B",
@@ -34353,20 +34271,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 6200,
+                                "23AAF": {
+                                    "salary": 3300,
                                     "proj": 5.1,
-                                    "value": 0.83
+                                    "value": 1.56
                                 },
                                 "23B7E": {
                                     "salary": 3300,
                                     "proj": 5.1,
                                     "value": 1.56
                                 },
-                                "23AAF": {
-                                    "salary": 3300,
+                                "23B7F": {
+                                    "salary": 6200,
                                     "proj": 5.1,
-                                    "value": 1.56
+                                    "value": 0.83
                                 }
                             },
                             "fd_positions": "3B/SS",
@@ -34406,20 +34324,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 6600,
+                                "23AAF": {
+                                    "salary": 3600,
                                     "proj": 5.3,
-                                    "value": 0.81
+                                    "value": 1.48
                                 },
                                 "23B7E": {
                                     "salary": 3600,
                                     "proj": 5.3,
                                     "value": 1.48
                                 },
-                                "23AAF": {
-                                    "salary": 3600,
+                                "23B7F": {
+                                    "salary": 6600,
                                     "proj": 5.3,
-                                    "value": 1.48
+                                    "value": 0.81
                                 }
                             },
                             "fd_positions": "OF",
@@ -34459,20 +34377,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 6000,
+                                "23AAF": {
+                                    "salary": 3200,
                                     "proj": 5.4,
-                                    "value": 0.89
+                                    "value": 1.68
                                 },
                                 "23B7E": {
                                     "salary": 3200,
                                     "proj": 5.4,
                                     "value": 1.68
                                 },
-                                "23AAF": {
-                                    "salary": 3200,
+                                "23B7F": {
+                                    "salary": 6000,
                                     "proj": 5.4,
-                                    "value": 1.68
+                                    "value": 0.89
                                 }
                             },
                             "fd_positions": "OF",
@@ -34512,20 +34430,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 4200,
+                                "23AAF": {
+                                    "salary": 2300,
                                     "proj": 4.5,
-                                    "value": 1.07
+                                    "value": 1.96
                                 },
                                 "23B7E": {
                                     "salary": 2300,
                                     "proj": 4.5,
                                     "value": 1.96
                                 },
-                                "23AAF": {
-                                    "salary": 2300,
+                                "23B7F": {
+                                    "salary": 4200,
                                     "proj": 4.5,
-                                    "value": 1.96
+                                    "value": 1.07
                                 }
                             },
                             "fd_positions": "OF",
@@ -34565,20 +34483,20 @@
                                 }
                             },
                             "dk_slates": {
-                                "23B7F": {
-                                    "salary": 5000,
+                                "23AAF": {
+                                    "salary": 2500,
                                     "proj": 4.0,
-                                    "value": 0.79
+                                    "value": 1.59
                                 },
                                 "23B7E": {
                                     "salary": 2500,
                                     "proj": 4.0,
                                     "value": 1.59
                                 },
-                                "23AAF": {
-                                    "salary": 2500,
+                                "23B7F": {
+                                    "salary": 5000,
                                     "proj": 4.0,
-                                    "value": 1.59
+                                    "value": 0.79
                                 }
                             },
                             "fd_positions": "C",
