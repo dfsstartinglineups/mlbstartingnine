@@ -127,7 +127,7 @@
             z-index: 10;
             background-color: transparent; 
             /* THE MAGIC: 0.3s snappy bezier for sliding, moving, and exiting */
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
             transform: translate(1200px, 0px); /* Start off-screen right by default */
         }
 
@@ -314,8 +314,7 @@
                     );
 
                     if (games.length === 0) {
-                        compiledFrames.push({ type: 'OFF', date: dateStr });
-                        continue;
+                        continue; // Skip off days entirely
                     }
 
                     // Handles doubleheaders seamlessly
@@ -356,12 +355,12 @@
                             });
                         } else {
                             // Rainout / No Lineup Submitted
-                            compiledFrames.push({ type: 'OFF', date: dateStr });
+                            continue;
                         }
                     });
 
                 } catch (e) {
-                    compiledFrames.push({ type: 'OFF', date: dateStr });
+                    continue;
                 }
             }
         }
@@ -483,7 +482,7 @@
                 }
                 renderFrame(compiledFrames[frameIndex]);
                 frameIndex++;
-            }, 500); 
+            }, 1000); 
         }
 
         populateTeamDropdown();
