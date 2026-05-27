@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Dugout Lineup Timelapse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            var(--paper-bg): #f4f1ea;
+            var(--paper-line): rgba(40, 45, 55, 0.3);
+            var(--marker-ink): #1a1e24;
+            var(--pencil-ink): #4a4f58;
+            var(--highlighter): rgba(230, 255, 0, 0.5);
+            var(--accent): #e31837; 
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #222;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #controls {
+            margin-bottom: 20px;
+            background: #333;
+            padding: 15px 25px;
+            border-radius: 8px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 100;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        select, button, input {
+            padding: 8px 12px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: #444;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover { background: #555; }
+        .run-btn { background: #007ac1; border-color: #005a91; font-weight: bold; }
+        .run-btn:hover { background: #005a91; }
+
+        /* =========================================
+           THE EXPORTABLE CANVAS (1080x1350)
+           ========================================= */
+        #capture-area {
+            width: 1080px;
+            height: 1350px; 
+            background-color: var(--paper-bg);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            color: var(--marker-ink);
+        }
+
+        /* --- Header Section --- */
+        #header {
+            padding: 40px 50px 30px;
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            border-bottom: 4px solid var(--paper-line);
+            position: relative;
+            background-color: transparent;
+            z-index: 50;
+        }
+
+        .team-logo-container { width: 150px; height: 150px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        #team-logo { width: 140px; height: 140px; object-fit: contain; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); }
+        
+        .header-text { display: flex; flex-direction: column; justify-content: center; flex-grow: 1; }
+        .title-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
+        .title-tag { font-family: 'Permanent Marker', cursive; font-size: 28px; color: var(--marker-ink); background-color: var(--highlighter); padding: 0 10px; transform: rotate(-2deg); display: inline-block; }
+        
+        /* The dynamic date header needs to flip fast without snapping awkwardly */
+        .date-display { font-family: 'Caveat', cursive; font-size: 32px; color: var(--pencil-ink); font-weight: 700; transition: opacity 0.1s; }
+
+        #team-name { font-family: 'Permanent Marker', cursive; font-size: 58px; margin: 5px 0 0 0; line-height: 1.1; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #matchup-info { font-family: 'Caveat', cursive; font-size: 34px; color: var(--pencil-ink); margin-top: 5px; font-weight: 700; display: flex; align-items: center; gap: 15px; }
+        .opp-sp { font-size: 28px; opacity: 0.85; }
+
+        /* --- Lineup Section (Absolute Positioning Grid) --- */
+        #lineup-container {
+            flex-grow: 1;
+            position: relative; 
+            width: 100%;
+        }
+
+        .watermark-logo { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 850px; height: 850px; object-fit: contain; opacity: 0.05; z-index: 0; pointer-events: none; }
+
+        #off-day-stamp {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg);
+            font-family: 'Permanent Marker', cursive; font-size: 140px; color: var(--accent);
+            opacity: 0; border: 8px solid var(--accent); padding: 10px 40px; border-radius: 20px;
+            pointer-events: none; z-index: 100; transition: opacity 0.3s ease;
+        }
+
+        /* --- The Persistent Player Row --- */
+        .player-row {
+            position: absolute; 
+            width: calc(100% - 80px); /* 1080 - 40 left - 40 right */
+            left: 40px;
+            height: 95px; 
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid var(--paper-line);
+            z-index: 10;
+            background-color: transparent; 
+            /* THE MAGIC: 0.3s snappy bezier for sliding, moving, and exiting */
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+            transform: translate(1200px, 0px); /* Start off-screen right by default */
+        }
+
+        #pitcher-row-container {
+            border-top: 4px solid var(--paper-line);
+            border-bottom: 4px solid var(--paper-line);
+            background-color: rgba(0,0,0,0.03);
+            border-bottom: none;
+        }
+
+        /* Grid Columns */
+        .col-order { width: 90px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 2px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 42px; color: var(--marker-ink); }
+        .col-photo { width: 110px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 2px solid var(--paper-line); }
+        .col-name { flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 25px; border-right: 2px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 36px; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; }
+        .col-pos { width: 100px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 42px; font-weight: 700; color: var(--pencil-ink); }
+        .hand-indicator { font-family: 'Caveat', cursive; font-size: 32px; color: var(--pencil-ink); opacity: 0.8; margin-right: 12px; font-weight: 700; text-transform: none; letter-spacing: 0; }
+        
+        .headshot-wrapper { width: 70px; height: 70px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 3px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; }
+        .headshot { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+        .pitcher-label { font-family: 'Caveat', cursive; font-size: 28px; color: var(--pencil-ink); font-weight: 700; position: absolute; left: 50px; top: 900px; z-index: 5; }
+        .col-order.sp-text { font-size: 28px; }
+
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <label>Team:</label>
+        <select id="team-selector"></select>
+        
+        <label>Start Date:</label>
+        <input type="date" id="start-date">
+        
+        <label>End Date:</label>
+        <input type="date" id="end-date">
+        
+        <button class="run-btn" onclick="runTimelapse()">Run Timelapse</button>
+    </div>
+
+    <div id="capture-area">
+        <div id="header">
+            <div class="team-logo-container">
+                <img id="team-logo" src="" alt="Team Logo">
+            </div>
+            <div class="header-text">
+                <div class="title-row">
+                    <div class="title-tag">Starting 9</div>
+                    <div id="game-date" class="date-display">SELECT DATES</div>
+                </div>
+                <h1 id="team-name">WAITING...</h1>
+                <div id="matchup-info"></div>
+            </div>
+        </div>
+
+        <div id="lineup-container">
+            <img id="watermark-bg" src="" class="watermark-logo" style="display: none;">
+            <div id="off-day-stamp">OFF DAY</div>
+            <div class="pitcher-label">Starting Pitcher</div>
+        </div>
+    </div>
+
+    <script>
+        const TEAM_THEMES = {
+            108: { name: "Angels", paperBg: "#f4f1ea", paperLine: "rgba(186, 0, 33, 0.4)", markerInk: "#ba0021" },
+            109: { name: "Diamondbacks", paperBg: "#f4f1ea", paperLine: "rgba(167, 25, 48, 0.4)", markerInk: "#a71930" },
+            110: { name: "Orioles", paperBg: "#f4f1ea", paperLine: "rgba(223, 70, 1, 0.4)", markerInk: "#000000" },
+            111: { name: "Red Sox", paperBg: "#f8f0f1", paperLine: "rgba(189, 48, 57, 0.4)", markerInk: "#0c2340" },
+            112: { name: "Cubs", paperBg: "#f0f4f8", paperLine: "rgba(14, 51, 134, 0.4)", markerInk: "#0e3386" },
+            113: { name: "Reds", paperBg: "#f8f0f1", paperLine: "rgba(198, 1, 31, 0.4)", markerInk: "#c6011f" },
+            114: { name: "Guardians", paperBg: "#f4f1ea", paperLine: "rgba(227, 25, 55, 0.4)", markerInk: "#0c2340" },
+            115: { name: "Rockies", paperBg: "#f3f0f6", paperLine: "rgba(51, 0, 111, 0.4)", markerInk: "#33006f" },
+            116: { name: "Tigers", paperBg: "#f4f1ea", paperLine: "rgba(12, 35, 64, 0.4)", markerInk: "#0c2340" },
+            117: { name: "Astros", paperBg: "#f4f1ea", paperLine: "rgba(0, 45, 98, 0.4)", markerInk: "#002d62" },
+            118: { name: "Royals", paperBg: "#f0f4f8", paperLine: "rgba(0, 70, 135, 0.4)", markerInk: "#004687" },
+            119: { name: "Dodgers", paperBg: "#f0f4f8", paperLine: "rgba(0, 90, 156, 0.4)", markerInk: "#003b6b" },
+            120: { name: "Nationals", paperBg: "#f4f1ea", paperLine: "rgba(171, 0, 3, 0.4)", markerInk: "#ab0003" },
+            121: { name: "Mets", paperBg: "#f4f1ea", paperLine: "rgba(0, 45, 114, 0.4)", markerInk: "#002d72" },
+            133: { name: "Athletics", paperBg: "#f0f6f2", paperLine: "rgba(0, 56, 49, 0.4)", markerInk: "#003831" },
+            134: { name: "Pirates", paperBg: "#f4f1ea", paperLine: "rgba(253, 184, 39, 0.6)", markerInk: "#000000" },
+            135: { name: "Padres", paperBg: "#f5f2ed", paperLine: "rgba(47, 36, 29, 0.4)", markerInk: "#2f241d" },
+            136: { name: "Mariners", paperBg: "#f0f5f6", paperLine: "rgba(0, 92, 92, 0.4)", markerInk: "#005c5c" },
+            137: { name: "Giants", paperBg: "#f4f1ea", paperLine: "rgba(253, 90, 30, 0.5)", markerInk: "#27251f" },
+            138: { name: "Cardinals", paperBg: "#f8f0f1", paperLine: "rgba(196, 30, 58, 0.4)", markerInk: "#c41e3a" },
+            139: { name: "Rays", paperBg: "#f0f4f8", paperLine: "rgba(9, 44, 92, 0.4)", markerInk: "#092c5c" },
+            140: { name: "Rangers", paperBg: "#f4f1ea", paperLine: "rgba(0, 50, 120, 0.4)", markerInk: "#003278" },
+            141: { name: "Blue Jays", paperBg: "#f0f4f8", paperLine: "rgba(19, 74, 142, 0.4)", markerInk: "#134a8e" },
+            142: { name: "Twins", paperBg: "#f4f1ea", paperLine: "rgba(0, 43, 92, 0.4)", markerInk: "#002b5c" },
+            143: { name: "Phillies", paperBg: "#f8f0f1", paperLine: "rgba(232, 24, 40, 0.4)", markerInk: "#e81828" },
+            144: { name: "Braves", paperBg: "#f4f1ea", paperLine: "rgba(206, 17, 65, 0.4)", markerInk: "#13274f" },
+            145: { name: "White Sox", paperBg: "#f4f1ea", paperLine: "rgba(39, 37, 31, 0.4)", markerInk: "#27251f" },
+            146: { name: "Marlins", paperBg: "#f4f1ea", paperLine: "rgba(0, 163, 224, 0.4)", markerInk: "#000000" },
+            147: { name: "Yankees", paperBg: "#f4f1ea", paperLine: "rgba(12, 35, 64, 0.4)", markerInk: "#0c2340" },
+            158: { name: "Brewers", paperBg: "#f0f4f8", paperLine: "rgba(18, 40, 75, 0.4)", markerInk: "#12284b" }
+        };
+
+        const ROW_HEIGHT = 95; 
+        const SP_Y_POS = 940; // Fixed absolute Y coordinate for the Starting Pitcher
+
+        let compiledFrames = [];
+        let animationInterval;
+
+        function populateTeamDropdown() {
+            const select = document.getElementById('team-selector');
+            Object.keys(TEAM_THEMES).sort((a,b) => TEAM_THEMES[a].name.localeCompare(TEAM_THEMES[b].name)).forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.textContent = TEAM_THEMES[id].name;
+                select.appendChild(opt);
+            });
+            // Defaults to Yankees
+            select.value = 147; 
+        }
+
+        function applyTeamTheme(teamId) {
+            const theme = TEAM_THEMES[teamId];
+            if (theme) {
+                document.documentElement.style.setProperty('--paper-bg', theme.paperBg);
+                document.documentElement.style.setProperty('--paper-line', theme.paperLine);
+                document.documentElement.style.setProperty('--marker-ink', theme.markerInk);
+                document.getElementById('team-name').textContent = theme.name;
+                document.getElementById('team-logo').src = `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+                
+                const wm = document.getElementById('watermark-bg');
+                wm.src = `https://www.mlbstatic.com/team-logos/${teamId}.svg`;
+                wm.style.display = 'block';
+            }
+        }
+
+        // Generates an array of "YYYY-MM-DD" strings between start and end dates
+        function getDatesInRange(start, end) {
+            let dates = [];
+            let currDate = new Date(start + 'T12:00:00'); // Force midday to avoid timezone jumps
+            let endDate = new Date(end + 'T12:00:00');
+            while (currDate <= endDate) {
+                const yyyy = currDate.getFullYear();
+                const mm = String(currDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(currDate.getDate()).padStart(2, '0');
+                dates.push(`${yyyy}-${mm}-${dd}`);
+                currDate.setDate(currDate.getDate() + 1);
+            }
+            return dates;
+        }
+
+        // Builds the DOM element if the player doesn't exist yet
+        function createPlayerElement(player, isPitcher) {
+            const el = document.createElement('div');
+            el.className = 'player-row';
+            el.id = `player-${player.id}`;
+            if (isPitcher) el.id += '-sp'; // allows Ohtani to exist as batter and pitcher
+
+            const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${player.id}/headshot/67/current`;
+            const posClass = isPitcher ? 'sp-text' : '';
+
+            el.innerHTML = `
+                <div class="col-order ${posClass}"></div>
+                <div class="col-photo">
+                    <div class="headshot-wrapper"><img src="${headshot}" class="headshot" crossorigin="anonymous"></div>
+                </div>
+                <div class="col-name">
+                    <span class="hand-indicator"></span><span class="name-text"></span>
+                </div>
+                <div class="col-pos"></div>
+            `;
+            
+            // Set starting state off-screen right
+            el.style.transform = `translate(1200px, ${isPitcher ? SP_Y_POS : 0}px)`;
+            document.getElementById('lineup-container').appendChild(el);
+            return el;
+        }
+
+        async function compileDataPipeline(teamId, dates) {
+            compiledFrames = [];
+            for (const dateStr of dates) {
+                try {
+                    // Pre-fetching local files
+                    const res = await fetch(`games_${dateStr}.json`);
+                    if (!res.ok) throw new Error("No data");
+                    const data = await res.json();
+                    
+                    const games = data.games.filter(g => 
+                        g.gameRaw.teams.away.team.id == teamId || 
+                        g.gameRaw.teams.home.team.id == teamId
+                    );
+
+                    if (games.length === 0) {
+                        compiledFrames.push({ type: 'OFF', date: dateStr });
+                        continue;
+                    }
+
+                    // Handles doubleheaders seamlessly
+                    games.forEach(g => {
+                        const isHome = g.gameRaw.teams.home.team.id == teamId;
+                        const sideStr = isHome ? 'home' : 'away';
+                        const oppSide = isHome ? 'away' : 'home';
+                        const oppTeam = g.gameRaw.teams[oppSide].team.name;
+
+                        // Ensure lineups exist in the raw API feed
+                        if(g.gameRaw.lineups && g.gameRaw.lineups[`${sideStr}Players`]) {
+                            const batters = g.gameRaw.lineups[`${sideStr}Players`].slice(0, 9);
+                            const pitcher = g.gameRaw.teams[sideStr].probablePitcher;
+                            const oppSp = g.gameRaw.teams[oppSide].probablePitcher;
+                            
+                            // Map positions and handedness
+                            const posMap = g.gamePositions || {};
+                            const handMap = g.lineupHandedness || {};
+
+                            compiledFrames.push({
+                                type: 'GAME',
+                                date: dateStr,
+                                isHome: isHome,
+                                oppName: oppTeam,
+                                oppSpName: oppSp ? oppSp.fullName : "TBD",
+                                batters: batters.map((b, idx) => ({
+                                    id: b.id,
+                                    name: b.fullName,
+                                    order: idx + 1,
+                                    pos: posMap[b.id] || b.primaryPosition.abbreviation,
+                                    hand: handMap[b.id] || ''
+                                })),
+                                pitcher: pitcher ? {
+                                    id: pitcher.id,
+                                    name: pitcher.fullName,
+                                    hand: handMap[pitcher.id] || ''
+                                } : null
+                            });
+                        } else {
+                            // Rainout / No Lineup Submitted
+                            compiledFrames.push({ type: 'OFF', date: dateStr });
+                        }
+                    });
+
+                } catch (e) {
+                    compiledFrames.push({ type: 'OFF', date: dateStr });
+                }
+            }
+        }
+
+        function renderFrame(frame) {
+            const dateObj = new Date(frame.date + 'T12:00:00'); 
+            const dateStrFormatted = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            document.getElementById('game-date').textContent = dateStrFormatted;
+            
+            const activeIds = new Set();
+            const offStamp = document.getElementById('off-day-stamp');
+
+            if (frame.type === 'OFF') {
+                document.getElementById('matchup-info').innerHTML = `NO GAME / RAINOUT`;
+                offStamp.style.opacity = '1';
+                
+                // Sweep everyone off the left side of the desk
+                document.querySelectorAll('.player-row').forEach(el => {
+                    const y = el.dataset.lastY || 0;
+                    el.style.transform = `translate(-1200px, ${y}px)`;
+                });
+                return;
+            }
+
+            offStamp.style.opacity = '0';
+            
+            // Format Matchup
+            const vsAt = frame.isHome ? 'vs' : '@';
+            document.getElementById('matchup-info').innerHTML = `${vsAt} ${frame.oppName} <span style="color:var(--paper-line); margin: 0 5px;">|</span> <span class="opp-sp">Opp SP: ${frame.oppSpName}</span>`;
+
+            // Process Batters
+            frame.batters.forEach((p, idx) => {
+                activeIds.add(`player-${p.id}`);
+                const targetY = idx * ROW_HEIGHT;
+                
+                let el = document.getElementById(`player-${p.id}`);
+                if (!el) {
+                    el = createPlayerElement(p, false);
+                    void el.offsetWidth; // Force CSS reflow so it knows it spawned off-screen
+                }
+
+                // Update text
+                el.querySelector('.col-order').textContent = p.order;
+                el.querySelector('.col-pos').textContent = p.pos;
+                el.querySelector('.name-text').textContent = p.name;
+                el.querySelector('.hand-indicator').textContent = p.hand ? `(${p.hand})` : '';
+
+                // Slide to spot
+                el.style.transform = `translate(0px, ${targetY}px)`;
+                el.dataset.lastY = targetY;
+            });
+
+            // Process Pitcher
+            if (frame.pitcher) {
+                const spId = `player-${frame.pitcher.id}-sp`;
+                activeIds.add(spId);
+                
+                let el = document.getElementById(spId);
+                if (!el) {
+                    el = createPlayerElement(frame.pitcher, true);
+                    el.classList.add('pitcher-styled');
+                    if (TEAM_THEMES[document.getElementById('team-selector').value]) {
+                        el.style.borderTop = `4px solid ${TEAM_THEMES[document.getElementById('team-selector').value].paperLine}`;
+                        el.style.borderBottom = `4px solid ${TEAM_THEMES[document.getElementById('team-selector').value].paperLine}`;
+                    }
+                    el.style.backgroundColor = `rgba(0,0,0,0.03)`;
+                    void el.offsetWidth;
+                }
+
+                el.querySelector('.col-order').textContent = "SP";
+                el.querySelector('.col-pos').textContent = "P";
+                el.querySelector('.name-text').textContent = frame.pitcher.name;
+                el.querySelector('.hand-indicator').textContent = frame.pitcher.hand ? `(${frame.pitcher.hand})` : '';
+
+                el.style.transform = `translate(0px, ${SP_Y_POS}px)`;
+                el.dataset.lastY = SP_Y_POS;
+            }
+
+            // Bench anyone who isn't in today's lineup (Slide off Left)
+            document.querySelectorAll('.player-row').forEach(el => {
+                if (!activeIds.has(el.id)) {
+                    const y = el.dataset.lastY || 0;
+                    el.style.transform = `translate(-1200px, ${y}px)`;
+                }
+            });
+        }
+
+        async function runTimelapse() {
+            if (animationInterval) clearInterval(animationInterval);
+            
+            const teamId = document.getElementById('team-selector').value;
+            const start = document.getElementById('start-date').value;
+            const end = document.getElementById('end-date').value;
+
+            if (!start || !end) { alert("Please select a valid date range."); return; }
+
+            applyTeamTheme(teamId);
+            document.getElementById('game-date').textContent = "COMPILING DATA...";
+            
+            const dates = getDatesInRange(start, end);
+            await compileDataPipeline(teamId, dates);
+
+            if (compiledFrames.length === 0) {
+                document.getElementById('game-date').textContent = "NO DATA FOUND";
+                return;
+            }
+
+            let frameIndex = 0;
+            
+            // Render Frame 1 immediately
+            renderFrame(compiledFrames[frameIndex]);
+            frameIndex++;
+
+            // Exactly 0.5s (500ms) interval
+            animationInterval = setInterval(() => {
+                if (frameIndex >= compiledFrames.length) {
+                    clearInterval(animationInterval);
+                    return;
+                }
+                renderFrame(compiledFrames[frameIndex]);
+                frameIndex++;
+            }, 500); 
+        }
+
+        populateTeamDropdown();
+        
+        // Auto-fill dates for ease of testing
+        document.getElementById('start-date').value = "2026-05-01";
+        document.getElementById('end-date').value = "2026-05-15";
+
+    </script>
+</body>
+</html>
