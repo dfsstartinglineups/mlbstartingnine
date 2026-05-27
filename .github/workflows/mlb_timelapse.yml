@@ -1,0 +1,48 @@
+name: Generate MLB Timelapse Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      team_id:
+        description: 'MLB Team ID (e.g., 147 for Yankees, 119 for Dodgers)'
+        required: true
+        default: '147'
+      start_date:
+        description: 'Start Date (YYYY-MM-DD)'
+        required: true
+        default: '2026-04-01'
+      end_date:
+        description: 'End Date (YYYY-MM-DD)'
+        required: true
+        default: '2026-05-01'
+
+jobs:
+  generate-video:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install playwright moviepy
+          playwright install chromium
+          playwright install-deps
+
+      - name: Run MLB Python Engine
+        env:
+          TEAM_ID: ${{ github.event.inputs.team_id }}
+          START_DATE: ${{ github.event.inputs.start_date }}
+          END_DATE: ${{ github.event.inputs.end_date }}
+        run: python scripts/build_mlb_timelapse.py
+
+      - name: Upload MP4 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlb-timelapse-video
+          path: videos/*.mp4
