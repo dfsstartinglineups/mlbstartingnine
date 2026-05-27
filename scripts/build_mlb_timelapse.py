@@ -52,21 +52,14 @@ async def record_mlb_timelapse():
         )
         page = await context.new_page()
         
-        # Navigate to the local server
-        await page.goto("http://localhost:8080/mlb_animation.html", wait_until="networkidle")
+        # Navigate directly to the URL with the parameters attached
+        url = f"http://localhost:8080/mlb_animation.html?team={TEAM_ID}&start={START_DATE}&end={END_DATE}"
+        await page.goto(url, wait_until="networkidle")
         
         # Hide the UI controls so they don't appear in the final MP4
         await page.evaluate("""
             const controls = document.getElementById('controls');
             if(controls) { controls.style.display = 'none'; }
-        """)
-
-        # Inject the GitHub Action parameters directly into the DOM and trigger the function
-        await page.evaluate(f"""
-            document.getElementById('team-selector').value = '{TEAM_ID}';
-            document.getElementById('start-date').value = '{START_DATE}';
-            document.getElementById('end-date').value = '{END_DATE}';
-            runTimelapse();
         """)
         
         # Wait for the entire animation to play out
