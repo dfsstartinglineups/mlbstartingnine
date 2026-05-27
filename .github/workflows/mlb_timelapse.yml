@@ -45,18 +45,14 @@ jobs:
           END_DATE: ${{ github.event.inputs.end_date }}
         run: python scripts/build_mlb_timelapse.py
 
-      # NEW: This step adds the new video, commits it, and pushes it to your branch
+      # NEW: This step adds the new video, commits it, pulls latest changes, and pushes it
       - name: Commit and Push Video to Repo
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add videos/*.mp4
           git diff --staged --quiet || git commit -m "Auto-generated MLB timelapse video for team ${{ github.event.inputs.team_id }}"
+          git pull --rebase origin main
           git push
 
-      # Optional: Keeps the Artifact download active just in case
-      - name: Upload MP4 Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mlb-timelapse-video
-          path: videos/*.mp4
+      
