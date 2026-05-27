@@ -487,9 +487,22 @@
 
         populateTeamDropdown();
         
-        // Auto-fill dates for ease of testing
-        document.getElementById('start-date').value = "2026-05-01";
-        document.getElementById('end-date').value = "2026-05-15";
+        // 1. Grab parameters from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const teamParam = urlParams.get('team');
+        const startParam = urlParams.get('start');
+        const endParam = urlParams.get('end');
+
+        // 2. Apply parameters if they exist, otherwise use fallback defaults
+        if (teamParam) document.getElementById('team-selector').value = teamParam;
+        document.getElementById('start-date').value = startParam || "2026-05-01";
+        document.getElementById('end-date').value = endParam || "2026-05-15";
+
+        // 3. Auto-run the animation immediately if all parameters were passed
+        if (teamParam && startParam && endParam) {
+            // Slight delay ensures fonts and DOM elements render before the CSS animation triggers
+            setTimeout(runTimelapse, 300);
+        }
 
     </script>
 </body>
