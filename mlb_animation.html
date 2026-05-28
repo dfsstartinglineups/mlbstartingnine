@@ -533,12 +533,19 @@
             }
 
             // 3. Format dates for the Splash Screen
-            const startFmt = new Date(start + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            // const startFmt = new Date(start + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+           // const endFmt = new Date(end + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            // 4. Update the Splash Screen Text
+           // splashText.innerHTML = `${teamName} Starting Lineups`;
+           // splashSubtext.innerHTML = `From ${startFmt} to ${endFmt}`;
+
+            // 3. Format dates for the Splash Screen
             const endFmt = new Date(end + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
             // 4. Update the Splash Screen Text
             splashText.innerHTML = `${teamName} Starting Lineups`;
-            splashSubtext.innerHTML = `From ${startFmt} to ${endFmt}`;
+            splashSubtext.innerHTML = `From Opening Day to ${endFmt}`;
 
             // 5. Wait 2 seconds, fade it out, and start the engine
             setTimeout(() => {
