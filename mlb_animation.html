@@ -128,7 +128,10 @@
         /* The dynamic date header */
         .date-display { font-family: 'Caveat', cursive; font-size: 54px; color: var(--pencil-ink); font-weight: 700; transition: opacity 0.1s; }
 
-        #team-name { font-family: 'Permanent Marker', cursive; font-size: 58px; margin: 5px 0 0 0; line-height: 1.1; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .team-name-row { display: flex; align-items: baseline; gap: 15px; margin: 5px 0 0 0; }
+        #team-name { font-family: 'Permanent Marker', cursive; font-size: 58px; margin: 0; line-height: 1.1; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        #team-record { font-family: 'Caveat', cursive; font-size: 46px; color: var(--pencil-ink); font-weight: 700; }
+        
         #matchup-info { font-family: 'Caveat', cursive; font-size: 34px; color: var(--pencil-ink); margin-top: 5px; font-weight: 700; display: flex; align-items: center; gap: 15px; }
         .opp-sp { font-size: 28px; opacity: 0.85; }
 
@@ -188,7 +191,7 @@
         #creator-watermark {
             position: absolute;
             left: 45px;
-            bottom: 10px; /* Reduced from 30px to move it lower */
+            bottom: 10px;
             font-family: 'Caveat', cursive;
             font-size: 32px;
             color: var(--pencil-ink);
@@ -229,7 +232,10 @@
                     <div class="title-tag">Starting 9</div>
                     <div id="game-date" class="date-display">SELECT DATES</div>
                 </div>
-                <h1 id="team-name">WAITING...</h1>
+                <div class="team-name-row">
+                    <h1 id="team-name">WAITING...</h1>
+                    <span id="team-record"></span>
+                </div>
                 <div id="matchup-info"></div>
             </div>
         </div>
@@ -386,6 +392,10 @@
                             // Map positions and handedness
                             const posMap = g.gamePositions || {};
                             const handMap = g.lineupHandedness || {};
+                            
+                            // Capture the team's record up to this point
+                            const teamRecord = g.gameRaw.teams[sideStr].leagueRecord;
+                            const recordString = teamRecord ? `(${teamRecord.wins}-${teamRecord.losses})` : "";
 
                             compiledFrames.push({
                                 type: 'GAME',
@@ -393,6 +403,7 @@
                                 isHome: isHome,
                                 oppName: oppTeam,
                                 oppSpName: oppSp ? oppSp.fullName : "TBD",
+                                record: recordString,
                                 batters: batters.map((b, idx) => ({
                                     id: b.id,
                                     name: b.fullName,
@@ -443,6 +454,11 @@
             // Format Matchup
             const vsAt = frame.isHome ? 'vs' : '@';
             document.getElementById('matchup-info').innerHTML = `${vsAt} ${frame.oppName} <span style="color:var(--paper-line); margin: 0 5px;">|</span> <span class="opp-sp">Opp SP: ${frame.oppSpName}</span>`;
+
+            // Update the team record
+            if (frame.record) {
+                document.getElementById('team-record').textContent = frame.record;
+            }
 
             // Process Batters
             frame.batters.forEach((p, idx) => {
@@ -531,14 +547,6 @@
                 splashText.innerHTML = "NO DATA FOUND";
                 return;
             }
-
-            // 3. Format dates for the Splash Screen
-            // const startFmt = new Date(start + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-           // const endFmt = new Date(end + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-
-            // 4. Update the Splash Screen Text
-           // splashText.innerHTML = `${teamName} Starting Lineups`;
-           // splashSubtext.innerHTML = `From ${startFmt} to ${endFmt}`;
 
             // 3. Format dates for the Splash Screen
             const endFmt = new Date(end + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
