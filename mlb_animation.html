@@ -73,6 +73,39 @@
             color: var(--marker-ink);
         }
 
+        /* --- Splash Screen --- */
+        #splash-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--paper-bg);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #splash-text {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 72px;
+            color: var(--marker-ink);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .splash-date {
+            font-family: 'Caveat', cursive;
+            font-size: 48px;
+            color: var(--pencil-ink);
+            margin-top: 20px;
+        }
+
         /* --- Header Section --- */
         #header {
             padding: 40px 50px 30px;
@@ -92,8 +125,8 @@
         .title-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px; }
         .title-tag { font-family: 'Permanent Marker', cursive; font-size: 28px; color: var(--marker-ink); background-color: var(--highlighter); padding: 0 10px; transform: rotate(-2deg); display: inline-block; }
         
-        /* The dynamic date header needs to flip fast without snapping awkwardly */
-        .date-display { font-family: 'Caveat', cursive; font-size: 32px; color: var(--pencil-ink); font-weight: 700; transition: opacity 0.1s; }
+        /* The dynamic date header */
+        .date-display { font-family: 'Caveat', cursive; font-size: 54px; color: var(--pencil-ink); font-weight: 700; transition: opacity 0.1s; }
 
         #team-name { font-family: 'Permanent Marker', cursive; font-size: 58px; margin: 5px 0 0 0; line-height: 1.1; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         #matchup-info { font-family: 'Caveat', cursive; font-size: 34px; color: var(--pencil-ink); margin-top: 5px; font-weight: 700; display: flex; align-items: center; gap: 15px; }
@@ -126,7 +159,7 @@
             border-bottom: 2px solid var(--paper-line);
             z-index: 10;
             background-color: transparent; 
-            /* THE MAGIC: 0.3s snappy bezier for sliding, moving, and exiting */
+            /* THE MAGIC: 0.5s snappy bezier for sliding, moving, and exiting */
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
             transform: translate(1200px, 0px); /* Start off-screen right by default */
         }
@@ -151,6 +184,19 @@
         .pitcher-label { font-family: 'Caveat', cursive; font-size: 28px; color: var(--pencil-ink); font-weight: 700; position: absolute; left: 50px; top: 900px; z-index: 5; }
         .col-order.sp-text { font-size: 28px; }
 
+        /* --- Footer Watermark --- */
+        #creator-watermark {
+            position: absolute;
+            left: 45px;
+            bottom: 30px;
+            font-family: 'Caveat', cursive;
+            font-size: 32px;
+            color: var(--pencil-ink);
+            opacity: 0.85;
+            font-weight: 700;
+            z-index: 50;
+        }
+
     </style>
 </head>
 <body>
@@ -169,6 +215,11 @@
     </div>
 
     <div id="capture-area">
+        <div id="splash-screen">
+            <h1 id="splash-text"></h1>
+            <div id="splash-subtext" class="splash-date"></div>
+        </div>
+
         <div id="header">
             <div class="team-logo-container">
                 <img id="team-logo" src="" alt="Team Logo">
@@ -188,6 +239,8 @@
             <div id="off-day-stamp">OFF DAY</div>
             <div class="pitcher-label">Starting Pitcher</div>
         </div>
+
+        <div id="creator-watermark">created by: mlbstartingnine.com</div>
     </div>
 
     <script>
@@ -457,50 +510,79 @@
 
             if (!start || !end) { alert("Please select a valid date range."); return; }
 
+            // 1. Setup the UI and Splash Screen
             applyTeamTheme(teamId);
-            document.getElementById('game-date').textContent = "COMPILING DATA...";
+            const teamName = TEAM_THEMES[teamId] ? TEAM_THEMES[teamId].name : "Team";
             
+            const splash = document.getElementById('splash-screen');
+            const splashText = document.getElementById('splash-text');
+            const splashSubtext = document.getElementById('splash-subtext');
+            
+            splash.style.opacity = '1';
+            splash.style.visibility = 'visible';
+            splashText.innerHTML = `Gathering Lineups...`;
+            splashSubtext.innerHTML = ``;
+            
+            // 2. Fetch the Data
             const dates = getDatesInRange(start, end);
             await compileDataPipeline(teamId, dates);
 
             if (compiledFrames.length === 0) {
-                document.getElementById('game-date').textContent = "NO DATA FOUND";
+                splashText.innerHTML = "NO DATA FOUND";
                 return;
             }
 
-            let frameIndex = 0;
-            
-            // Render Frame 1 immediately
-            renderFrame(compiledFrames[frameIndex]);
-            frameIndex++;
+            // 3. Format dates for the Splash Screen
+            const startFmt = new Date(start + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            const endFmt = new Date(end + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-            // Exactly 0.5s (500ms) interval
-            animationInterval = setInterval(() => {
-                if (frameIndex >= compiledFrames.length) {
-                    clearInterval(animationInterval);
-                    return;
-                }
-                renderFrame(compiledFrames[frameIndex]);
-                frameIndex++;
-            }, 1000); 
+            // 4. Update the Splash Screen Text
+            splashText.innerHTML = `${teamName} Starting Lineups`;
+            splashSubtext.innerHTML = `From ${startFmt} to ${endFmt}`;
+
+            // 5. Wait 2 seconds, fade it out, and start the engine
+            setTimeout(() => {
+                splash.style.opacity = '0';
+                
+                // Wait for the fade out to finish before hiding from DOM
+                setTimeout(() => { 
+                    splash.style.visibility = 'hidden'; 
+                    
+                    let frameIndex = 0;
+                    
+                    // Render Frame 1 immediately
+                    renderFrame(compiledFrames[frameIndex]);
+                    frameIndex++;
+
+                    // Start the 1-second interval loop
+                    animationInterval = setInterval(() => {
+                        if (frameIndex >= compiledFrames.length) {
+                            clearInterval(animationInterval);
+                            return;
+                        }
+                        renderFrame(compiledFrames[frameIndex]);
+                        frameIndex++;
+                    }, 1000); 
+
+                }, 500); 
+            }, 2000);
         }
 
         populateTeamDropdown();
         
-        // 1. Grab parameters from the URL
+        // Grab parameters from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const teamParam = urlParams.get('team');
         const startParam = urlParams.get('start');
         const endParam = urlParams.get('end');
 
-        // 2. Apply parameters if they exist, otherwise use fallback defaults
+        // Apply parameters if they exist, otherwise use fallback defaults
         if (teamParam) document.getElementById('team-selector').value = teamParam;
         document.getElementById('start-date').value = startParam || "2026-05-01";
         document.getElementById('end-date').value = endParam || "2026-05-15";
 
-        // 3. Auto-run the animation immediately if all parameters were passed
+        // Auto-run the animation immediately if all parameters were passed
         if (teamParam && startParam && endParam) {
-            // Slight delay ensures fonts and DOM elements render before the CSS animation triggers
             setTimeout(runTimelapse, 300);
         }
 
