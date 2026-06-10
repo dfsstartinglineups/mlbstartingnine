@@ -783,6 +783,7 @@ def run_engines(memory):
     39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},    
     40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
     10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
+    1:  {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "worldcup"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
     3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
     188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "australia"},
@@ -826,8 +827,8 @@ def run_engines(memory):
             if not home_startXI or not away_startXI: continue
 
             raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
-            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 10 else raw_h_name
-            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 10 else raw_a_name
+            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
+            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
 
             h_pos, a_pos = parse_futbol_lineup(home_startXI), parse_futbol_lineup(away_startXI)
             h_form = home_lineup.get('formation', 'TBD')
@@ -960,8 +961,8 @@ def run_engines(memory):
 
             h_id, a_id = match['teams']['home']['id'], match['teams']['away']['id']
             raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
-            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 10 else raw_h_name
-            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 10 else raw_a_name
+            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
+            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
 
             def get_actual_minute(e):
                 t_str = str(e.get('time', '0')).replace("'", "").strip()
