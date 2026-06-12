@@ -140,9 +140,14 @@ async def take_screenshot(fixture_id, target_date):
         url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
         
         try:
+            # Wait for the DOM to load instead of the strict networkidle
             await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await page.locator(".player-node").nth(21).wait_for(timeout=30000)
-            await asyncio.sleep(2)
+            
+            # Use the tripwire to confirm JS execution
+            await page.locator(".player-node").first.wait_for(timeout=30000)
+            
+            # Give the browser 3 full seconds to download the player headshots and paint the CSS
+            await asyncio.sleep(3) 
             
             capture_area = page.locator("#capture-area")
             await capture_area.screenshot(path="temp_matchup.png", type="png")
