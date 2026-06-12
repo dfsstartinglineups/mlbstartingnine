@@ -182,9 +182,14 @@ async def take_mlb_screenshot(game_pk, side, target_date):
         url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
         
         try:
+            # Wait for the DOM to load
             await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await page.locator("#lineup-container .player-row").nth(8).wait_for(timeout=30000)
-            await asyncio.sleep(2)
+            
+            # Use the tripwire: look for the VERY FIRST player row
+            await page.locator("#lineup-container .player-row").first.wait_for(timeout=30000)
+            
+            # Give the browser 3 full seconds to download headshots and paint the screen
+            await asyncio.sleep(3)
             
             capture_area = page.locator("#capture-area")
             await capture_area.screenshot(path="mlb_matchup.png", type="png")
