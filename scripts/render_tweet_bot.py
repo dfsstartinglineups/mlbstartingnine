@@ -372,7 +372,7 @@ def run_engines(memory):
         "POR": "Trail Blazers", "SAC": "Kings", "SAS": "Spurs", "TOR": "Raptors", "UTA": "Jazz", "WAS": "Wizards"
     }
    
-   for game in nba_data:
+    for game in nba_data:
         if not game.get('teams') or len(game['teams']) < 2: continue
         away_team, home_team = game['teams'][0], game['teams'][1]
         matchup = f"{away_team} vs {home_team}"
