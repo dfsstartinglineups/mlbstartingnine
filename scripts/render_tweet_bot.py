@@ -368,8 +368,8 @@ def run_engines(memory):
         "MIL": "Bucks", "MIN": "Timberwolves", "NOP": "Pelicans", "NYK": "Knicks", "OKC": "Thunder", "ORL": "Magic", "PHI": "76ers", "PHX": "Suns",
         "POR": "Trail Blazers", "SAC": "Kings", "SAS": "Spurs", "TOR": "Raptors", "UTA": "Jazz", "WAS": "Wizards"
     }
-
-    for game in nba_data:
+   ###########******************REMOVE # FROM LINE BELOW TO PUT NBA BACK ON
+   #ADD BACK IN WHEN NBA IS BACK for game in nba_data:
         if not game.get('teams') or len(game['teams']) < 2: continue
         away_team, home_team = game['teams'][0], game['teams'][1]
         matchup = f"{away_team} vs {home_team}"
