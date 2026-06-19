@@ -105,98 +105,69 @@ argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 # ==========================================
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
 # ==========================================
-async def take_screenshot(fixture_id, target_date):
-    print(f"📸 Connecting to Cloud Browser for Fixture {fixture_id}...")
-    async with async_playwright() as p:
-        browserless_url = os.environ.get("BROWSERLESS_URL")
+# Notice these functions now accept the `browser` argument!
+async def take_screenshot(browser, fixture_id, target_date):
+    print(f"📸 Generating Futbol Graphic for Fixture {fixture_id}...")
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+    url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await page.locator(".player-node").first.wait_for(timeout=60000)
+        await asyncio.sleep(3) 
         
-        # Connect to remote cloud browser if URL exists to save Render memory
-        if browserless_url:
-            browser = await p.chromium.connect_over_cdp(browserless_url)
-        else:
-            browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
-            
-        page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
-        url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
-        
-        try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
-            await page.locator(".player-node").first.wait_for(timeout=60000)
-            await asyncio.sleep(3) 
-            
-            capture_area = page.locator("#capture-area")
-            await capture_area.screenshot(path="temp_matchup.png", type="png")
-            await capture_area.screenshot(path="temp_matchup.jpg", type="jpeg", quality=70)
-            print("✅ Futbol Screenshots saved (PNG & JPEG)!")
-            await browser.close()
-            return True
-            
-        except Exception as e:
-            print(f"⚠️ Futbol Graphics failed. Error: {e}")
-            await browser.close()
-            return False
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="temp_matchup.png", type="png")
+        await capture_area.screenshot(path="temp_matchup.jpg", type="jpeg", quality=70)
+        print("✅ Futbol Screenshots saved (PNG & JPEG)!")
+        return True
+    except Exception as e:
+        print(f"⚠️ Futbol Graphics failed. Error: {e}")
+        return False
+    finally:
+        await page.close() # Free up the cloud memory by closing the tab
 
-async def take_mlb_screenshot(game_pk, side, target_date):
-    print(f"📸 Connecting to Cloud Browser for MLB {game_pk} ({side})...")
-    async with async_playwright() as p:
-        browserless_url = os.environ.get("BROWSERLESS_URL")
+async def take_mlb_screenshot(browser, game_pk, side, target_date):
+    print(f"📸 Generating MLB Graphic for {game_pk} ({side})...")
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+    url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await page.locator("#lineup-container .player-row").first.wait_for(timeout=60000)
+        await asyncio.sleep(3)
         
-        # Connect to remote cloud browser if URL exists to save Render memory
-        if browserless_url:
-            browser = await p.chromium.connect_over_cdp(browserless_url)
-        else:
-            browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
-            
-        page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
-        url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
-        
-        try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
-            await page.locator("#lineup-container .player-row").first.wait_for(timeout=60000)
-            await asyncio.sleep(3)
-            
-            capture_area = page.locator("#capture-area")
-            await capture_area.screenshot(path="mlb_matchup.png", type="png")
-            await capture_area.screenshot(path="mlb_matchup.jpg", type="jpeg", quality=70)
-            print("✅ MLB Screenshots saved (PNG & JPEG)!")
-            await browser.close()
-            return True
-            
-        except Exception as e:
-            print(f"⚠️ MLB Graphics failed. Error: {e}")
-            await browser.close()
-            return False
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="mlb_matchup.png", type="png")
+        await capture_area.screenshot(path="mlb_matchup.jpg", type="jpeg", quality=70)
+        print("✅ MLB Screenshots saved (PNG & JPEG)!")
+        return True
+    except Exception as e:
+        print(f"⚠️ MLB Graphics failed. Error: {e}")
+        return False
+    finally:
+        await page.close()
 
-async def take_nba_screenshot(team_abbr, side, target_date):
-    print(f"📸 Connecting to Cloud Browser for NBA {team_abbr} ({side})...")
-    async with async_playwright() as p:
-        browserless_url = os.environ.get("BROWSERLESS_URL")
+async def take_nba_screenshot(browser, team_abbr, side, target_date):
+    print(f"📸 Generating NBA Graphic for {team_abbr} ({side})...")
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
+    url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await page.locator(".player-node").first.wait_for(timeout=60000)
+        await asyncio.sleep(3) 
         
-        # Connect to remote cloud browser if URL exists to save Render memory
-        if browserless_url:
-            browser = await p.chromium.connect_over_cdp(browserless_url)
-        else:
-            browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
-            
-        page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
-        url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
-        
-        try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
-            await page.locator(".player-node").first.wait_for(timeout=60000)
-            await asyncio.sleep(3) 
-            
-            capture_area = page.locator("#capture-area")
-            await capture_area.screenshot(path="nba_matchup.png", type="png")
-            await capture_area.screenshot(path="nba_matchup.jpg", type="jpeg", quality=70)
-            print("✅ NBA Screenshots saved (PNG & JPEG)!")
-            await browser.close()
-            return True
-            
-        except Exception as e:
-            print(f"⚠️ NBA Graphics failed. Error: {e}")
-            await browser.close()
-            return False
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="nba_matchup.png", type="png")
+        await capture_area.screenshot(path="nba_matchup.jpg", type="jpeg", quality=70)
+        print("✅ NBA Screenshots saved (PNG & JPEG)!")
+        return True
+    except Exception as e:
+        print(f"⚠️ NBA Graphics failed. Error: {e}")
+        return False
+    finally:
+        await page.close()
 
 def get_short_name(full_name, team_name):
     name = team_name if team_name else full_name.split(' ')[-1]
@@ -239,7 +210,6 @@ def fetch_initial_memory():
         except Exception as e:
             print(f"⚠️ Firebase memory fetch failed: {e}")
             
-    # MIGRATION BRIDGE (Update Repo URL here if needed)
     print("🌉 Firebase empty. Bridging gap: Fetching legacy tweet log from GitHub...")
     gh_url = f"https://raw.githubusercontent.com/dfsstartinglineups/mlbstartingnine/refs/heads/main/data/tweet_log.json?v={time.time()}"
     try:
@@ -257,7 +227,27 @@ def fetch_initial_memory():
 # ==========================================
 # 5. CORE BOT ENGINE (RUNS EVERY LOOP)
 # ==========================================
-def run_engines(memory):
+# Converted to an async function
+async def run_engines(memory):
+    # ----------------------------------------------------
+    # BROWSER CONNECTION MANAGER (The Lazy Loader)
+    # ----------------------------------------------------
+    playwright_manager = await async_playwright().start()
+    browser = None
+
+    async def get_browser():
+        nonlocal browser
+        if browser is None:
+            print("🌐 Opening Cloud Browser connection for this loop...")
+            browserless_url = os.environ.get("BROWSERLESS_URL")
+            if browserless_url:
+                browser = await playwright_manager.chromium.connect_over_cdp(browserless_url)
+            else:
+                browser = await playwright_manager.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
+        return browser
+
+    # ----------------------------------------------------
+
     today_est = datetime.now(zoneinfo.ZoneInfo("America/New_York"))
     date_str = today_est.strftime('%Y-%m-%d')
     game_date_short = f"{today_est.month}/{today_est.day}"
@@ -272,7 +262,6 @@ def run_engines(memory):
     MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
     NBA_DATA_URL = f"https://nbastartingfive.com/data/{date_str}.json?v={today_est.timestamp()}"
 
-    # --- THE JANITOR: Clean old memory ---
     dates_to_keep = [date_str, yesterday_str, tomorrow_str]
     keys_to_delete = [k for k in memory.keys() if k not in dates_to_keep]
     for k in keys_to_delete:
@@ -391,11 +380,12 @@ def run_engines(memory):
                 screenshot_success = False
                 for attempt in range(2):
                     try:
-                        if asyncio.run(take_nba_screenshot(team, side, date_str)):
+                        b = await get_browser()
+                        if await take_nba_screenshot(b, team, side, date_str):
                             screenshot_success = True
                             break 
-                        time.sleep(5)
-                    except: time.sleep(5)
+                        await asyncio.sleep(5)
+                    except: await asyncio.sleep(5)
                         
                 if not screenshot_success: continue 
 
@@ -412,7 +402,7 @@ def run_engines(memory):
                     
                     for attempt in range(2):
                         try:
-                            if attempt == 1: time.sleep(3) 
+                            if attempt == 1: await asyncio.sleep(3) 
                             media = nba_api_v1.media_upload("nba_matchup.png")
                             nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
                             nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
@@ -424,7 +414,7 @@ def run_engines(memory):
                     if config and config.get("bsky_client"):
                         for attempt in range(2):
                             try:
-                                if attempt == 1: time.sleep(3)
+                                if attempt == 1: await asyncio.sleep(3)
                                 with open("nba_matchup.jpg", "rb") as f:
                                     img_data = f.read()
                                 config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
@@ -461,7 +451,7 @@ def run_engines(memory):
     try: odds_data = requests.get(MLB_ODDS_URL).json().get('odds', [])
     except: odds_data = []
 
-    def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
+    async def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
         if memory_key in memory.get(date_str, []): return False
         
         tweet_text = f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n"
@@ -482,11 +472,12 @@ def run_engines(memory):
         screenshot_success = False
         for attempt in range(2):
             try:
-                if asyncio.run(take_mlb_screenshot(game_pk, side, date_string)):
+                b = await get_browser()
+                if await take_mlb_screenshot(b, game_pk, side, date_string):
                     screenshot_success = True
                     break 
-                time.sleep(5)
-            except: time.sleep(5)
+                await asyncio.sleep(5)
+            except: await asyncio.sleep(5)
                 
         if not screenshot_success: return False
 
@@ -500,7 +491,7 @@ def run_engines(memory):
             
             for attempt in range(2):
                 try:
-                    if attempt == 1: time.sleep(3) 
+                    if attempt == 1: await asyncio.sleep(3) 
                     media = mlb_api_v1.media_upload("mlb_matchup.png")
                     mlb_api_v1.create_media_metadata(media.media_id, alt_text)
                     mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
@@ -512,7 +503,7 @@ def run_engines(memory):
             if config and config.get("bsky_client"):
                 for attempt in range(2):
                     try:
-                        if attempt == 1: time.sleep(3) 
+                        if attempt == 1: await asyncio.sleep(3) 
                         with open("mlb_matchup.jpg", "rb") as f:
                             img_data = f.read()
                         config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
@@ -551,7 +542,7 @@ def run_engines(memory):
                     
                     for attempt in range(2):
                         try:
-                            if attempt == 1: time.sleep(3)
+                            if attempt == 1: await asyncio.sleep(3)
                             mlb_client.create_tweet(text=alert_text)
                             twitter_success = True
                             break
@@ -561,7 +552,7 @@ def run_engines(memory):
                     if config and config.get("bsky_client"):
                         for attempt in range(2):
                             try:
-                                if attempt == 1: time.sleep(3)
+                                if attempt == 1: await asyncio.sleep(3)
                                 bsky_tb = client_utils.TextBuilder()
                                 bsky_tb.text(alert_text)
                                 config["bsky_client"].send_post(bsky_tb)
@@ -644,7 +635,7 @@ def run_engines(memory):
             previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
 
             if not previously_tweeted_keys:
-                if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
+                if await send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
                     log_today.append(full_key)
                     tweeted_recently.append(full_key)
                     new_tweets_sent = True
@@ -662,7 +653,7 @@ def run_engines(memory):
                     in_names = [next((p.get('fullName', 'Unknown Player') for p in players_array if str(p['id']) == pid), 'Unknown') for pid in in_ids]
                     alert_header = f"🚨 {team_short_ref} LATE SCRATCH\nOUT: {', '.join(out_names) if out_names else 'None'}\nIN: {', '.join(in_names) if in_names else 'None'}"
 
-                if send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key, alert_header=alert_header):
+                if await send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key, alert_header=alert_header):
                     for k in previously_tweeted_keys:
                         if k in log_today: log_today.remove(k)
                         if k in tweeted_recently: tweeted_recently.remove(k)
@@ -748,14 +739,12 @@ def run_engines(memory):
             
             h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
             
-            # --- SMART LINK CONSTRUCTOR (Lineups) ---
             if "base_url" in league_info:
                 full_link = f"{league_info['base_url']}?date={target_date_str}#lineup-{fixture_id}"
             else:
                 slug = league_info.get("url_slug", "top")
                 full_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#lineup-{fixture_id}"
             
-            # 1. Pick a random emoji and a random clean title
             EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
             e = random.choice(EMOJIS)
             
@@ -792,15 +781,15 @@ def run_engines(memory):
 
             if team_key in memory.get(date_str, []): continue
 
-            # Apply the 2-attempt safety net to Futbol!
             screenshot_success = False
             for attempt in range(2):
                 try:
-                    if asyncio.run(take_screenshot(fixture_id, target_date_str)):
+                    b = await get_browser()
+                    if await take_screenshot(b, fixture_id, target_date_str):
                         screenshot_success = True
                         break 
-                    time.sleep(5)
-                except: time.sleep(5)
+                    await asyncio.sleep(5)
+                except: await asyncio.sleep(5)
                 
             if not screenshot_success: continue
 
@@ -898,18 +887,12 @@ def run_engines(memory):
                 # --- AGGREGATE ROUTER (Pipeline B) ---
                 first_leg = match.get("first_leg_goals")
                 if first_leg:
-                    # 1. Calculate Aggregate Scores
                     agg_h_score = current_home_score + first_leg.get(str(h_id), 0)
                     agg_a_score = current_away_score + first_leg.get(str(a_id), 0)
                     
-                    # 2. Evaluate Aggregate Scenarios
                     is_agg_equalizer = agg_h_score == agg_a_score
                     is_agg_go_ahead = (team_id == h_id and agg_h_score - agg_a_score == 1) or (team_id == a_id and agg_a_score - agg_h_score == 1)
-                    
-                    # Is it a blowout/dagger? (Up by 2+ goals on aggregate)
                     is_dagger = (team_id == h_id and agg_h_score - agg_a_score >= 2) or (team_id == a_id and agg_a_score - agg_h_score >= 2)
-                    
-                    # Consolation: They scored, but are still losing the tie.
                     is_consolation = (team_id == h_id and agg_h_score < agg_a_score) or (team_id == a_id and agg_a_score < agg_h_score)
 
                     scenario_key = None
@@ -957,11 +940,9 @@ def run_engines(memory):
                 conceding_team_name = a_name if team_id == h_id else h_name
                 scorer = event.get('player')
                 
-                # NEW: If the API hasn't provided the player's name yet, skip and try again next minute
                 if not scorer or str(scorer).lower() == "null":
                     continue
                 
-                # Since we know the scorer exists now, we can simplify the strings
                 if event.get('detail') == 'Own Goal':
                     scorer_str = f"{scorer} (Own Goal)"
                 else:
@@ -970,7 +951,6 @@ def run_engines(memory):
                 american_odds = f"+{int((scorer_odds - 1) * 100)}"
                 h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
                 
-                # --- SMART LINK CONSTRUCTOR (Goal Alerts) ---
                 if "base_url" in league_info:
                     link = f"{league_info['base_url']}?date={target_date_str}#goal-{fixture_id}"
                 else:
@@ -1121,7 +1101,6 @@ def run_engines(memory):
                     }
                 }
 
-                # Dynamically format titles specifically for the go-ahead variables
                 raw_title = random.choice(PHRASES[scenario_key]["titles"])
                 title = raw_title.format(scoring_team_name=scoring_team_name)
                 
@@ -1130,7 +1109,6 @@ def run_engines(memory):
                 
                 blurb = blurb_raw.format(scoring_team_name=scoring_team_name, conceding_team_name=conceding_team_name)
 
-                # --- THE DUAL-SCORE FORMATTER ---
                 if scenario_key.startswith("agg_"):
                     tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n"
                     tweet_text += f"Today: {h_name} {current_home_score} - {current_away_score} {a_name}\n"
@@ -1163,8 +1141,13 @@ def run_engines(memory):
                     memory[target_date_str] = log_target_date
 
     # ==========================================
-    # FIREBASE SYNC (END OF LOOP)
+    # CLOSING BROWSER CLEANUP
     # ==========================================
+    if browser:
+        print("🛑 Closing Cloud Browser connection for this loop.")
+        await browser.close()
+    await playwright_manager.stop()
+
     if new_tweets_sent and firebase_admin._apps:
         try:
             db.reference('tweet_log').update(memory)
@@ -1176,7 +1159,8 @@ def run_engines(memory):
 # ==========================================
 # 6. THE PERSISTENT RENDER WRAPPER
 # ==========================================
-if __name__ == "__main__":
+# The main function is now entirely asynchronous!
+async def main():
     print("🤖 Starting Publisher Bot (Render Persistent Engine)...")
     
     persisted_memory = fetch_initial_memory()
@@ -1193,7 +1177,7 @@ if __name__ == "__main__":
         try:
             loop_start_time = time.time()
             
-            target_sleep_sec, updated_memory = run_engines(persisted_memory)
+            target_sleep_sec, updated_memory = await run_engines(persisted_memory)
             persisted_memory = updated_memory
             
             loop_elapsed = time.time() - loop_start_time
@@ -1201,8 +1185,11 @@ if __name__ == "__main__":
             
             if actual_sleep > 0:
                 print(f"⏳ Loop took {loop_elapsed:.1f}s. Sleeping {actual_sleep:.1f}s...")
-                time.sleep(actual_sleep)
+                await asyncio.sleep(actual_sleep)
                 
         except Exception as e:
             print(f"\n❌ Loop crashed: {e}. Restarting loop in 60s...")
-            time.sleep(60)
+            await asyncio.sleep(60)
+
+if __name__ == "__main__":
+    asyncio.run(main())
