@@ -17,20 +17,6 @@ import subprocess
 import sys
 import ctypes
 
-# --- AUTOMATIC PLAYWRIGHT BROWSER INSTALL ---
-def ensure_browsers():
-    try:
-        import playwright
-        print("🌐 Checking Playwright browser binaries...")
-        # Use check_call to block the script until installation is finished
-        subprocess.check_call([sys.executable, "-m", "playwright", "install", "chromium"])
-        print("✅ Playwright binaries are ready.")
-    except Exception as e:
-        print(f"⚠️ Playwright auto-install failed: {e}")
-
-# Call it immediately
-ensure_browsers()
-
 # ==========================================
 # 0. ENVIRONMENT & DRY RUN SETTINGS
 # ==========================================
@@ -120,33 +106,22 @@ argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
 # ==========================================
 async def take_screenshot(fixture_id, target_date):
-    print(f"📸 Booting headless browser for Fixture {fixture_id}...")
+    print(f"📸 Connecting to Cloud Browser for Fixture {fixture_id}...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,
-            args=[
-                '--disable-gpu', 
-                '--disable-dev-shm-usage', 
-                '--no-sandbox', 
-                '--disable-setuid-sandbox', 
-                '--no-zygote',
-                '--single-process', # 🛑 MASSIVE MEMORY SAVER: Runs everything in 1 process
-                '--disable-site-isolation-trials', # Disables heavy security sandboxing
-                '--disable-features=IsolateOrigins,site-per-process',
-                '--js-flags="--max-old-space-size=50"' # 🛑 Limits JS engine to 50MB
-            ]
-        )
+        browserless_url = os.environ.get("BROWSERLESS_URL")
+        
+        # Connect to remote cloud browser if URL exists to save Render memory
+        if browserless_url:
+            browser = await p.chromium.connect_over_cdp(browserless_url)
+        else:
+            browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
+            
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
         url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
         
         try:
-            # Wait for the DOM to load instead of the strict networkidle
             await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            
-            # Use the tripwire to confirm JS execution
             await page.locator(".player-node").first.wait_for(timeout=30000)
-            
-            # Give the browser 3 full seconds to download the player headshots and paint the CSS
             await asyncio.sleep(3) 
             
             capture_area = page.locator("#capture-area")
@@ -162,33 +137,22 @@ async def take_screenshot(fixture_id, target_date):
             return False
 
 async def take_mlb_screenshot(game_pk, side, target_date):
-    print(f"📸 Booting headless browser for MLB {game_pk} ({side})...")
+    print(f"📸 Connecting to Cloud Browser for MLB {game_pk} ({side})...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,
-            args=[
-                '--disable-gpu', 
-                '--disable-dev-shm-usage', 
-                '--no-sandbox', 
-                '--disable-setuid-sandbox', 
-                '--no-zygote',
-                '--single-process', # 🛑 MASSIVE MEMORY SAVER: Runs everything in 1 process
-                '--disable-site-isolation-trials', # Disables heavy security sandboxing
-                '--disable-features=IsolateOrigins,site-per-process',
-                '--js-flags="--max-old-space-size=50"' # 🛑 Limits JS engine to 50MB
-            ]
-        )
+        browserless_url = os.environ.get("BROWSERLESS_URL")
+        
+        # Connect to remote cloud browser if URL exists to save Render memory
+        if browserless_url:
+            browser = await p.chromium.connect_over_cdp(browserless_url)
+        else:
+            browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
+            
         page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
         url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
         
         try:
-            # Wait for the DOM to load
             await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            
-            # Use the tripwire: look for the VERY FIRST player row
             await page.locator("#lineup-container .player-row").first.wait_for(timeout=30000)
-            
-            # Give the browser 3 full seconds to download headshots and paint the screen
             await asyncio.sleep(3)
             
             capture_area = page.locator("#capture-area")
@@ -204,29 +168,23 @@ async def take_mlb_screenshot(game_pk, side, target_date):
             return False
 
 async def take_nba_screenshot(team_abbr, side, target_date):
-    print(f"📸 Booting headless browser for NBA {team_abbr} ({side})...")
+    print(f"📸 Connecting to Cloud Browser for NBA {team_abbr} ({side})...")
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,
-            args=[
-                '--disable-gpu', 
-                '--disable-dev-shm-usage', 
-                '--no-sandbox', 
-                '--disable-setuid-sandbox', 
-                '--no-zygote',
-                '--single-process', # 🛑 MASSIVE MEMORY SAVER: Runs everything in 1 process
-                '--disable-site-isolation-trials', # Disables heavy security sandboxing
-                '--disable-features=IsolateOrigins,site-per-process',
-                '--js-flags="--max-old-space-size=50"' # 🛑 Limits JS engine to 50MB
-            ]
-        )
+        browserless_url = os.environ.get("BROWSERLESS_URL")
+        
+        # Connect to remote cloud browser if URL exists to save Render memory
+        if browserless_url:
+            browser = await p.chromium.connect_over_cdp(browserless_url)
+        else:
+            browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
+            
         page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
         url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
         
         try:
             await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await page.locator(".player-node").nth(4).wait_for(timeout=30000)
-            await asyncio.sleep(2) 
+            await page.locator(".player-node").first.wait_for(timeout=30000)
+            await asyncio.sleep(3) 
             
             capture_area = page.locator("#capture-area")
             await capture_area.screenshot(path="nba_matchup.png", type="png")
@@ -271,7 +229,6 @@ def parse_futbol_lineup(startXI):
 # 4. THE COLD START MIGRATION BRIDGE
 # ==========================================
 def fetch_initial_memory():
-    """Pulls from Firebase first. If empty, bridges the gap with GitHub."""
     mem = {}
     if firebase_admin._apps:
         try:
@@ -301,7 +258,6 @@ def fetch_initial_memory():
 # 5. CORE BOT ENGINE (RUNS EVERY LOOP)
 # ==========================================
 def run_engines(memory):
-    # Establish fresh dates and URLs for this specific loop
     today_est = datetime.now(zoneinfo.ZoneInfo("America/New_York"))
     date_str = today_est.strftime('%Y-%m-%d')
     game_date_short = f"{today_est.month}/{today_est.day}"
@@ -342,7 +298,7 @@ def run_engines(memory):
     try: nba_data = requests.get(NBA_DATA_URL).json().get('games', [])
     except: nba_data = []
 
-    # 🛑 ADD THIS LINE TO TURN OFF NBA TWEETS:
+    # 🛑 NBA BYPASS: Leave this set to True to keep NBA tweets turned off
     if True: nba_data = []
 
     ESPN_TO_STD = {"NY": "NYK", "NO": "NOP", "SA": "SAS", "GS": "GSW", "WSH": "WAS", "UTAH": "UTA"}
@@ -429,7 +385,6 @@ def run_engines(memory):
                 bsky_tb.link(link_url, link_url)
                 bsky_tb.text(f"\n\n#{team_hash} #{team_hash}Lineup #NBA")
 
-                # The IN-MEMORY Race Condition check (Since Render is single-instance, we just check local dict)
                 if team_date_key in memory.get(date_str, []):
                     continue
 
@@ -450,65 +405,49 @@ def run_engines(memory):
 
                 if DRY_RUN:
                     print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking NBA Tweet for {team_name}:")
-                    print(f"      -> Text: {tweet_text[:80]}...")
-                    print(f"      -> Image Generated: True | Alt: {nba_alt_text[:60]}...")
-                    upload_success = True # Treat dry runs as successful
+                    upload_success = True 
                 else:
                     twitter_success = False
                     bsky_success = False
                     
-                    # 1. Post to Twitter Safely (Max 2 Attempts)
                     for attempt in range(2):
                         try:
-                            if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                            if attempt == 1: time.sleep(3) 
                             media = nba_api_v1.media_upload("nba_matchup.png")
                             nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
                             nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                            print(f"✅ Successfully tweeted {team_name} NBA lineup graphic!")
                             twitter_success = True
-                            break # Success! Break out of the retry loop.
-                        except Exception as e:
-                            print(f"⚠️ X.com attempt {attempt + 1} failed for {team_name}: {e}")
+                            break 
+                        except Exception as e: pass
                             
-                    # 2. Post to Bluesky Safely (Max 2 Attempts)
                     config = LEAGUE_CONFIG.get("nba")
                     if config and config.get("bsky_client"):
                         for attempt in range(2):
                             try:
-                                if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                                if attempt == 1: time.sleep(3)
                                 with open("nba_matchup.jpg", "rb") as f:
                                     img_data = f.read()
                                 config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
-                                print(f"✅ Successfully posted {team_name} to Bluesky (Native JPEG)!")
                                 bsky_success = True
-                                break # Success! Break out of the retry loop.
-                            except Exception as e:
-                                print(f"⚠️ Bluesky attempt {attempt + 1} failed for {team_name}: {e}")
+                                break 
+                            except Exception as e: pass
 
-                    # 3. Memory Lock: If EITHER platform worked, consider the job done so we don't spam.
                     upload_success = twitter_success or bsky_success
 
-                # ALWAYS clean up files
                 if os.path.exists("nba_matchup.png"): os.remove("nba_matchup.png")
                 if os.path.exists("nba_matchup.jpg"): os.remove("nba_matchup.jpg")
                 
-                # ONLY log to memory if the upload actually worked
                 if upload_success:
                     log_today.append(team_date_key)
                     tweeted_recently.append(team_date_key)
                     memory[date_str] = log_today
                     new_tweets_sent = True
-                    
-                    # 🛑 KEEPING FIREBASE SYNC:
                     if firebase_admin._apps:
                         db.reference('tweet_log').update({date_str: log_today})
                     
-                # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
                 gc.collect()
-                try:
-                    ctypes.CDLL('libc.so.6').malloc_trim(0)
-                except Exception:
-                    pass
+                try: ctypes.CDLL('libc.so.6').malloc_trim(0)
+                except Exception: pass
 
     # ==========================================
     # MLB ENGINE
@@ -553,60 +492,44 @@ def run_engines(memory):
 
         if DRY_RUN:
             print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking MLB Tweet for {team_short}:")
-            print(f"      -> Text: {tweet_text[:80]}...")
-            print(f"      -> Image Generated: True | Alt: {alt_text[:60]}...")
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
-            return True # Tell the main loop it succeeded
+            return True
         else:
             twitter_success = False
             bsky_success = False
             
-            # 1. Post to Twitter Safely (Max 2 Attempts)
             for attempt in range(2):
                 try:
-                    if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                    if attempt == 1: time.sleep(3) 
                     media = mlb_api_v1.media_upload("mlb_matchup.png")
                     mlb_api_v1.create_media_metadata(media.media_id, alt_text)
                     mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                    print(f"✅ Successfully tweeted {team_short} MLB lineup graphic!")
                     twitter_success = True
-                    break # Success! Break out of the retry loop.
-                except Exception as e: 
-                    print(f"⚠️ X.com attempt {attempt + 1} failed for {team_short}: {e}")
+                    break 
+                except Exception as e: pass
                 
-            # 2. Post to Bluesky Safely (Max 2 Attempts)
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
                 for attempt in range(2):
                     try:
-                        if attempt == 1: time.sleep(3) # Pause for 3 seconds before retry
+                        if attempt == 1: time.sleep(3) 
                         with open("mlb_matchup.jpg", "rb") as f:
                             img_data = f.read()
                         config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
-                        print(f"✅ Successfully posted {team_short} to Bluesky (Native JPEG)!")
                         bsky_success = True
-                        break # Success! Break out of the retry loop.
-                    except Exception as e:
-                        print(f"⚠️ Bluesky attempt {attempt + 1} failed for {team_short}: {e}")
+                        break 
+                    except Exception as e: pass
 
-            # 3. Memory Lock: If EITHER platform worked, consider the job done so we don't spam.
             upload_success = twitter_success or bsky_success
             
-            # ALWAYS clean up
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             if os.path.exists("mlb_matchup.jpg"): os.remove("mlb_matchup.jpg")
             
-            # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
             gc.collect()
-            try:
-                ctypes.CDLL('libc.so.6').malloc_trim(0)
-            except Exception:
-                pass
+            try: ctypes.CDLL('libc.so.6').malloc_trim(0)
+            except Exception: pass
                 
-            # Return the actual status. If False, the main loop won't write to Firebase.
             return upload_success
-
-    
 
     for game in games:
         game_pk = str(game['gamePk'])
@@ -621,25 +544,19 @@ def run_engines(memory):
                 alert_text = f"🚨 POSTPONED: The game between the {away_short} and {home_short} has been postponed due to {reason}.\n\n#{away_short.replace(' ', '')} #{home_short.replace(' ', '')} #MLB"
                 
                 if DRY_RUN:
-                    print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking MLB Postponement for {away_short}:")
-                    print(f"      -> Text: {alert_text}")
-                    upload_success = True # Treat dry runs as successful
+                    upload_success = True 
                 else:
                     twitter_success = False
                     bsky_success = False
                     
-                    # 1. Post to Twitter Safely
                     for attempt in range(2):
                         try:
                             if attempt == 1: time.sleep(3)
                             mlb_client.create_tweet(text=alert_text)
-                            print(f"✅ Successfully tweeted postponement for {away_short} vs {home_short} to X!")
                             twitter_success = True
                             break
-                        except Exception as e: 
-                            print(f"⚠️ X.com attempt {attempt + 1} failed for {away_short} postponement: {e}")
+                        except Exception as e: pass
 
-                    # 2. Post to Bluesky Safely
                     config = LEAGUE_CONFIG.get("mlb")
                     if config and config.get("bsky_client"):
                         for attempt in range(2):
@@ -648,35 +565,28 @@ def run_engines(memory):
                                 bsky_tb = client_utils.TextBuilder()
                                 bsky_tb.text(alert_text)
                                 config["bsky_client"].send_post(bsky_tb)
-                                print(f"✅ Successfully posted postponement for {away_short} to Bluesky!")
                                 bsky_success = True
                                 break
-                            except Exception as e:
-                                print(f"⚠️ Bluesky attempt {attempt + 1} failed for {away_short} postponement: {e}")
+                            except Exception as e: pass
                                 
                     upload_success = twitter_success or bsky_success
                     
-                # ONLY log to memory if the upload actually worked
                 if upload_success:
                     log_today.append(postponed_key)
                     tweeted_recently.append(postponed_key)
                     memory[date_str] = log_today
                     new_tweets_sent = True
-                    # 🛑 KEEPING FIREBASE SYNC:
                     if firebase_admin._apps:
                         db.reference('tweet_log').update({date_str: log_today})
             continue
         
         positions = {}
-        player_names_map = {} # <-- ADD THIS
+        player_names_map = {} 
         try:
             box_teams = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live").json().get('liveData', {}).get('boxscore', {}).get('teams', {})
             for pid, p_data in {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}.items():
-                
-                # <-- ADD THIS TO MAP IDs TO NAMES
                 person_id = str(p_data['person']['id'])
                 player_names_map[person_id] = p_data['person']['fullName'] 
-                
                 if p_data.get('position', {}).get('abbreviation'): positions[p_data['person']['id']] = p_data['position']['abbreviation']
                 elif p_data.get('allPositions'): positions[p_data['person']['id']] = p_data['allPositions'][0]['abbreviation']
         except: pass
@@ -738,7 +648,6 @@ def run_engines(memory):
                     log_today.append(full_key)
                     tweeted_recently.append(full_key)
                     new_tweets_sent = True
-                    # 🛑 ADD THIS HERE:
                     if firebase_admin._apps:
                         db.reference('tweet_log').update({date_str: log_today})
             elif full_key not in previously_tweeted_keys:
@@ -749,7 +658,6 @@ def run_engines(memory):
 
                 if len(out_ids) == 0 and len(in_ids) == 0: alert_header = f"⚠️ {team_short_ref} LINEUP SHUFFLE: The batting order has changed."
                 else:
-                    # <-- FIX THE OUT NAMES HERE
                     out_names = [player_names_map.get(str(pid), 'Unknown') for pid in out_ids]
                     in_names = [next((p.get('fullName', 'Unknown Player') for p in players_array if str(p['id']) == pid), 'Unknown') for pid in in_ids]
                     alert_header = f"🚨 {team_short_ref} LATE SCRATCH\nOUT: {', '.join(out_names) if out_names else 'None'}\nIN: {', '.join(in_names) if in_names else 'None'}"
@@ -765,18 +673,7 @@ def run_engines(memory):
     # ==========================================
     # FUTBOL ENGINE (Lineups & Live Alerts)
     # ==========================================
-    
-    # 137: {"name": "COPPA ITALIA 🇮🇹", "tag": "#CoppaItalia", "url_slug": "coppaitalia", "x_client": seriea_client, "v1_client": seriea_api_v1},
-    
-    
     FUTBOL_LEAGUES = {
-   # 81:  {"name": "DFB-POKAL 🇩🇪", "tag": "#DFBPokal", "url_slug": "dfbpokal", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},    
-   # 203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "turkey", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},
-   # 144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#ProLeague", "url_slug": "belgium", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},
-   # 119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "denmark", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},    
-   # 88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},
-   # 94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "portugal", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1},    
-   # 78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "x_client": bundesliga_client, "v1_client": bundesliga_api_v1, "base_url": "https://futbolstartingeleven.com/bundesliga.html"},        
     143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey", "x_client": seriea_client, "v1_client": seriea_api_v1},
     140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},    
     61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/ligue1.html"},     
@@ -910,9 +807,7 @@ def run_engines(memory):
             target_client, target_v1_client = league_info.get("x_client") or futbol_client, league_info.get("v1_client") or futbol_api_v1
 
             if DRY_RUN:
-                print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking Futbol Lineup for {h_name}:")
-                print(f"      -> Text: {tweet_text[:80]}...")
-                upload_success = True # Treat dry runs as successful so the loop advances
+                upload_success = True 
             else:
                 upload_success = False
                 try:
@@ -925,33 +820,24 @@ def run_engines(memory):
                         with open("temp_matchup.jpg", "rb") as f:
                             img_data = f.read()
                         target_bsky_client.send_image(text=bsky_tb, image=img_data, image_alt=futbol_alt_text)
-                        print(f"✅ Successfully posted to Bluesky (Native JPEG)!")
                     
-                    # If it makes it here without crashing, it was a success!
                     upload_success = True
-                except Exception as e: 
-                    print(f"❌ Failed to tweet Futbol matchup: {e}")
+                except Exception as e: pass
 
-            # ALWAYS clean up the files to save hard drive space
             if os.path.exists("temp_matchup.png"): os.remove("temp_matchup.png")
             if os.path.exists("temp_matchup.jpg"): os.remove("temp_matchup.jpg")
             
-            # ONLY update memory and Firebase if it actually uploaded
             if upload_success:
                 log_target_date.append(team_key)
                 tweeted_recently.append(team_key)
                 new_tweets_sent = True
                 
-                # 🛑 KEEPING FIREBASE SYNC:
                 if firebase_admin._apps:
                     db.reference('tweet_log').update({target_date_str: log_target_date})
                 
-            # 🧹 FORCE GARBAGE COLLECTION & LINUX MEMORY FLUSH
             gc.collect()
-            try:
-                ctypes.CDLL('libc.so.6').malloc_trim(0)
-            except Exception:
-                pass            
+            try: ctypes.CDLL('libc.so.6').malloc_trim(0)
+            except Exception: pass            
 
         # --- B. FUTBOL LIVE ALERTS ---
         live_futbol_data = {}
@@ -1261,20 +1147,15 @@ def run_engines(memory):
                 tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
                 
                 if DRY_RUN:
-                    print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking Goal Alert for {scoring_team_name}:")
-                    print(f"      -> Text: {tweet_text[:80]}...")
-                    upload_success = True # Treat dry runs as successful
+                    upload_success = True 
                 else:
                     upload_success = False
                     try:
                         target_client = league_info.get("x_client") or futbol_client
                         if target_client: target_client.create_tweet(text=tweet_text)
-                        print(f"✅ [{league_info['name']}] Successfully tweeted ALERTS for {scoring_team_name}!")
-                        upload_success = True # Mark success if it didn't crash
-                    except Exception as e: 
-                        print(f"❌ Failed to tweet ALERT: {e}")
+                        upload_success = True 
+                    except Exception as e: pass
 
-                # ONLY log to memory if the upload actually worked
                 if upload_success:
                     log_target_date.append(event_key)
                     tweeted_recently.append(event_key)
@@ -1288,10 +1169,9 @@ def run_engines(memory):
         try:
             db.reference('tweet_log').update(memory)
             print("\n💾 In-Memory State Synced to Firebase.")
-        except Exception as e:
-            print(f"⚠️ Failed to push log to Firebase: {e}")
+        except Exception as e: pass
     
-    return 60, memory # Return the target sleep time and the persistent memory
+    return 60, memory 
 
 # ==========================================
 # 6. THE PERSISTENT RENDER WRAPPER
@@ -1299,14 +1179,11 @@ def run_engines(memory):
 if __name__ == "__main__":
     print("🤖 Starting Publisher Bot (Render Persistent Engine)...")
     
-    # 1. Fetch initial state
     persisted_memory = fetch_initial_memory()
     
-    # 2. SEED FIREBASE: If Firebase is empty but we got GH data, save it now!
     if firebase_admin._apps:
         existing_fb = db.reference('tweet_log').get()
         if not existing_fb and persisted_memory:
-            print("🌱 Seeding Firebase with legacy GitHub log...")
             db.reference('tweet_log').set(persisted_memory)
     
     if persisted_memory is None:
@@ -1316,7 +1193,6 @@ if __name__ == "__main__":
         try:
             loop_start_time = time.time()
             
-            # Run engines - we now capture the updated memory and the sleep time
             target_sleep_sec, updated_memory = run_engines(persisted_memory)
             persisted_memory = updated_memory
             
@@ -1330,5 +1206,3 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"\n❌ Loop crashed: {e}. Restarting loop in 60s...")
             time.sleep(60)
-            # CRITICAL: We DO NOT re-fetch memory here. 
-            # We keep the persisted_memory we already have in RAM.
