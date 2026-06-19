@@ -120,8 +120,8 @@ async def take_screenshot(fixture_id, target_date):
         url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
         
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await page.locator(".player-node").first.wait_for(timeout=30000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            await page.locator(".player-node").first.wait_for(timeout=60000)
             await asyncio.sleep(3) 
             
             capture_area = page.locator("#capture-area")
@@ -151,8 +151,8 @@ async def take_mlb_screenshot(game_pk, side, target_date):
         url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
         
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await page.locator("#lineup-container .player-row").first.wait_for(timeout=30000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            await page.locator("#lineup-container .player-row").first.wait_for(timeout=60000)
             await asyncio.sleep(3)
             
             capture_area = page.locator("#capture-area")
@@ -182,8 +182,8 @@ async def take_nba_screenshot(team_abbr, side, target_date):
         url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
         
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            await page.locator(".player-node").first.wait_for(timeout=30000)
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            await page.locator(".player-node").first.wait_for(timeout=60000)
             await asyncio.sleep(3) 
             
             capture_area = page.locator("#capture-area")
