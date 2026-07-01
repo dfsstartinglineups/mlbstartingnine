@@ -130,7 +130,15 @@ async def take_screenshot(browser, fixture_id, target_date):
 async def take_mlb_screenshot(browser, game_pk, side, target_date):
     print(f"📸 Generating MLB Graphic for {game_pk} ({side})...")
     page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
-    url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}"
+    
+    # 🔍 1. TURN ON X-RAY VISION (Prints hidden browser errors to Render logs)
+    page.on("console", lambda msg: print(f"   [Browser Console]: {msg.text}"))
+    page.on("pageerror", lambda err: print(f"   [Browser JS Error]: {err}"))
+    page.on("requestfailed", lambda req: print(f"   [Request Failed]: {req.url}"))
+    
+    # 💥 2. CACHE-BUSTING URL (Forces a fresh, uncached page load)
+    bust_cache = int(time.time())
+    url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}&v={bust_cache}"
     
     try:
         await page.goto(url, wait_until="domcontentloaded", timeout=60000)
