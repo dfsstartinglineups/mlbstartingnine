@@ -509,7 +509,11 @@ def main():
     print(f"🚀 Building Master JSONs using the Daily File as Memory")
     
     session = requests.Session()
-    session.headers.update({"User-Agent": "MLBStartingNine-DataBot/1.0"})
+    session.headers.update({
+        "User-Agent": "MLBStartingNine-DataBot/1.0",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache"
+    })
     
     ump_cache = load_json(UMPIRES_FILE, {}).get('umpires', {})
     park_cache = load_json(PARKS_FILE, {}).get('parks', {})
@@ -520,8 +524,9 @@ def main():
 
     API_CALL_TRACKER["schedule"] += 1
     sport_ids = get_active_sport_ids()
-    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person"
-    try: schedule_data = session.get(schedule_url, timeout=15).json()
+    # Attaching the exact current second to the URL as a cache-buster
+    current_timestamp = int(time.time())
+    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person&v={current_timestamp}"try: schedule_data = session.get(schedule_url, timeout=15).json()
     except Exception as e:
         print(f"❌ Failed to fetch schedule: {e}")
         return
