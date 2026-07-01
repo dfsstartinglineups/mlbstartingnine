@@ -526,7 +526,8 @@ def main():
     sport_ids = get_active_sport_ids()
     # Attaching the exact current second to the URL as a cache-buster
     current_timestamp = int(time.time())
-    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person&v={current_timestamp}"try: schedule_data = session.get(schedule_url, timeout=15).json()
+    schedule_url = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&startDate={start_date}&endDate={end_date}&hydrate=linescore,probablePitcher,lineups,person&v={current_timestamp}"
+    try: schedule_data = session.get(schedule_url, timeout=15).json()
     except Exception as e:
         print(f"❌ Failed to fetch schedule: {e}")
         return
