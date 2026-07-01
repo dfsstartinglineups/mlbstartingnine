@@ -131,12 +131,32 @@ async def take_mlb_screenshot(browser, game_pk, side, target_date):
     print(f"📸 Generating MLB Graphic for {game_pk} ({side})...")
     page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
     
-    # 🔍 1. TURN ON X-RAY VISION (Prints hidden browser errors to Render logs)
+    # 🔍 X-RAY VISION (Keep this on just in case!)
     page.on("console", lambda msg: print(f"   [Browser Console]: {msg.text}"))
     page.on("pageerror", lambda err: print(f"   [Browser JS Error]: {err}"))
     page.on("requestfailed", lambda req: print(f"   [Request Failed]: {req.url}"))
     
-    # 💥 2. CACHE-BUSTING URL (Forces a fresh, uncached page load)
+    # 🛡️ THE PROXY SHIELD: Intercept MLB API calls and run them through Python
+    async def intercept_mlb_api(route):
+        try:
+            # Python makes the request from the trusted Render IP
+            res = requests.get(route.request.url, timeout=10)
+            
+            # Feed the data back to the browser and artificially inject the CORS header
+            await route.fulfill(
+                status=res.status_code,
+                content_type="application/json",
+                body=res.text,
+                headers={"Access-Control-Allow-Origin": "*"} 
+            )
+        except Exception as e:
+            print(f"   [Proxy Error]: {e}")
+            await route.abort()
+
+    # Attach the shield to the page before we load it
+    await page.route("**/statsapi.mlb.com/**", intercept_mlb_api)
+    
+    # 💥 CACHE-BUSTING URL
     bust_cache = int(time.time())
     url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}&v={bust_cache}"
     
