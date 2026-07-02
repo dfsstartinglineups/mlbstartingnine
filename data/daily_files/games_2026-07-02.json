@@ -1,5 +1,5 @@
 {
-    "last_updated": "Jul 02, 03:36 PM ET",
+    "last_updated": "Jul 02, 03:39 PM ET",
     "slates": {
         "fanduel": [
             {
@@ -81,12 +81,12 @@
                 "gameDate": "2026-07-02T16:35:00Z",
                 "officialDate": "2026-07-02",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -96,12 +96,13 @@
                             "link": "/api/v1/teams/134"
                         },
                         "leagueRecord": {
-                            "wins": 43,
+                            "wins": 44,
                             "losses": 44,
                             "ties": 0,
-                            "pct": ".494"
+                            "pct": ".500"
                         },
                         "score": 6,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 683003,
                             "fullName": "Jared Jones",
@@ -162,11 +163,12 @@
                         },
                         "leagueRecord": {
                             "wins": 49,
-                            "losses": 38,
+                            "losses": 39,
                             "ties": 0,
-                            "pct": ".563"
+                            "pct": ".557"
                         },
                         "score": 1,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 660604,
                             "fullName": "Alan Rangel",
@@ -361,6 +363,7 @@
                             "num": 9,
                             "ordinalNum": "9th",
                             "home": {
+                                "runs": 0,
                                 "hits": 0,
                                 "errors": 0,
                                 "leftOnBase": 0
@@ -501,56 +504,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 664761,
-                            "fullName": "Alec Bohm",
-                            "link": "/api/v1/people/664761",
-                            "firstName": "Alec",
-                            "lastName": "Bohm",
-                            "primaryNumber": "28",
-                            "birthDate": "1996-08-03",
-                            "currentAge": 29,
-                            "birthCity": "Omaha",
-                            "birthStateProvince": "NE",
-                            "birthCountry": "USA",
-                            "height": "6' 4\"",
-                            "weight": 218,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "5",
-                                "name": "Third Base",
-                                "type": "Infielder",
-                                "abbreviation": "3B"
-                            },
-                            "useName": "Alec",
-                            "useLastName": "Bohm",
-                            "middleName": "Daniel",
-                            "boxscoreName": "Bohm",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2018,
-                            "pronunciation": "bome; like home",
-                            "mlbDebutDate": "2020-08-13",
-                            "batSide": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Alec Bohm",
-                            "nameSlug": "alec-bohm-664761",
-                            "firstLastName": "Alec Bohm",
-                            "lastFirstName": "Bohm, Alec",
-                            "lastInitName": "Bohm, A",
-                            "initLastName": "A Bohm",
-                            "fullFMLName": "Alec Daniel Bohm",
-                            "fullLFMName": "Bohm, Alec Daniel",
-                            "strikeZoneTop": 3.407,
-                            "strikeZoneBottom": 1.719
-                        },
-                        "onDeck": {
                             "id": 681082,
                             "fullName": "Bryson Stott",
                             "link": "/api/v1/people/681082",
@@ -600,7 +553,7 @@
                             "strikeZoneTop": 3.225,
                             "strikeZoneBottom": 1.628
                         },
-                        "inHole": {
+                        "onDeck": {
                             "id": 687282,
                             "fullName": "Gabriel Rincones Jr.",
                             "link": "/api/v1/people/687282",
@@ -653,6 +606,54 @@
                             "strikeZoneTop": 3.33,
                             "strikeZoneBottom": 1.68
                         },
+                        "inHole": {
+                            "id": 702222,
+                            "fullName": "Justin Crawford",
+                            "link": "/api/v1/people/702222",
+                            "firstName": "Justin",
+                            "lastName": "Crawford",
+                            "primaryNumber": "2",
+                            "birthDate": "2004-01-13",
+                            "currentAge": 22,
+                            "birthCity": "Phoenix",
+                            "birthStateProvince": "AZ",
+                            "birthCountry": "USA",
+                            "height": "6' 2\"",
+                            "weight": 188,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "8",
+                                "name": "Outfielder",
+                                "type": "Outfielder",
+                                "abbreviation": "CF"
+                            },
+                            "useName": "Justin",
+                            "useLastName": "Crawford",
+                            "boxscoreName": "Crawford",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2022,
+                            "mlbDebutDate": "2026-03-26",
+                            "batSide": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Justin Crawford",
+                            "nameSlug": "justin-crawford-702222",
+                            "firstLastName": "Justin Crawford",
+                            "lastFirstName": "Crawford, Justin",
+                            "lastInitName": "Crawford, J",
+                            "initLastName": "J Crawford",
+                            "fullFMLName": "Justin Crawford",
+                            "fullLFMName": "Crawford, Justin",
+                            "strikeZoneTop": 3.28,
+                            "strikeZoneBottom": 1.66
+                        },
                         "pitcher": {
                             "id": 679775,
                             "fullName": "Kyle Backhus",
@@ -702,7 +703,7 @@
                             "strikeZoneTop": 3.388,
                             "strikeZoneBottom": 1.71
                         },
-                        "battingOrder": 5,
+                        "battingOrder": 6,
                         "team": {
                             "id": 143,
                             "name": "Philadelphia Phillies",
@@ -710,8 +711,8 @@
                         }
                     },
                     "balls": 1,
-                    "strikes": 2,
-                    "outs": 1
+                    "strikes": 3,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 2681,
@@ -721,6 +722,7 @@
                 "content": {
                     "link": "/api/v1/game/823442/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
@@ -772,15 +774,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 9000,
-                                    "proj": 9.2,
-                                    "value": 1.02
-                                },
                                 "24AC5": {
                                     "salary": 5000,
                                     "proj": 9.2,
                                     "value": 1.84
+                                },
+                                "24AC7": {
+                                    "salary": 9000,
+                                    "proj": 9.2,
+                                    "value": 1.02
                                 }
                             },
                             "fd_positions": "SS",
@@ -818,15 +820,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 10000,
-                                    "proj": 10.7,
-                                    "value": 1.07
-                                },
                                 "24AC5": {
                                     "salary": 6000,
                                     "proj": 10.7,
                                     "value": 1.78
+                                },
+                                "24AC7": {
+                                    "salary": 10000,
+                                    "proj": 10.7,
+                                    "value": 1.07
                                 }
                             },
                             "fd_positions": "OF",
@@ -864,15 +866,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 9600,
-                                    "proj": 10.4,
-                                    "value": 1.08
-                                },
                                 "24AC5": {
                                     "salary": 5500,
                                     "proj": 10.4,
                                     "value": 1.89
+                                },
+                                "24AC7": {
+                                    "salary": 9600,
+                                    "proj": 10.4,
+                                    "value": 1.08
                                 }
                             },
                             "fd_positions": "1B",
@@ -910,15 +912,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 8200,
-                                    "proj": 9.9,
-                                    "value": 1.21
-                                },
                                 "24AC5": {
                                     "salary": 4500,
                                     "proj": 9.9,
                                     "value": 2.2
+                                },
+                                "24AC7": {
+                                    "salary": 8200,
+                                    "proj": 9.9,
+                                    "value": 1.21
                                 }
                             },
                             "fd_positions": "OF",
@@ -956,15 +958,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 5400,
-                                    "proj": 7.3,
-                                    "value": 1.35
-                                },
                                 "24AC5": {
                                     "salary": 3000,
                                     "proj": 7.3,
                                     "value": 2.43
+                                },
+                                "24AC7": {
+                                    "salary": 5400,
+                                    "proj": 7.3,
+                                    "value": 1.35
                                 }
                             },
                             "fd_positions": "3B",
@@ -1002,15 +1004,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 7200,
-                                    "proj": 8.0,
-                                    "value": 1.11
-                                },
                                 "24AC5": {
                                     "salary": 3800,
                                     "proj": 8.0,
                                     "value": 2.09
+                                },
+                                "24AC7": {
+                                    "salary": 7200,
+                                    "proj": 8.0,
+                                    "value": 1.11
                                 }
                             },
                             "fd_positions": "2B/SS",
@@ -1048,15 +1050,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 4200,
-                                    "proj": 7.1,
-                                    "value": 1.69
-                                },
                                 "24AC5": {
                                     "salary": 2400,
                                     "proj": 7.1,
                                     "value": 2.96
+                                },
+                                "24AC7": {
+                                    "salary": 4200,
+                                    "proj": 7.1,
+                                    "value": 1.69
                                 }
                             },
                             "fd_positions": "OF",
@@ -1094,15 +1096,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 5000,
-                                    "proj": 6.8,
-                                    "value": 1.37
-                                },
                                 "24AC5": {
                                     "salary": 2900,
                                     "proj": 6.8,
                                     "value": 2.36
+                                },
+                                "24AC7": {
+                                    "salary": 5000,
+                                    "proj": 6.8,
+                                    "value": 1.37
                                 }
                             },
                             "fd_positions": "OF",
@@ -1140,15 +1142,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 3800,
-                                    "proj": 6.0,
-                                    "value": 1.57
-                                },
                                 "24AC5": {
                                     "salary": 2300,
                                     "proj": 6.0,
                                     "value": 2.6
+                                },
+                                "24AC7": {
+                                    "salary": 3800,
+                                    "proj": 6.0,
+                                    "value": 1.57
                                 }
                             },
                             "fd_positions": "C",
@@ -1188,15 +1190,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 6400,
-                                    "proj": 8.2,
-                                    "value": 1.29
-                                },
                                 "24AC5": {
                                     "salary": 3500,
                                     "proj": 8.2,
                                     "value": 2.35
+                                },
+                                "24AC7": {
+                                    "salary": 6400,
+                                    "proj": 8.2,
+                                    "value": 1.29
                                 }
                             },
                             "fd_positions": "OF",
@@ -1234,15 +1236,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 9200,
-                                    "proj": 10.6,
-                                    "value": 1.15
-                                },
                                 "24AC5": {
                                     "salary": 5300,
                                     "proj": 10.6,
                                     "value": 2.0
+                                },
+                                "24AC7": {
+                                    "salary": 9200,
+                                    "proj": 10.6,
+                                    "value": 1.15
                                 }
                             },
                             "fd_positions": "2B",
@@ -1280,15 +1282,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 8600,
-                                    "proj": 9.4,
-                                    "value": 1.09
-                                },
                                 "24AC5": {
                                     "salary": 4800,
                                     "proj": 9.4,
                                     "value": 1.96
+                                },
+                                "24AC7": {
+                                    "salary": 8600,
+                                    "proj": 9.4,
+                                    "value": 1.09
                                 }
                             },
                             "fd_positions": "OF",
@@ -1326,15 +1328,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 4600,
-                                    "proj": 9.3,
-                                    "value": 2.02
-                                },
                                 "24AC5": {
                                     "salary": 2800,
                                     "proj": 9.3,
                                     "value": 3.32
+                                },
+                                "24AC7": {
+                                    "salary": 4600,
+                                    "proj": 9.3,
+                                    "value": 2.02
                                 }
                             },
                             "fd_positions": "OF",
@@ -1372,15 +1374,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 8000,
-                                    "proj": 8.4,
-                                    "value": 1.05
-                                },
                                 "24AC5": {
                                     "salary": 4400,
                                     "proj": 8.4,
                                     "value": 1.91
+                                },
+                                "24AC7": {
+                                    "salary": 8000,
+                                    "proj": 8.4,
+                                    "value": 1.05
                                 }
                             },
                             "fd_positions": "1B/OF",
@@ -1418,15 +1420,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 7600,
-                                    "proj": 7.1,
-                                    "value": 0.94
-                                },
                                 "24AC5": {
                                     "salary": 4100,
                                     "proj": 7.1,
                                     "value": 1.73
+                                },
+                                "24AC7": {
+                                    "salary": 7600,
+                                    "proj": 7.1,
+                                    "value": 0.94
                                 }
                             },
                             "fd_positions": "2B/SS",
@@ -1464,15 +1466,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 5600,
-                                    "proj": 7.6,
-                                    "value": 1.35
-                                },
                                 "24AC5": {
                                     "salary": 3000,
                                     "proj": 7.6,
                                     "value": 2.52
+                                },
+                                "24AC7": {
+                                    "salary": 5600,
+                                    "proj": 7.6,
+                                    "value": 1.35
                                 }
                             },
                             "fd_positions": "OF",
@@ -1510,15 +1512,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 7000,
-                                    "proj": 7.5,
-                                    "value": 1.07
-                                },
                                 "24AC5": {
                                     "salary": 3700,
                                     "proj": 7.5,
                                     "value": 2.03
+                                },
+                                "24AC7": {
+                                    "salary": 7000,
+                                    "proj": 7.5,
+                                    "value": 1.07
                                 }
                             },
                             "fd_positions": "C/1B",
@@ -1556,15 +1558,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 3200,
-                                    "proj": 6.4,
-                                    "value": 2.01
-                                },
                                 "24AC5": {
                                     "salary": 2100,
                                     "proj": 6.4,
                                     "value": 3.07
+                                },
+                                "24AC7": {
+                                    "salary": 3200,
+                                    "proj": 6.4,
+                                    "value": 2.01
                                 }
                             },
                             "fd_positions": "3B/2B",
@@ -1599,15 +1601,15 @@
                             }
                         },
                         "dk_slates": {
-                            "24AC7": {
-                                "salary": 11000,
-                                "proj": 13.2,
-                                "value": 1.2
-                            },
                             "24AC5": {
                                 "salary": 6900,
                                 "proj": 13.2,
                                 "value": 1.91
+                            },
+                            "24AC7": {
+                                "salary": 11000,
+                                "proj": 13.2,
+                                "value": 1.2
                             }
                         },
                         "fd_positions": "P",
@@ -1638,15 +1640,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 6400,
-                                    "proj": 8.2,
-                                    "value": 1.29
-                                },
                                 "24AC5": {
                                     "salary": 3500,
                                     "proj": 8.2,
                                     "value": 2.35
+                                },
+                                "24AC7": {
+                                    "salary": 6400,
+                                    "proj": 8.2,
+                                    "value": 1.29
                                 }
                             },
                             "fd_positions": "OF",
@@ -1676,15 +1678,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 9200,
-                                    "proj": 10.6,
-                                    "value": 1.15
-                                },
                                 "24AC5": {
                                     "salary": 5300,
                                     "proj": 10.6,
                                     "value": 2.0
+                                },
+                                "24AC7": {
+                                    "salary": 9200,
+                                    "proj": 10.6,
+                                    "value": 1.15
                                 }
                             },
                             "fd_positions": "2B",
@@ -1714,15 +1716,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 8600,
-                                    "proj": 9.4,
-                                    "value": 1.09
-                                },
                                 "24AC5": {
                                     "salary": 4800,
                                     "proj": 9.4,
                                     "value": 1.96
+                                },
+                                "24AC7": {
+                                    "salary": 8600,
+                                    "proj": 9.4,
+                                    "value": 1.09
                                 }
                             },
                             "fd_positions": "OF",
@@ -1752,15 +1754,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 4600,
-                                    "proj": 9.3,
-                                    "value": 2.02
-                                },
                                 "24AC5": {
                                     "salary": 2800,
                                     "proj": 9.3,
                                     "value": 3.32
+                                },
+                                "24AC7": {
+                                    "salary": 4600,
+                                    "proj": 9.3,
+                                    "value": 2.02
                                 }
                             },
                             "fd_positions": "OF",
@@ -1790,15 +1792,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 8000,
-                                    "proj": 8.4,
-                                    "value": 1.05
-                                },
                                 "24AC5": {
                                     "salary": 4400,
                                     "proj": 8.4,
                                     "value": 1.91
+                                },
+                                "24AC7": {
+                                    "salary": 8000,
+                                    "proj": 8.4,
+                                    "value": 1.05
                                 }
                             },
                             "fd_positions": "1B/OF",
@@ -1828,15 +1830,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 7600,
-                                    "proj": 7.1,
-                                    "value": 0.94
-                                },
                                 "24AC5": {
                                     "salary": 4100,
                                     "proj": 7.1,
                                     "value": 1.73
+                                },
+                                "24AC7": {
+                                    "salary": 7600,
+                                    "proj": 7.1,
+                                    "value": 0.94
                                 }
                             },
                             "fd_positions": "2B/SS",
@@ -1866,15 +1868,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 5600,
-                                    "proj": 7.6,
-                                    "value": 1.35
-                                },
                                 "24AC5": {
                                     "salary": 3000,
                                     "proj": 7.6,
                                     "value": 2.52
+                                },
+                                "24AC7": {
+                                    "salary": 5600,
+                                    "proj": 7.6,
+                                    "value": 1.35
                                 }
                             },
                             "fd_positions": "OF",
@@ -1904,15 +1906,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 7000,
-                                    "proj": 7.5,
-                                    "value": 1.07
-                                },
                                 "24AC5": {
                                     "salary": 3700,
                                     "proj": 7.5,
                                     "value": 2.03
+                                },
+                                "24AC7": {
+                                    "salary": 7000,
+                                    "proj": 7.5,
+                                    "value": 1.07
                                 }
                             },
                             "fd_positions": "C/1B",
@@ -1942,15 +1944,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 3200,
-                                    "proj": 6.4,
-                                    "value": 2.01
-                                },
                                 "24AC5": {
                                     "salary": 2100,
                                     "proj": 6.4,
                                     "value": 3.07
+                                },
+                                "24AC7": {
+                                    "salary": 3200,
+                                    "proj": 6.4,
+                                    "value": 2.01
                                 }
                             },
                             "fd_positions": "3B/2B",
@@ -1982,15 +1984,15 @@
                             }
                         },
                         "dk_slates": {
-                            "24AC7": {
-                                "salary": 10200,
-                                "proj": 10.1,
-                                "value": 0.99
-                            },
                             "24AC5": {
                                 "salary": 5600,
                                 "proj": 10.1,
                                 "value": 1.8
+                            },
+                            "24AC7": {
+                                "salary": 10200,
+                                "proj": 10.1,
+                                "value": 0.99
                             }
                         },
                         "fd_positions": "P",
@@ -2021,15 +2023,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 9000,
-                                    "proj": 9.2,
-                                    "value": 1.02
-                                },
                                 "24AC5": {
                                     "salary": 5000,
                                     "proj": 9.2,
                                     "value": 1.84
+                                },
+                                "24AC7": {
+                                    "salary": 9000,
+                                    "proj": 9.2,
+                                    "value": 1.02
                                 }
                             },
                             "fd_positions": "SS",
@@ -2059,15 +2061,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 10000,
-                                    "proj": 10.7,
-                                    "value": 1.07
-                                },
                                 "24AC5": {
                                     "salary": 6000,
                                     "proj": 10.7,
                                     "value": 1.78
+                                },
+                                "24AC7": {
+                                    "salary": 10000,
+                                    "proj": 10.7,
+                                    "value": 1.07
                                 }
                             },
                             "fd_positions": "OF",
@@ -2097,15 +2099,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 9600,
-                                    "proj": 10.4,
-                                    "value": 1.08
-                                },
                                 "24AC5": {
                                     "salary": 5500,
                                     "proj": 10.4,
                                     "value": 1.89
+                                },
+                                "24AC7": {
+                                    "salary": 9600,
+                                    "proj": 10.4,
+                                    "value": 1.08
                                 }
                             },
                             "fd_positions": "1B",
@@ -2135,15 +2137,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 8200,
-                                    "proj": 9.9,
-                                    "value": 1.21
-                                },
                                 "24AC5": {
                                     "salary": 4500,
                                     "proj": 9.9,
                                     "value": 2.2
+                                },
+                                "24AC7": {
+                                    "salary": 8200,
+                                    "proj": 9.9,
+                                    "value": 1.21
                                 }
                             },
                             "fd_positions": "OF",
@@ -2173,15 +2175,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 5400,
-                                    "proj": 7.3,
-                                    "value": 1.35
-                                },
                                 "24AC5": {
                                     "salary": 3000,
                                     "proj": 7.3,
                                     "value": 2.43
+                                },
+                                "24AC7": {
+                                    "salary": 5400,
+                                    "proj": 7.3,
+                                    "value": 1.35
                                 }
                             },
                             "fd_positions": "3B",
@@ -2211,15 +2213,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 7200,
-                                    "proj": 8.0,
-                                    "value": 1.11
-                                },
                                 "24AC5": {
                                     "salary": 3800,
                                     "proj": 8.0,
                                     "value": 2.09
+                                },
+                                "24AC7": {
+                                    "salary": 7200,
+                                    "proj": 8.0,
+                                    "value": 1.11
                                 }
                             },
                             "fd_positions": "2B/SS",
@@ -2249,15 +2251,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 4200,
-                                    "proj": 7.1,
-                                    "value": 1.69
-                                },
                                 "24AC5": {
                                     "salary": 2400,
                                     "proj": 7.1,
                                     "value": 2.96
+                                },
+                                "24AC7": {
+                                    "salary": 4200,
+                                    "proj": 7.1,
+                                    "value": 1.69
                                 }
                             },
                             "fd_positions": "OF",
@@ -2287,15 +2289,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 5000,
-                                    "proj": 6.8,
-                                    "value": 1.37
-                                },
                                 "24AC5": {
                                     "salary": 2900,
                                     "proj": 6.8,
                                     "value": 2.36
+                                },
+                                "24AC7": {
+                                    "salary": 5000,
+                                    "proj": 6.8,
+                                    "value": 1.37
                                 }
                             },
                             "fd_positions": "OF",
@@ -2325,15 +2327,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24AC7": {
-                                    "salary": 3800,
-                                    "proj": 6.0,
-                                    "value": 1.57
-                                },
                                 "24AC5": {
                                     "salary": 2300,
                                     "proj": 6.0,
                                     "value": 2.6
+                                },
+                                "24AC7": {
+                                    "salary": 3800,
+                                    "proj": 6.0,
+                                    "value": 1.57
                                 }
                             },
                             "fd_positions": "C",
@@ -3526,9 +3528,9 @@
                 "linescore": {
                     "currentInning": 6,
                     "currentInningOrdinal": "6th",
-                    "inningState": "Middle",
-                    "inningHalf": "Top",
-                    "isTopInning": true,
+                    "inningState": "Bottom",
+                    "inningHalf": "Bottom",
+                    "isTopInning": false,
                     "scheduledInnings": 9,
                     "innings": [
                         {
@@ -3754,57 +3756,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 592885,
-                            "fullName": "Christian Yelich",
-                            "link": "/api/v1/people/592885",
-                            "firstName": "Christian",
-                            "lastName": "Yelich",
-                            "primaryNumber": "22",
-                            "birthDate": "1991-12-05",
-                            "currentAge": 34,
-                            "birthCity": "Thousand Oaks",
-                            "birthStateProvince": "CA",
-                            "birthCountry": "USA",
-                            "height": "6' 4\"",
-                            "weight": 220,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "10",
-                                "name": "Designated Hitter",
-                                "type": "Hitter",
-                                "abbreviation": "DH"
-                            },
-                            "useName": "Christian",
-                            "useLastName": "Yelich",
-                            "middleName": "Stephen",
-                            "boxscoreName": "Yelich",
-                            "nickName": "Yeli",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2010,
-                            "pronunciation": "YELL-itch",
-                            "mlbDebutDate": "2013-07-23",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Christian Yelich",
-                            "nameSlug": "christian-yelich-592885",
-                            "firstLastName": "Christian Yelich",
-                            "lastFirstName": "Yelich, Christian",
-                            "lastInitName": "Yelich, C",
-                            "initLastName": "C Yelich",
-                            "fullFMLName": "Christian Stephen Yelich",
-                            "fullLFMName": "Yelich, Christian Stephen",
-                            "strikeZoneTop": 3.37,
-                            "strikeZoneBottom": 1.7
-                        },
-                        "onDeck": {
                             "id": 694192,
                             "fullName": "Jackson Chourio",
                             "link": "/api/v1/people/694192",
@@ -3853,7 +3804,7 @@
                             "strikeZoneTop": 3.24,
                             "strikeZoneBottom": 1.63
                         },
-                        "inHole": {
+                        "onDeck": {
                             "id": 668930,
                             "fullName": "Brice Turang",
                             "link": "/api/v1/people/668930",
@@ -3901,6 +3852,54 @@
                             "fullLFMName": "Turang, Brice Craig",
                             "strikeZoneTop": 3.21,
                             "strikeZoneBottom": 1.62
+                        },
+                        "inHole": {
+                            "id": 661388,
+                            "fullName": "William Contreras",
+                            "link": "/api/v1/people/661388",
+                            "firstName": "William",
+                            "lastName": "Contreras",
+                            "primaryNumber": "24",
+                            "birthDate": "1997-12-24",
+                            "currentAge": 28,
+                            "birthCity": "Puerto Cabello",
+                            "birthCountry": "Venezuela",
+                            "height": "5' 10\"",
+                            "weight": 217,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "2",
+                                "name": "Catcher",
+                                "type": "Catcher",
+                                "abbreviation": "C"
+                            },
+                            "useName": "William",
+                            "useLastName": "Contreras",
+                            "middleName": "Jesus",
+                            "boxscoreName": "Contreras, Wm",
+                            "gender": "M",
+                            "nameMatrilineal": "Castillo",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "mlbDebutDate": "2020-07-24",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "William Contreras",
+                            "nameSlug": "william-contreras-661388",
+                            "firstLastName": "William Contreras",
+                            "lastFirstName": "Contreras, William",
+                            "lastInitName": "Contreras, W",
+                            "initLastName": "W Contreras",
+                            "fullFMLName": "William Jesus Contreras",
+                            "fullLFMName": "Contreras, William Jesus",
+                            "strikeZoneTop": 3.13,
+                            "strikeZoneBottom": 1.58
                         },
                         "pitcher": {
                             "id": 681982,
@@ -3951,16 +3950,16 @@
                             "strikeZoneTop": 3.21,
                             "strikeZoneBottom": 1.62
                         },
-                        "battingOrder": 10,
+                        "battingOrder": 2,
                         "team": {
                             "id": 158,
                             "name": "Milwaukee Brewers",
                             "link": "/api/v1/teams/158"
                         }
                     },
-                    "balls": 2,
-                    "strikes": 0,
-                    "outs": 3
+                    "balls": 0,
+                    "strikes": 2,
+                    "outs": 1
                 },
                 "venue": {
                     "id": 32,
@@ -6700,104 +6699,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 691594,
-                            "fullName": "Javier Sanoja",
-                            "link": "/api/v1/people/691594",
-                            "firstName": "Javier",
-                            "lastName": "Sanoja",
-                            "primaryNumber": "8",
-                            "birthDate": "2002-09-03",
-                            "currentAge": 23,
-                            "birthCity": "Maracay",
-                            "birthCountry": "Venezuela",
-                            "height": "5' 7\"",
-                            "weight": 150,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "5",
-                                "name": "Third Base",
-                                "type": "Infielder",
-                                "abbreviation": "3B"
-                            },
-                            "useName": "Javier",
-                            "useLastName": "Sanoja",
-                            "middleName": "Ernesto",
-                            "boxscoreName": "Sanoja",
-                            "gender": "M",
-                            "nameMatrilineal": "Duran",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "pronunciation": "sahn-oh-ha",
-                            "mlbDebutDate": "2024-09-07",
-                            "batSide": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Javier Sanoja",
-                            "nameSlug": "javier-sanoja-691594",
-                            "firstLastName": "Javier Sanoja",
-                            "lastFirstName": "Sanoja, Javier",
-                            "lastInitName": "Sanoja, J",
-                            "initLastName": "J Sanoja",
-                            "fullFMLName": "Javier Ernesto Sanoja",
-                            "fullLFMName": "Sanoja, Javier Ernesto",
-                            "strikeZoneTop": 2.995,
-                            "strikeZoneBottom": 1.512
-                        },
-                        "onDeck": {
-                            "id": 691788,
-                            "fullName": "Joe Mack",
-                            "link": "/api/v1/people/691788",
-                            "firstName": "Joseph",
-                            "lastName": "Mack",
-                            "primaryNumber": "80",
-                            "birthDate": "2002-12-27",
-                            "currentAge": 23,
-                            "birthCity": "Williamsville",
-                            "birthStateProvince": "NY",
-                            "birthCountry": "USA",
-                            "height": "6' 0\"",
-                            "weight": 210,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "2",
-                                "name": "Catcher",
-                                "type": "Catcher",
-                                "abbreviation": "C"
-                            },
-                            "useName": "Joe",
-                            "useLastName": "Mack",
-                            "middleName": "Allan",
-                            "boxscoreName": "Mack",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2021,
-                            "mlbDebutDate": "2026-05-04",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Joe Mack",
-                            "nameSlug": "joe-mack-691788",
-                            "firstLastName": "Joe Mack",
-                            "lastFirstName": "Mack, Joe",
-                            "lastInitName": "Mack, J",
-                            "initLastName": "J Mack",
-                            "fullFMLName": "Joseph Allan Mack",
-                            "fullLFMName": "Mack, Joseph Allan",
-                            "strikeZoneTop": 3.221,
-                            "strikeZoneBottom": 1.625
-                        },
-                        "inHole": {
                             "id": 689414,
                             "fullName": "Liam Hicks",
                             "link": "/api/v1/people/689414",
@@ -6845,6 +6746,104 @@
                             "fullLFMName": "Hicks, Liam John Sherwood",
                             "strikeZoneTop": 3.086,
                             "strikeZoneBottom": 1.557
+                        },
+                        "onDeck": {
+                            "id": 672640,
+                            "fullName": "Otto Lopez",
+                            "link": "/api/v1/people/672640",
+                            "firstName": "Otto",
+                            "lastName": "Lopez",
+                            "primaryNumber": "6",
+                            "birthDate": "1998-10-01",
+                            "currentAge": 27,
+                            "birthCity": "Santo Domingo",
+                            "birthCountry": "Dominican Republic",
+                            "height": "5' 10\"",
+                            "weight": 185,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "6",
+                                "name": "Shortstop",
+                                "type": "Infielder",
+                                "abbreviation": "SS"
+                            },
+                            "useName": "Otto",
+                            "useLastName": "Lopez",
+                            "middleName": "Ariel",
+                            "boxscoreName": "Lopez, O",
+                            "gender": "M",
+                            "nameMatrilineal": "Bello",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "mlbDebutDate": "2021-08-17",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Otto Lopez",
+                            "nameSlug": "otto-lopez-672640",
+                            "firstLastName": "Otto Lopez",
+                            "lastFirstName": "Lopez, Otto",
+                            "lastInitName": "Lopez, O",
+                            "initLastName": "O Lopez",
+                            "fullFMLName": "Otto Ariel Lopez",
+                            "fullLFMName": "Lopez, Otto Ariel",
+                            "strikeZoneTop": 3.14,
+                            "strikeZoneBottom": 1.58
+                        },
+                        "inHole": {
+                            "id": 669065,
+                            "fullName": "Kyle Stowers",
+                            "link": "/api/v1/people/669065",
+                            "firstName": "Kyle",
+                            "lastName": "Stowers",
+                            "primaryNumber": "28",
+                            "birthDate": "1998-01-02",
+                            "currentAge": 28,
+                            "birthCity": "El Cajon",
+                            "birthStateProvince": "CA",
+                            "birthCountry": "USA",
+                            "height": "6' 2\"",
+                            "weight": 215,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "7",
+                                "name": "Outfielder",
+                                "type": "Outfielder",
+                                "abbreviation": "LF"
+                            },
+                            "useName": "Kyle",
+                            "useLastName": "Stowers",
+                            "middleName": "Jacob",
+                            "boxscoreName": "Stowers",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2019,
+                            "pronunciation": "stoww-uhrs; like powers",
+                            "mlbDebutDate": "2022-06-13",
+                            "batSide": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "pitchHand": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "nameFirstLast": "Kyle Stowers",
+                            "nameSlug": "kyle-stowers-669065",
+                            "firstLastName": "Kyle Stowers",
+                            "lastFirstName": "Stowers, Kyle",
+                            "lastInitName": "Stowers, K",
+                            "initLastName": "K Stowers",
+                            "fullFMLName": "Kyle Jacob Stowers",
+                            "fullLFMName": "Stowers, Kyle Jacob",
+                            "strikeZoneTop": 3.295,
+                            "strikeZoneBottom": 1.663
                         },
                         "pitcher": {
                             "id": 687473,
@@ -6896,16 +6895,16 @@
                             "strikeZoneTop": 3.388,
                             "strikeZoneBottom": 1.71
                         },
-                        "battingOrder": 8,
+                        "battingOrder": 1,
                         "team": {
                             "id": 146,
                             "name": "Miami Marlins",
                             "link": "/api/v1/teams/146"
                         }
                     },
-                    "balls": 3,
-                    "strikes": 2,
-                    "outs": 0
+                    "balls": 0,
+                    "strikes": 1,
+                    "outs": 2
                 },
                 "venue": {
                     "id": 19,
@@ -16806,15 +16805,15 @@
                             }
                         },
                         "dk_slates": {
-                            "24A1B": {
-                                "salary": 7300,
-                                "proj": 15.0,
-                                "value": 2.05
-                            },
                             "24ACD": {
                                 "salary": 10600,
                                 "proj": 15.0,
                                 "value": 1.41
+                            },
+                            "24A1B": {
+                                "salary": 7300,
+                                "proj": 15.0,
+                                "value": 2.05
                             }
                         },
                         "fd_positions": "P",
@@ -16850,15 +16849,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 4500,
-                                    "proj": 8.3,
-                                    "value": 1.84
-                                },
                                 "24ACD": {
                                     "salary": 8600,
                                     "proj": 8.3,
                                     "value": 0.97
+                                },
+                                "24A1B": {
+                                    "salary": 4500,
+                                    "proj": 8.3,
+                                    "value": 1.84
                                 }
                             },
                             "fd_positions": "SS/3B",
@@ -16893,15 +16892,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 5200,
-                                    "proj": 7.6,
-                                    "value": 1.46
-                                },
                                 "24ACD": {
                                     "salary": 9600,
                                     "proj": 7.6,
                                     "value": 0.79
+                                },
+                                "24A1B": {
+                                    "salary": 5200,
+                                    "proj": 7.6,
+                                    "value": 1.46
                                 }
                             },
                             "fd_positions": "C",
@@ -16936,15 +16935,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 4000,
-                                    "proj": 8.3,
-                                    "value": 2.08
-                                },
                                 "24ACD": {
                                     "salary": 8000,
                                     "proj": 8.3,
                                     "value": 1.04
+                                },
+                                "24A1B": {
+                                    "salary": 4000,
+                                    "proj": 8.3,
+                                    "value": 2.08
                                 }
                             },
                             "fd_positions": "OF",
@@ -16979,15 +16978,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3600,
-                                    "proj": 6.7,
-                                    "value": 1.86
-                                },
                                 "24ACD": {
                                     "salary": 6800,
                                     "proj": 6.7,
                                     "value": 0.99
+                                },
+                                "24A1B": {
+                                    "salary": 3600,
+                                    "proj": 6.7,
+                                    "value": 1.86
                                 }
                             },
                             "fd_positions": "1B",
@@ -17022,15 +17021,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3500,
-                                    "proj": 7.3,
-                                    "value": 2.09
-                                },
                                 "24ACD": {
                                     "salary": 6600,
                                     "proj": 7.3,
                                     "value": 1.11
+                                },
+                                "24A1B": {
+                                    "salary": 3500,
+                                    "proj": 7.3,
+                                    "value": 2.09
                                 }
                             },
                             "fd_positions": "OF",
@@ -17065,15 +17064,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3200,
-                                    "proj": 6.2,
-                                    "value": 1.94
-                                },
                                 "24ACD": {
                                     "salary": 6000,
                                     "proj": 6.2,
                                     "value": 1.04
+                                },
+                                "24A1B": {
+                                    "salary": 3200,
+                                    "proj": 6.2,
+                                    "value": 1.94
                                 }
                             },
                             "fd_positions": "1B/2B",
@@ -17108,15 +17107,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3100,
-                                    "proj": 1.5,
-                                    "value": 0.48
-                                },
                                 "24ACD": {
                                     "salary": 5800,
                                     "proj": 1.5,
                                     "value": 0.26
+                                },
+                                "24A1B": {
+                                    "salary": 3100,
+                                    "proj": 1.5,
+                                    "value": 0.48
                                 }
                             },
                             "fd_positions": "OF/3B",
@@ -17151,15 +17150,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 2200,
-                                    "proj": 5.8,
-                                    "value": 2.64
-                                },
                                 "24ACD": {
                                     "salary": 3600,
                                     "proj": 5.8,
                                     "value": 1.61
+                                },
+                                "24A1B": {
+                                    "salary": 2200,
+                                    "proj": 5.8,
+                                    "value": 2.64
                                 }
                             },
                             "fd_positions": "2B",
@@ -17197,15 +17196,15 @@
                             }
                         },
                         "dk_slates": {
-                            "24A1B": {
-                                "salary": 9000,
-                                "proj": 18.5,
-                                "value": 2.06
-                            },
                             "24ACD": {
                                 "salary": 12000,
                                 "proj": 18.5,
                                 "value": 1.54
+                            },
+                            "24A1B": {
+                                "salary": 9000,
+                                "proj": 18.5,
+                                "value": 2.06
                             }
                         },
                         "fd_positions": "P",
@@ -17247,15 +17246,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 4200,
-                                    "proj": 7.4,
-                                    "value": 1.77
-                                },
                                 "24ACD": {
                                     "salary": 8200,
                                     "proj": 7.4,
                                     "value": 0.91
+                                },
+                                "24A1B": {
+                                    "salary": 4200,
+                                    "proj": 7.4,
+                                    "value": 1.77
                                 }
                             },
                             "fd_positions": "3B",
@@ -17290,15 +17289,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3600,
-                                    "proj": 7.3,
-                                    "value": 2.03
-                                },
                                 "24ACD": {
                                     "salary": 7000,
                                     "proj": 7.3,
                                     "value": 1.04
+                                },
+                                "24A1B": {
+                                    "salary": 3600,
+                                    "proj": 7.3,
+                                    "value": 2.03
                                 }
                             },
                             "fd_positions": "OF",
@@ -17333,15 +17332,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3800,
-                                    "proj": 7.6,
-                                    "value": 2.01
-                                },
                                 "24ACD": {
                                     "salary": 7400,
                                     "proj": 7.6,
                                     "value": 1.03
+                                },
+                                "24A1B": {
+                                    "salary": 3800,
+                                    "proj": 7.6,
+                                    "value": 2.01
                                 }
                             },
                             "fd_positions": "1B",
@@ -17376,15 +17375,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3400,
-                                    "proj": 6.6,
-                                    "value": 1.93
-                                },
                                 "24ACD": {
                                     "salary": 6400,
                                     "proj": 6.6,
                                     "value": 1.02
+                                },
+                                "24A1B": {
+                                    "salary": 3400,
+                                    "proj": 6.6,
+                                    "value": 1.93
                                 }
                             },
                             "fd_positions": "2B",
@@ -17419,15 +17418,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 3800,
-                                    "proj": 6.4,
-                                    "value": 1.69
-                                },
                                 "24ACD": {
                                     "salary": 7600,
                                     "proj": 6.4,
                                     "value": 0.84
+                                },
+                                "24A1B": {
+                                    "salary": 3800,
+                                    "proj": 6.4,
+                                    "value": 1.69
                                 }
                             },
                             "fd_positions": "3B/SS",
@@ -17462,15 +17461,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 2600,
-                                    "proj": 6.7,
-                                    "value": 2.57
-                                },
                                 "24ACD": {
                                     "salary": 4800,
                                     "proj": 6.7,
                                     "value": 1.39
+                                },
+                                "24A1B": {
+                                    "salary": 2600,
+                                    "proj": 6.7,
+                                    "value": 2.57
                                 }
                             },
                             "fd_positions": "C",
@@ -17505,15 +17504,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 2500,
-                                    "proj": 5.1,
-                                    "value": 2.05
-                                },
                                 "24ACD": {
                                     "salary": 4600,
                                     "proj": 5.1,
                                     "value": 1.11
+                                },
+                                "24A1B": {
+                                    "salary": 2500,
+                                    "proj": 5.1,
+                                    "value": 2.05
                                 }
                             },
                             "fd_positions": "OF",
@@ -17548,15 +17547,15 @@
                                 }
                             },
                             "dk_slates": {
-                                "24A1B": {
-                                    "salary": 2500,
-                                    "proj": 4.4,
-                                    "value": 1.76
-                                },
                                 "24ACD": {
                                     "salary": 4400,
                                     "proj": 4.4,
                                     "value": 1.0
+                                },
+                                "24A1B": {
+                                    "salary": 2500,
+                                    "proj": 4.4,
+                                    "value": 1.76
                                 }
                             },
                             "fd_positions": "2B/SS",
@@ -18639,12 +18638,12 @@
                             }
                         },
                         "dk_slates": {
-                            "24ACE": {
+                            "24A1B": {
                                 "salary": 8300,
                                 "proj": 12.0,
                                 "value": 1.45
                             },
-                            "24A1B": {
+                            "24ACE": {
                                 "salary": 8300,
                                 "proj": 12.0,
                                 "value": 1.45
@@ -18683,12 +18682,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4900,
                                     "proj": 7.6,
                                     "value": 1.54
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4900,
                                     "proj": 7.6,
                                     "value": 1.54
@@ -18726,12 +18725,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3200,
                                     "proj": 6.1,
                                     "value": 1.89
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3200,
                                     "proj": 6.1,
                                     "value": 1.89
@@ -18769,12 +18768,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3500,
                                     "proj": 6.2,
                                     "value": 1.77
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3500,
                                     "proj": 6.2,
                                     "value": 1.77
@@ -18812,12 +18811,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3700,
                                     "proj": 5.7,
                                     "value": 1.55
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3700,
                                     "proj": 5.7,
                                     "value": 1.55
@@ -18855,12 +18854,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3000,
                                     "proj": 5.7,
                                     "value": 1.89
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3000,
                                     "proj": 5.7,
                                     "value": 1.89
@@ -18898,12 +18897,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3500,
                                     "proj": 6.3,
                                     "value": 1.8
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3500,
                                     "proj": 6.3,
                                     "value": 1.8
@@ -18941,12 +18940,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3000,
                                     "proj": 4.6,
                                     "value": 1.53
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3000,
                                     "proj": 4.6,
                                     "value": 1.53
@@ -18984,12 +18983,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 2700,
                                     "proj": 4.8,
                                     "value": 1.78
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 2700,
                                     "proj": 4.8,
                                     "value": 1.78
@@ -19027,12 +19026,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 2800,
                                     "proj": 1.5,
                                     "value": 0.54
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 2800,
                                     "proj": 1.5,
                                     "value": 0.54
@@ -19072,12 +19071,12 @@
                             }
                         },
                         "dk_slates": {
-                            "24ACE": {
+                            "24A1B": {
                                 "salary": 9500,
                                 "proj": 18.9,
                                 "value": 1.99
                             },
-                            "24A1B": {
+                            "24ACE": {
                                 "salary": 9500,
                                 "proj": 18.9,
                                 "value": 1.99
@@ -19116,12 +19115,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3400,
                                     "proj": 6.9,
                                     "value": 2.02
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3400,
                                     "proj": 6.9,
                                     "value": 2.02
@@ -19159,12 +19158,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4500,
                                     "proj": 9.4,
                                     "value": 2.08
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4500,
                                     "proj": 9.4,
                                     "value": 2.08
@@ -19202,12 +19201,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3600,
                                     "proj": 6.9,
                                     "value": 1.93
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3600,
                                     "proj": 6.9,
                                     "value": 1.93
@@ -19245,12 +19244,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4900,
                                     "proj": 7.5,
                                     "value": 1.53
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4900,
                                     "proj": 7.5,
                                     "value": 1.53
@@ -19288,12 +19287,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4100,
                                     "proj": 7.7,
                                     "value": 1.89
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4100,
                                     "proj": 7.7,
                                     "value": 1.89
@@ -19331,12 +19330,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4300,
                                     "proj": 8.0,
                                     "value": 1.85
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4300,
                                     "proj": 8.0,
                                     "value": 1.85
@@ -19374,12 +19373,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3100,
                                     "proj": 5.5,
                                     "value": 1.79
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3100,
                                     "proj": 5.5,
                                     "value": 1.79
@@ -19423,12 +19422,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3500,
                                     "proj": 5.3,
                                     "value": 1.52
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3500,
                                     "proj": 5.3,
                                     "value": 1.52
@@ -20510,12 +20509,12 @@
                             }
                         },
                         "dk_slates": {
-                            "24ACE": {
+                            "24A1B": {
                                 "salary": 6300,
                                 "proj": 8.5,
                                 "value": 1.35
                             },
-                            "24A1B": {
+                            "24ACE": {
                                 "salary": 6300,
                                 "proj": 8.5,
                                 "value": 1.35
@@ -20564,12 +20563,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4700,
                                     "proj": 10.1,
                                     "value": 2.15
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4700,
                                     "proj": 10.1,
                                     "value": 2.15
@@ -20617,12 +20616,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3700,
                                     "proj": 7.6,
                                     "value": 2.05
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3700,
                                     "proj": 7.6,
                                     "value": 2.05
@@ -20670,12 +20669,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3900,
                                     "proj": 7.9,
                                     "value": 2.03
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3900,
                                     "proj": 7.9,
                                     "value": 2.03
@@ -20723,12 +20722,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4100,
                                     "proj": 8.7,
                                     "value": 2.11
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4100,
                                     "proj": 8.7,
                                     "value": 2.11
@@ -20776,12 +20775,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3500,
                                     "proj": 8.1,
                                     "value": 2.32
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3500,
                                     "proj": 8.1,
                                     "value": 2.32
@@ -20829,12 +20828,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3600,
                                     "proj": 7.1,
                                     "value": 1.97
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3600,
                                     "proj": 7.1,
                                     "value": 1.97
@@ -20882,12 +20881,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 3100,
                                     "proj": 1.5,
                                     "value": 0.48
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 3100,
                                     "proj": 1.5,
                                     "value": 0.48
@@ -20944,12 +20943,12 @@
                             }
                         },
                         "dk_slates": {
-                            "24ACE": {
+                            "24A1B": {
                                 "salary": 7700,
                                 "proj": 13.9,
                                 "value": 1.81
                             },
-                            "24A1B": {
+                            "24ACE": {
                                 "salary": 7700,
                                 "proj": 13.9,
                                 "value": 1.81
@@ -20998,12 +20997,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 6500,
                                     "proj": 11.9,
                                     "value": 1.83
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 6500,
                                     "proj": 11.9,
                                     "value": 1.83
@@ -21051,12 +21050,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 5100,
                                     "proj": 8.4,
                                     "value": 1.65
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 5100,
                                     "proj": 8.4,
                                     "value": 1.65
@@ -21104,12 +21103,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 5800,
                                     "proj": 10.8,
                                     "value": 1.86
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 5800,
                                     "proj": 10.8,
                                     "value": 1.86
@@ -21157,12 +21156,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 5500,
                                     "proj": 9.1,
                                     "value": 1.65
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 5500,
                                     "proj": 9.1,
                                     "value": 1.65
@@ -21210,12 +21209,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4400,
                                     "proj": 7.4,
                                     "value": 1.67
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4400,
                                     "proj": 7.4,
                                     "value": 1.67
@@ -21263,12 +21262,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 5000,
                                     "proj": 7.4,
                                     "value": 1.48
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 5000,
                                     "proj": 7.4,
                                     "value": 1.48
@@ -21316,12 +21315,12 @@
                                 }
                             },
                             "dk_slates": {
-                                "24ACE": {
+                                "24A1B": {
                                     "salary": 4200,
                                     "proj": 5.9,
                                     "value": 1.4
                                 },
-                                "24A1B": {
+                                "24ACE": {
                                     "salary": 4200,
                                     "proj": 5.9,
                                     "value": 1.4
