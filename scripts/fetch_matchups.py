@@ -962,9 +962,13 @@ def main():
             "games": master_dates[date_str]
         }
 
-        daily_file = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
-        save_json(daily_file, final_output)
-        print(f"✅ Created/Updated {daily_file} with {len(master_dates[date_str])} games.")
+        # THE SAVE GATE: Only save Yesterday, Today, Tomorrow, OR if we pulled fresh future projections
+        if days_away <= 1 or needs_bbm_fetch:
+            daily_file = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
+            save_json(daily_file, final_output)
+            print(f"✅ Created/Updated {daily_file} with {len(master_dates[date_str])} games.")
+        else:
+            print(f"⏩ Skipped saving {date_str} (No fresh data needed yet).")
 
     # --- PRINT API METRICS ---
     total_calls = sum(API_CALL_TRACKER.values())
