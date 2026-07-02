@@ -962,13 +962,37 @@ def main():
             "games": master_dates[date_str]
         }
 
-        # THE SAVE GATE: Only save Yesterday, Today, Tomorrow, OR if we pulled fresh future projections
+        # THE SAVE GATE: Only process Yesterday, Today, Tomorrow, OR if we pulled fresh future projections
         if days_away <= 1 or needs_bbm_fetch:
             daily_file = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
-            save_json(daily_file, final_output)
-            print(f"✅ Created/Updated {daily_file} with {len(master_dates[date_str])} games.")
+            
+            should_save = True
+            if os.path.exists(daily_file):
+                try:
+                    with open(daily_file, 'r') as f:
+                        old_data = json.load(f)
+                    
+                    # Create shallow copies so we don't delete the timestamp from the actual output
+                    old_compare = dict(old_data)
+                    new_compare = dict(final_output)
+                    
+                    # Ignore the timestamp since it changes every single run
+                    old_compare.pop("last_updated", None)
+                    new_compare.pop("last_updated", None)
+                    
+                    # Deep compare every single stat, lineup, and odds value
+                    if old_compare == new_compare:
+                        should_save = False
+                except Exception:
+                    pass # If the old file is corrupted or unreadable, default to saving over it
+            
+            if should_save:
+                save_json(daily_file, final_output)
+                print(f"✅ Created/Updated {daily_file} with {len(master_dates[date_str])} games.")
+            else:
+                print(f"🛑 No data changes for {date_str}. Skipped file overwrite to prevent GitHub build.")
         else:
-            print(f"⏩ Skipped saving {date_str} (No fresh data needed yet).")
+            print(f"⏩ Skipped saving {date_str} (Future game with no fresh BBM data).")
 
     # --- PRINT API METRICS ---
     total_calls = sum(API_CALL_TRACKER.values())
