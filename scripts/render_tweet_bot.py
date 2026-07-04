@@ -741,6 +741,11 @@ async def run_engines(memory):
         for match in futbol_data:
             league_id = match.get('league', {}).get('id')
             if league_id not in FUTBOL_LEAGUES: continue
+
+            # 🛡️ COPYRIGHT SAFETY SHIELD: Skip lineup card generation for high-risk AI copyright leagues
+            # 140 = La Liga, 143 = Copa del Rey, 61 = ligue1, 135 = seriea
+            if league_id in [140, 143,61,135]: 
+                continue
             league_info = FUTBOL_LEAGUES[league_id]
             fixture_id = match.get('fixture', {}).get('id')
             team_key = f"FUTBOL_{fixture_id}"
