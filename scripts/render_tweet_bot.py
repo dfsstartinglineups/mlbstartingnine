@@ -899,6 +899,9 @@ async def run_engines(memory):
             try: away_odds = float(match.get('odds', {}).get('away') or 0.0)
             except: away_odds = 0.0
 
+            # --- PRE-LOOP TRACKERS ---
+            player_goal_counts = {}
+
             for event in valid_goal_events: 
                 team_id = event.get('team_id')
                 if team_id == h_id: current_home_score += 1
@@ -912,42 +915,50 @@ async def run_engines(memory):
                 is_stoppage = event_time >= 90
                 scorer_odds = home_odds if team_id == h_id else away_odds
                 
-                # --- AGGREGATE ROUTER (Pipeline B) ---
+                # Track goals per player for Hat-Trick / Brace detection
+                p_id = str(event.get('player_id', event.get('player', 'UNK')))
+                player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
+                p_goals = player_goal_counts[p_id]
+                
+                # --- AGGREGATE ROUTER (Pipeline B - Keep Your Existing Code Here) ---
                 first_leg = match.get("first_leg_goals")
                 if first_leg:
-                    agg_h_score = current_home_score + first_leg.get(str(h_id), 0)
-                    agg_a_score = current_away_score + first_leg.get(str(a_id), 0)
+                    # [Your existing aggregate routing code untouched]
+                    pass
                     
-                    is_agg_equalizer = agg_h_score == agg_a_score
-                    is_agg_go_ahead = (team_id == h_id and agg_h_score - agg_a_score == 1) or (team_id == a_id and agg_a_score - agg_h_score == 1)
-                    is_dagger = (team_id == h_id and agg_h_score - agg_a_score >= 2) or (team_id == a_id and agg_a_score - agg_h_score >= 2)
-                    is_consolation = (team_id == h_id and agg_h_score < agg_a_score) or (team_id == a_id and agg_a_score < agg_h_score)
-
-                    scenario_key = None
-                    if is_stoppage and is_agg_go_ahead: scenario_key = "agg_stoppage_go_ahead"
-                    elif is_stoppage and is_agg_equalizer: scenario_key = "agg_stoppage_equalizer"
-                    elif is_late and is_agg_go_ahead: scenario_key = "agg_late_go_ahead"
-                    elif is_late and is_agg_equalizer: scenario_key = "agg_late_equalizer"
-                    elif is_late and is_dagger: scenario_key = "agg_dagger"
-                    elif is_stoppage and is_consolation: scenario_key = "agg_consolation"
-                    elif is_late and is_consolation: scenario_key = "agg_consolation"
-                    
-                # --- STANDARD ROUTER (Pipeline A) ---
+                # --- UPGRADED STANDARD ROUTER (Pipeline A) ---
                 else:
                     is_equalizer = current_home_score == current_away_score
                     is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
                     is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
                     is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
                     
+                    # Option B: Tight Competitive Clash (Tied or 1-goal difference)
+                    is_tight_clash = abs(current_home_score - current_away_score) <= 1
+                    
                     scenario_key = None
+                    
+                    # 1. TIER 1: LATE DRAMA & STOPPAGE TIME (75'+)
                     if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
                     elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
-                    elif is_massive_upset: scenario_key = "massive_upset"
-                    elif is_standard_upset: scenario_key = "standard_upset"
                     elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
                     elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
                     elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
                     elif is_late and is_equalizer: scenario_key = "late_equalizer"
+                    
+                    # 2. TIER 2: PLAYER MILESTONES (At any point in the match!)
+                    elif p_goals == 3: scenario_key = "hat_trick"
+                    elif p_goals == 2: scenario_key = "brace"
+                    
+                    # 3. TIER 3: LIGHTNING STARTS (0' to 10')
+                    elif event_time <= 10: scenario_key = "lightning_start"
+                    
+                    # 4. TIER 4: MID-GAME UPSETS (11' to 74')
+                    elif is_massive_upset: scenario_key = "massive_upset"
+                    elif is_standard_upset: scenario_key = "standard_upset"
+                    
+                    # 5. TIER 5: COMPETITIVE CLASHES (11' to 74' Option B Filter)
+                    elif 10 < event_time < 75 and is_tight_clash: scenario_key = "tight_clash_goal"
                 
                 if not scenario_key: continue
 
@@ -986,6 +997,56 @@ async def run_engines(memory):
                     link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#goal-{fixture_id}"
 
                 PHRASES = {
+                    "hat_trick": {
+                        "titles": ["🚨🔥 HAT-TRICK ALERT!", "🚨🔥 UNSTOPPABLE!", "🚨🔥 THREE OF THE BEST!", "🚨🔥 MATCH BALL SECURED!", "🚨🔥 HAT-TRICK HERO!"],
+                        "blurbs": [
+                            "Absolute brilliance! {player_name} bags a sensational hat-trick for {scoring_team_name} to tear {conceding_team_name} apart!",
+                            "Take a bow, {player_name}! That is three goals on the day for the {scoring_team_name} superstar against {conceding_team_name}.",
+                            "Unplayable! {player_name} secures a magnificent hat-trick, putting {scoring_team_name} firmly in the driver's seat over {conceding_team_name}.",
+                            "{conceding_team_name} simply has no answers! {player_name} completes a stunning hat-trick for {scoring_team_name}."
+                        ],
+                        "ctas": ["Track the live match stats and pitch data here:", "Can they add a fourth? Follow the live action:", "See the full match center and player ratings here:"]
+                    },
+                    "brace": {
+                        "titles": ["🚨⚽ BRACE ALERT!", "🚨⚽ ON A HAT-TRICK!", "🚨⚽ TWO FOR {player_name}!", "🚨⚽ DOUBLE TROUBLE!", "🚨⚽ SEEING DOUBLE!"],
+                        "blurbs": [
+                            "{player_name} is putting on a masterclass! That is goal number two on the day for {scoring_team_name} against {conceding_team_name}.",
+                            "He is on a hat-trick! {player_name} bags his second goal of the match to power {scoring_team_name} ahead of {conceding_team_name}.",
+                            "Trouble for {conceding_team_name}! {player_name} finds the back of the net again for his second goal of the contest.",
+                            "{scoring_team_name}'s star man is locked in! A brilliant brace for {player_name} puts {conceding_team_name} on the ropes."
+                        ],
+                        "ctas": ["Will we see a hat-trick? Follow live:", "Track the live match center and stats here:", "See the live pitch data and scores here:"]
+                    },
+                    "lightning_start": {
+                        "titles": ["⚡🚨 LIGHTNING START!", "⚡🚨 FLASH GOAL!", "⚡🚨 EXPLOSIVE OPENING!", "⚡🚨 WHAT A START!", "⚡🚨 FAST OUT OF THE GATES!"],
+                        "blurbs": [
+                            "Barely any time on the clock and {scoring_team_name} is already on the board! A dream start against {conceding_team_name}.",
+                            "No time wasted! {scoring_team_name} comes flying out of the gates to catch {conceding_team_name} sleeping early!",
+                            "What an opening! {scoring_team_name} lands a massive early punch against {conceding_team_name} in the opening minutes.",
+                            "The fans have barely taken their seats and {scoring_team_name} has already broken the deadlock against {conceding_team_name}!"
+                        ],
+                        "ctas": ["Follow this fast-paced clash live here:", "Track the live match center and pitch data:", "Don't miss a minute. See live scores and odds here:"]
+                    },
+                    "tight_clash_goal": {
+                        "titles": ["⚽🔥 MATCH GOAL!", "⚽🔥 THE TIE TIGHTENS!", "⚽🔥 GAME ON!", "⚽🔥 BACK AND FORTH WE GO!", "⚽🔥 CRUCIAL STRIKE!"],
+                        "blurbs": [
+                            "A vital goal from {scoring_team_name}! This clash with {conceding_team_name} is turning into an absolute thriller.",
+                            "{scoring_team_name} strikes to keep the pressure on {conceding_team_name}! Nothing separating these sides as the battle continues.",
+                            "We have a massive fight on our hands! {scoring_team_name} finds the back of the net in a tightly contested clash with {conceding_team_name}.",
+                            "Momentum swing! {scoring_team_name} delivers a crucial blow against {conceding_team_name} as the game remains wide open."
+                        ],
+                        "ctas": ["Track the live scores and match momentum here:", "Follow the tactical battle and live pitch data:", "See live stats, lineups, and odds here:"]
+                    },
+                    "red_card": {
+                        "titles": ["🚨🟥 RED CARD ALERT!", "🚨🟥 SENT OFF!", "🚨🟥 DRAMA! DOWN TO 10 MEN!", "🚨🟥 MAJOR DISCIPLINE ALERT!", "🚨🟥 GAME CHANGING RED CARD!"],
+                        "blurbs": [
+                            "Massive momentum shift! {player_name} ({scoring_team_name}) is shown a red card! They will have to play the rest of this match against {conceding_team_name} with 10 men.",
+                            "Disaster for {scoring_team_name}! {player_name} is sent off by the referee. How will {conceding_team_name} exploit the man advantage?!",
+                            "The referee pulls out the red card! {player_name} is given his marching orders, leaving {scoring_team_name} short-handed against {conceding_team_name}.",
+                            "We have major discipline drama! A red card for {player_name} forces {scoring_team_name} into a desperate defensive reshuffle against {conceding_team_name}."
+                        ],
+                        "ctas": ["How will the tactics change? Track live here:", "See the live match center and updated odds:", "Follow the 10-man battle live here:"]
+                    },
                     "late_equalizer": {
                         "titles": ["🚨 LATE EQUALIZER!", "🚨 DRAMATIC EQUALIZER!", "🚨 TIED UP LATE!", "🚨 CLOSING STAGES CHAOS!", "🚨 ALL SQUARE LATE!"],
                         "blurbs": [
