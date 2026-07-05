@@ -914,18 +914,20 @@ async def run_engines(memory):
                 
                 event_time = get_actual_minute(event)
                 event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{current_home_score if team_id == h_id else current_away_score}"
+                
+                # 🛡️ FIX 1: ALWAYS count cumulative player goals first before checking tweeted_recently!
+                p_id = str(event.get('player_id', event.get('player', 'UNK')))
+                player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
+                p_goals = player_goal_counts[p_id]
+                
+                # Now we can safely skip if this specific goal was already tweeted!
                 if event_key in tweeted_recently: continue
 
                 is_late = 75 <= event_time < 90
                 is_stoppage = event_time >= 90
                 scorer_odds = home_odds if team_id == h_id else away_odds
                 
-                # Track goals per player for Hat-Trick / Brace detection
-                p_id = str(event.get('player_id', event.get('player', 'UNK')))
-                player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
-                p_goals = player_goal_counts[p_id]
-                
-                # --- AGGREGATE ROUTER (Pipeline B - Keep Your Existing Code Here) ---
+                # --- AGGREGATE ROUTER (Pipeline B) ---
                 first_leg = match.get("first_leg_goals")
                 if first_leg:
                     # [Your existing aggregate routing code untouched]
@@ -943,17 +945,17 @@ async def run_engines(memory):
                     
                     scenario_key = None
                     
-                    # 1. TIER 1: LATE DRAMA & STOPPAGE TIME (75'+)
-                    if is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
+                    # 1. TIER 1: PLAYER MILESTONES (Top priority! Overrides generic late goals)
+                    if p_goals == 3: scenario_key = "hat_trick"
+                    elif p_goals == 2: scenario_key = "brace"
+                    
+                    # 2. TIER 2: LATE DRAMA & STOPPAGE TIME (75'+)
+                    elif is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
                     elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
                     elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
                     elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
                     elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
                     elif is_late and is_equalizer: scenario_key = "late_equalizer"
-                    
-                    # 2. TIER 2: PLAYER MILESTONES (At any point in the match!)
-                    elif p_goals == 3: scenario_key = "hat_trick"
-                    elif p_goals == 2: scenario_key = "brace"
                     
                     # 3. TIER 3: LIGHTNING STARTS (0' to 10')
                     elif event_time <= 10: scenario_key = "lightning_start"
@@ -962,8 +964,9 @@ async def run_engines(memory):
                     elif is_massive_upset: scenario_key = "massive_upset"
                     elif is_standard_upset: scenario_key = "standard_upset"
                     
-                    # 5. TIER 5: COMPETITIVE CLASHES (11' to 74' Option B Filter)
-                    elif 10 < event_time < 75 and is_tight_clash: scenario_key = "tight_clash_goal"
+                    # 5. TIER 5: COMPETITIVE CLASHES (11' to 90'+ Option B Filter)
+                    # 🛡️ FIX 2: Removed < 75 limit so late 2-1 and 3-2 deficit cutters trigger!
+                    elif event_time > 10 and is_tight_clash: scenario_key = "tight_clash_goal"
                 
                 if not scenario_key: continue
 
