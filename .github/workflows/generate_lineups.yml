@@ -1,0 +1,51 @@
+name: Generate MLB Static Team Pages
+
+on:
+  # Trigger automatically if you ever modify the python generator script
+  push:
+    branches:
+      - main
+    paths:
+      - 'generate_team_pages.py'
+      
+  # Allows you to run this workflow manually from the GitHub Actions tab anytime!
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🏗️ Run Static Pages Generator
+        run: |
+          python generate_team_pages.py
+
+      - name: 🚀 Commit and Push Generated Pages
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # Stage the lineups directory
+          git add lineups/
+          
+          # Check if there are any actual changes before attempting to commit
+          if git diff --staged --quiet; then
+            echo "ℹ️ No changes detected in /lineups/. Everything is up to date!"
+          else
+            git commit -m "🤖 Auto-generated 30 MLB static team SEO pages [skip ci]"
+            git push
+            echo "✅ Successfully pushed updated static pages to repository!"
+          fi
