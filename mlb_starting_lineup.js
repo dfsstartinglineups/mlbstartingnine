@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Attempt to load today's compiled JSON slate
     try {
         // Change this line inside the DOMContentLoaded event listener:
-        const res = await fetch(`../../data/games_${todayStr}.json?v=${now.getTime()}`);
+        const res = await fetch(`../../data/daily_files/games_${todayStr}.json?v=${now.getTime()}`);
         if (!res.ok) throw new Error("Daily slate JSON not found, falling back to live API if needed.");
         dailySlateData = await res.json();
     } catch (err) {
