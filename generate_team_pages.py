@@ -218,10 +218,11 @@ def generate_all_team_pages():
             os.makedirs(team_dir)
             
         # Format the HTML template with this specific team's data
-        file_content = HTML_TEMPLATE.format(
-            team_name=team["name"],
-            team_slug=team["slug"],
-            team_id=team["id"]
+        # Safely replace variables without tripping over CSS curly braces
+        file_content = (
+            HTML_TEMPLATE.replace("{team_name}", team["name"])
+                         .replace("{team_slug}", team["slug"])
+                         .replace("{team_id}", str(team["id"]))
         )
         
         file_path = os.path.join(team_dir, "index.html")
