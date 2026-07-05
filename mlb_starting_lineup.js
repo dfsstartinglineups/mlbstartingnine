@@ -1,7 +1,8 @@
 /**
  * ============================================================================
  * MLB STARTING 9 - MASTER TEAM LINEUP ENGINE (mlb_starting_lineup.js)
- * Fully upgraded with visual dugout card aesthetics, headshots, and centered watermark.
+ * Compact Dugout Scorecard: Uses real field positions (gamePositions),
+ * removes salaries, and scales fluidly for laptops and mobile devices.
  * ============================================================================
  */
 
@@ -52,7 +53,7 @@ function getHeadshotUrl(personId) {
 }
 
 // ==========================================
-// 2. INITIALIZATION
+// 2. INITIALIZATION & DATA FETCHING
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     buildHeaderAndFooter();
@@ -64,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const todayStr = `${year}-${month}-${day}`;
 
     try {
-        const res = await fetch(`../../data/daily_files/games_${todayStr}.json?v=${now.getTime()}`);
+        const res = await fetch(`../../data/games_${todayStr}.json?v=${now.getTime()}`);
         if (!res.ok) throw new Error("Daily slate JSON not found.");
         dailySlateData = await res.json();
     } catch (err) {
@@ -82,25 +83,25 @@ function buildHeaderAndFooter() {
     const headerContainer = document.getElementById("header-container");
     if (headerContainer) {
         headerContainer.innerHTML = `
-            <header style="background: #121212; border-bottom: 1px solid #222; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <a href="../../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 10px;">
-                        <img src="../../logo.webp" alt="MLB Starting 9 Logo" style="height: 40px; width: auto; border-radius: 6px;" onerror="this.style.display='none'">
+            <header style="background: #121212; border-bottom: 1px solid #222; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <a href="../../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        <img src="../../logo.webp" alt="MLB Starting 9 Logo" style="height: 36px; width: auto; border-radius: 6px;" onerror="this.style.display='none'">
                         <div>
-                            <span style="font-family: 'Bebas Neue', cursive; font-size: 26px; color: #fff; letter-spacing: 1px; line-height: 1;">MLB STARTING 9</span>
-                            <div style="font-family: 'Montserrat', sans-serif; font-size: 10px; color: #00e676; font-weight: 700; letter-spacing: 0.5px;">DAILY FANTASY STATS & LINEUPS</div>
+                            <span style="font-family: 'Bebas Neue', cursive; font-size: 24px; color: #fff; letter-spacing: 1px; line-height: 1;">MLB STARTING 9</span>
+                            <div style="font-family: 'Montserrat', sans-serif; font-size: 9px; color: #00e676; font-weight: 700; letter-spacing: 0.5px;">DAILY FANTASY STATS & LINEUPS</div>
                         </div>
                     </a>
                 </div>
                 
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <a href="../../index.html" style="font-family: 'Montserrat', sans-serif; font-size: 13px; color: #aaa; text-decoration: none; border: 1px solid #333; padding: 8px 14px; border-radius: 6px; transition: all 0.2s;" onmouseover="this.style.borderColor='#00e676'; this.style.color='#fff'" onmouseout="this.style.borderColor='#333'; this.style.color='#aaa'">
-                        &larr; Back to Daily Slate
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <a href="../../index.html" style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #aaa; text-decoration: none; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.borderColor='#00e676'; this.style.color='#fff'" onmouseout="this.style.borderColor='#333'; this.style.color='#aaa'">
+                        &larr; Back to Slate
                     </a>
                     
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <label for="team-selector" style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #888; text-transform: uppercase; font-weight: 600;">Switch Team:</label>
-                        <select id="team-selector" onchange="handleTeamSwitch(this)" style="background: #1e1e1e; color: #fff; border: 1px solid #444; padding: 8px 12px; border-radius: 6px; font-family: 'Montserrat', sans-serif; font-size: 13px; outline: none; cursor: pointer;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <label for="team-selector" style="font-family: 'Montserrat', sans-serif; font-size: 11px; color: #888; text-transform: uppercase; font-weight: 600; display: none;">Team:</label>
+                        <select id="team-selector" onchange="handleTeamSwitch(this)" style="background: #1e1e1e; color: #fff; border: 1px solid #444; padding: 6px 10px; border-radius: 6px; font-family: 'Montserrat', sans-serif; font-size: 12px; outline: none; cursor: pointer; max-width: 220px;">
                             <option value="">Loading teams...</option>
                         </select>
                     </div>
@@ -112,11 +113,11 @@ function buildHeaderAndFooter() {
     const footerContainer = document.getElementById("footer-container");
     if (footerContainer) {
         footerContainer.innerHTML = `
-            <footer style="background: #0a0a0a; border-top: 1px solid #1a1a1a; padding: 30px 20px; text-align: center; margin-top: 50px; font-family: 'Montserrat', sans-serif;">
-                <p style="color: #666; font-size: 12px; margin: 0 0 10px 0;">
-                    &copy; ${new Date().getFullYear()} MLB Starting 9. All rights reserved. Data updated in real-time from official MLB sources.
+            <footer style="background: #0a0a0a; border-top: 1px solid #1a1a1a; padding: 25px 15px; text-align: center; margin-top: 40px; font-family: 'Montserrat', sans-serif;">
+                <p style="color: #666; font-size: 11px; margin: 0 0 8px 0;">
+                    &copy; ${new Date().getFullYear()} MLB Starting 9. All rights reserved. Real-time data from official MLB sources.
                 </p>
-                <p style="color: #444; font-size: 11px; max-width: 600px; margin: 0 auto; line-height: 1.5;">
+                <p style="color: #444; font-size: 10px; max-width: 550px; margin: 0 auto; line-height: 1.4;">
                     Disclaimer: This website is for informational and entertainment purposes only. Not affiliated with or endorsed by Major League Baseball or any MLB franchise.
                 </p>
             </footer>
@@ -140,7 +141,7 @@ function populateTeamDropdown() {
             if (!teamObj) return;
 
             const status = tracking[side]?.status || "NONE";
-            const badge = (status === "OFFICIAL" || status === "MODIFIED") ? "✓ OFFICIAL" : "⏳ PROJ";
+            const badge = (status === "OFFICIAL" || status === "MODIFIED") ? "✓" : "⏳";
             const oppSide = side === 'away' ? 'home' : 'away';
             const oppName = raw.teams?.[oppSide]?.team?.name || "OPP";
             const vsSymbol = side === 'away' ? `@ ${oppName}` : `vs ${oppName}`;
@@ -198,11 +199,11 @@ function renderTeamPage() {
     // OFF-DAY FALLBACK
     if (!targetGame || !targetSide) {
         captureArea.innerHTML = `
-            <div style="max-width: 600px; margin: 40px auto; background: var(--paper-bg); border: 2px dashed var(--marker-ink); border-radius: 12px; padding: 40px 20px; text-align: center; font-family: 'Montserrat', sans-serif; color: #222; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="height: 80px; margin-bottom: 15px; opacity: 0.8;">
-                <h1 style="font-family: 'Bebas Neue', cursive; font-size: 36px; color: var(--marker-ink); margin: 0;">NO GAME SCHEDULED TODAY</h1>
-                <p style="font-size: 15px; color: #555; margin-top: 10px;">The ${currentTargetName} have an off-day or their game has been postponed.</p>
-                <a href="../../index.html" style="display: inline-block; margin-top: 20px; background: var(--marker-ink); color: #fff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;">View Full MLB Slate &rarr;</a>
+            <div style="max-width: 550px; margin: 30px auto; background: var(--paper-bg); border: 2px dashed var(--marker-ink); border-radius: 10px; padding: 35px 20px; text-align: center; font-family: 'Montserrat', sans-serif; color: #222; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="height: 70px; margin-bottom: 12px; opacity: 0.8;">
+                <h1 style="font-family: 'Bebas Neue', cursive; font-size: 32px; color: var(--marker-ink); margin: 0;">NO GAME SCHEDULED TODAY</h1>
+                <p style="font-size: 14px; color: #555; margin-top: 8px;">The ${currentTargetName} have an off-day or their game has been postponed.</p>
+                <a href="../../index.html" style="display: inline-block; margin-top: 18px; background: var(--marker-ink); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px;">View Full Slate &rarr;</a>
             </div>
         `;
         return;
@@ -214,16 +215,20 @@ function renderTeamPage() {
     const tracking = targetGame.lineupTracking?.[targetSide] || {};
     const projData = targetGame.projectedLineups?.[targetSide] || {};
     
+    // 🔥 REAL MLB FIELDING POSITIONS & HANDEDNESS MAPS 🔥
+    const posMap = targetGame.gamePositions || {};
+    const handMap = targetGame.lineupHandedness || {};
+
     // Status Badge Logic
     const status = tracking.status || "NONE";
     let badgeHtml = "";
     if (status === "OFFICIAL") {
         const timeStr = tracking.officialAt ? ` (${tracking.officialAt})` : "";
-        badgeHtml = `<span style="background: #00e676; color: #000; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 8px; box-shadow: 0 0 10px rgba(0, 230, 118, 0.4);">✓ OFFICIAL STARTING 9${timeStr}</span>`;
+        badgeHtml = `<span style="background: #00e676; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 6px; box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);">✓ OFFICIAL STARTING 9${timeStr}</span>`;
     } else if (status === "MODIFIED") {
-        badgeHtml = `<span style="background: #ff1744; color: #fff; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 8px; box-shadow: 0 0 10px rgba(255, 23, 68, 0.4);">🚨 LINEUP MODIFIED / LATE SCRATCH</span>`;
+        badgeHtml = `<span style="background: #ff1744; color: #fff; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 6px; box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);">🚨 MODIFIED / LATE SCRATCH</span>`;
     } else {
-        badgeHtml = `<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 11px; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 8px;">⏳ PROJECTED BATTING ORDER</span>`;
+        badgeHtml = `<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 6px;">⏳ PROJECTED BATTING ORDER</span>`;
     }
 
     const vsSymbol = targetSide === 'away' ? `@ ${oppTeamObj.name}` : `vs ${oppTeamObj.name}`;
@@ -233,63 +238,60 @@ function renderTeamPage() {
         const ml = targetGame.odds.moneyline[targetSide];
         const mlFormat = ml > 0 ? `+${ml}` : ml;
         const ou = targetGame.odds.overUnder ? ` • O/U ${targetGame.odds.overUnder}` : "";
-        if (ml) oddsStr = `<div style="font-family: 'Roboto Mono', monospace; font-size: 12px; color: #444; margin-top: 4px;">Vegas Line: ${mlFormat}${ou}</div>`;
+        if (ml) oddsStr = `<div style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #555; margin-top: 3px;">Vegas Line: ${mlFormat}${ou}</div>`;
     }
 
-    // 4. BUILD VISUAL CARD WITH CENTERED WATERMARK & RICH DUGOUT AESTHETICS
+    // 4. BUILD COMPACT VISUAL CARD (No Salaries, Slim 42px Rows, Fluid Mobile Widths)
     let cardHtml = `
-        <div style="max-width: 680px; margin: 20px auto; background: var(--paper-bg); border-radius: 12px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.7), inset 0 0 40px rgba(0,0,0,0.04); position: relative; overflow: hidden; border: 1px solid #ccc; color: var(--marker-ink);">
+        <div style="max-width: 580px; width: 94%; margin: 15px auto; background: var(--paper-bg); border-radius: 10px; padding: 18px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; border: 1px solid #bbb; color: var(--marker-ink); box-sizing: border-box;">
             
-            <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; height: 520px; object-fit: contain; opacity: 0.04; pointer-events: none; z-index: 0;">
+            <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; height: 420px; object-fit: contain; opacity: 0.04; pointer-events: none; z-index: 0;">
 
-            <div style="display: flex; align-items: center; gap: 20px; border-bottom: 3px solid var(--marker-ink); padding-bottom: 20px; margin-bottom: 15px; position: relative; z-index: 1;">
-                <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" alt="${currentTargetName} Logo" style="height: 80px; width: 80px; filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2)); flex-shrink: 0;">
-                <div>
+            <div style="display: flex; align-items: center; gap: 14px; border-bottom: 2.5px solid var(--marker-ink); padding-bottom: 12px; margin-bottom: 10px; position: relative; z-index: 1;">
+                <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" alt="${currentTargetName} Logo" style="height: 56px; width: 56px; filter: drop-shadow(1px 3px 4px rgba(0,0,0,0.2)); flex-shrink: 0;">
+                <div style="overflow: hidden;">
                     ${badgeHtml}
-                    <h1 style="font-family: 'Permanent Marker', cursive; font-size: 40px; color: var(--marker-ink); margin: 0; line-height: 0.95; letter-spacing: 1px; text-transform: uppercase;">${currentTargetName}</h1>
-                    <div style="font-family: 'Caveat', cursive; font-size: 22px; color: #4a4f58; font-weight: 700; margin-top: 4px;">${vsSymbol} <span style="font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 600; color: #777;">| ${venueName}</span></div>
+                    <h1 style="font-family: 'Permanent Marker', cursive; font-size: clamp(24px, 6vw, 32px); color: var(--marker-ink); margin: 0; line-height: 0.95; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${currentTargetName}</h1>
+                    <div style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 19px); color: #4a4f58; font-weight: 700; margin-top: 2px;">${vsSymbol} <span style="font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; color: #777;">| ${venueName}</span></div>
                     ${oddsStr}
                 </div>
             </div>
 
             <div style="position: relative; z-index: 1;">
-                <div style="font-family: 'Montserrat', sans-serif; font-size: 11px; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; border-bottom: 1px dashed var(--paper-line); padding-bottom: 4px;">Batting Order</div>
+                <div style="font-family: 'Montserrat', sans-serif; font-size: 10px; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; border-bottom: 1px dashed var(--paper-line); padding-bottom: 3px;">Batting Order</div>
     `;
 
-    // Populate Batting Order with Photos & Dugout Grid
+    // Populate Compact Batting Order (42px height per row fits laptops without scrolling!)
     const batters = projData.battingOrder || [];
     if (batters.length === 0) {
-        cardHtml += `<div style="padding: 20px; text-align: center; font-family: 'Montserrat', sans-serif; color: #666; font-style: italic;">Batting order not populated yet.</div>`;
+        cardHtml += `<div style="padding: 15px; text-align: center; font-family: 'Montserrat', sans-serif; color: #666; font-style: italic;">Batting order not populated yet.</div>`;
     } else {
         batters.forEach((b, idx) => {
-            const pos = b.fd_positions || b.dk_positions || "FLEX";
-            const sal = b.salary ? `$${b.salary}` : "";
-            const hand = b.hand ? `(${b.hand})` : "";
+            // Pull REAL baseball fielding position (SS, CF, 2B) instead of C/1B fantasy slots!
+            const pos = posMap[b.id] || posMap[String(b.id)] || b.fd_positions || b.dk_positions || "DH";
+            const hand = handMap[b.id] || handMap[String(b.id)] || b.hand || "";
+            const handDisplay = hand ? `(${hand}) ` : "";
             const headshot = getHeadshotUrl(b.id);
             
             cardHtml += `
-                <div style="display: flex; align-items: center; border-bottom: 1.5px solid var(--paper-line); height: 64px; position: relative; z-index: 2; transition: background 0.15s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                <div style="display: flex; align-items: center; border-bottom: 1px solid var(--paper-line); height: 42px; position: relative; z-index: 2; transition: background 0.15s; padding: 0 4px;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
                     
-                    <div style="width: 45px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1.5px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 24px; color: var(--marker-ink); flex-shrink: 0;">
+                    <div style="width: 32px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 17px; color: var(--marker-ink); flex-shrink: 0;">
                         ${idx + 1}
                     </div>
                     
-                    <div style="width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1.5px solid var(--paper-line); flex-shrink: 0;">
-                        <div style="width: 48px; height: 48px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 2px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 44px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
                             <img src="${headshot}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" crossorigin="anonymous" onerror="this.src='https://www.mlbstatic.com/team-logos/100.svg'">
                         </div>
                     </div>
                     
-                    <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 15px; border-right: 1.5px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 22px; text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: 20px; color: #4a4f58; opacity: 0.85; margin-right: 8px; font-weight: 700; text-transform: none;">${hand}</span>${b.name}
+                    <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(15px, 3.8vw, 17px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span>${b.name}
                     </div>
                     
-                    <div style="width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 24px; font-weight: 700; color: #4a4f58; border-right: 1.5px solid var(--paper-line); flex-shrink: 0;">
+                    <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
                         ${pos}
-                    </div>
-
-                    <div style="width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 700; color: #444; flex-shrink: 0;">
-                        ${sal}
                     </div>
 
                 </div>
@@ -297,41 +299,36 @@ function renderTeamPage() {
         });
     }
 
-    // Starting Pitcher Section
+    // Starting Pitcher Section (Compact 50px Box)
     const pitcher = projData.startingPitcher || {};
     const pName = pitcher.name || "To Be Determined";
-    const pHand = pitcher.hand ? `(${pitcher.hand})` : "";
-    const pSal = pitcher.salary ? `$${pitcher.salary}` : "";
+    const pHand = pitcher.hand ? `(${pitcher.hand}) ` : "";
     const pHeadshot = getHeadshotUrl(pitcher.id);
 
     cardHtml += `
             </div>
             
-            <div style="margin-top: 15px; position: relative; z-index: 1;">
-                <div style="font-family: 'Caveat', cursive; font-size: 22px; color: #4a4f58; font-weight: 700; margin-bottom: 4px; padding-left: 5px;">Starting Pitcher</div>
+            <div style="margin-top: 12px; position: relative; z-index: 1;">
+                <div style="font-family: 'Caveat', cursive; font-size: 17px; color: #4a4f58; font-weight: 700; margin-bottom: 2px; padding-left: 4px;">Starting Pitcher</div>
                 
-                <div style="display: flex; align-items: center; border: 2px solid var(--marker-ink); background-color: rgba(0,0,0,0.03); border-radius: 8px; height: 72px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <div style="display: flex; align-items: center; border: 1.5px solid var(--marker-ink); background-color: rgba(0,0,0,0.03); border-radius: 6px; height: 50px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); padding: 0 4px;">
                     
-                    <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1.5px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 22px; color: var(--marker-ink); background: rgba(0,0,0,0.04); flex-shrink: 0;">
+                    <div style="width: 36px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 16px; color: var(--marker-ink); background: rgba(0,0,0,0.04); flex-shrink: 0;">
                         SP
                     </div>
                     
-                    <div style="width: 70px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1.5px solid var(--paper-line); flex-shrink: 0;">
-                        <div style="width: 52px; height: 52px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 2px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
                             <img src="${pHeadshot}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" crossorigin="anonymous" onerror="this.src='https://www.mlbstatic.com/team-logos/100.svg'">
                         </div>
                     </div>
                     
-                    <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 15px; border-right: 1.5px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 24px; text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: 20px; color: #4a4f58; opacity: 0.85; margin-right: 8px; font-weight: 700; text-transform: none;">${pHand}</span>${pName}
+                    <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(16px, 4vw, 18px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${pHand}</span>${pName}
                     </div>
                     
-                    <div style="width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 24px; font-weight: 700; color: #4a4f58; border-right: 1.5px solid var(--paper-line); flex-shrink: 0;">
+                    <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
                         SP
-                    </div>
-
-                    <div style="width: 65px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Roboto Mono', monospace; font-size: 13px; font-weight: 700; color: #444; flex-shrink: 0;">
-                        ${pSal}
                     </div>
 
                 </div>
