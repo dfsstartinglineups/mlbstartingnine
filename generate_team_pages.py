@@ -64,7 +64,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta property="og:site_name" content="MLB Starting 9">
     <meta name="twitter:card" content="summary_large_image">
     
-    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="/styles.css">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -85,8 +85,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         window.TARGET_TEAM_NAME = "{team_name}";
     </script>
 
-    <script src="../../mlb_starting_lineup.js"></script>
-</body>
+    <script src="/mlb_starting_lineup.js"></script>
 </html>
 """
 
