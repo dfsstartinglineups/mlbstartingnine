@@ -1,14 +1,12 @@
 name: Generate MLB Static Team Pages
 
 on:
-  # Trigger automatically if you ever modify the python generator script
   push:
     branches:
       - main
     paths:
       - 'generate_team_pages.py'
       
-  # Allows you to run this workflow manually from the GitHub Actions tab anytime!
   workflow_dispatch:
 
 permissions:
@@ -21,8 +19,7 @@ jobs:
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        # Removed fetch-depth: 0 to allow a lightning-fast shallow clone
 
       - name: 🐍 Set up Python 3.11
         uses: actions/setup-python@v5
