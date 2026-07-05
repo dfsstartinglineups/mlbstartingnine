@@ -1199,12 +1199,22 @@ async def run_engines(memory):
                 }
 
                 raw_title = random.choice(PHRASES[scenario_key]["titles"])
-                title = raw_title.format(scoring_team_name=scoring_team_name)
+                # 🛡️ Added player_name=scorer and conceding_team_name so no placeholders crash!
+                title = raw_title.format(
+                    scoring_team_name=scoring_team_name, 
+                    conceding_team_name=conceding_team_name, 
+                    player_name=scorer
+                )
                 
                 blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
                 cta = random.choice(PHRASES[scenario_key]["ctas"])
                 
-                blurb = blurb_raw.format(scoring_team_name=scoring_team_name, conceding_team_name=conceding_team_name)
+                # 🛡️ Added player_name=scorer here as well!
+                blurb = blurb_raw.format(
+                    scoring_team_name=scoring_team_name, 
+                    conceding_team_name=conceding_team_name, 
+                    player_name=scorer
+                )
 
                 if scenario_key.startswith("agg_"):
                     tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n"
