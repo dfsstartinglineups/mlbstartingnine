@@ -69,6 +69,114 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;600;700&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+        body { background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        /* Sleek Header - Upgraded to match image */
+        .header-brand { 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            font-size: 2rem; 
+            color: #fff; 
+            font-style: italic; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+        .header-brand a {
+            color: inherit;
+        }
+        .header-brand span { 
+            text-shadow: none !important;
+            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
+            padding-right: 2px; /* Fix for italic 'e' getting cut off */
+            display: inline-block; /* Required for padding to push the bounding box */
+        }
+        
+        /* Lineup Card */
+        .lineup-card { 
+            background: #fff; 
+            border: 1px solid #dee2e6; 
+            border-radius: 12px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        /* Logos */
+        .team-logo {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 2px rgba(0,0,0,0.1));
+        }
+        
+        /* Batting Order List */
+        .batting-order { padding-left: 0; list-style-type: none; margin-bottom: 0; }
+        .batting-order li {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid #f1f3f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .batting-order li:last-child { border-bottom: none; }
+        .order-num { color: #adb5bd; font-weight: 700; font-size: 0.7rem; width: 15px; display: inline-block; }
+        .batter-name { font-weight: 600; color: #495057; }
+        
+        /* Cross-Promo Link */
+        .promo-btn { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+
+        /* --- X (Twitter) Share Button Styles --- */
+        .x-btn {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        .x-btn:hover {
+            background-color: #333;
+            color: #fff;
+        }
+        .x-icon {
+            fill: currentColor;
+            width: 14px;
+            height: 14px;
+        }
+
+        
+        /* EXPANDING SEARCH BOX (MLB THEME) */
+        #team-search { 
+            color: #ffffff !important; 
+            color-scheme: dark; 
+            width: 45px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #343a40;
+            border: 1px solid #495057;
+            cursor: pointer;
+        }
+        #team-search::placeholder { 
+            color: #adb5bd !important; 
+            opacity: 1; 
+        }
+        #team-search:focus { 
+            width: 150px;
+            background-color: #495057 !important; 
+            color: #ffffff !important; 
+            border-color: #0d6efd !important; /* MLB Blue */
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+            cursor: text;
+        }
+    </style>
+
 </head>
 <body class="dark-theme">
 
