@@ -167,7 +167,39 @@
 
         <div class="d-flex align-items-center gap-2 gap-md-3">
             <input type="text" id="team-search" class="form-control form-control-sm" placeholder="🔍">
-            <button id="global-toggle-btn" class="btn btn-sm fw-bold" style="background-color: #343a40; color: #adb5bd; border: 1px solid #495057;">[+] Expand All</button>
+            <select class="form-select form-select-sm fw-bold" style="background-color: #343a40; color: #adb5bd; border: 1px solid #495057; cursor: pointer; max-width: 170px;" onchange="if(this.value) window.location.href=this.value;">
+                <option value="">Team Lineups</option>
+                <option value="/lineups/arizona-diamondbacks/">Arizona Diamondbacks</option>
+                <option value="/lineups/athletics/">Athletics</option>
+                <option value="/lineups/atlanta-braves/">Atlanta Braves</option>
+                <option value="/lineups/baltimore-orioles/">Baltimore Orioles</option>
+                <option value="/lineups/boston-red-sox/">Boston Red Sox</option>
+                <option value="/lineups/chicago-cubs/">Chicago Cubs</option>
+                <option value="/lineups/chicago-white-sox/">Chicago White Sox</option>
+                <option value="/lineups/cincinnati-reds/">Cincinnati Reds</option>
+                <option value="/lineups/cleveland-guardians/">Cleveland Guardians</option>
+                <option value="/lineups/colorado-rockies/">Colorado Rockies</option>
+                <option value="/lineups/detroit-tigers/">Detroit Tigers</option>
+                <option value="/lineups/houston-astros/">Houston Astros</option>
+                <option value="/lineups/kansas-city-royals/">Kansas City Royals</option>
+                <option value="/lineups/los-angeles-angels/">Los Angeles Angels</option>
+                <option value="/lineups/los-angeles-dodgers/">Los Angeles Dodgers</option>
+                <option value="/lineups/miami-marlins/">Miami Marlins</option>
+                <option value="/lineups/milwaukee-brewers/">Milwaukee Brewers</option>
+                <option value="/lineups/minnesota-twins/">Minnesota Twins</option>
+                <option value="/lineups/new-york-mets/">New York Mets</option>
+                <option value="/lineups/new-york-yankees/">New York Yankees</option>
+                <option value="/lineups/philadelphia-phillies/">Philadelphia Phillies</option>
+                <option value="/lineups/pittsburgh-pirates/">Pittsburgh Pirates</option>
+                <option value="/lineups/san-diego-padres/">San Diego Padres</option>
+                <option value="/lineups/san-francisco-giants/">San Francisco Giants</option>
+                <option value="/lineups/seattle-mariners/">Seattle Mariners</option>
+                <option value="/lineups/st-louis-cardinals/">St. Louis Cardinals</option>
+                <option value="/lineups/tampa-bay-rays/">Tampa Bay Rays</option>
+                <option value="/lineups/texas-rangers/">Texas Rangers</option>
+                <option value="/lineups/toronto-blue-jays/">Toronto Blue Jays</option>
+                <option value="/lineups/washington-nationals/">Washington Nationals</option>
+            </select>
             <input type="date" id="date-picker" class="form-control form-control-sm text-center fw-bold w-auto" style="background-color: #343a40; color: #fff; border: none; color-scheme: dark;">
         </div>
     </div>
