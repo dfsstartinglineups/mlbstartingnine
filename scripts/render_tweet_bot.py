@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 import time
 import random
 import copy
-from atproto import Client, client_utils
+from atproto import Client, client_utils, models
 import firebase_admin
 from firebase_admin import credentials, db
 import asyncio
@@ -105,7 +105,6 @@ argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 # ==========================================
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
 # ==========================================
-# Notice these functions now accept the `browser` argument!
 async def take_screenshot(browser, fixture_id, target_date):
     print(f"📸 Generating Futbol Graphic for Fixture {fixture_id}...")
     page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
@@ -125,24 +124,19 @@ async def take_screenshot(browser, fixture_id, target_date):
         print(f"⚠️ Futbol Graphics failed. Error: {e}")
         return False
     finally:
-        await page.close() # Free up the cloud memory by closing the tab
+        await page.close() 
 
 async def take_mlb_screenshot(browser, game_pk, side, target_date):
     print(f"📸 Generating MLB Graphic for {game_pk} ({side})...")
     page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
     
-    # 🔍 X-RAY VISION (Keep this on just in case!)
     page.on("console", lambda msg: print(f"   [Browser Console]: {msg.text}"))
     page.on("pageerror", lambda err: print(f"   [Browser JS Error]: {err}"))
     page.on("requestfailed", lambda req: print(f"   [Request Failed]: {req.url}"))
     
-    # 🛡️ THE PROXY SHIELD: Intercept MLB API calls and run them through Python
     async def intercept_mlb_api(route):
         try:
-            # Python makes the request from the trusted Render IP
             res = requests.get(route.request.url, timeout=10)
-            
-            # Feed the data back to the browser and artificially inject the CORS header
             await route.fulfill(
                 status=res.status_code,
                 content_type="application/json",
@@ -153,10 +147,8 @@ async def take_mlb_screenshot(browser, game_pk, side, target_date):
             print(f"   [Proxy Error]: {e}")
             await route.abort()
 
-    # Attach the shield to the page before we load it
     await page.route("**/statsapi.mlb.com/**", intercept_mlb_api)
     
-    # 💥 CACHE-BUSTING URL
     bust_cache = int(time.time())
     url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}&v={bust_cache}"
     
@@ -215,6 +207,10 @@ def format_odds(price):
 def get_lineup_hash(players_array):
     return "-".join([str(p['id']) for p in players_array[:9]])
 
+def get_team_slug(full_name):
+    if full_name == "Athletics": return "athletics"
+    return full_name.lower().replace(".", "").replace(" ", "-")
+
 def parse_futbol_lineup(startXI):
     pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
     for player_item in startXI:
@@ -255,10 +251,9 @@ def fetch_initial_memory():
 # ==========================================
 # 5. CORE BOT ENGINE (RUNS EVERY LOOP)
 # ==========================================
-# Converted to an async function
 async def run_engines(memory):
     # ----------------------------------------------------
-    # BROWSER CONNECTION MANAGER (The Lazy Loader)
+    # BROWSER CONNECTION MANAGER
     # ----------------------------------------------------
     playwright_manager = await async_playwright().start()
     browser = None
@@ -315,7 +310,6 @@ async def run_engines(memory):
     try: nba_data = requests.get(NBA_DATA_URL).json().get('games', [])
     except: nba_data = []
 
-    # 🛑 NBA BYPASS: Leave this set to True to keep NBA tweets turned off
     if True: nba_data = []
 
     ESPN_TO_STD = {"NY": "NYK", "NO": "NOP", "SA": "SAS", "GS": "GSW", "WSH": "WAS", "UTAH": "UTA"}
@@ -479,24 +473,25 @@ async def run_engines(memory):
     try: odds_data = requests.get(MLB_ODDS_URL).json().get('odds', [])
     except: odds_data = []
 
-    async def send_mlb_tweet(game_pk, team_short, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
+    async def send_mlb_tweet(game_pk, team_short, full_team_name, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
         if memory_key in memory.get(date_str, []): return False
         
+        # 1. GENERATE THE NEW PROGRAMMATIC SEO URL
+        team_slug = get_team_slug(full_team_name)
+        team_url = f"https://mlbstartingnine.com/lineups/{team_slug}/"
+        reply_text = f"View the {full_team_name} daily starting lineups at our new team lineup page:\n{team_url}"
+
+        # 2. BUILD THE MAIN TWEET (Removed the link from the main text!)
         tweet_text = f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n"
         if team_odds != "TBD": tweet_text += f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
-        link_url = f"https://mlbstartingnine.com/#game-{game_pk}"
-        if random.randint(1, 100) <= 100 and not alert_header: tweet_text += f"Full matchup stats, BvP, & umpire ratings:\n{link_url}\n\n"
         tweet_text += f"#{team_hash} #{team_hash}Lineup #MLB"
         
         bsky_tb = client_utils.TextBuilder()
         bsky_tb.text(f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n")
         if team_odds != "TBD": bsky_tb.text(f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n")
-        if not alert_header:
-            bsky_tb.text("Full matchup stats, BvP, & umpire ratings:\n")
-            bsky_tb.link(link_url, link_url)
-            bsky_tb.text("\n\n")
         bsky_tb.text(f"#{team_hash} #{team_hash}Lineup #MLB")
 
+        # 3. GENERATE SCREENSHOT
         screenshot_success = False
         for attempt in range(2):
             try:
@@ -517,16 +512,25 @@ async def run_engines(memory):
             twitter_success = False
             bsky_success = False
             
+            # --- X (TWITTER) UPLOAD & THREADED REPLY ---
             for attempt in range(2):
                 try:
                     if attempt == 1: await asyncio.sleep(3) 
                     media = mlb_api_v1.media_upload("mlb_matchup.png")
                     mlb_api_v1.create_media_metadata(media.media_id, alt_text)
-                    mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    
+                    # Send Main Tweet & Capture Response
+                    response = mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    
+                    # Fire Threaded Reply Using Tweet ID
+                    tweet_id = response.data['id']
+                    mlb_client.create_tweet(text=reply_text, in_reply_to_tweet_id=tweet_id)
+                    
                     twitter_success = True
                     break 
                 except Exception as e: pass
                 
+            # --- BLUESKY UPLOAD & THREADED REPLY ---
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
                 for attempt in range(2):
@@ -534,7 +538,19 @@ async def run_engines(memory):
                         if attempt == 1: await asyncio.sleep(3) 
                         with open("mlb_matchup.jpg", "rb") as f:
                             img_data = f.read()
-                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
+                        
+                        # Send Main Post & Capture Response
+                        post_response = config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
+                        
+                        # Build and Fire Threaded Reply
+                        reply_tb = client_utils.TextBuilder()
+                        reply_tb.text(f"View the {full_team_name} daily starting lineups at our new team lineup page:\n")
+                        reply_tb.link(team_url, team_url)
+                        
+                        parent_ref = models.create_strong_ref(post_response)
+                        reply_ref = models.AppBskyFeedPost.ReplyRef(parent=parent_ref, root=parent_ref)
+                        config["bsky_client"].send_post(reply_tb, reply_to=reply_ref)
+                        
                         bsky_success = True
                         break 
                     except Exception as e: pass
@@ -651,6 +667,7 @@ async def run_engines(memory):
             full_key = f"{base_key}_{current_hash}"
 
             team_short_ref = away_short if side == 'away' else home_short
+            team_full_ref = away_full if side == 'away' else home_full
             team_p_ref = f"{away_p_name}" if side == 'away' else f"{home_p_name}"
             team_o_ref = away_odds_str if side == 'away' else home_odds_str
             opp_short_ref = home_short if side == 'away' else away_short
@@ -663,7 +680,7 @@ async def run_engines(memory):
             previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
 
             if not previously_tweeted_keys:
-                if await send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
+                if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
                     log_today.append(full_key)
                     tweeted_recently.append(full_key)
                     new_tweets_sent = True
@@ -681,7 +698,7 @@ async def run_engines(memory):
                     in_names = [next((p.get('fullName', 'Unknown Player') for p in players_array if str(p['id']) == pid), 'Unknown') for pid in in_ids]
                     alert_header = f"🚨 {team_short_ref} LATE SCRATCH\nOUT: {', '.join(out_names) if out_names else 'None'}\nIN: {', '.join(in_names) if in_names else 'None'}"
 
-                if await send_mlb_tweet(game_pk, team_short_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key, alert_header=alert_header):
+                if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key, alert_header=alert_header):
                     for k in previously_tweeted_keys:
                         if k in log_today: log_today.remove(k)
                         if k in tweeted_recently: tweeted_recently.remove(k)
@@ -743,8 +760,7 @@ async def run_engines(memory):
             if league_id not in FUTBOL_LEAGUES: continue
 
             # 🛡️ COPYRIGHT SAFETY SHIELD: Skip lineup card generation for high-risk AI copyright leagues
-            # 140 = La Liga, 143 = Copa del Rey, 61 = ligue1, 135 = seriea
-            if league_id in [140, 143,61,135]: 
+            if league_id in [140, 143, 61, 135]: 
                 continue
             league_info = FUTBOL_LEAGUES[league_id]
             fixture_id = match.get('fixture', {}).get('id')
@@ -915,12 +931,10 @@ async def run_engines(memory):
                 event_time = get_actual_minute(event)
                 event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{current_home_score if team_id == h_id else current_away_score}"
                 
-                # 🛡️ FIX 1: ALWAYS count cumulative player goals first before checking tweeted_recently!
                 p_id = str(event.get('player_id', event.get('player', 'UNK')))
                 player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
                 p_goals = player_goal_counts[p_id]
                 
-                # Now we can safely skip if this specific goal was already tweeted!
                 if event_key in tweeted_recently: continue
 
                 is_late = 75 <= event_time < 90
@@ -930,7 +944,6 @@ async def run_engines(memory):
                 # --- AGGREGATE ROUTER (Pipeline B) ---
                 first_leg = match.get("first_leg_goals")
                 if first_leg:
-                    # [Your existing aggregate routing code untouched]
                     pass
                     
                 # --- UPGRADED STANDARD ROUTER (Pipeline A) ---
@@ -940,12 +953,11 @@ async def run_engines(memory):
                     is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
                     is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
                     
-                    # Option B: Tight Competitive Clash (Tied or 1-goal difference)
                     is_tight_clash = abs(current_home_score - current_away_score) <= 1
                     
                     scenario_key = None
                     
-                    # 1. TIER 1: PLAYER MILESTONES (Top priority! Overrides generic late goals)
+                    # 1. TIER 1: PLAYER MILESTONES
                     if p_goals == 3: scenario_key = "hat_trick"
                     elif p_goals == 2: scenario_key = "brace"
                     
@@ -965,7 +977,6 @@ async def run_engines(memory):
                     elif is_standard_upset: scenario_key = "standard_upset"
                     
                     # 5. TIER 5: COMPETITIVE CLASHES (11' to 90'+ Option B Filter)
-                    # 🛡️ FIX 2: Removed < 75 limit so late 2-1 and 3-2 deficit cutters trigger!
                     elif event_time > 10 and is_tight_clash: scenario_key = "tight_clash_goal"
                 
                 if not scenario_key: continue
@@ -1199,7 +1210,6 @@ async def run_engines(memory):
                 }
 
                 raw_title = random.choice(PHRASES[scenario_key]["titles"])
-                # 🛡️ Added player_name=scorer and conceding_team_name so no placeholders crash!
                 title = raw_title.format(
                     scoring_team_name=scoring_team_name, 
                     conceding_team_name=conceding_team_name, 
@@ -1209,7 +1219,6 @@ async def run_engines(memory):
                 blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
                 cta = random.choice(PHRASES[scenario_key]["ctas"])
                 
-                # 🛡️ Added player_name=scorer here as well!
                 blurb = blurb_raw.format(
                     scoring_team_name=scoring_team_name, 
                     conceding_team_name=conceding_team_name, 
@@ -1266,7 +1275,6 @@ async def run_engines(memory):
 # ==========================================
 # 6. THE PERSISTENT RENDER WRAPPER
 # ==========================================
-# The main function is now entirely asynchronous!
 async def main():
     print("🤖 Starting Publisher Bot (Render Persistent Engine)...")
     
