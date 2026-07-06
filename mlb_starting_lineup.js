@@ -361,7 +361,11 @@ function renderTeamPage() {
         </div>
     `;
 
+    // Inside renderTeamPage()
     captureArea.innerHTML = cardHtml;
+
+    // ADD THIS LINE HERE:
+    renderAnalyticsSection(targetGame, targetSide, projData);
 }
 
 // ==========================================
@@ -401,4 +405,168 @@ function getSlugFromId(id) {
         147: "new-york-yankees"
     };
     return slugMap[id] || "los-angeles-dodgers";
+}
+
+// ==========================================
+// 6. RENDER ADVANCED ANALYTICS SECTION
+// ==========================================
+function renderAnalyticsSection(targetGame, targetSide, projData) {
+    const container = document.getElementById("public-analytics-section");
+    if (!container) return;
+
+    if (!targetGame || !targetGame.deepStats) {
+        container.innerHTML = "";
+        return;
+    }
+
+    const deepStats = targetGame.deepStats || {};
+    const umpStats = targetGame.umpStats || {};
+    const parkStats = targetGame.parkStats || {};
+    
+    // Identify Opposing Pitcher
+    const oppSide = targetSide === 'away' ? 'home' : 'away';
+    const oppPitcher = targetGame.projectedLineups?.[oppSide]?.startingPitcher || {};
+    const pStats = oppPitcher.id ? deepStats[oppPitcher.id] : null;
+    const pitcherHand = oppPitcher.hand || 'R'; 
+    
+    // --- CSS STYLES FOR THE DATA VAULT ---
+    const tableCSS = `
+        <style>
+            .stat-container { max-width: 580px; width: 94%; margin: 10px auto 40px auto; font-family: 'Montserrat', sans-serif; }
+            .stat-card { background: #1a1d24; border: 1px solid #2d323b; border-radius: 10px; margin-bottom: 25px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+            .stat-header { background: #22262e; padding: 12px 15px; border-bottom: 2px solid var(--marker-ink, #444); color: #fff; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: space-between; }
+            .stat-table { width: 100%; border-collapse: collapse; color: #ddd; font-size: 12px; }
+            .stat-table th { background: #15171c; padding: 10px; text-align: center; color: #8892a3; font-weight: 600; text-transform: uppercase; font-size: 10px; border-bottom: 1px solid #2d323b; }
+            .stat-table th:first-child, .stat-table td:first-child { text-align: left; padding-left: 15px; font-weight: 600; color: #fff; }
+            .stat-table td { padding: 10px; text-align: center; border-bottom: 1px solid #252933; }
+            .stat-table tr:last-child td { border-bottom: none; }
+            .stat-table tr:hover { background: rgba(255,255,255,0.03); }
+            .highlight-text { color: #00e676; font-weight: 700; }
+            .env-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+            .env-box { background: #15171c; border-radius: 8px; padding: 12px; border: 1px solid #252933; }
+            .env-title { font-size: 10px; color: #8892a3; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #2d323b; padding-bottom: 4px; }
+            .env-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: #ddd; }
+        </style>
+    `;
+
+    const batters = projData.battingOrder || [];
+
+    // 1. BUILD DFS TABLE
+    let dfsRows = '';
+    batters.forEach(b => {
+        const fdSal = b.salary ? `$${b.salary}` : '-';
+        const fdProj = b.proj ? parseFloat(b.proj).toFixed(1) : '-';
+        const dkSal = b.dk_salary ? `$${b.dk_salary}` : '-';
+        const dkProj = b.dk_proj ? parseFloat(b.dk_proj).toFixed(1) : '-';
+        const pos = b.fd_positions || b.dk_positions || 'FLEX';
+        
+        dfsRows += `<tr>
+            <td>${b.name}</td>
+            <td style="color: #8892a3;">${pos}</td>
+            <td>${fdSal}</td>
+            <td class="highlight-text">${fdProj}</td>
+            <td>${dkSal}</td>
+            <td class="highlight-text">${dkProj}</td>
+        </tr>`;
+    });
+
+    // 2. BUILD PITCHER TABLE
+    let pitcherHtml = '';
+    if (pStats) {
+        const vL = pStats.split_vL || {};
+        const vR = pStats.split_vR || {};
+        const season = pStats.season || {};
+        pitcherHtml = `
+        <div class="stat-card">
+            <div class="stat-header">Opposing Pitcher: ${oppPitcher.name || 'TBD'}</div>
+            <table class="stat-table">
+                <thead><tr><th>Split</th><th>AVG</th><th>OPS</th><th>HR</th><th>K</th></tr></thead>
+                <tbody>
+                    <tr>
+                        <td>vs LHB</td>
+                        <td>${vL.avg || '-'}</td>
+                        <td class="${vL.ops > '.750' ? 'highlight-text' : ''}">${vL.ops || '-'}</td>
+                        <td>${vL.hr || '-'}</td>
+                        <td>${vL.k || '-'}</td>
+                    </tr>
+                    <tr>
+                        <td>vs RHB</td>
+                        <td>${vR.avg || '-'}</td>
+                        <td class="${vR.ops > '.750' ? 'highlight-text' : ''}">${vR.ops || '-'}</td>
+                        <td>${vR.hr || '-'}</td>
+                        <td>${vR.k || '-'}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style="background: #15171c; padding: 10px 15px; font-size: 11px; color: #8892a3; border-top: 1px solid #2d323b; display: flex; gap: 15px; justify-content: center;">
+                <span><strong>SEASON:</strong></span>
+                <span>${season.ip || 0} IP</span>
+                <span>${season.era || '-'} ERA</span>
+                <span>${season.whip || '-'} WHIP</span>
+                <span>${season.k || '-'} SO</span>
+            </div>
+        </div>`;
+    }
+
+    // 3. BUILD BATTER SPLITS TABLE
+    let splitRows = '';
+    batters.forEach(b => {
+        const bStats = deepStats[b.id] || {};
+        const splitData = pitcherHand === 'L' ? (bStats.split_vL || {}) : (bStats.split_vR || {});
+        const ops = splitData.ops || '-';
+        const bvp = bStats.bvp || {};
+        const bvpAb = bvp.ab !== undefined ? bvp.ab : '-';
+        const bvpAvg = bvp.avg || '-';
+        const bvpHr = bvp.hr !== undefined ? bvp.hr : '-';
+        
+        splitRows += `<tr>
+            <td>${b.name}</td>
+            <td class="${ops > '.800' ? 'highlight-text' : ''}">${ops}</td>
+            <td>${bvpAb}</td>
+            <td>${bvpAvg}</td>
+            <td style="color: ${bvpHr > 0 ? '#ff1744' : 'inherit'}; font-weight: ${bvpHr > 0 ? '700' : '400'};">${bvpHr}</td>
+        </tr>`;
+    });
+
+    // 4. BUILD ENVIRONMENT HTML
+    const envHtml = `
+    <div class="stat-card">
+        <div class="stat-header">Game Environment</div>
+        <div class="env-grid">
+            <div class="env-box">
+                <div class="env-title">Park Factors (100 = Avg)</div>
+                <div class="env-row"><span>Runs:</span> <span class="${parkStats.runs > 102 ? 'highlight-text' : ''}">${parkStats.runs || '-'}</span></div>
+                <div class="env-row"><span>HR (LHB):</span> <span>${parkStats.hr_l || '-'}</span></div>
+                <div class="env-row"><span>HR (RHB):</span> <span>${parkStats.hr_r || '-'}</span></div>
+            </div>
+            <div class="env-box">
+                <div class="env-title">Umpire: ${targetGame.hpUmpire || 'TBD'}</div>
+                <div class="env-row"><span>K Rate:</span> <span>${umpStats.k_rate || '-'}</span></div>
+                <div class="env-row"><span>BB Rate:</span> <span>${umpStats.bb_rate || '-'}</span></div>
+                <div class="env-row"><span>Runs/Game:</span> <span>${umpStats.rpg || '-'}</span></div>
+            </div>
+        </div>
+    </div>`;
+
+    // INJECT INTO DOM
+    container.innerHTML = tableCSS + `
+    <div class="stat-container">
+        <div class="stat-card">
+            <div class="stat-header">DFS Projections & Pricing</div>
+            <table class="stat-table">
+                <thead><tr><th>Batter</th><th>Pos</th><th>FD $</th><th>FD Proj</th><th>DK $</th><th>DK Proj</th></tr></thead>
+                <tbody>${dfsRows}</tbody>
+            </table>
+        </div>
+        ${pitcherHtml}
+        <div class="stat-card">
+            <div class="stat-header">Batter Splits & BvP</div>
+            <table class="stat-table">
+                <thead><tr><th>Batter</th><th>vs ${pitcherHand}HP (OPS)</th><th>BvP AB</th><th>BvP AVG</th><th>BvP HR</th></tr></thead>
+                <tbody>${splitRows}</tbody>
+            </table>
+        </div>
+        ${envHtml}
+    </div>
+    `;
 }
