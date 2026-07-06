@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const todayStr = `${year}-${month}-${day}`;
 
     try {
-        const res = await fetch(`/data/games_${todayStr}.json?v=${now.getTime()}`);
+        const res = await fetch(`/data/daily_files/games_${todayStr}.json?v=${now.getTime()}`);
         if (!res.ok) throw new Error("Daily slate JSON not found.");
         dailySlateData = await res.json();
     } catch (err) {
