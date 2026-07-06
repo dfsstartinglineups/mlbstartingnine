@@ -1,8 +1,7 @@
 /**
  * ============================================================================
  * MLB STARTING 9 - MASTER TEAM LINEUP ENGINE (mlb_starting_lineup.js)
- * Compact Dugout Scorecard: Uses real field positions (gamePositions),
- * removes salaries, and scales fluidly for laptops and mobile devices.
+ * Compact Dugout Scorecard: Short Names, Visible Watermark, & Dynamic Date.
  * ============================================================================
  */
 
@@ -46,14 +45,23 @@ let currentTargetId = window.TARGET_TEAM_ID || 119;
 let currentTargetSlug = window.TARGET_TEAM_SLUG || "los-angeles-dodgers";
 let currentTargetName = window.TARGET_TEAM_NAME || "Los Angeles Dodgers";
 
-// Helper: Get Official MLB Headshot Image
 function getHeadshotUrl(personId) {
     if (!personId) return "https://www.mlbstatic.com/team-logos/100.svg";
     return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${personId}/headshot/67/current`;
 }
 
+// Helper to convert "Los Angeles Dodgers" -> "Dodgers"
+function getShortTeamName(fullName, mlbTeamNameNode) {
+    let short = mlbTeamNameNode || fullName.split(' ').pop();
+    if (fullName.includes('Red Sox')) short = 'Red Sox';
+    if (fullName.includes('White Sox')) short = 'White Sox';
+    if (fullName.includes('Blue Jays')) short = 'Blue Jays';
+    if (short === 'Diamondbacks') short = 'D-Backs';
+    return short.toUpperCase();
+}
+
 // ==========================================
-// 2. INITIALIZATION & DATA FETCHING
+// 2. INITIALIZATION
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     buildHeaderAndFooter();
@@ -65,7 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const todayStr = `${year}-${month}-${day}`;
 
     try {
-        const res = await fetch(`../../data/daily_files/games_${todayStr}.json?v=${now.getTime()}`);
+        const res = await fetch(`/data/games_${todayStr}.json?v=${now.getTime()}`);
         if (!res.ok) throw new Error("Daily slate JSON not found.");
         dailySlateData = await res.json();
     } catch (err) {
@@ -85,8 +93,8 @@ function buildHeaderAndFooter() {
         headerContainer.innerHTML = `
             <header style="background: #121212; border-bottom: 1px solid #222; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <a href="../../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
-                        <img src="../../logo.webp" alt="MLB Starting 9 Logo" style="height: 36px; width: auto; border-radius: 6px;" onerror="this.style.display='none'">
+                    <a href="/" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                        <img src="/logo.webp" alt="MLB Starting 9 Logo" style="height: 36px; width: auto; border-radius: 6px;" onerror="this.style.display='none'">
                         <div>
                             <span style="font-family: 'Bebas Neue', cursive; font-size: 24px; color: #fff; letter-spacing: 1px; line-height: 1;">MLB STARTING 9</span>
                             <div style="font-family: 'Montserrat', sans-serif; font-size: 9px; color: #00e676; font-weight: 700; letter-spacing: 0.5px;">DAILY FANTASY STATS & LINEUPS</div>
@@ -95,7 +103,7 @@ function buildHeaderAndFooter() {
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                    <a href="../../index.html" style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #aaa; text-decoration: none; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.borderColor='#00e676'; this.style.color='#fff'" onmouseout="this.style.borderColor='#333'; this.style.color='#aaa'">
+                    <a href="/" style="font-family: 'Montserrat', sans-serif; font-size: 12px; color: #aaa; text-decoration: none; border: 1px solid #333; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; white-space: nowrap;" onmouseover="this.style.borderColor='#00e676'; this.style.color='#fff'" onmouseout="this.style.borderColor='#333'; this.style.color='#aaa'">
                         &larr; Back to Slate
                     </a>
                     
@@ -203,7 +211,7 @@ function renderTeamPage() {
                 <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="height: 70px; margin-bottom: 12px; opacity: 0.8;">
                 <h1 style="font-family: 'Bebas Neue', cursive; font-size: 32px; color: var(--marker-ink); margin: 0;">NO GAME SCHEDULED TODAY</h1>
                 <p style="font-size: 14px; color: #555; margin-top: 8px;">The ${currentTargetName} have an off-day or their game has been postponed.</p>
-                <a href="../../index.html" style="display: inline-block; margin-top: 18px; background: var(--marker-ink); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px;">View Full Slate &rarr;</a>
+                <a href="/" style="display: inline-block; margin-top: 18px; background: var(--marker-ink); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px;">View Full Slate &rarr;</a>
             </div>
         `;
         return;
@@ -219,19 +227,29 @@ function renderTeamPage() {
     const posMap = targetGame.gamePositions || {};
     const handMap = targetGame.lineupHandedness || {};
 
+    // Generate Short Names (e.g. "DODGERS", "D-BACKS")
+    const shortName = getShortTeamName(currentTargetName, raw.teams?.[targetSide]?.team?.teamName);
+    const oppShortName = getShortTeamName(oppTeamObj.name, oppTeamObj.teamName);
+
+    // Format The Game Date
+    const gameDateRaw = raw.officialDate || new Date().toISOString().split('T')[0];
+    const [yy, mm, dd] = gameDateRaw.split('-');
+    const dObj = new Date(yy, mm - 1, dd);
+    const displayDate = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' }).toUpperCase();
+
     // Status Badge Logic
     const status = tracking.status || "NONE";
     let badgeHtml = "";
     if (status === "OFFICIAL") {
         const timeStr = tracking.officialAt ? ` (${tracking.officialAt})` : "";
-        badgeHtml = `<span style="background: #00e676; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 6px; box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);">✓ OFFICIAL STARTING 9${timeStr}</span>`;
+        badgeHtml = `<span style="background: #00e676; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);">✓ OFFICIAL STARTING 9${timeStr}</span>`;
     } else if (status === "MODIFIED") {
-        badgeHtml = `<span style="background: #ff1744; color: #fff; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 6px; box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);">🚨 MODIFIED / LATE SCRATCH</span>`;
+        badgeHtml = `<span style="background: #ff1744; color: #fff; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);">🚨 MODIFIED / LATE SCRATCH</span>`;
     } else {
-        badgeHtml = `<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; margin-bottom: 6px;">⏳ PROJECTED BATTING ORDER</span>`;
+        badgeHtml = `<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block;">⏳ PROJECTED BATTING ORDER</span>`;
     }
 
-    const vsSymbol = targetSide === 'away' ? `@ ${oppTeamObj.name}` : `vs ${oppTeamObj.name}`;
+    const vsSymbol = targetSide === 'away' ? `@ ${oppShortName}` : `vs ${oppShortName}`;
     const venueName = raw.venue?.name || "Stadium";
     let oddsStr = "";
     if (targetGame.odds && targetGame.odds.moneyline) {
@@ -241,17 +259,23 @@ function renderTeamPage() {
         if (ml) oddsStr = `<div style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #555; margin-top: 3px;">Vegas Line: ${mlFormat}${ou}</div>`;
     }
 
-    // 4. BUILD COMPACT VISUAL CARD (No Salaries, Slim 42px Rows, Fluid Mobile Widths)
+    // 4. BUILD COMPACT VISUAL CARD 
     let cardHtml = `
         <div style="max-width: 580px; width: 94%; margin: 15px auto; background: var(--paper-bg); border-radius: 10px; padding: 18px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; border: 1px solid #bbb; color: var(--marker-ink); box-sizing: border-box;">
             
-            <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; height: 420px; object-fit: contain; opacity: 0.04; pointer-events: none; z-index: 0;">
+            <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; height: 420px; object-fit: contain; opacity: 0.09; pointer-events: none; z-index: 0;">
 
             <div style="display: flex; align-items: center; gap: 14px; border-bottom: 2.5px solid var(--marker-ink); padding-bottom: 12px; margin-bottom: 10px; position: relative; z-index: 1;">
                 <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" alt="${currentTargetName} Logo" style="height: 56px; width: 56px; filter: drop-shadow(1px 3px 4px rgba(0,0,0,0.2)); flex-shrink: 0;">
-                <div style="overflow: hidden;">
-                    ${badgeHtml}
-                    <h1 style="font-family: 'Permanent Marker', cursive; font-size: clamp(24px, 6vw, 32px); color: var(--marker-ink); margin: 0; line-height: 0.95; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${currentTargetName}</h1>
+                <div style="overflow: hidden; width: 100%;">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2px;">
+                        ${badgeHtml}
+                        <span style="font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; color: #666; letter-spacing: 0.5px;">${displayDate}</span>
+                    </div>
+
+                    <h1 style="font-family: 'Permanent Marker', cursive; font-size: clamp(26px, 7vw, 38px); color: var(--marker-ink); margin: 0; line-height: 0.95; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${shortName}</h1>
+                    
                     <div style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 19px); color: #4a4f58; font-weight: 700; margin-top: 2px;">${vsSymbol} <span style="font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; color: #777;">| ${venueName}</span></div>
                     ${oddsStr}
                 </div>
@@ -358,7 +382,7 @@ function handleTeamSwitch(selectElement) {
     window.TARGET_TEAM_SLUG = newSlug;
     window.TARGET_TEAM_NAME = newName;
 
-    const newUrl = `../../lineups/${newSlug}/`;
+    const newUrl = `/lineups/${newSlug}/`;
     window.history.pushState({ teamId: newId }, "", newUrl);
     
     document.title = `${newName} Starting Lineup Today | Batting Order & Pitcher`;
