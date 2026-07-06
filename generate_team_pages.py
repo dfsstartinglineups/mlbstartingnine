@@ -65,8 +65,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     
     <meta property="og:image" content="https://www.mlbstatic.com/team-logos/{team_id}.svg">
     <meta name="twitter:image" content="https://www.mlbstatic.com/team-logos/{team_id}.svg">
-    
     <meta name="twitter:card" content="summary">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
     
     <link rel="stylesheet" href="../../styles.css">
     
