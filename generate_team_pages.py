@@ -60,9 +60,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta property="og:type" content="website">
     <meta property="og:title" content="{team_name} Starting 9 | Today's Lineup & Stats">
     <meta property="og:description" content="Official batting order, live odds, and matchup analytics for the {team_name}. Updated in real-time.">
-    <meta property="og:url" content="https://mlbstartingnine.com/lineups/{team_slug}">
+    <meta property="og:url" content="https://mlbstartingnine.com/lineups/{team_slug}/">
     <meta property="og:site_name" content="MLB Starting 9">
-    <meta name="twitter:card" content="summary_large_image">
+    
+    <meta property="og:image" content="https://www.mlbstatic.com/team-logos/{team_id}.svg">
+    <meta name="twitter:image" content="https://www.mlbstatic.com/team-logos/{team_id}.svg">
+    
+    <meta name="twitter:card" content="summary">
     
     <link rel="stylesheet" href="../../styles.css">
     
