@@ -1023,23 +1023,24 @@ async def run_engines(memory):
             # --- C. FULL TIME RECAP ALERTS ---
             ft_key = f"FUTBOL_FT_{fixture_id}"
             
-            # 🛡️ SILENT SKIP: If the game went to penalties, log it in memory but DO NOT tweet it.
+            # 🛡️ SILENT SKIP FOR PENALTIES: If it went to a shootout, log it but DO NOT tweet it
             if fixture_status in ['PEN', 'P']:
                 if ft_key not in tweeted_recently:
                     log_target_date.append(ft_key)
                     tweeted_recently.append(ft_key)
                     memory[target_date_str] = log_target_date
                 continue
-            
+
             if fixture_status in ['FT', 'AET']:
-                # 1. Check if the game is "stale" (ended more than 25 mins ago)
-                match_ended_str = match.get("match_ended_at")
-                is_stale = True
-                if match_ended_str:
-                    try:
-                        if (datetime.now(timezone.utc) - datetime.fromisoformat(match_ended_str)).total_seconds() / 60 < 25: 
-                            is_stale = False
-                    except: pass
+                # 1. Check if the game is "stale" based on kickoff time
+                # If more than 4 hours (14400 seconds) have passed since kickoff, it's an old game (skip it)
+                kickoff_ts = match.get('fixture', {}).get('timestamp', 0)
+                is_stale = False
+                
+                if kickoff_ts > 0:
+                    hours_since_kickoff = (time.time() - kickoff_ts) / 3600
+                    if hours_since_kickoff > 4.0:
+                        is_stale = True
                 
                 # 2. If it's stale, mark it in memory so it doesn't tweet, and skip
                 if ft_key not in tweeted_recently:
