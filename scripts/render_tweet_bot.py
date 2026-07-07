@@ -1044,32 +1044,55 @@ async def run_engines(memory):
                         h_score = match.get('goals', {}).get('home', current_home_score)
                         a_score = match.get('goals', {}).get('away', current_away_score)
 
+                        # --- NEW UNIVERSAL RESULT PHRASING ---
                         if h_score > a_score:
-                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{h_name} takes all 3 points!"
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{h_name} secures the victory!"
                         elif a_score > h_score:
-                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{a_name} secures a massive away win!"
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{a_name} claims the win on the road!"
                         else:
-                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\nThe points are shared in a hard-fought draw."
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\nThe match ends in a draw."
 
-                        # Build the Goal & Assist Log
-                        goal_log = []
+                        # --- NEW SPLIT TEAM GOAL LOGS ---
+                        home_goals = []
+                        away_goals = []
+                        
                         for e in valid_goal_events:
                             time_m = get_actual_minute(e)
                             scorer = e.get('player', 'Unknown')
                             assist = e.get('assist')
+                            team_id = e.get('team_id')
                             
                             if e.get('detail') == 'Own Goal':
-                                goal_log.append(f"⚽ {scorer} (OG) {time_m}'")
+                                goal_str = f"• {scorer} (OG) {time_m}'"
                             elif assist and str(assist).lower() != "null":
-                                goal_log.append(f"⚽ {scorer} {time_m}' (A: {assist})")
+                                goal_str = f"• {scorer} {time_m}' (A: {assist})"
                             else:
-                                goal_log.append(f"⚽ {scorer} {time_m}'")
-                        
-                        # Cap at 7 goals so we don't hit Twitter's character limit on blowouts
-                        if len(goal_log) > 7:
-                            goal_text = "\n".join(goal_log[:6]) + "\n...and more!"
+                                goal_str = f"• {scorer} {time_m}'"
+                                
+                            # Sort the goal under the correct team
+                            if team_id == h_id:
+                                home_goals.append(goal_str)
+                            else:
+                                away_goals.append(goal_str)
+
+                        # Combine them into a clean, readable layout
+                        goal_text_lines = []
+                        if home_goals:
+                            goal_text_lines.append(f"⚽ {h_name}:")
+                            goal_text_lines.extend(home_goals)
+                        if away_goals:
+                            if home_goals: goal_text_lines.append("") # Blank line to separate teams
+                            goal_text_lines.append(f"⚽ {a_name}:")
+                            goal_text_lines.extend(away_goals)
+                            
+                        if not goal_text_lines:
+                            goal_text = "🚫 No goals scored."
                         else:
-                            goal_text = "\n".join(goal_log) if goal_log else "🚫 No goals scored."
+                            # Cap at 12 lines so blowouts don't break Twitter's character limit
+                            if len(goal_text_lines) > 12:
+                                goal_text = "\n".join(goal_text_lines[:11]) + "\n...and more!"
+                            else:
+                                goal_text = "\n".join(goal_text_lines)
 
                         # Build the URL
                         if "base_url" in league_info:
@@ -1084,6 +1107,8 @@ async def run_engines(memory):
                         bsky_ft.text(f"{result_text}\n\n{goal_text}\n\n📊 Full match stats & player ratings:\n")
                         bsky_ft.link(ft_link, ft_link)
                         bsky_ft.text(f"\n\n{league_info['tag']} #{h_hash} #{a_hash}")
+
+                       
 
                         if DRY_RUN:
                             upload_success = True
