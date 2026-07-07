@@ -1,0 +1,1536 @@
+import os
+import json
+import requests
+import tweepy
+import zoneinfo
+from datetime import datetime, timezone, timedelta
+import time
+import random
+import copy
+from atproto import Client, client_utils, models
+import firebase_admin
+from firebase_admin import credentials, db
+import asyncio
+from playwright.async_api import async_playwright
+import gc
+import subprocess
+import sys
+import ctypes
+
+# ==========================================
+# 0. ENVIRONMENT & DRY RUN SETTINGS
+# ==========================================
+# Set DRY_RUN = False in Render Environment Variables to go live!
+DRY_RUN = os.environ.get("DRY_RUN", "True").lower() == "true"
+
+# ==========================================
+# 1. FIREBASE INITIALIZATION
+# ==========================================
+if not firebase_admin._apps:
+    raw_firebase_key = os.environ.get("FIREBASE_SERVICE_ACCOUNT")
+    if raw_firebase_key:
+        try:
+            cred_dict = json.loads(raw_firebase_key)
+            cred = credentials.Certificate(cred_dict)
+            firebase_admin.initialize_app(cred, {
+                'databaseURL': 'https://nbastartingfive-8b420-default-rtdb.firebaseio.com/'
+            })
+            print("✅ Firebase authenticated for Render Tweet Bot!")
+        except Exception as e:
+            print(f"❌ Firebase Auth Failed: {e}")
+
+# ==========================================
+# 2. UNIFIED CREDENTIALS & CLIENTS
+# ==========================================
+try:
+    raw_secrets = os.environ.get("NEW_SOCIAL_CREDENTIALS", "{}")
+    auth_data = json.loads(raw_secrets)
+except Exception as e:
+    print(f"⚠️ Could not load V2 credentials: {e}")
+    auth_data = {}
+
+def setup_bsky_client(account_key):
+    creds = auth_data.get(account_key)
+    if creds and creds.get("bsky_handle"):
+        try:
+            client = Client()
+            client.login(creds["bsky_handle"], creds["bsky_password"])
+            print(f"✅ Logged into Bluesky as {creds['bsky_handle']}")
+            return client
+        except Exception as e:
+            print(f"❌ Failed to log into Bluesky for {account_key}: {e}")
+    return None
+
+def create_x_clients(consumer_key, consumer_secret, access_token, access_token_secret):
+    if not all([consumer_key, consumer_secret, access_token, access_token_secret]):
+        return None, None
+    client = tweepy.Client(
+        consumer_key=consumer_key, consumer_secret=consumer_secret, 
+        access_token=access_token, access_token_secret=access_token_secret
+    )
+    auth = tweepy.OAuth1UserHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api_v1 = tweepy.API(auth)
+    return client, api_v1
+
+def get_dynamic_clients(key):
+    creds = auth_data.get(key, {})
+    return create_x_clients(
+        creds.get("consumer_key"), creds.get("consumer_secret"),
+        creds.get("access_token"), creds.get("access_token_secret")
+    )
+
+LEAGUE_CONFIG = {
+    "mlb": {"league_name": "MLB ⚾", "bsky_client": setup_bsky_client("mlb_account")},
+    "nba": {"league_name": "NBA 🏀", "bsky_client": setup_bsky_client("nba_account")}
+}
+
+# --- CORE ACCOUNTS ---
+mlb_client, mlb_api_v1 = get_dynamic_clients("mlb_x")
+nba_client, nba_api_v1 = get_dynamic_clients("nba_x")
+futbol_client, futbol_api_v1 = get_dynamic_clients("futbol_x")
+friendly_client, friendly_api_v1 = get_dynamic_clients("friendly_x")
+
+# --- SOCCER SUB-ACCOUNTS ---
+championship_client, championship_api_v1 = get_dynamic_clients("championship_x")
+bundesliga_client, bundesliga_api_v1 = get_dynamic_clients("bundesliga_x")
+nwsl_client, nwsl_api_v1 = get_dynamic_clients("nwsl_x")
+mls_client, mls_api_v1 = get_dynamic_clients("mls_x")
+ligue1_client, ligue1_api_v1 = get_dynamic_clients("ligue1_x")
+seriea_client, seriea_api_v1 = get_dynamic_clients("seriea_x")
+laliga_client, laliga_api_v1 = get_dynamic_clients("laliga_x")
+epl_client, epl_api_v1 = get_dynamic_clients("epl_x")
+argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
+
+# ==========================================
+# 3. PLAYWRIGHT & HELPER FUNCTIONS
+# ==========================================
+async def take_weather_screenshot(browser):
+    print("📸 Generating MLB Daily Weather Graphic...")
+    # Using 1080x1080 square viewport to match our compact 3-column grid
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1080}) 
+    
+    bust_cache = int(time.time())
+    url = f"https://weathermlb.com/daily_weather_card.html?v={bust_cache}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        
+        # Target the specific container we created in HTML
+        capture_area = page.locator("#capture-area")
+        
+        # Wait for the grid to actually finish populating from JSON
+        await page.locator(".game-card").first.wait_for(state="visible", timeout=30000)
+        await asyncio.sleep(2) # Give gradients and fonts a moment to settle
+        
+        await capture_area.screenshot(path="mlb_weather.png", type="png")
+        await capture_area.screenshot(path="mlb_weather.jpg", type="jpeg", quality=75)
+        print("✅ Weather Screenshots saved successfully!")
+        return True
+    except Exception as e:
+        print(f"⚠️ Weather Graphic capture failed. Error: {e}")
+        return False
+    finally:
+        await page.close()
+
+async def take_screenshot(browser, fixture_id, target_date):
+    print(f"📸 Generating Futbol Graphic for Fixture {fixture_id}...")
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+    url = f"https://futbolstartingeleven.com/matchup_card.html?date={target_date}&fixture={fixture_id}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await page.locator(".player-node").first.wait_for(timeout=60000)
+        await asyncio.sleep(3) 
+        
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="temp_matchup.png", type="png")
+        await capture_area.screenshot(path="temp_matchup.jpg", type="jpeg", quality=70)
+        print("✅ Futbol Screenshots saved (PNG & JPEG)!")
+        return True
+    except Exception as e:
+        print(f"⚠️ Futbol Graphics failed. Error: {e}")
+        return False
+    finally:
+        await page.close() 
+
+async def take_mlb_screenshot(browser, game_pk, side, target_date):
+    print(f"📸 Generating MLB Graphic for {game_pk} ({side})...")
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
+    
+    page.on("console", lambda msg: print(f"   [Browser Console]: {msg.text}"))
+    page.on("pageerror", lambda err: print(f"   [Browser JS Error]: {err}"))
+    page.on("requestfailed", lambda req: print(f"   [Request Failed]: {req.url}"))
+    
+    async def intercept_mlb_api(route):
+        try:
+            res = requests.get(route.request.url, timeout=10)
+            await route.fulfill(
+                status=res.status_code,
+                content_type="application/json",
+                body=res.text,
+                headers={"Access-Control-Allow-Origin": "*"} 
+            )
+        except Exception as e:
+            print(f"   [Proxy Error]: {e}")
+            await route.abort()
+
+    await page.route("**/statsapi.mlb.com/**", intercept_mlb_api)
+    
+    bust_cache = int(time.time())
+    url = f"https://mlbstartingnine.com/mlb_card.html?date={target_date}&gamePk={game_pk}&side={side}&v={bust_cache}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await page.locator("#lineup-container .player-row").first.wait_for(timeout=60000)
+        await asyncio.sleep(3)
+        
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="mlb_matchup.png", type="png")
+        await capture_area.screenshot(path="mlb_matchup.jpg", type="jpeg", quality=70)
+        print("✅ MLB Screenshots saved (PNG & JPEG)!")
+        return True
+    except Exception as e:
+        print(f"⚠️ MLB Graphics failed. Error: {e}")
+        return False
+    finally:
+        await page.close()
+
+async def take_nba_screenshot(browser, team_abbr, side, target_date):
+    print(f"📸 Generating NBA Graphic for {team_abbr} ({side})...")
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1080})
+    url = f"https://nbastartingfive.com/nba_card.html?date={target_date}&team={team_abbr}&side={side}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        await page.locator(".player-node").first.wait_for(timeout=60000)
+        await asyncio.sleep(3) 
+        
+        capture_area = page.locator("#capture-area")
+        await capture_area.screenshot(path="nba_matchup.png", type="png")
+        await capture_area.screenshot(path="nba_matchup.jpg", type="jpeg", quality=70)
+        print("✅ NBA Screenshots saved (PNG & JPEG)!")
+        return True
+    except Exception as e:
+        print(f"⚠️ NBA Graphics failed. Error: {e}")
+        return False
+    finally:
+        await page.close()
+
+def get_short_name(full_name, team_name):
+    name = team_name if team_name else full_name.split(' ')[-1]
+    if 'Red Sox' in full_name: name = 'Red Sox'
+    if 'White Sox' in full_name: name = 'White Sox'
+    if 'Blue Jays' in full_name: name = 'Blue Jays'
+    if name == 'Diamondbacks': name = 'Dbacks'
+    for country in ['Dominican Republic', 'United States', 'Puerto Rico', 'Great Britain', 'Chinese Taipei']:
+        if country in full_name: name = country
+    if 'Korea' in full_name or name == 'Korea': name = 'South Korea'
+    return name
+
+def format_odds(price):
+    if price == "TBD": return price
+    return f"+{price}" if price > 0 else str(price)
+
+def get_lineup_hash(players_array):
+    return "-".join([str(p['id']) for p in players_array[:9]])
+
+def get_team_slug(full_name):
+    if full_name == "Athletics": return "athletics"
+    return full_name.lower().replace(".", "").replace(" ", "-")
+
+def parse_futbol_lineup(startXI):
+    pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
+    for player_item in startXI:
+        p = player_item.get('player', {})
+        pos = p.get('pos', 'M')
+        if pos not in pos_dict: pos = 'M' 
+        pos_dict[pos].append(p.get('name', 'Unknown'))
+    return pos_dict
+
+# ==========================================
+# 4. THE COLD START MIGRATION BRIDGE
+# ==========================================
+def fetch_initial_memory():
+    mem = {}
+    if firebase_admin._apps:
+        try:
+            fb_state = db.reference('tweet_log').get()
+            if fb_state and isinstance(fb_state, dict):
+                print("🗄️ Fetched persistent tweet log from Firebase.")
+                return fb_state
+        except Exception as e:
+            print(f"⚠️ Firebase memory fetch failed: {e}")
+            
+    print("🌉 Firebase empty. Bridging gap: Fetching legacy tweet log from GitHub...")
+    gh_url = f"https://raw.githubusercontent.com/dfsstartinglineups/mlbstartingnine/refs/heads/main/data/tweet_log.json?v={time.time()}"
+    try:
+        gh_resp = requests.get(gh_url, headers={'Cache-Control': 'no-cache'}, timeout=10)
+        if gh_resp.status_code == 200:
+            mem = gh_resp.json()
+            print(f"✅ Successfully bridged legacy GitHub log! ({len(mem)} dates found)")
+    except Exception as e:
+        print(f"⚠️ Failed to fetch GitHub bridge: {e}")
+        
+    if mem is None:
+        mem = {}
+    return mem
+
+# ==========================================
+# 5. CORE BOT ENGINE (RUNS EVERY LOOP)
+# ==========================================
+async def run_engines(memory):
+    # ----------------------------------------------------
+    # BROWSER CONNECTION MANAGER
+    # ----------------------------------------------------
+    playwright_manager = await async_playwright().start()
+    browser = None
+
+    async def get_browser():
+        nonlocal browser
+        if browser is None:
+            print("🌐 Opening Cloud Browser connection for this loop...")
+            browserless_url = os.environ.get("BROWSERLESS_URL")
+            if browserless_url:
+                browser = await playwright_manager.chromium.connect_over_cdp(browserless_url)
+            else:
+                browser = await playwright_manager.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--single-process'])
+        return browser
+
+    # ----------------------------------------------------
+
+    today_est = datetime.now(zoneinfo.ZoneInfo("America/New_York"))
+    date_str = today_est.strftime('%Y-%m-%d')
+    game_date_short = f"{today_est.month}/{today_est.day}"
+    yesterday_str = (today_est - timedelta(days=1)).strftime('%Y-%m-%d')
+    tomorrow_str = (today_est + timedelta(days=1)).strftime('%Y-%m-%d')
+
+    current_date = today_est.date()
+    wbc_start, wbc_end = datetime(2026, 3, 4).date(), datetime(2026, 3, 17).date()
+    sport_ids = "1,51" if wbc_start <= current_date <= wbc_end else "1"
+
+    MLB_API_URL = f"https://statsapi.mlb.com/api/v1/schedule?sportId={sport_ids}&date={date_str}&hydrate=probablePitcher,lineups,person"
+    MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
+    NBA_DATA_URL = f"https://nbastartingfive.com/data/{date_str}.json?v={today_est.timestamp()}"
+
+    # 🛡️ Keep 6 days of memory (5 days back, 1 day forward) to prevent timezone ghost tweets
+    dates_to_keep = [(today_est + timedelta(days=d)).strftime('%Y-%m-%d') for d in range(-5, 2)]
+    keys_to_delete = [k for k in memory.keys() if k not in dates_to_keep]
+    for k in keys_to_delete:
+        del memory[k]
+        if firebase_admin._apps:
+            try:
+                db.reference(f'tweet_log/{k}').delete()
+                print(f"🧹 Janitor: Deleted old log '{k}' from Firebase.")
+            except: pass
+
+    if date_str not in memory: memory[date_str] = []
+    log_today = memory[date_str]
+    
+    tweeted_recently = []
+    for date_list in memory.values():
+        tweeted_recently.extend(date_list)
+
+    new_tweets_sent = False
+
+    # ==========================================
+    # NBA ENGINE
+    # ==========================================
+    try: nba_data = requests.get(NBA_DATA_URL).json().get('games', [])
+    except: nba_data = []
+
+    if True: nba_data = []
+
+    ESPN_TO_STD = {"NY": "NYK", "NO": "NOP", "SA": "SAS", "GS": "GSW", "WSH": "WAS", "UTAH": "UTA"}
+    nba_odds_map = {}
+    try:
+        espn_date = date_str.replace('-', '')
+        espn_url = f"https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates={espn_date}"
+        espn_data = requests.get(espn_url).json()
+        for event in espn_data.get('events', []):
+            espn_game_id = str(event.get('id', ''))
+            espn_state = event.get('status', {}).get('type', {}).get('state', 'pre')
+            comp = event['competitions'][0]
+            spread, ou = "TBD", "TBD"
+            if comp.get('odds'):
+                spread = comp['odds'][0].get('details', 'TBD')
+                ou = comp['odds'][0].get('overUnder', 'TBD')
+            for c in comp['competitors']:
+                espn_abbr = c['team']['abbreviation'].upper()
+                std_abbr = ESPN_TO_STD.get(espn_abbr, espn_abbr)
+                nba_odds_map[std_abbr] = {"spread": spread, "ou": ou, "id": espn_game_id, "state": espn_state}
+    except: pass
+
+    NBA_TEAM_NAMES = {
+        "ATL": "Hawks", "BOS": "Celtics", "BKN": "Nets", "CHA": "Hornets", "CHI": "Bulls", "CLE": "Cavaliers", "DAL": "Mavericks", "DEN": "Nuggets",
+        "DET": "Pistons", "GSW": "Warriors", "HOU": "Rockets", "IND": "Pacers", "LAC": "Clippers", "LAL": "Lakers", "MEM": "Grizzlies", "MIA": "Heat",
+        "MIL": "Bucks", "MIN": "Timberwolves", "NOP": "Pelicans", "NYK": "Knicks", "OKC": "Thunder", "ORL": "Magic", "PHI": "76ers", "PHX": "Suns",
+        "POR": "Trail Blazers", "SAC": "Kings", "SAS": "Spurs", "TOR": "Raptors", "UTA": "Jazz", "WAS": "Wizards"
+    }
+   
+    for game in nba_data:
+        if not game.get('teams') or len(game['teams']) < 2: continue
+        away_team, home_team = game['teams'][0], game['teams'][1]
+        matchup = f"{away_team} vs {home_team}"
+        
+        if game.get('date') and game.get('date') != date_str: continue
+        if nba_odds_map.get(away_team, {}).get('state') in ['in', 'post']: continue
+
+        meta = game.get('meta', {})
+        url_game_id = game.get('id') or f"{away_team}-{home_team}-{date_str}"
+        espn_game_id = nba_odds_map.get(away_team, {}).get('id', url_game_id)
+            
+        final_spread, final_ou = "TBD", "TBD"
+        if away_team in nba_odds_map and nba_odds_map[away_team]['spread'] != "TBD":
+            final_spread = nba_odds_map[away_team]['spread']
+            final_ou = nba_odds_map[away_team]['ou']
+        else:
+            local_spread = meta.get('spread', 'TBD')
+            local_ou = meta.get('total', 'TBD')
+            if str(local_spread) not in ["TBD", "nan", "+nan", "None", ""]:
+                final_spread = f"{away_team} {local_spread}" if "-" in str(local_spread) else f"{home_team} -{str(local_spread).replace('+', '')}"
+            if str(local_ou) not in ["TBD", "nan", "+nan", "None", ""]: final_ou = local_ou
+                
+        odds_parts = [final_spread] if final_spread != "TBD" else []
+        if final_ou != "TBD": odds_parts.append(f"O/U {final_ou}")
+        odds_str = f" [{' | '.join(odds_parts)}]" if odds_parts else ""
+
+        for team, data in game.get('rosters', {}).items():
+            team_date_key = f"NBA_{team}_{date_str}"
+            espn_team_key = f"NBA_{team}_{espn_game_id}" 
+            legacy_base_key = f"NBA_{team}"
+            
+            if team_date_key in tweeted_recently or espn_team_key in tweeted_recently or legacy_base_key in log_today:
+                continue
+                
+            players = data.get('players', [])
+            is_official = data.get('is_official') == True or (len(players) >= 5 and all(p.get('verified') == True for p in players))
+            
+            if is_official:
+                opp = matchup.replace(team, '').replace(' vs ', '').strip()
+                team_name, opp_name = NBA_TEAM_NAMES.get(team, team), NBA_TEAM_NAMES.get(opp, opp)
+                team_hash = team_name.replace(" ", "")
+                side = "away" if team == away_team else "home"
+
+                tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\n\n"
+                if odds_str: tweet_text += f"📊 Live Line:{odds_str}\n\n"
+                link_url = f"https://nbastartingfive.com/#game-{url_game_id}"
+                if random.randint(1, 100) <= 100: tweet_text += f"Full matchups, stats, & odds:\n{link_url}\n\n"
+                tweet_text += f"#{team_hash} #{team_hash}Lineup #NBA"
+                
+                bsky_tb = client_utils.TextBuilder()
+                bsky_tb.text(f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\n\n")
+                if odds_str: bsky_tb.text(f"📊 Live Line:{odds_str}\n\n")
+                bsky_tb.text("Full matchups, stats, & odds:\n")
+                bsky_tb.link(link_url, link_url)
+                bsky_tb.text(f"\n\n#{team_hash} #{team_hash}Lineup #NBA")
+
+                if team_date_key in memory.get(date_str, []):
+                    continue
+
+                screenshot_success = False
+                for attempt in range(2):
+                    try:
+                        b = await get_browser()
+                        if await take_nba_screenshot(b, team, side, date_str):
+                            screenshot_success = True
+                            break 
+                        await asyncio.sleep(5)
+                    except: await asyncio.sleep(5)
+                        
+                if not screenshot_success: continue 
+
+                alt_parts = [f"Graphical lineup card for the {team_name} starting 5 against the {opp_name}."]
+                for p in players[:5]: alt_parts.append(f"{p.get('pos', 'Flex')}: {p.get('name', 'Unknown')}.")
+                nba_alt_text = " ".join(alt_parts)[:1000]
+
+                if DRY_RUN:
+                    print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking NBA Tweet for {team_name}:")
+                    upload_success = True 
+                else:
+                    twitter_success = False
+                    bsky_success = False
+                    
+                    for attempt in range(2):
+                        try:
+                            if attempt == 1: await asyncio.sleep(3) 
+                            media = nba_api_v1.media_upload("nba_matchup.png")
+                            nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
+                            nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                            twitter_success = True
+                            break 
+                        except Exception as e: pass
+                            
+                    config = LEAGUE_CONFIG.get("nba")
+                    if config and config.get("bsky_client"):
+                        for attempt in range(2):
+                            try:
+                                if attempt == 1: await asyncio.sleep(3)
+                                with open("nba_matchup.jpg", "rb") as f:
+                                    img_data = f.read()
+                                config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=nba_alt_text)
+                                bsky_success = True
+                                break 
+                            except Exception as e: pass
+
+                    upload_success = twitter_success or bsky_success
+
+                if os.path.exists("nba_matchup.png"): os.remove("nba_matchup.png")
+                if os.path.exists("nba_matchup.jpg"): os.remove("nba_matchup.jpg")
+                
+                if upload_success:
+                    log_today.append(team_date_key)
+                    tweeted_recently.append(team_date_key)
+                    memory[date_str] = log_today
+                    new_tweets_sent = True
+                    if firebase_admin._apps:
+                        db.reference('tweet_log').update({date_str: log_today})
+                    
+                gc.collect()
+                try: ctypes.CDLL('libc.so.6').malloc_trim(0)
+                except Exception: pass
+
+    # ==========================================
+    # MLB ENGINE
+    # ==========================================
+    # ==========================================
+    # DAILY MLB WEATHER REPORT (Fires after 10 AM EST)
+    # ==========================================
+    weather_key = f"WEATHER_REPORT_{date_str}"
+    
+    if weather_key not in memory.get(date_str, []) and today_est.hour >= 10:
+        weather_success = False
+        for attempt in range(2):
+            try:
+                b = await get_browser()
+                if await take_weather_screenshot(b):
+                    weather_success = True
+                    break
+                await asyncio.sleep(5)
+            except Exception as e:
+                print(f"⚠️ Weather screenshot attempt {attempt+1} failed: {e}")
+                await asyncio.sleep(5)
+            
+        if weather_success:
+            weather_text = f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nFull interactive radar & hourly forecasts:\nhttps://weathermlb.com\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather"
+            
+            if DRY_RUN:
+                print(f"\n[SHADOW] 🛑 Mocking Weather Tweet for {date_str}:\n{weather_text}")
+                upload_success = True
+            else:
+                twitter_success = False
+                bsky_success = False
+                
+                # --- X (Twitter) Upload -> @DailyMLBLineups ---
+                try:
+                    media = mlb_api_v1.media_upload("mlb_weather.png")
+                    mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
+                    mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
+                    twitter_success = True
+                    print("✅ Successfully tweeted MLB Weather Report to X!")
+                except Exception as e:
+                    print(f"⚠️ Failed to tweet weather on X: {e}")
+                    
+                # --- Bluesky Upload ---
+                config = LEAGUE_CONFIG.get("mlb")
+                if config and config.get("bsky_client"):
+                    try:
+                        with open("mlb_weather.jpg", "rb") as f:
+                            img_data = f.read()
+                        bsky_tb = client_utils.TextBuilder()
+                        bsky_tb.text(f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\nFull interactive radar & hourly forecasts:\n")
+                        bsky_tb.link("https://weathermlb.com", "https://weathermlb.com")
+                        bsky_tb.text("\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather")
+                        
+                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt="MLB Daily Weather Report & Stadium Wind Speeds")
+                        bsky_success = True
+                        print("✅ Successfully posted MLB Weather Report to Bluesky!")
+                    except Exception as e:
+                        print(f"⚠️ Failed to post weather on Bluesky: {e}")
+
+                upload_success = twitter_success or bsky_success
+
+            # Clean up images & log to persistent memory
+            if os.path.exists("mlb_weather.png"): os.remove("mlb_weather.png")
+            if os.path.exists("mlb_weather.jpg"): os.remove("mlb_weather.jpg")
+            
+            if upload_success:
+                log_today.append(weather_key)
+                tweeted_recently.append(weather_key)
+                new_tweets_sent = True
+                if firebase_admin._apps:
+                    try: db.reference('tweet_log').update({date_str: log_today})
+                    except: pass
+    try:
+        schedule_data = requests.get(MLB_API_URL).json()
+        games = schedule_data['dates'][0]['games'] if schedule_data.get('dates') else []
+    except:
+        games = []
+
+    try: odds_data = requests.get(MLB_ODDS_URL).json().get('odds', [])
+    except: odds_data = []
+
+    async def send_mlb_tweet(game_pk, team_short, full_team_name, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
+        if memory_key in memory.get(date_str, []): return False
+        
+        # 1. GENERATE THE NEW PROGRAMMATIC SEO URL
+        team_slug = get_team_slug(full_team_name)
+        team_url = f"https://mlbstartingnine.com/lineups/{team_slug}/"
+        reply_text = f"View the {full_team_name} daily starting lineups at our new team lineup page:\n{team_url}"
+
+        # 2. BUILD THE MAIN TWEET (Removed the link from the main text!)
+        tweet_text = f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n"
+        if team_odds != "TBD": tweet_text += f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
+        tweet_text += f"#{team_hash} #{team_hash}Lineup #MLB"
+        
+        bsky_tb = client_utils.TextBuilder()
+        bsky_tb.text(f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n")
+        if team_odds != "TBD": bsky_tb.text(f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n")
+        bsky_tb.text(f"#{team_hash} #{team_hash}Lineup #MLB")
+
+        # 3. GENERATE SCREENSHOT
+        screenshot_success = False
+        for attempt in range(2):
+            try:
+                b = await get_browser()
+                if await take_mlb_screenshot(b, game_pk, side, date_string):
+                    screenshot_success = True
+                    break 
+                await asyncio.sleep(5)
+            except: await asyncio.sleep(5)
+                
+        if not screenshot_success: return False
+
+        if DRY_RUN:
+            print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking MLB Tweet for {team_short}:")
+            if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
+            return True
+        else:
+            twitter_success = False
+            bsky_success = False
+            
+            # --- X (TWITTER) UPLOAD & THREADED REPLY ---
+            for attempt in range(2):
+                try:
+                    if attempt == 1: await asyncio.sleep(3) 
+                    media = mlb_api_v1.media_upload("mlb_matchup.png")
+                    mlb_api_v1.create_media_metadata(media.media_id, alt_text)
+                    
+                    # Send Main Tweet & Capture Response
+                    response = mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    
+                    # Fire Threaded Reply Using Tweet ID
+                    tweet_id = response.data['id']
+                    mlb_client.create_tweet(text=reply_text, in_reply_to_tweet_id=tweet_id)
+                    
+                    twitter_success = True
+                    break 
+                except Exception as e: pass
+                
+            # --- BLUESKY UPLOAD & THREADED REPLY ---
+            config = LEAGUE_CONFIG.get("mlb")
+            if config and config.get("bsky_client"):
+                for attempt in range(2):
+                    try:
+                        if attempt == 1: await asyncio.sleep(3) 
+                        with open("mlb_matchup.jpg", "rb") as f:
+                            img_data = f.read()
+                        
+                        # Send Main Post & Capture Response
+                        post_response = config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
+                        
+                        # Build and Fire Threaded Reply
+                        reply_tb = client_utils.TextBuilder()
+                        reply_tb.text(f"View the {full_team_name} daily starting lineups at our new team lineup page:\n")
+                        reply_tb.link(team_url, team_url)
+                        
+                        parent_ref = models.create_strong_ref(post_response)
+                        reply_ref = models.AppBskyFeedPost.ReplyRef(parent=parent_ref, root=parent_ref)
+                        config["bsky_client"].send_post(reply_tb, reply_to=reply_ref)
+                        
+                        bsky_success = True
+                        break 
+                    except Exception as e: pass
+
+            upload_success = twitter_success or bsky_success
+            
+            if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
+            if os.path.exists("mlb_matchup.jpg"): os.remove("mlb_matchup.jpg")
+            
+            gc.collect()
+            try: ctypes.CDLL('libc.so.6').malloc_trim(0)
+            except Exception: pass
+                
+            return upload_success
+
+    for game in games:
+        game_pk = str(game['gamePk'])
+        status = game.get('status', {})
+        if status.get('detailedState') == 'Postponed':
+            postponed_key = f"MLB_POSTPONED_{game_pk}"
+            if postponed_key not in tweeted_recently:
+                away_full, home_full = game['teams']['away']['team']['name'], game['teams']['home']['team']['name']
+                away_short = get_short_name(away_full, game['teams']['away']['team'].get('teamName'))
+                home_short = get_short_name(home_full, game['teams']['home']['team'].get('teamName'))
+                reason = status.get('reason', 'unspecified reasons')
+                alert_text = f"🚨 POSTPONED: The game between the {away_short} and {home_short} has been postponed due to {reason}.\n\n#{away_short.replace(' ', '')} #{home_short.replace(' ', '')} #MLB"
+                
+                if DRY_RUN:
+                    upload_success = True 
+                else:
+                    twitter_success = False
+                    bsky_success = False
+                    
+                    for attempt in range(2):
+                        try:
+                            if attempt == 1: await asyncio.sleep(3)
+                            mlb_client.create_tweet(text=alert_text)
+                            twitter_success = True
+                            break
+                        except Exception as e: pass
+
+                    config = LEAGUE_CONFIG.get("mlb")
+                    if config and config.get("bsky_client"):
+                        for attempt in range(2):
+                            try:
+                                if attempt == 1: await asyncio.sleep(3)
+                                bsky_tb = client_utils.TextBuilder()
+                                bsky_tb.text(alert_text)
+                                config["bsky_client"].send_post(bsky_tb)
+                                bsky_success = True
+                                break
+                            except Exception as e: pass
+                                
+                    upload_success = twitter_success or bsky_success
+                    
+                if upload_success:
+                    log_today.append(postponed_key)
+                    tweeted_recently.append(postponed_key)
+                    memory[date_str] = log_today
+                    new_tweets_sent = True
+                    if firebase_admin._apps:
+                        db.reference('tweet_log').update({date_str: log_today})
+            continue
+        
+        positions = {}
+        player_names_map = {} 
+        try:
+            box_teams = requests.get(f"https://statsapi.mlb.com/api/v1.1/game/{game_pk}/feed/live").json().get('liveData', {}).get('boxscore', {}).get('teams', {})
+            for pid, p_data in {**box_teams.get('away', {}).get('players', {}), **box_teams.get('home', {}).get('players', {})}.items():
+                person_id = str(p_data['person']['id'])
+                player_names_map[person_id] = p_data['person']['fullName'] 
+                if p_data.get('position', {}).get('abbreviation'): positions[p_data['person']['id']] = p_data['position']['abbreviation']
+                elif p_data.get('allPositions'): positions[p_data['person']['id']] = p_data['allPositions'][0]['abbreviation']
+        except: pass
+
+        away_full, home_full = game['teams']['away']['team']['name'], game['teams']['home']['team']['name']
+        away_short = get_short_name(away_full, game['teams']['away']['team'].get('teamName'))
+        home_short = get_short_name(home_full, game['teams']['home']['team'].get('teamName'))
+        away_p_name = game['teams']['away'].get('probablePitcher', {}).get('fullName', 'TBD')
+        home_p_name = game['teams']['home'].get('probablePitcher', {}).get('fullName', 'TBD')
+
+        raw_away_odds, raw_home_odds, raw_total = "TBD", "TBD", "TBD"
+        try: game_time_ms = datetime.strptime(game['gameDate'], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp() * 1000
+        except: game_time_ms = 0
+
+        def parse_odds_time(date_str):
+            if date_str.endswith('Z'): date_str = date_str[:-1]
+            if len(date_str.split(':')) == 2: date_str += ":00"
+            try: return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S").replace(tzinfo=timezone.utc).timestamp() * 1000
+            except: return 0
+
+        potential_odds = [o for o in odds_data if o['home_team'] == home_full and o['away_team'] == away_full]
+        if potential_odds and game_time_ms > 0:
+            closest_odds = sorted(potential_odds, key=lambda o: abs(parse_odds_time(o['commence_time']) - game_time_ms))[0]
+            for bookie in closest_odds.get('bookmakers', []):
+                h2h = next((m for m in bookie['markets'] if m['key'] == 'h2h'), None)
+                totals = next((m for m in bookie['markets'] if m['key'] == 'totals'), None)
+                if h2h:
+                    for outcome in h2h['outcomes']:
+                        if outcome['name'] == away_full: raw_away_odds = outcome['price']
+                        if outcome['name'] == home_full: raw_home_odds = outcome['price']
+                if totals and totals['outcomes']: raw_total = totals['outcomes'][0]['point']
+                if raw_away_odds != "TBD": break
+
+        total_string = f" • O/U {raw_total}" if raw_total != "TBD" else ""
+        away_odds_str, home_odds_str = format_odds(raw_away_odds), format_odds(raw_home_odds)
+
+        for side in ['away', 'home']:
+            players_array = game.get('lineups', {}).get(f'{side}Players', [])
+            if not players_array or len(players_array) < 9: continue
+
+            current_hash = get_lineup_hash(players_array)
+            base_key = f"{game_pk}_{side}"
+            full_key = f"{base_key}_{current_hash}"
+
+            team_short_ref = away_short if side == 'away' else home_short
+            team_full_ref = away_full if side == 'away' else home_full
+            team_p_ref = f"{away_p_name}" if side == 'away' else f"{home_p_name}"
+            team_o_ref = away_odds_str if side == 'away' else home_odds_str
+            opp_short_ref = home_short if side == 'away' else away_short
+
+            mlb_alt_parts = [f"Graphical lineup card for the {team_short_ref} against the {opp_short_ref}.", "Batting Order:"]
+            for i in range(9): mlb_alt_parts.append(f"{i+1}. {players_array[i].get('fullName', 'Unknown')} ({positions.get(players_array[i].get('id'), '-')}).")
+            mlb_alt_parts.append(f"Starting Pitcher: {team_p_ref}.")
+            mlb_alt_text = " ".join(mlb_alt_parts)[:1000]
+
+            previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
+
+            if not previously_tweeted_keys:
+                if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
+                    log_today.append(full_key)
+                    tweeted_recently.append(full_key)
+                    new_tweets_sent = True
+                    if firebase_admin._apps:
+                        db.reference('tweet_log').update({date_str: log_today})
+            elif full_key not in previously_tweeted_keys:
+                old_ids = previously_tweeted_keys[0].replace(f"{base_key}_", "").split('-')
+                new_ids = current_hash.split('-')
+                out_ids = [pid for pid in old_ids if pid not in new_ids]
+                in_ids = [pid for pid in new_ids if pid not in old_ids]
+
+                if len(out_ids) == 0 and len(in_ids) == 0: alert_header = f"⚠️ {team_short_ref} LINEUP SHUFFLE: The batting order has changed."
+                else:
+                    out_names = [player_names_map.get(str(pid), 'Unknown') for pid in out_ids]
+                    in_names = [next((p.get('fullName', 'Unknown Player') for p in players_array if str(p['id']) == pid), 'Unknown') for pid in in_ids]
+                    alert_header = f"🚨 {team_short_ref} LATE SCRATCH\nOUT: {', '.join(out_names) if out_names else 'None'}\nIN: {', '.join(in_names) if in_names else 'None'}"
+
+                if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key, alert_header=alert_header):
+                    for k in previously_tweeted_keys:
+                        if k in log_today: log_today.remove(k)
+                        if k in tweeted_recently: tweeted_recently.remove(k)
+                    log_today.append(full_key)
+                    tweeted_recently.append(full_key)
+                    new_tweets_sent = True
+
+    # ==========================================
+    # FUTBOL ENGINE (Lineups & Live Alerts)
+    # ==========================================
+    FUTBOL_LEAGUES = {
+    143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey", "x_client": seriea_client, "v1_client": seriea_api_v1},
+    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},    
+    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/ligue1.html"},     
+    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},    
+    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+    13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+    71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+    128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations", "x_client": mls_client, "v1_client": mls_api_v1},    
+    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},    
+    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf", "x_client": mls_client, "v1_client": mls_api_v1},    
+    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
+    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},    
+    179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scotland", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+    45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},    
+    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
+    10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
+    1:  {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "worldcup"},
+    2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
+    3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
+    188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "australia"},
+    5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
+    848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },    
+    307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"}
+}
+
+    INTL_FLAGS = {
+        "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
+        "Northern Ireland": "🇬🇧", "Argentina": "🇦🇷", "Brazil": "🇧🇷", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹", "Mexico": "🇲🇽", "Netherlands": "🇳🇱", "Portugal": "🇵🇹", "Spain": "🇪🇸", "USA": "🇺🇸"
+    }
+
+    futbol_dates_to_check = [date_str]
+    if today_est.hour >= 20: futbol_dates_to_check.append(tomorrow_str)
+    if today_est.hour <= 2: futbol_dates_to_check.append(yesterday_str)   
+
+    for target_date_str in futbol_dates_to_check:
+        if target_date_str not in memory: memory[target_date_str] = []
+        log_target_date = memory[target_date_str]
+
+        try: futbol_data = requests.get(f"https://futbolstartingeleven.com/data/games_{target_date_str}.json?v={today_est.timestamp()}").json()
+        except: futbol_data = []
+
+        # --- A. FUTBOL LINEUPS ---
+        for match in futbol_data:
+            league_id = match.get('league', {}).get('id')
+            if league_id not in FUTBOL_LEAGUES: continue
+
+            # 🛡️ COPYRIGHT SAFETY SHIELD: Skip lineup card generation for high-risk AI copyright leagues
+            if league_id in [140, 143, 61, 135]: 
+                continue
+            league_info = FUTBOL_LEAGUES[league_id]
+            fixture_id = match.get('fixture', {}).get('id')
+            team_key = f"FUTBOL_{fixture_id}"
+            
+            if team_key in tweeted_recently: continue
+                
+            home_lineup = match.get('homeLineup')
+            away_lineup = match.get('awayLineup')
+            if not home_lineup or not away_lineup: continue
+                
+            home_startXI = home_lineup.get('startXI', [])
+            away_startXI = away_lineup.get('startXI', [])
+            if not home_startXI or not away_startXI: continue
+
+            raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
+            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
+            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
+
+            h_pos, a_pos = parse_futbol_lineup(home_startXI), parse_futbol_lineup(away_startXI)
+            h_form = home_lineup.get('formation', 'TBD')
+            a_form = away_lineup.get('formation', 'TBD')
+            odds = match.get('odds', {})
+            odds_str = f"📊 Live Match Odds\n{h_name}: {odds.get('home', 'TBD')} | Draw: {odds.get('draw', 'TBD')} | {a_name}: {odds.get('away', 'TBD')}\nOver {odds.get('total', '2.5')}: {odds.get('over', 'TBD')} | Under {odds.get('total', '2.5')}: {odds.get('under', 'TBD')}"
+            
+            h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
+            
+            if "base_url" in league_info:
+                full_link = f"{league_info['base_url']}?date={target_date_str}#lineup-{fixture_id}"
+            else:
+                slug = league_info.get("url_slug", "top")
+                full_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#lineup-{fixture_id}"
+            
+            EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
+            e = random.choice(EMOJIS)
+            
+            TITLES = [
+                f"{e} OFFICIAL STARTING XI: {league_info['name']}",
+                f"{e} {h_name} vs {a_name} starting lineups are out!",
+                f"{e} {h_name} and {a_name} have released their starting XI!",
+                f"{e} Lineups confirmed! {h_name} takes on {a_name} in {league_info['name']}.",
+                f"{e} The starting XI for {h_name} vs {a_name} is locked in.",
+                f"{e} {league_info['name']} action incoming! Here are the lineups for {h_name} vs {a_name}.",
+                f"{e} Team news is in for {h_name} vs {a_name}!",
+                f"{e} Managers have named their starting XI for {h_name} vs {a_name}.",
+                f"{e} Official lineups for today's {league_info['name']} clash between {h_name} and {a_name}.",
+                f"{e} {h_name} vs {a_name} lineups are confirmed. {league_info['name']}"
+            ]
+            chosen_title = random.choice(TITLES)
+            
+            h_rank = f"[{match['teams']['home']['rank']}] " if match['teams']['home'].get('rank') else ""
+            h_rec = f"({match['teams']['home']['record']})" if match['teams']['home'].get('record') else ""
+            a_rank = f"[{match['teams']['away']['rank']}] " if match['teams']['away'].get('rank') else ""
+            a_rec = f"({match['teams']['away']['record']})" if match['teams']['away'].get('record') else ""
+            
+            header = f"{chosen_title}\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
+            link_text = f"📱 Live stats & scores: {full_link}"
+            tags_text = f"{league_info['tag']} #{h_hash} #{a_hash}"
+            tweet_text = "\n\n".join([header, link_text, odds_str, tags_text])
+
+            bsky_tb = client_utils.TextBuilder()
+            bsky_tb.text(header + "\n\n")
+            bsky_tb.link(link_text, full_link)
+            bsky_tb.text("\n\n" + odds_str + "\n\n" + tags_text)
+
+            futbol_alt_text = f"Graphical tactical lineup card for {h_name} vs {a_name}."
+
+            if team_key in memory.get(date_str, []): continue
+
+            screenshot_success = False
+            for attempt in range(2):
+                try:
+                    b = await get_browser()
+                    if await take_screenshot(b, fixture_id, target_date_str):
+                        screenshot_success = True
+                        break 
+                    await asyncio.sleep(5)
+                except: await asyncio.sleep(5)
+                
+            if not screenshot_success: continue
+
+            target_client, target_v1_client = league_info.get("x_client") or futbol_client, league_info.get("v1_client") or futbol_api_v1
+
+            if DRY_RUN:
+                upload_success = True 
+            else:
+                upload_success = False
+                try:
+                    media = target_v1_client.media_upload("temp_matchup.png")
+                    target_v1_client.create_media_metadata(media.media_id, futbol_alt_text)
+                    if target_client: target_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    
+                    target_bsky_client = league_info.get("bsky_client")
+                    if target_bsky_client:
+                        with open("temp_matchup.jpg", "rb") as f:
+                            img_data = f.read()
+                        target_bsky_client.send_image(text=bsky_tb, image=img_data, image_alt=futbol_alt_text)
+                    
+                    upload_success = True
+                except Exception as e: pass
+
+            if os.path.exists("temp_matchup.png"): os.remove("temp_matchup.png")
+            if os.path.exists("temp_matchup.jpg"): os.remove("temp_matchup.jpg")
+            
+            if upload_success:
+                log_target_date.append(team_key)
+                tweeted_recently.append(team_key)
+                new_tweets_sent = True
+                
+                if firebase_admin._apps:
+                    db.reference('tweet_log').update({target_date_str: log_target_date})
+                
+            gc.collect()
+            try: ctypes.CDLL('libc.so.6').malloc_trim(0)
+            except Exception: pass            
+
+        # --- B. FUTBOL LIVE ALERTS ---
+        live_futbol_data = {}
+        if target_date_str == date_str:
+            try:
+                live_snapshot = db.reference('futbol_live_games').get()
+                if live_snapshot: live_futbol_data = list(live_snapshot.values())
+            except: pass
+
+        alerts_source = live_futbol_data if live_futbol_data else futbol_data
+
+        for match in alerts_source:
+            league_id = match.get('league', {}).get('id')
+            if league_id not in FUTBOL_LEAGUES: continue
+            league_info = FUTBOL_LEAGUES[league_id]
+            fixture_id = match.get('fixture', {}).get('id')
+            fixture_status = match.get('fixture', {}).get('status', {}).get('short', '')
+            events = match.get('events', [])
+            if not events: continue
+
+            h_id, a_id = match['teams']['home']['id'], match['teams']['away']['id']
+            raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
+            h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
+            a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
+            # Define team hashtags early so the FT recap can use them!
+            h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
+            a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
+
+            def get_actual_minute(e):
+                t_str = str(e.get('time', '0')).replace("'", "").strip()
+                if '+' in t_str:
+                    parts = t_str.split('+')
+                    try: return int(parts[0]) + int(parts[1])
+                    except: return int(parts[0]) if parts[0].isdigit() else 90
+                return int(t_str) if t_str.isdigit() else 0
+
+            is_shootout = fixture_status in ['P', 'PEN'] or sum(1 for e in events if e.get('type') == 'Goal' and e.get('detail') == 'Penalty' and get_actual_minute(e) >= 90) > 1
+            valid_goal_events = [e for e in events if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty', 'Own Goal'] and not (e.get('detail') == 'Penalty' and get_actual_minute(e) >= 90 and is_shootout)]
+            valid_goal_events.sort(key=get_actual_minute)
+
+            current_home_score, current_away_score = 0, 0
+            try: home_odds = float(match.get('odds', {}).get('home') or 0.0)
+            except: home_odds = 0.0
+            
+            try: away_odds = float(match.get('odds', {}).get('away') or 0.0)
+            except: away_odds = 0.0
+
+            # --- C. FULL TIME RECAP ALERTS ---
+            ft_key = f"FUTBOL_FT_{fixture_id}"
+            
+            if fixture_status in ['FT', 'AET', 'PEN']:
+                # 1. Check if the game is "stale" (ended more than 25 mins ago)
+                match_ended_str = match.get("match_ended_at")
+                is_stale = True
+                if match_ended_str:
+                    try:
+                        if (datetime.now(timezone.utc) - datetime.fromisoformat(match_ended_str)).total_seconds() / 60 < 25: 
+                            is_stale = False
+                    except: pass
+                
+                # 2. If it's stale, mark it in memory so it doesn't tweet, and skip
+                if ft_key not in tweeted_recently:
+                    if is_stale:
+                        log_target_date.append(ft_key)
+                        tweeted_recently.append(ft_key)
+                        memory[target_date_str] = log_target_date
+                    else:
+                        # 3. IT'S A FRESH FULL TIME FINISH! BUILD THE TWEET!
+                        h_score = match.get('goals', {}).get('home', current_home_score)
+                        a_score = match.get('goals', {}).get('away', current_away_score)
+
+                        # --- NEW UNIVERSAL RESULT PHRASING ---
+                        if h_score > a_score:
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{h_name} secures the victory!"
+                        elif a_score > h_score:
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{a_name} claims the win on the road!"
+                        else:
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\nThe match ends in a draw."
+
+                        # --- NEW SPLIT TEAM GOAL LOGS ---
+                        home_goals = []
+                        away_goals = []
+                        
+                        for e in valid_goal_events:
+                            time_m = get_actual_minute(e)
+                            scorer = e.get('player', 'Unknown')
+                            assist = e.get('assist')
+                            team_id = e.get('team_id')
+                            
+                            if e.get('detail') == 'Own Goal':
+                                goal_str = f"• {scorer} (OG) {time_m}'"
+                            elif assist and str(assist).lower() != "null":
+                                goal_str = f"• {scorer} {time_m}' (A: {assist})"
+                            else:
+                                goal_str = f"• {scorer} {time_m}'"
+                                
+                            # Sort the goal under the correct team
+                            if team_id == h_id:
+                                home_goals.append(goal_str)
+                            else:
+                                away_goals.append(goal_str)
+
+                        # Combine them into a clean, readable layout
+                        goal_text_lines = []
+                        if home_goals:
+                            goal_text_lines.append(f"⚽ {h_name}:")
+                            goal_text_lines.extend(home_goals)
+                        if away_goals:
+                            if home_goals: goal_text_lines.append("") # Blank line to separate teams
+                            goal_text_lines.append(f"⚽ {a_name}:")
+                            goal_text_lines.extend(away_goals)
+                            
+                        if not goal_text_lines:
+                            goal_text = "🚫 No goals scored."
+                        else:
+                            # Cap at 12 lines so blowouts don't break Twitter's character limit
+                            if len(goal_text_lines) > 12:
+                                goal_text = "\n".join(goal_text_lines[:11]) + "\n...and more!"
+                            else:
+                                goal_text = "\n".join(goal_text_lines)
+
+                        # Build the URL
+                        if "base_url" in league_info:
+                            ft_link = f"{league_info['base_url']}?date={target_date_str}#match-{fixture_id}"
+                        else:
+                            slug = league_info.get("url_slug", "top")
+                            ft_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#match-{fixture_id}"
+
+                        ft_tweet_text = f"{result_text}\n\n{goal_text}\n\n📊 Full match stats & player ratings:\n{ft_link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+                        
+                        bsky_ft = client_utils.TextBuilder()
+                        bsky_ft.text(f"{result_text}\n\n{goal_text}\n\n📊 Full match stats & player ratings:\n")
+                        bsky_ft.link(ft_link, ft_link)
+                        bsky_ft.text(f"\n\n{league_info['tag']} #{h_hash} #{a_hash}")
+
+                       
+
+                        if DRY_RUN:
+                            upload_success = True
+                            print(f"\n[SHADOW] 🛑 Mocking FT Tweet:\n{ft_tweet_text}")
+                        else:
+                            upload_success = False
+                            try:
+                                target_client = league_info.get("x_client") or futbol_client
+                                if target_client: target_client.create_tweet(text=ft_tweet_text)
+                                
+                                target_bsky_client = league_info.get("bsky_client")
+                                if target_bsky_client: target_bsky_client.send_post(bsky_ft)
+                                
+                                upload_success = True
+                            except Exception as e:
+                                print(f"⚠️ Failed to post FT alert: {e}")
+
+                        if upload_success:
+                            log_target_date.append(ft_key)
+                            tweeted_recently.append(ft_key)
+                            new_tweets_sent = True
+                            memory[target_date_str] = log_target_date
+
+            # --- PRE-LOOP TRACKERS ---
+            player_goal_counts = {}
+
+            for event in valid_goal_events: 
+                team_id = event.get('team_id')
+                if team_id == h_id: current_home_score += 1
+                else: current_away_score += 1
+                
+                event_time = get_actual_minute(event)
+                event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{current_home_score if team_id == h_id else current_away_score}"
+                
+                p_id = str(event.get('player_id', event.get('player', 'UNK')))
+                player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
+                p_goals = player_goal_counts[p_id]
+                
+                if event_key in tweeted_recently: continue
+
+                is_late = 75 <= event_time < 90
+                is_stoppage = event_time >= 90
+                scorer_odds = home_odds if team_id == h_id else away_odds
+                
+                # --- AGGREGATE ROUTER (Pipeline B) ---
+                first_leg = match.get("first_leg_goals")
+                if first_leg:
+                    pass
+                    
+                # --- UPGRADED STANDARD ROUTER (Pipeline A) ---
+                else:
+                    is_equalizer = current_home_score == current_away_score
+                    is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
+                    # 🛡️ ADD THESE TWO LINES:
+                    is_two_goal_lead = abs(current_home_score - current_away_score) == 2
+                    is_blowout = abs(current_home_score - current_away_score) >= 3
+                    is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
+                    is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
+                    
+                    is_tight_clash = abs(current_home_score - current_away_score) <= 1
+                    
+                    scenario_key = None
+                    
+                    # 1. TIER 1: PLAYER MILESTONES
+                    if p_goals == 3: scenario_key = "hat_trick"
+                    elif p_goals == 2: scenario_key = "brace"
+                    
+                    # 2. TIER 2: LATE DRAMA & STOPPAGE TIME (75'+)
+                    elif is_stoppage and (is_standard_upset or is_massive_upset): scenario_key = "stoppage_upset"
+                    elif is_late and (is_standard_upset or is_massive_upset): scenario_key = "late_upset"
+                    elif is_stoppage and is_go_ahead: scenario_key = "stoppage_go_ahead"
+                    elif is_stoppage and is_equalizer: scenario_key = "stoppage_equalizer"
+                    elif is_late and is_go_ahead: scenario_key = "late_go_ahead"
+                    elif is_late and is_equalizer: scenario_key = "late_equalizer"
+                    
+                    # 3. TIER 3: LIGHTNING STARTS (0' to 10')
+                    elif event_time <= 10: scenario_key = "lightning_start"
+                    
+                    # 4. TIER 4: MID-GAME UPSETS & MOMENTUM SHIFTS
+                    elif is_massive_upset: scenario_key = "massive_upset"
+                    elif is_standard_upset: scenario_key = "standard_upset"
+                    elif is_blowout: scenario_key = "blowout"
+                    elif is_two_goal_lead: scenario_key = "takes_control"
+                    
+                    # 5. TIER 5: COMPETITIVE CLASHES (11' to 90'+ Option B Filter)
+                    elif event_time > 10 and is_tight_clash: scenario_key = "tight_clash_goal"
+                
+                if not scenario_key: continue
+
+                
+
+                scoring_team_name = h_name if team_id == h_id else a_name
+                conceding_team_name = a_name if team_id == h_id else h_name
+                scorer = event.get('player')
+                
+                if not scorer or str(scorer).lower() == "null":
+                    continue
+                
+                if event.get('detail') == 'Own Goal':
+                    scorer_str = f"{scorer} (Own Goal)"
+                else:
+                    scorer_str = f"{scorer} ({scoring_team_name})"
+
+                american_odds = f"+{int((scorer_odds - 1) * 100)}"
+                h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
+                
+                if "base_url" in league_info:
+                    link = f"{league_info['base_url']}?date={target_date_str}#goal-{fixture_id}"
+                else:
+                    slug = league_info.get("url_slug", "top")
+                    link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#goal-{fixture_id}"
+
+                PHRASES = {
+                    "hat_trick": {
+                        "titles": ["🚨🔥 HAT-TRICK ALERT!", "🚨🔥 UNSTOPPABLE!", "🚨🔥 THREE OF THE BEST!", "🚨🔥 MATCH BALL SECURED!", "🚨🔥 HAT-TRICK HERO!"],
+                        "blurbs": [
+                            "Absolute brilliance! {player_name} bags a sensational hat-trick for {scoring_team_name} to tear {conceding_team_name} apart!",
+                            "Take a bow, {player_name}! That is three goals on the day for the {scoring_team_name} superstar against {conceding_team_name}.",
+                            "Unplayable! {player_name} secures a magnificent hat-trick, putting {scoring_team_name} firmly in the driver's seat over {conceding_team_name}.",
+                            "{conceding_team_name} simply has no answers! {player_name} completes a stunning hat-trick for {scoring_team_name}."
+                        ],
+                        "ctas": ["Track the live match stats and pitch data here:", "Can they add a fourth? Follow the live action:", "See the full match center and player ratings here:"]
+                    },
+                    "brace": {
+                        "titles": ["🚨⚽ BRACE ALERT!", "🚨⚽ ON A HAT-TRICK!", "🚨⚽ TWO FOR {player_name}!", "🚨⚽ DOUBLE TROUBLE!", "🚨⚽ SEEING DOUBLE!"],
+                        "blurbs": [
+                            "{player_name} is putting on a masterclass! That is goal number two on the day for {scoring_team_name} against {conceding_team_name}.",
+                            "He is on a hat-trick! {player_name} bags his second goal of the match to power {scoring_team_name} ahead of {conceding_team_name}.",
+                            "Trouble for {conceding_team_name}! {player_name} finds the back of the net again for his second goal of the contest.",
+                            "{scoring_team_name}'s star man is locked in! A brilliant brace for {player_name} puts {conceding_team_name} on the ropes."
+                        ],
+                        "ctas": ["Will we see a hat-trick? Follow live:", "Track the live match center and stats here:", "See the live pitch data and scores here:"]
+                    },
+                    "lightning_start": {
+                        "titles": ["⚡🚨 LIGHTNING START!", "⚡🚨 FLASH GOAL!", "⚡🚨 EXPLOSIVE OPENING!", "⚡🚨 WHAT A START!", "⚡🚨 FAST OUT OF THE GATES!"],
+                        "blurbs": [
+                            "Barely any time on the clock and {scoring_team_name} is already on the board! A dream start against {conceding_team_name}.",
+                            "No time wasted! {scoring_team_name} comes flying out of the gates to catch {conceding_team_name} sleeping early!",
+                            "What an opening! {scoring_team_name} lands a massive early punch against {conceding_team_name} in the opening minutes.",
+                            "The fans have barely taken their seats and {scoring_team_name} has already broken the deadlock against {conceding_team_name}!"
+                        ],
+                        "ctas": ["Follow this fast-paced clash live here:", "Track the live match center and pitch data:", "Don't miss a minute. See live scores and odds here:"]
+                    },
+                    "tight_clash_goal": {
+                        "titles": ["⚽🔥 MATCH GOAL!", "⚽🔥 THE TIE TIGHTENS!", "⚽🔥 GAME ON!", "⚽🔥 BACK AND FORTH WE GO!", "⚽🔥 CRUCIAL STRIKE!"],
+                        "blurbs": [
+                            "A vital goal from {scoring_team_name}! This clash with {conceding_team_name} is turning into an absolute thriller.",
+                            "{scoring_team_name} strikes to keep the pressure on {conceding_team_name}! Nothing separating these sides as the battle continues.",
+                            "We have a massive fight on our hands! {scoring_team_name} finds the back of the net in a tightly contested clash with {conceding_team_name}.",
+                            "Momentum swing! {scoring_team_name} delivers a crucial blow against {conceding_team_name} as the game remains wide open."
+                        ],
+                        "ctas": ["Track the live scores and match momentum here:", "Follow the tactical battle and live pitch data:", "See live stats, lineups, and odds here:"]
+                    },
+                    "red_card": {
+                        "titles": ["🚨🟥 RED CARD ALERT!", "🚨🟥 SENT OFF!", "🚨🟥 DRAMA! DOWN TO 10 MEN!", "🚨🟥 MAJOR DISCIPLINE ALERT!", "🚨🟥 GAME CHANGING RED CARD!"],
+                        "blurbs": [
+                            "Massive momentum shift! {player_name} ({scoring_team_name}) is shown a red card! They will have to play the rest of this match against {conceding_team_name} with 10 men.",
+                            "Disaster for {scoring_team_name}! {player_name} is sent off by the referee. How will {conceding_team_name} exploit the man advantage?!",
+                            "The referee pulls out the red card! {player_name} is given his marching orders, leaving {scoring_team_name} short-handed against {conceding_team_name}.",
+                            "We have major discipline drama! A red card for {player_name} forces {scoring_team_name} into a desperate defensive reshuffle against {conceding_team_name}."
+                        ],
+                        "ctas": ["How will the tactics change? Track live here:", "See the live match center and updated odds:", "Follow the 10-man battle live here:"]
+                    },
+                    "late_equalizer": {
+                        "titles": ["🚨 LATE EQUALIZER!", "🚨 DRAMATIC EQUALIZER!", "🚨 TIED UP LATE!", "🚨 CLOSING STAGES CHAOS!", "🚨 ALL SQUARE LATE!"],
+                        "blurbs": [
+                            "A massive goal from {scoring_team_name} to level the score, leaving {conceding_team_name} scrambling as time winds down!",
+                            "{scoring_team_name} claws their way back to tie the match, ripping the momentum right out of {conceding_team_name}'s hands.",
+                            "{scoring_team_name} refuses to go away quietly! We are all square as {conceding_team_name} tries to regain control.",
+                            "A crucial tying goal for {scoring_team_name} stuns {conceding_team_name} and sets up a frantic finish!",
+                            "{scoring_team_name} finds a late lifeline against {conceding_team_name}! A massive momentum swing erases the deficit."
+                        ],
+                        "ctas": ["Track the final push for a game-winner here:", "See the live momentum shift and pitch data:", "Can someone find a late winner? Follow live:", "Watch the closing minutes unfold live:"]
+                    },
+                    "late_go_ahead": {
+                        "titles": ["🚨 LATE GO-AHEAD GOAL!", "🚨 THE DEADLOCK IS BROKEN!", "🚨 CLUTCH MOMENT!", "🚨 HUGE LATE GOAL!", "🚨 TENSION IN THE FINAL 15!"],
+                        "blurbs": [
+                            "A game-changing strike from {scoring_team_name} forces {conceding_team_name} to chase the game late!",
+                            "{scoring_team_name} snatches the advantage right when they needed it, leaving {conceding_team_name} stunned.",
+                            "A massive momentum swing puts {scoring_team_name} in front, and now {conceding_team_name} is running out of time!",
+                            "The defense finally cracks! {scoring_team_name} takes a crucial late lead over {conceding_team_name}.",
+                            "Heartbreak for {conceding_team_name} as they concede the lead to {scoring_team_name} late in the half!"
+                        ],
+                        "ctas": ["Can they hold on? Follow the final minutes live:", "Track the closing stages and live stats here:", "See if the defense can shut the door:", "Follow the live pitch data as time winds down:"]
+                    },
+                    "stoppage_equalizer": {
+                        "titles": ["🚨 STOPPAGE TIME EQUALIZER!", "🚨 SAVED AT THE DEATH!", "🚨 LAST MINUTE LIFELINE!", "🚨 90TH MINUTE MADNESS!", "🚨 SCENES IN STOPPAGE TIME!"],
+                        "blurbs": [
+                            "Absolute scenes! A miraculous stoppage-time equalizer for {scoring_team_name} throws {conceding_team_name} into chaos!",
+                            "{scoring_team_name} climbs out of the grave to level the match. Is there still time for {conceding_team_name} to respond?!",
+                            "You can't write a better script! {scoring_team_name} stuns {conceding_team_name} with a tying goal deep in stoppage time.",
+                            "A devastating blown lead for {conceding_team_name}! {scoring_team_name} forces a dramatic tie in the dying moments.",
+                            "An unbelievable momentum shift! {scoring_team_name} breaks {conceding_team_name}'s hearts to level the score right at the end."
+                        ],
+                        "ctas": ["Watch the frantic final moments unfold live:", "Track the live pitch data before the referee blows the whistle:", "See the post-goal chaos and live match center here:", "Don't miss the ending. See live stats and match data here:"]
+                    },
+                    "stoppage_go_ahead": {
+                        "titles": ["🚨 STOPPAGE TIME THRILLER!", "🚨 AT THE DEATH!", "🚨 LATE HEARTBREAK!", "🚨 STOPPAGE TIME DAGGER!", "🚨 90TH MINUTE MADNESS!"],
+                        "blurbs": [
+                            "Heartbreak for {conceding_team_name}! {scoring_team_name} pulls a rabbit out of the hat to take the lead in stoppage time.",
+                            "A staggering late dagger! {scoring_team_name} snatches a crucial lead, leaving {conceding_team_name} with virtually no time to respond.",
+                            "Absolute madness! {scoring_team_name} takes the lead at the death, forcing {conceding_team_name} into pure panic mode.",
+                            "A devastating stoppage-time strike puts {scoring_team_name} in front, leaving {conceding_team_name} desperate for a last-second miracle.",
+                            "Have they just won it at the death?! {scoring_team_name} stuns {conceding_team_name} with a massive go-ahead goal in the dying moments."
+                        ],
+                        "ctas": ["Can they survive the final whistle? Follow live:", "Don't miss the frantic ending. See live stats and pitch data here:", "Will there be one last twist? Track the closing seconds here:", "Watch the desperate final push unfold live:"]
+                    },
+                    "takes_control": {
+                        "titles": ["🚨 TWO GOAL CUSHION!", "🚨 BREATHING ROOM!", "🚨 IN FULL CONTROL!", "🚨 PULLING AWAY!"],
+                        "blurbs": [
+                            "{scoring_team_name} doubles their advantage! They take a commanding two-goal lead over {conceding_team_name}.",
+                            "A massive insurance goal for {scoring_team_name}! They are now in full control against {conceding_team_name}.",
+                            "{scoring_team_name} creates some breathing room, taking a two-goal lead and putting {conceding_team_name} in a deep hole.",
+                            "It is a long way back for {conceding_team_name} now. {scoring_team_name} extends their lead to two goals!"
+                        ],
+                        "ctas": ["Can the trailing side mount a comeback? Track live:", "Follow the live match center and pitch data here:"]
+                    },
+                    "blowout": {
+                        "titles": ["🚨 THE ROUT IS ON!", "🚨 ABSOLUTE DOMINANCE!", "🚨 RUNNING RIOT!", "🚨 OUT OF REACH!"],
+                        "blurbs": [
+                            "It is turning into a nightmare for {conceding_team_name}. {scoring_team_name} extends their massive lead to three goals!",
+                            "{scoring_team_name} is running riot! They pour it on {conceding_team_name} to turn this match into an absolute blowout.",
+                            "Complete and total dominance from {scoring_team_name}. The lead swells, and {conceding_team_name} has no answers today.",
+                            "This match is effectively over! {scoring_team_name} extends their massive cushion, leaving {conceding_team_name} in the dust."
+                        ],
+                        "ctas": ["Track the rest of the blowout live here:", "Follow the live match stats and ratings here:"]
+                    },
+                    "standard_upset": {
+                        "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
+                        "blurbs": [
+                            "The underdogs have taken the lead! {scoring_team_name} strikes against {conceding_team_name}.",
+                            "A surprising turn of events puts {scoring_team_name} ahead of heavy favorites {conceding_team_name}.",
+                            "The heavy favorites find themselves trailing as {scoring_team_name} takes the game right to {conceding_team_name}!",
+                            "Vegas might be sweating a bit as {scoring_team_name} snatches the lead from {conceding_team_name}.",
+                            "The script is flipped! {scoring_team_name} grabs the advantage over {conceding_team_name}."
+                        ],
+                        "ctas": ["Can they hold on for the upset? Track live here:", "Follow the live match center and pitch data here:", "See the live odds and full stats here:"]
+                    },
+                    "massive_upset": {
+                        "titles": ["🚨🔥 MAJOR UPSET ALERT!", "🚨🔥 SHOCKER IN PROGRESS!", "🚨🔥 MASSIVE UPSET BREWING!", "🚨🔥 DAVID VS GOLIATH!"],
+                        "blurbs": [
+                            "A massive shocker is unfolding! {scoring_team_name} takes a stunning lead over {conceding_team_name}.",
+                            "Nobody saw this coming! Massive underdogs {scoring_team_name} are out in front of {conceding_team_name}.",
+                            "Stunning scenes! The heavy favorites are on the ropes as {scoring_team_name} goes up on {conceding_team_name}.",
+                            "A potential shocker of the weekend is happening right now, with {scoring_team_name} leading {conceding_team_name}.",
+                            "Parlays are in serious danger! {scoring_team_name} just flipped the script on {conceding_team_name}."
+                        ],
+                        "ctas": ["Witness the upset attempt live:", "Don't miss this potential shocker. Live stats and odds:", "Will the favorites respond? Follow the live action here:"]
+                    },
+                    "late_upset": {
+                        "titles": ["🚨⚠️ LATE UPSET BREWING!", "🚨⚠️ LATE UNDERDOG ALERT!", "🚨⚠️ UPSET WATCH: CLOSING STAGES!", "🚨⚠️ VEGAS IS SWEATING!"],
+                        "blurbs": [
+                            "{scoring_team_name} snatches a crucial late lead, putting {conceding_team_name} in serious danger of a huge upset!",
+                            "A massive late goal puts heavy favorites {conceding_team_name} on the brink of defeat against {scoring_team_name}.",
+                            "With time running out, {scoring_team_name} takes a shocking late lead over {conceding_team_name}!",
+                            "Live bettors take note: {scoring_team_name} just struck late to put {conceding_team_name} on the ropes!"
+                        ],
+                        "ctas": ["Watch the frantic final push live here:", "Can the underdogs hold the line? Live stats:", "Will Goliath respond? Follow the live action here:"]
+                    },
+                    "stoppage_upset": {
+                        "titles": ["🚨🔥 STUNNER IN STOPPAGE TIME!", "🚨🔥 LATE UPSET THRILLER!", "🚨🔥 MADNESS AT THE DEATH!", "🚨🔥 THE ULTIMATE SHOCKER!"],
+                        "blurbs": [
+                            "A staggering stoppage-time strike! {scoring_team_name} takes a shocking lead, forcing {conceding_team_name} into a desperate final push.",
+                            "Parlays are in critical danger! {scoring_team_name} strikes in stoppage time to go ahead of {conceding_team_name}. Will there be one last twist?",
+                            "You cannot write a better script! {scoring_team_name} takes a massive late lead, leaving {conceding_team_name} stunned with the clock ticking down.",
+                            "Absolute pandemonium! {scoring_team_name} scores deep in stoppage time, putting heavy favorites {conceding_team_name} on the brink of an epic collapse.",
+                            "A potential miracle in the making! {scoring_team_name} snatches a shock lead, leaving {conceding_team_name} desperate for a last-gasp response."
+                        ],
+                        "ctas": ["Witness the final frantic moments live:", "Don't miss the final whistle of this shocker. Live stats:", "See the post-goal chaos and live match center here:"]
+                    },
+                    "agg_late_equalizer": {
+                        "titles": ["🚨 AGGREGATE TIED LATE!", "🚨 THE TIE IS LEVEL!", "🚨 DRAMATIC AGGREGATE EQUALIZER!"],
+                        "blurbs": [
+                            "A massive goal from {scoring_team_name}! They have erased the deficit and the tournament tie is completely level as time winds down.",
+                            "{scoring_team_name} refuses to go quietly! They tie things up on aggregate, setting up a frantic finish against {conceding_team_name}.",
+                            "We are all square on aggregate! {scoring_team_name} claws their way back into the tie."
+                        ],
+                        "ctas": ["Who will find a winner? Follow the final push live:", "Track the closing minutes of this tie here:"]
+                    },
+                    "agg_late_go_ahead": {
+                        "titles": ["🚨 LATE AGGREGATE LEAD!", "🚨 ADVANTAGE: {scoring_team_name}!", "🚨 CLUTCH TOURNAMENT GOAL!"],
+                        "blurbs": [
+                            "A game-changing strike! {scoring_team_name} snatches the aggregate lead late in the 2nd leg.",
+                            "Heartbreak for {conceding_team_name} as {scoring_team_name} takes a crucial late lead in the tie!",
+                            "{scoring_team_name} steps up when it matters most, taking the aggregate advantage over {conceding_team_name}."
+                        ],
+                        "ctas": ["Can they hold on to advance? Follow live:", "Track the final minutes of this 2nd leg here:"]
+                    },
+                    "agg_stoppage_equalizer": {
+                        "titles": ["🚨 MIRACLE AT THE DEATH!", "🚨 STOPPAGE TIME AGGREGATE EQUALIZER!", "🚨 ABSOLUTE SCENES!"],
+                        "blurbs": [
+                            "You cannot write a better script! {scoring_team_name} scores deep in stoppage time to tie the aggregate score!",
+                            "A devastating blown lead for {conceding_team_name}! {scoring_team_name} forces a dramatic tie in the dying moments.",
+                            "Absolute madness! {scoring_team_name} climbs out of the grave to level the tie right at the end."
+                        ],
+                        "ctas": ["Are we heading to extra time? Follow live:", "Don't miss the post-goal chaos here:"]
+                    },
+                    "agg_stoppage_go_ahead": {
+                        "titles": ["🚨 STOPPAGE TIME TOURNAMENT THRILLER!", "🚨 A DAGGER AT THE DEATH!", "🚨 LATE HEARTBREAK!"],
+                        "blurbs": [
+                            "Heartbreak for {conceding_team_name}! {scoring_team_name} takes the aggregate lead in stoppage time.",
+                            "A staggering late dagger! {scoring_team_name} snatches the tie, leaving {conceding_team_name} with virtually no time to respond.",
+                            "They have won it at the death! {scoring_team_name} stuns {conceding_team_name} to take the aggregate advantage."
+                        ],
+                        "ctas": ["Can they survive the final whistle? Follow live:", "Watch the desperate final seconds unfold here:"]
+                    },
+                    "agg_dagger": {
+                        "titles": ["🚨 NAIL IN THE COFFIN!", "🚨 THE TIE IS SLIPPING AWAY!", "🚨 COMMANDING AGGREGATE LEAD!"],
+                        "blurbs": [
+                            "That might just do it! {scoring_team_name} extends their aggregate lead, putting the tie nearly out of reach for {conceding_team_name}.",
+                            "A devastating blow for {conceding_team_name}. {scoring_team_name} takes a commanding multi-goal lead on aggregate.",
+                            "{scoring_team_name} flexes their muscles, adding an insurance goal to all but secure their spot in the next round."
+                        ],
+                        "ctas": ["Track the remainder of the match live here:", "Follow the live pitch data and stats here:"]
+                    },
+                    "agg_consolation": {
+                        "titles": ["⚽ MATCH GOAL", "⚽ CONSOLATION STRIKE", "⚽ LATE MATCH LEAD"],
+                        "blurbs": [
+                            "{scoring_team_name} finds the back of the net on the day, but they still have a mountain to climb against {conceding_team_name} on aggregate.",
+                            "A goal for {scoring_team_name} rewards the live bettors, but {conceding_team_name} remains in complete control of the overall tie.",
+                            "{scoring_team_name} gets on the board, but they still heavily trail {conceding_team_name} on aggregate with time running out."
+                        ],
+                        "ctas": ["See the live match center and stats here:", "Follow the closing stages of the tie here:"]
+                    }
+                }
+
+                raw_title = random.choice(PHRASES[scenario_key]["titles"])
+                title = raw_title.format(
+                    scoring_team_name=scoring_team_name, 
+                    conceding_team_name=conceding_team_name, 
+                    player_name=scorer
+                )
+                
+                blurb_raw = random.choice(PHRASES[scenario_key]["blurbs"])
+                cta = random.choice(PHRASES[scenario_key]["ctas"])
+                
+                blurb = blurb_raw.format(
+                    scoring_team_name=scoring_team_name, 
+                    conceding_team_name=conceding_team_name, 
+                    player_name=scorer
+                )
+
+                if scenario_key.startswith("agg_"):
+                    tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n"
+                    tweet_text += f"Today: {h_name} {current_home_score} - {current_away_score} {a_name}\n"
+                    tweet_text += f"Agg: {h_name} {agg_h_score} - {agg_a_score} {a_name}\n\n"
+                    tweet_text += f"{blurb}\n\n"
+                else:
+                    tweet_text = f"{title}\n\n⚽ {event_time}' GOAL - {scorer_str}\n{h_name} {current_home_score} - {current_away_score} {a_name}\n\n"
+                    if "upset" in scenario_key: tweet_text += f"📊 Pre-Match Line: {scoring_team_name} ({american_odds})\n\n"
+                    tweet_text += f"{blurb}\n\n"
+                
+                if random.randint(1, 100) <= 100:
+                    tweet_text += f"{cta}\n⬇️\n{link}\n\n"
+                
+                tweet_text += f"{league_info['tag']} #{h_hash} #{a_hash}"
+                
+                if DRY_RUN:
+                    upload_success = True 
+                else:
+                    upload_success = False
+                    try:
+                        target_client = league_info.get("x_client") or futbol_client
+                        if target_client: target_client.create_tweet(text=tweet_text)
+                        upload_success = True 
+                    except Exception as e: pass
+
+                if upload_success:
+                    log_target_date.append(event_key)
+                    tweeted_recently.append(event_key)
+                    new_tweets_sent = True
+                    memory[target_date_str] = log_target_date
+
+    # ==========================================
+    # CLOSING BROWSER CLEANUP
+    # ==========================================
+    if browser:
+        print("🛑 Closing Cloud Browser connection for this loop.")
+        await browser.close()
+    await playwright_manager.stop()
+
+    if new_tweets_sent and firebase_admin._apps:
+        try:
+            db.reference('tweet_log').update(memory)
+            print("\n💾 In-Memory State Synced to Firebase.")
+        except Exception as e: pass
+    
+    return 60, memory 
+
+# ==========================================
+# 6. THE PERSISTENT RENDER WRAPPER
+# ==========================================
+async def main():
+    print("🤖 Starting Publisher Bot (Render Persistent Engine)...")
+    
+    persisted_memory = fetch_initial_memory()
+    
+    if firebase_admin._apps:
+        existing_fb = db.reference('tweet_log').get()
+        if not existing_fb and persisted_memory:
+            db.reference('tweet_log').set(persisted_memory)
+    
+    if persisted_memory is None:
+        persisted_memory = {}
+    
+    while True:
+        try:
+            loop_start_time = time.time()
+            
+            target_sleep_sec, updated_memory = await run_engines(persisted_memory)
+            persisted_memory = updated_memory
+            
+            loop_elapsed = time.time() - loop_start_time
+            actual_sleep = max(0.0, target_sleep_sec - loop_elapsed)
+            
+            if actual_sleep > 0:
+                print(f"⏳ Loop took {loop_elapsed:.1f}s. Sleeping {actual_sleep:.1f}s...")
+                await asyncio.sleep(actual_sleep)
+                
+        except Exception as e:
+            print(f"\n❌ Loop crashed: {e}. Restarting loop in 60s...")
+            await asyncio.sleep(60)
+
+if __name__ == "__main__":
+    asyncio.run(main())
