@@ -3,44 +3,44 @@ import os
 # ==========================================
 # 1. THE MASTER 30 MLB TEAMS DICTIONARY
 # ==========================================
-# Maps exact MLB API IDs to clean URL slugs and display names
+# Maps exact MLB API IDs to clean URL slugs, display names, and ESPN PNG abbreviations
 MLB_TEAMS = [
     # AL East
-    {"id": 110, "slug": "baltimore-orioles", "name": "Baltimore Orioles"},
-    {"id": 111, "slug": "boston-red-sox", "name": "Boston Red Sox"},
-    {"id": 147, "slug": "new-york-yankees", "name": "New York Yankees"},
-    {"id": 139, "slug": "tampa-bay-rays", "name": "Tampa Bay Rays"},
-    {"id": 141, "slug": "toronto-blue-jays", "name": "Toronto Blue Jays"},
+    {"id": 110, "slug": "baltimore-orioles", "name": "Baltimore Orioles", "abbr": "bal"},
+    {"id": 111, "slug": "boston-red-sox", "name": "Boston Red Sox", "abbr": "bos"},
+    {"id": 147, "slug": "new-york-yankees", "name": "New York Yankees", "abbr": "nyy"},
+    {"id": 139, "slug": "tampa-bay-rays", "name": "Tampa Bay Rays", "abbr": "tb"},
+    {"id": 141, "slug": "toronto-blue-jays", "name": "Toronto Blue Jays", "abbr": "tor"},
     # AL Central
-    {"id": 145, "slug": "chicago-white-sox", "name": "Chicago White Sox"},
-    {"id": 114, "slug": "cleveland-guardians", "name": "Cleveland Guardians"},
-    {"id": 116, "slug": "detroit-tigers", "name": "Detroit Tigers"},
-    {"id": 118, "slug": "kansas-city-royals", "name": "Kansas City Royals"},
-    {"id": 142, "slug": "minnesota-twins", "name": "Minnesota Twins"},
+    {"id": 145, "slug": "chicago-white-sox", "name": "Chicago White Sox", "abbr": "chw"},
+    {"id": 114, "slug": "cleveland-guardians", "name": "Cleveland Guardians", "abbr": "cle"},
+    {"id": 116, "slug": "detroit-tigers", "name": "Detroit Tigers", "abbr": "det"},
+    {"id": 118, "slug": "kansas-city-royals", "name": "Kansas City Royals", "abbr": "kc"},
+    {"id": 142, "slug": "minnesota-twins", "name": "Minnesota Twins", "abbr": "min"},
     # AL West
-    {"id": 117, "slug": "houston-astros", "name": "Houston Astros"},
-    {"id": 108, "slug": "los-angeles-angels", "name": "Los Angeles Angels"},
-    {"id": 133, "slug": "athletics", "name": "Athletics"},
-    {"id": 136, "slug": "seattle-mariners", "name": "Seattle Mariners"},
-    {"id": 140, "slug": "texas-rangers", "name": "Texas Rangers"},
+    {"id": 117, "slug": "houston-astros", "name": "Houston Astros", "abbr": "hou"},
+    {"id": 108, "slug": "los-angeles-angels", "name": "Los Angeles Angels", "abbr": "laa"},
+    {"id": 133, "slug": "athletics", "name": "Athletics", "abbr": "oak"},
+    {"id": 136, "slug": "seattle-mariners", "name": "Seattle Mariners", "abbr": "sea"},
+    {"id": 140, "slug": "texas-rangers", "name": "Texas Rangers", "abbr": "tex"},
     # NL East
-    {"id": 144, "slug": "atlanta-braves", "name": "Atlanta Braves"},
-    {"id": 146, "slug": "miami-marlins", "name": "Miami Marlins"},
-    {"id": 121, "slug": "new-york-mets", "name": "New York Mets"},
-    {"id": 143, "slug": "philadelphia-phillies", "name": "Philadelphia Phillies"},
-    {"id": 120, "slug": "washington-nationals", "name": "Washington Nationals"},
+    {"id": 144, "slug": "atlanta-braves", "name": "Atlanta Braves", "abbr": "atl"},
+    {"id": 146, "slug": "miami-marlins", "name": "Miami Marlins", "abbr": "mia"},
+    {"id": 121, "slug": "new-york-mets", "name": "New York Mets", "abbr": "nym"},
+    {"id": 143, "slug": "philadelphia-phillies", "name": "Philadelphia Phillies", "abbr": "phi"},
+    {"id": 120, "slug": "washington-nationals", "name": "Washington Nationals", "abbr": "wsh"},
     # NL Central
-    {"id": 112, "slug": "chicago-cubs", "name": "Chicago Cubs"},
-    {"id": 113, "slug": "cincinnati-reds", "name": "Cincinnati Reds"},
-    {"id": 158, "slug": "milwaukee-brewers", "name": "Milwaukee Brewers"},
-    {"id": 134, "slug": "pittsburgh-pirates", "name": "Pittsburgh Pirates"},
-    {"id": 138, "slug": "st-louis-cardinals", "name": "St. Louis Cardinals"},
+    {"id": 112, "slug": "chicago-cubs", "name": "Chicago Cubs", "abbr": "chc"},
+    {"id": 113, "slug": "cincinnati-reds", "name": "Cincinnati Reds", "abbr": "cin"},
+    {"id": 158, "slug": "milwaukee-brewers", "name": "Milwaukee Brewers", "abbr": "mil"},
+    {"id": 134, "slug": "pittsburgh-pirates", "name": "Pittsburgh Pirates", "abbr": "pit"},
+    {"id": 138, "slug": "st-louis-cardinals", "name": "St. Louis Cardinals", "abbr": "stl"},
     # NL West
-    {"id": 109, "slug": "arizona-diamondbacks", "name": "Arizona Diamondbacks"},
-    {"id": 115, "slug": "colorado-rockies", "name": "Colorado Rockies"},
-    {"id": 119, "slug": "los-angeles-dodgers", "name": "Los Angeles Dodgers"},
-    {"id": 135, "slug": "san-diego-padres", "name": "San Diego Padres"},
-    {"id": 137, "slug": "san-francisco-giants", "name": "San Francisco Giants"}
+    {"id": 109, "slug": "arizona-diamondbacks", "name": "Arizona Diamondbacks", "abbr": "ari"},
+    {"id": 115, "slug": "colorado-rockies", "name": "Colorado Rockies", "abbr": "col"},
+    {"id": 119, "slug": "los-angeles-dodgers", "name": "Los Angeles Dodgers", "abbr": "lad"},
+    {"id": 135, "slug": "san-diego-padres", "name": "San Diego Padres", "abbr": "sd"},
+    {"id": 137, "slug": "san-francisco-giants", "name": "San Francisco Giants", "abbr": "sf"}
 ]
 
 # ==========================================
@@ -63,14 +63,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta property="og:url" content="https://mlbstartingnine.com/lineups/{team_slug}/">
     <meta property="og:site_name" content="MLB Starting 9">
     
-    <meta property="og:image" content="https://www.mlbstatic.com/team-logos/{team_id}.svg">
-    <meta name="twitter:image" content="https://www.mlbstatic.com/team-logos/{team_id}.svg">
+    <meta property="og:image" content="https://a.espncdn.com/i/teamlogos/mlb/500/{team_abbr}.png">
+    <meta name="twitter:image" content="https://a.espncdn.com/i/teamlogos/mlb/500/{team_abbr}.png">
     <meta name="twitter:card" content="summary">
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){{dataLayer.push(arguments);}}
+      function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-TW817924LJ');
     </script>
@@ -126,6 +126,7 @@ def generate_all_team_pages():
             HTML_TEMPLATE.replace("{team_name}", team["name"])
                          .replace("{team_slug}", team["slug"])
                          .replace("{team_id}", str(team["id"]))
+                         .replace("{team_abbr}", team["abbr"])
         )
         
         file_path = os.path.join(team_dir, "index.html")
