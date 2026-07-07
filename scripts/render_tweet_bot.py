@@ -107,6 +107,7 @@ argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 # ==========================================
 async def take_weather_screenshot(browser):
     print("📸 Generating MLB Daily Weather Graphic...")
+    # Using 1080x1080 square viewport to match our compact 3-column grid
     page = await browser.new_page(viewport={'width': 1080, 'height': 1080}) 
     
     bust_cache = int(time.time())
@@ -114,9 +115,13 @@ async def take_weather_screenshot(browser):
     
     try:
         await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        
+        # Target the specific container we created in HTML
         capture_area = page.locator("#capture-area")
+        
+        # Wait for the grid to actually finish populating from JSON
         await page.locator(".game-card").first.wait_for(state="visible", timeout=30000)
-        await asyncio.sleep(2) 
+        await asyncio.sleep(2) # Give gradients and fonts a moment to settle
         
         await capture_area.screenshot(path="mlb_weather.png", type="png")
         await capture_area.screenshot(path="mlb_weather.jpg", type="jpeg", quality=75)
@@ -362,7 +367,7 @@ async def run_engines(memory):
         "MIL": "Bucks", "MIN": "Timberwolves", "NOP": "Pelicans", "NYK": "Knicks", "OKC": "Thunder", "ORL": "Magic", "PHI": "76ers", "PHX": "Suns",
         "POR": "Trail Blazers", "SAC": "Kings", "SAS": "Spurs", "TOR": "Raptors", "UTA": "Jazz", "WAS": "Wizards"
     }
-    
+   
     for game in nba_data:
         if not game.get('teams') or len(game['teams']) < 2: continue
         away_team, home_team = game['teams'][0], game['teams'][1]
@@ -556,7 +561,6 @@ async def run_engines(memory):
                 if firebase_admin._apps:
                     try: db.reference('tweet_log').update({date_str: log_today})
                     except: pass
-
     try:
         schedule_data = requests.get(MLB_API_URL).json()
         games = schedule_data['dates'][0]['games'] if schedule_data.get('dates') else []
@@ -574,7 +578,7 @@ async def run_engines(memory):
         team_url = f"https://mlbstartingnine.com/lineups/{team_slug}/"
         reply_text = f"View the {full_team_name} daily starting lineups at our new team lineup page:\n{team_url}"
 
-        # 2. BUILD THE MAIN TWEET
+        # 2. BUILD THE MAIN TWEET (Removed the link from the main text!)
         tweet_text = f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n"
         if team_odds != "TBD": tweet_text += f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
         tweet_text += f"#{team_hash} #{team_hash}Lineup #MLB"
@@ -804,35 +808,35 @@ async def run_engines(memory):
     # ==========================================
     FUTBOL_LEAGUES = {
     143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey", "x_client": seriea_client, "v1_client": seriea_api_v1},
-    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},  
+    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},    
     61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/ligue1.html"},     
-    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},  
-    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},   
-    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia", "x_client": argbracol_client, "v1_client": argbracol_api_v1},   
+    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},    
+    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
     13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
     71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
     128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations", "x_client": mls_client, "v1_client": mls_api_v1},   
-    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},   
-    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf", "x_client": mls_client, "v1_client": mls_api_v1},   
+    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations", "x_client": mls_client, "v1_client": mls_api_v1},    
+    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},    
+    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf", "x_client": mls_client, "v1_client": mls_api_v1},    
     254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
-    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},   
-    179: {"name": "🏴󠁧󠁢󠁳󠁣󠁴󠁿 PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scotland", "x_client": nwsl_client, "v1_client": nwsl_api_v1},   
-    45:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 FA CUP", "tag": "#FACup", "url_slug": "facup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},   
-    39:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},   
-    40:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
+    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},    
+    179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scotland", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+    45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},    
+    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
     10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
     1:  {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "worldcup"},
     2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
     3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
     188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "australia"},
     5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
-    848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },   
+    848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },    
     307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"}
 }
 
     INTL_FLAGS = {
-        "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
+        "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
         "Northern Ireland": "🇬🇧", "Argentina": "🇦🇷", "Brazil": "🇧🇷", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹", "Mexico": "🇲🇽", "Netherlands": "🇳🇱", "Portugal": "🇵🇹", "Spain": "🇪🇸", "USA": "🇺🇸"
     }
 
@@ -993,7 +997,6 @@ async def run_engines(memory):
             raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
             h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
             a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
-            
             # Define team hashtags early so the FT recap can use them!
             h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
             a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
@@ -1006,14 +1009,8 @@ async def run_engines(memory):
                     except: return int(parts[0]) if parts[0].isdigit() else 90
                 return int(t_str) if t_str.isdigit() else 0
 
-            # API-Football correctly tags shootout goals in the 'comments' field. 
-            # This cleanly grabs all regular/extra-time goals while ignoring the shootout kicks!
-            valid_goal_events = [
-                e for e in events 
-                if e.get('type') == 'Goal' 
-                and e.get('detail') in ['Normal Goal', 'Penalty', 'Own Goal'] 
-                and str(e.get('comments', '')).lower() != 'penalty shootout'
-            ]
+            is_shootout = fixture_status in ['P', 'PEN'] or sum(1 for e in events if e.get('type') == 'Goal' and e.get('detail') == 'Penalty' and get_actual_minute(e) >= 90) > 1
+            valid_goal_events = [e for e in events if e.get('type') == 'Goal' and e.get('detail') in ['Normal Goal', 'Penalty', 'Own Goal'] and not (e.get('detail') == 'Penalty' and get_actual_minute(e) >= 90 and is_shootout)]
             valid_goal_events.sort(key=get_actual_minute)
 
             current_home_score, current_away_score = 0, 0
@@ -1047,17 +1044,8 @@ async def run_engines(memory):
                         h_score = match.get('goals', {}).get('home', current_home_score)
                         a_score = match.get('goals', {}).get('away', current_away_score)
 
-                        pen_score = match.get('score', {}).get('penalty', {}) or {}
-                        pen_h = pen_score.get('home')
-                        pen_a = pen_score.get('away')
-
                         # --- NEW UNIVERSAL RESULT PHRASING ---
-                        if fixture_status in ['PEN', 'P'] and pen_h is not None and pen_a is not None:
-                            if pen_h > pen_a:
-                                result_text = f"🏁 AET: {h_name} {h_score} - {a_score} {a_name}\n{h_name} wins {int(pen_h)}-{int(pen_a)} on penalties! 🎯"
-                            else:
-                                result_text = f"🏁 AET: {h_name} {h_score} - {a_score} {a_name}\n{a_name} wins {int(pen_a)}-{int(pen_h)} on penalties! 🎯"
-                        elif h_score > a_score:
+                        if h_score > a_score:
                             result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{h_name} secures the victory!"
                         elif a_score > h_score:
                             result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{a_name} claims the win on the road!"
@@ -1120,6 +1108,8 @@ async def run_engines(memory):
                         bsky_ft.link(ft_link, ft_link)
                         bsky_ft.text(f"\n\n{league_info['tag']} #{h_hash} #{a_hash}")
 
+                       
+
                         if DRY_RUN:
                             upload_success = True
                             print(f"\n[SHADOW] 🛑 Mocking FT Tweet:\n{ft_tweet_text}")
@@ -1172,10 +1162,9 @@ async def run_engines(memory):
                 else:
                     is_equalizer = current_home_score == current_away_score
                     is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
-                    
+                    # 🛡️ ADD THESE TWO LINES:
                     is_two_goal_lead = abs(current_home_score - current_away_score) == 2
                     is_blowout = abs(current_home_score - current_away_score) >= 3
-                    
                     is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
                     is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
                     
@@ -1209,6 +1198,8 @@ async def run_engines(memory):
                 
                 if not scenario_key: continue
 
+                
+
                 scoring_team_name = h_name if team_id == h_id else a_name
                 conceding_team_name = a_name if team_id == h_id else h_name
                 scorer = event.get('player')
@@ -1222,6 +1213,7 @@ async def run_engines(memory):
                     scorer_str = f"{scorer} ({scoring_team_name})"
 
                 american_odds = f"+{int((scorer_odds - 1) * 100)}"
+                h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
                 
                 if "base_url" in league_info:
                     link = f"{league_info['base_url']}?date={target_date_str}#goal-{fixture_id}"
