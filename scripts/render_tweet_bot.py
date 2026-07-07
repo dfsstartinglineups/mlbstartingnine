@@ -1172,9 +1172,10 @@ async def run_engines(memory):
                 else:
                     is_equalizer = current_home_score == current_away_score
                     is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
-                    # 🛡️ ADD THESE TWO LINES:
+                    
                     is_two_goal_lead = abs(current_home_score - current_away_score) == 2
                     is_blowout = abs(current_home_score - current_away_score) >= 3
+                    
                     is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
                     is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
                     
