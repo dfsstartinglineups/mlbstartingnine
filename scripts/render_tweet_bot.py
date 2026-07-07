@@ -285,7 +285,8 @@ async def run_engines(memory):
     MLB_ODDS_URL = "https://weathermlb.com/data/odds.json"
     NBA_DATA_URL = f"https://nbastartingfive.com/data/{date_str}.json?v={today_est.timestamp()}"
 
-    dates_to_keep = [date_str, yesterday_str, tomorrow_str]
+    # 🛡️ Keep 6 days of memory (5 days back, 1 day forward) to prevent timezone ghost tweets
+    dates_to_keep = [(today_est + timedelta(days=d)).strftime('%Y-%m-%d') for d in range(-5, 2)]
     keys_to_delete = [k for k in memory.keys() if k not in dates_to_keep]
     for k in keys_to_delete:
         del memory[k]
