@@ -139,6 +139,7 @@ function populateTeamDropdown() {
 
     let optionsHtml = "";
     const playingTeams = [];
+    const addedTeamIds = new Set(); // 🛡️ ADDED THIS: Tracks which teams are already in the list
 
     dailySlateData.games.forEach(game => {
         const raw = game.gameRaw || {};
@@ -147,6 +148,10 @@ function populateTeamDropdown() {
         ['away', 'home'].forEach(side => {
             const teamObj = raw.teams?.[side]?.team;
             if (!teamObj) return;
+
+            // 🛡️ THE FIX: If it's a doubleheader, ignore the duplicate!
+            if (addedTeamIds.has(teamObj.id)) return;
+            addedTeamIds.add(teamObj.id);
 
             const status = tracking[side]?.status || "NONE";
             const badge = (status === "OFFICIAL" || status === "MODIFIED") ? "✓" : "⏳";
