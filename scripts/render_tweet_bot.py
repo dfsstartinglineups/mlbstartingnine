@@ -1017,6 +1017,93 @@ async def run_engines(memory):
             try: away_odds = float(match.get('odds', {}).get('away') or 0.0)
             except: away_odds = 0.0
 
+            # --- C. FULL TIME RECAP ALERTS ---
+            ft_key = f"FUTBOL_FT_{fixture_id}"
+            
+            if fixture_status in ['FT', 'AET', 'PEN']:
+                # 1. Check if the game is "stale" (ended more than 25 mins ago)
+                match_ended_str = match.get("match_ended_at")
+                is_stale = True
+                if match_ended_str:
+                    try:
+                        if (datetime.now(timezone.utc) - datetime.fromisoformat(match_ended_str)).total_seconds() / 60 < 25: 
+                            is_stale = False
+                    except: pass
+                
+                # 2. If it's stale, mark it in memory so it doesn't tweet, and skip
+                if ft_key not in tweeted_recently:
+                    if is_stale:
+                        log_target_date.append(ft_key)
+                        tweeted_recently.append(ft_key)
+                        memory[target_date_str] = log_target_date
+                    else:
+                        # 3. IT'S A FRESH FULL TIME FINISH! BUILD THE TWEET!
+                        h_score = match.get('goals', {}).get('home', current_home_score)
+                        a_score = match.get('goals', {}).get('away', current_away_score)
+
+                        if h_score > a_score:
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{h_name} takes all 3 points!"
+                        elif a_score > h_score:
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\n{a_name} secures a massive away win!"
+                        else:
+                            result_text = f"🏁 FT: {h_name} {h_score} - {a_score} {a_name}\nThe points are shared in a hard-fought draw."
+
+                        # Build the Goal & Assist Log
+                        goal_log = []
+                        for e in valid_goal_events:
+                            time_m = get_actual_minute(e)
+                            scorer = e.get('player', 'Unknown')
+                            assist = e.get('assist')
+                            
+                            if e.get('detail') == 'Own Goal':
+                                goal_log.append(f"⚽ {scorer} (OG) {time_m}'")
+                            elif assist and str(assist).lower() != "null":
+                                goal_log.append(f"⚽ {scorer} {time_m}' (A: {assist})")
+                            else:
+                                goal_log.append(f"⚽ {scorer} {time_m}'")
+                        
+                        # Cap at 7 goals so we don't hit Twitter's character limit on blowouts
+                        if len(goal_log) > 7:
+                            goal_text = "\n".join(goal_log[:6]) + "\n...and more!"
+                        else:
+                            goal_text = "\n".join(goal_log) if goal_log else "🚫 No goals scored."
+
+                        # Build the URL
+                        if "base_url" in league_info:
+                            ft_link = f"{league_info['base_url']}?date={target_date_str}#match-{fixture_id}"
+                        else:
+                            slug = league_info.get("url_slug", "top")
+                            ft_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#match-{fixture_id}"
+
+                        ft_tweet_text = f"{result_text}\n\n{goal_text}\n\n📊 Full match stats & player ratings:\n{ft_link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
+                        
+                        bsky_ft = client_utils.TextBuilder()
+                        bsky_ft.text(f"{result_text}\n\n{goal_text}\n\n📊 Full match stats & player ratings:\n")
+                        bsky_ft.link(ft_link, ft_link)
+                        bsky_ft.text(f"\n\n{league_info['tag']} #{h_hash} #{a_hash}")
+
+                        if DRY_RUN:
+                            upload_success = True
+                            print(f"\n[SHADOW] 🛑 Mocking FT Tweet:\n{ft_tweet_text}")
+                        else:
+                            upload_success = False
+                            try:
+                                target_client = league_info.get("x_client") or futbol_client
+                                if target_client: target_client.create_tweet(text=ft_tweet_text)
+                                
+                                target_bsky_client = league_info.get("bsky_client")
+                                if target_bsky_client: target_bsky_client.send_post(bsky_ft)
+                                
+                                upload_success = True
+                            except Exception as e:
+                                print(f"⚠️ Failed to post FT alert: {e}")
+
+                        if upload_success:
+                            log_target_date.append(ft_key)
+                            tweeted_recently.append(ft_key)
+                            new_tweets_sent = True
+                            memory[target_date_str] = log_target_date
+
             # --- PRE-LOOP TRACKERS ---
             player_goal_counts = {}
 
@@ -1083,18 +1170,7 @@ async def run_engines(memory):
                 
                 if not scenario_key: continue
 
-                if fixture_status in ['FT', 'AET', 'PEN']:
-                    match_ended_str = match.get("match_ended_at")
-                    is_stale = True
-                    if match_ended_str:
-                        try:
-                            if (datetime.now(timezone.utc) - datetime.fromisoformat(match_ended_str)).total_seconds() / 60 < 20: is_stale = False
-                        except: pass
-                    if is_stale:
-                        log_target_date.append(event_key)
-                        tweeted_recently.append(event_key)
-                        memory[target_date_str] = log_target_date
-                        continue
+                
 
                 scoring_team_name = h_name if team_id == h_id else a_name
                 conceding_team_name = a_name if team_id == h_id else h_name
