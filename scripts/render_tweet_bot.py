@@ -997,6 +997,9 @@ async def run_engines(memory):
             raw_h_name, raw_a_name = match['teams']['home']['name'], match['teams']['away']['name']
             h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
             a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
+            # Define team hashtags early so the FT recap can use them!
+            h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
+            a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
 
             def get_actual_minute(e):
                 t_str = str(e.get('time', '0')).replace("'", "").strip()
