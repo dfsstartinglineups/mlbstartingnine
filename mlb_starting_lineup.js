@@ -197,33 +197,45 @@ function renderTeamPage() {
     let gameNum = 1;
 
     if (dailySlateData && dailySlateData.games) {
-        // 1. Find ALL games this team is playing today
-        const teamGames = [];
+        let game1 = null;
+        let game2 = null;
+
+        // 1. Explicitly isolate Today's Game 1 and Game 2 by their true MLB game numbers
         for (const g of dailySlateData.games) {
             const raw = g.gameRaw || {};
             if (raw.teams?.away?.team?.id === currentTargetId || raw.teams?.home?.team?.id === currentTargetId) {
-                teamGames.push(g);
+                const gNum = raw.gameNumber || 1;
+                
+                if (gNum === 1 && !game1) {
+                    game1 = g; // Lock in Today's Game 1
+                } else if (gNum === 2 && !game2) {
+                    game2 = g; // Lock in Today's Game 2
+                }
             }
         }
 
-        if (teamGames.length > 0) {
-            // Default to Game 1
-            targetGame = teamGames[0];
+        // 2. Doubleheader Auto-Flip Routing Logic
+        if (game1) {
+            targetGame = game1;
             targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
-            gameNum = targetGame.gameRaw?.gameNumber || 1;
+            gameNum = 1;
 
-            // 2. Doubleheader Auto-Flip Logic
-            if (teamGames.length > 1) {
+            if (game2) {
                 isDoubleHeader = true;
-                const status1 = targetGame.gameRaw?.status?.abstractGameState || "";
+                const status1 = game1.gameRaw?.status?.abstractGameState || "";
                 
-                // If Game 1 is officially over, flip the page to show Game 2!
+                // If Today's Game 1 is completely finished, flip to Today's true Game 2
                 if (status1 === "Final" || status1 === "Game Over") {
-                    targetGame = teamGames[1];
+                    targetGame = game2;
                     targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
-                    gameNum = targetGame.gameRaw?.gameNumber || 2;
+                    gameNum = 2;
                 }
             }
+        } else if (game2) {
+            // Fallback safety if Game 1 is completely dropped from active slate
+            targetGame = game2;
+            targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
+            gameNum = 2;
         }
     }
 
