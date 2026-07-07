@@ -1047,6 +1047,9 @@ async def run_engines(memory):
                 else:
                     is_equalizer = current_home_score == current_away_score
                     is_go_ahead = (team_id == h_id and current_home_score - current_away_score == 1) or (team_id == a_id and current_away_score - current_home_score == 1)
+                    # 🛡️ ADD THESE TWO LINES:
+                    is_two_goal_lead = abs(current_home_score - current_away_score) == 2
+                    is_blowout = abs(current_home_score - current_away_score) >= 3
                     is_standard_upset = is_go_ahead and (4.00 <= scorer_odds < 7.00)
                     is_massive_upset = is_go_ahead and (scorer_odds >= 7.00)
                     
@@ -1069,9 +1072,11 @@ async def run_engines(memory):
                     # 3. TIER 3: LIGHTNING STARTS (0' to 10')
                     elif event_time <= 10: scenario_key = "lightning_start"
                     
-                    # 4. TIER 4: MID-GAME UPSETS (11' to 74')
+                    # 4. TIER 4: MID-GAME UPSETS & MOMENTUM SHIFTS
                     elif is_massive_upset: scenario_key = "massive_upset"
                     elif is_standard_upset: scenario_key = "standard_upset"
+                    elif is_blowout: scenario_key = "blowout"
+                    elif is_two_goal_lead: scenario_key = "takes_control"
                     
                     # 5. TIER 5: COMPETITIVE CLASHES (11' to 90'+ Option B Filter)
                     elif event_time > 10 and is_tight_clash: scenario_key = "tight_clash_goal"
@@ -1206,6 +1211,26 @@ async def run_engines(memory):
                             "Have they just won it at the death?! {scoring_team_name} stuns {conceding_team_name} with a massive go-ahead goal in the dying moments."
                         ],
                         "ctas": ["Can they survive the final whistle? Follow live:", "Don't miss the frantic ending. See live stats and pitch data here:", "Will there be one last twist? Track the closing seconds here:", "Watch the desperate final push unfold live:"]
+                    },
+                    "takes_control": {
+                        "titles": ["🚨 TWO GOAL CUSHION!", "🚨 BREATHING ROOM!", "🚨 IN FULL CONTROL!", "🚨 PULLING AWAY!"],
+                        "blurbs": [
+                            "{scoring_team_name} doubles their advantage! They take a commanding two-goal lead over {conceding_team_name}.",
+                            "A massive insurance goal for {scoring_team_name}! They are now in full control against {conceding_team_name}.",
+                            "{scoring_team_name} creates some breathing room, taking a two-goal lead and putting {conceding_team_name} in a deep hole.",
+                            "It is a long way back for {conceding_team_name} now. {scoring_team_name} extends their lead to two goals!"
+                        ],
+                        "ctas": ["Can the trailing side mount a comeback? Track live:", "Follow the live match center and pitch data here:"]
+                    },
+                    "blowout": {
+                        "titles": ["🚨 THE ROUT IS ON!", "🚨 ABSOLUTE DOMINANCE!", "🚨 RUNNING RIOT!", "🚨 OUT OF REACH!"],
+                        "blurbs": [
+                            "It is turning into a nightmare for {conceding_team_name}. {scoring_team_name} extends their massive lead to three goals!",
+                            "{scoring_team_name} is running riot! They pour it on {conceding_team_name} to turn this match into an absolute blowout.",
+                            "Complete and total dominance from {scoring_team_name}. The lead swells, and {conceding_team_name} has no answers today.",
+                            "This match is effectively over! {scoring_team_name} extends their massive cushion, leaving {conceding_team_name} in the dust."
+                        ],
+                        "ctas": ["Track the rest of the blowout live here:", "Follow the live match stats and ratings here:"]
                     },
                     "standard_upset": {
                         "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
