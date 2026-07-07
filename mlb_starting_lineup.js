@@ -188,18 +188,36 @@ function renderTeamPage() {
 
     let targetGame = null;
     let targetSide = null;
+    let isDoubleHeader = false;
+    let gameNum = 1;
 
     if (dailySlateData && dailySlateData.games) {
+        // 1. Find ALL games this team is playing today
+        const teamGames = [];
         for (const g of dailySlateData.games) {
             const raw = g.gameRaw || {};
-            if (raw.teams?.away?.team?.id === currentTargetId) {
-                targetGame = g;
-                targetSide = 'away';
-                break;
-            } else if (raw.teams?.home?.team?.id === currentTargetId) {
-                targetGame = g;
-                targetSide = 'home';
-                break;
+            if (raw.teams?.away?.team?.id === currentTargetId || raw.teams?.home?.team?.id === currentTargetId) {
+                teamGames.push(g);
+            }
+        }
+
+        if (teamGames.length > 0) {
+            // Default to Game 1
+            targetGame = teamGames[0];
+            targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
+            gameNum = targetGame.gameRaw?.gameNumber || 1;
+
+            // 2. Doubleheader Auto-Flip Logic
+            if (teamGames.length > 1) {
+                isDoubleHeader = true;
+                const status1 = targetGame.gameRaw?.status?.abstractGameState || "";
+                
+                // If Game 1 is officially over, flip the page to show Game 2!
+                if (status1 === "Final" || status1 === "Game Over") {
+                    targetGame = teamGames[1];
+                    targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
+                    gameNum = targetGame.gameRaw?.gameNumber || 2;
+                }
             }
         }
     }
@@ -235,8 +253,12 @@ function renderTeamPage() {
     const gameDateRaw = raw.officialDate || new Date().toISOString().split('T')[0];
     const [yy, mm, dd] = gameDateRaw.split('-');
     const dObj = new Date(yy, mm - 1, dd);
-    const displayDate = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' }).toUpperCase();
-
+    let displayDate = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' }).toUpperCase();
+    
+    // ADD THIS: Append Game Number for Doubleheaders
+    if (isDoubleHeader) {
+        displayDate += ` &nbsp;•&nbsp; <span style="color: #ff1744;">GAME ${gameNum}</span>`;
+    }
     // Status Badge Logic
     const status = tracking.status || "NONE";
     let badgeHtml = "";
