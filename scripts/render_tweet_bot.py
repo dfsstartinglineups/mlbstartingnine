@@ -105,6 +105,34 @@ argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 # ==========================================
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
 # ==========================================
+async def take_weather_screenshot(browser):
+    print("📸 Generating MLB Daily Weather Graphic...")
+    # Using 1080x1080 square viewport to match our compact 3-column grid
+    page = await browser.new_page(viewport={'width': 1080, 'height': 1080}) 
+    
+    bust_cache = int(time.time())
+    url = f"https://weathermlb.com/daily_weather_card.html?v={bust_cache}"
+    
+    try:
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        
+        # Target the specific container we created in HTML
+        capture_area = page.locator("#capture-area")
+        
+        # Wait for the grid to actually finish populating from JSON
+        await page.locator(".game-card").first.wait_for(state="visible", timeout=30000)
+        await asyncio.sleep(2) # Give gradients and fonts a moment to settle
+        
+        await capture_area.screenshot(path="mlb_weather.png", type="png")
+        await capture_area.screenshot(path="mlb_weather.jpg", type="jpeg", quality=75)
+        print("✅ Weather Screenshots saved successfully!")
+        return True
+    except Exception as e:
+        print(f"⚠️ Weather Graphic capture failed. Error: {e}")
+        return False
+    finally:
+        await page.close()
+
 async def take_screenshot(browser, fixture_id, target_date):
     print(f"📸 Generating Futbol Graphic for Fixture {fixture_id}...")
     page = await browser.new_page(viewport={'width': 1080, 'height': 1350})
@@ -465,6 +493,74 @@ async def run_engines(memory):
     # ==========================================
     # MLB ENGINE
     # ==========================================
+    # ==========================================
+    # DAILY MLB WEATHER REPORT (Fires after 10 AM EST)
+    # ==========================================
+    weather_key = f"WEATHER_REPORT_{date_str}"
+    
+    if weather_key not in memory.get(date_str, []) and today_est.hour >= 10:
+        weather_success = False
+        for attempt in range(2):
+            try:
+                b = await get_browser()
+                if await take_weather_screenshot(b):
+                    weather_success = True
+                    break
+                await asyncio.sleep(5)
+            except Exception as e:
+                print(f"⚠️ Weather screenshot attempt {attempt+1} failed: {e}")
+                await asyncio.sleep(5)
+            
+        if weather_success:
+            weather_text = f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nFull interactive radar & hourly forecasts:\nhttps://weathermlb.com\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather"
+            
+            if DRY_RUN:
+                print(f"\n[SHADOW] 🛑 Mocking Weather Tweet for {date_str}:\n{weather_text}")
+                upload_success = True
+            else:
+                twitter_success = False
+                bsky_success = False
+                
+                # --- X (Twitter) Upload -> @DailyMLBLineups ---
+                try:
+                    media = mlb_api_v1.media_upload("mlb_weather.png")
+                    mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
+                    mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
+                    twitter_success = True
+                    print("✅ Successfully tweeted MLB Weather Report to X!")
+                except Exception as e:
+                    print(f"⚠️ Failed to tweet weather on X: {e}")
+                    
+                # --- Bluesky Upload ---
+                config = LEAGUE_CONFIG.get("mlb")
+                if config and config.get("bsky_client"):
+                    try:
+                        with open("mlb_weather.jpg", "rb") as f:
+                            img_data = f.read()
+                        bsky_tb = client_utils.TextBuilder()
+                        bsky_tb.text(f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\nFull interactive radar & hourly forecasts:\n")
+                        bsky_tb.link("https://weathermlb.com", "https://weathermlb.com")
+                        bsky_tb.text("\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather")
+                        
+                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt="MLB Daily Weather Report & Stadium Wind Speeds")
+                        bsky_success = True
+                        print("✅ Successfully posted MLB Weather Report to Bluesky!")
+                    except Exception as e:
+                        print(f"⚠️ Failed to post weather on Bluesky: {e}")
+
+                upload_success = twitter_success or bsky_success
+
+            # Clean up images & log to persistent memory
+            if os.path.exists("mlb_weather.png"): os.remove("mlb_weather.png")
+            if os.path.exists("mlb_weather.jpg"): os.remove("mlb_weather.jpg")
+            
+            if upload_success:
+                log_today.append(weather_key)
+                tweeted_recently.append(weather_key)
+                new_tweets_sent = True
+                if firebase_admin._apps:
+                    try: db.reference('tweet_log').update({date_str: log_today})
+                    except: pass
     try:
         schedule_data = requests.get(MLB_API_URL).json()
         games = schedule_data['dates'][0]['games'] if schedule_data.get('dates') else []
