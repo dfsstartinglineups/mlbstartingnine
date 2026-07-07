@@ -50,7 +50,35 @@ function getHeadshotUrl(personId) {
     return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${personId}/headshot/67/current`;
 }
 
-// Helper to convert "Los Angeles Dodgers" -> "Dodgers"
+// 🛡️ THE PITCHER FIX: Dynamically grabs handedness and ignores projected pitchers if MLB announces an official one
+function getSafePitcher(gameData, sideKey, gameNum) {
+    const raw = gameData.gameRaw || {};
+    const proj = gameData.projectedLineups?.[sideKey]?.startingPitcher || {};
+    const official = raw.teams?.[sideKey]?.probablePitcher;
+    const handMap = gameData.lineupHandedness || {};
+
+    // 1. If MLB officially announced the pitcher, ALWAYS trust MLB over the projection site.
+    if (official && official.fullName) {
+        return {
+            id: official.id,
+            name: official.fullName,
+            hand: handMap[official.id] || (proj.id === official.id ? proj.hand : "")
+        };
+    }
+    
+    // 2. If no official MLB pitcher, but it's Game 1, trust the backend projection.
+    if (gameNum === 1 && proj && proj.name) {
+        return {
+            id: proj.id,
+            name: proj.name,
+            hand: handMap[proj.id] || proj.hand || ""
+        };
+    }
+    
+    // 3. 🛡️ DOUBLEHEADER SHIELD: If Game 2 and no official MLB pitcher, DO NOT trust projections!
+    return { id: null, name: "TBD / Bullpen Game", hand: "" };
+}
+
 function getShortTeamName(fullName, mlbTeamNameNode) {
     let short = mlbTeamNameNode || fullName.split(' ').pop();
     if (fullName.includes('Red Sox')) short = 'Red Sox';
@@ -66,14 +94,15 @@ function getShortTeamName(fullName, mlbTeamNameNode) {
 document.addEventListener("DOMContentLoaded", async () => {
     buildHeaderAndFooter();
     
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const todayStr = `${year}-${month}-${day}`;
+    // Sync browser time to EST so files always load correctly across timezones
+    const estDateString = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(new Date());
+    const [mm, dd, yyyy] = estDateString.split('/');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
 
     try {
-        const res = await fetch(`/data/daily_files/games_${todayStr}.json?v=${now.getTime()}`);
+        const res = await fetch(`/data/daily_files/games_${todayStr}.json?v=${new Date().getTime()}`);
         if (!res.ok) throw new Error("Daily slate JSON not found.");
         dailySlateData = await res.json();
     } catch (err) {
@@ -139,7 +168,7 @@ function populateTeamDropdown() {
 
     let optionsHtml = "";
     const playingTeams = [];
-    const addedTeamIds = new Set(); // 🛡️ ADDED THIS: Tracks which teams are already in the list
+    const addedTeamIds = new Set(); 
 
     dailySlateData.games.forEach(game => {
         const raw = game.gameRaw || {};
@@ -149,7 +178,6 @@ function populateTeamDropdown() {
             const teamObj = raw.teams?.[side]?.team;
             if (!teamObj) return;
 
-            // 🛡️ THE FIX: If it's a doubleheader, ignore the duplicate!
             if (addedTeamIds.has(teamObj.id)) return;
             addedTeamIds.add(teamObj.id);
 
@@ -207,9 +235,9 @@ function renderTeamPage() {
                 const gNum = raw.gameNumber || 1;
                 
                 if (gNum === 1 && !game1) {
-                    game1 = g; // Lock in Today's Game 1
+                    game1 = g;
                 } else if (gNum === 2 && !game2) {
-                    game2 = g; // Lock in Today's Game 2
+                    game2 = g;
                 }
             }
         }
@@ -224,7 +252,6 @@ function renderTeamPage() {
                 isDoubleHeader = true;
                 const status1 = game1.gameRaw?.status?.abstractGameState || "";
                 
-                // If Today's Game 1 is completely finished, flip to Today's true Game 2
                 if (status1 === "Final" || status1 === "Game Over") {
                     targetGame = game2;
                     targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
@@ -232,7 +259,6 @@ function renderTeamPage() {
                 }
             }
         } else if (game2) {
-            // Fallback safety if Game 1 is completely dropped from active slate
             targetGame = game2;
             targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
             gameNum = 2;
@@ -258,25 +284,21 @@ function renderTeamPage() {
     const tracking = targetGame.lineupTracking?.[targetSide] || {};
     const projData = targetGame.projectedLineups?.[targetSide] || {};
     
-    // 🔥 REAL MLB FIELDING POSITIONS & HANDEDNESS MAPS 🔥
     const posMap = targetGame.gamePositions || {};
     const handMap = targetGame.lineupHandedness || {};
 
-    // Generate Short Names (e.g. "DODGERS", "D-BACKS")
     const shortName = getShortTeamName(currentTargetName, raw.teams?.[targetSide]?.team?.teamName);
     const oppShortName = getShortTeamName(oppTeamObj.name, oppTeamObj.teamName);
 
-    // Format The Game Date
     const gameDateRaw = raw.officialDate || new Date().toISOString().split('T')[0];
     const [yy, mm, dd] = gameDateRaw.split('-');
     const dObj = new Date(yy, mm - 1, dd);
     let displayDate = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' }).toUpperCase();
     
-    // ADD THIS: Append Game Number for Doubleheaders
     if (isDoubleHeader) {
         displayDate += ` &nbsp;•&nbsp; <span style="color: #ff1744;">GAME ${gameNum}</span>`;
     }
-    // Status Badge Logic
+    
     const status = tracking.status || "NONE";
     let badgeHtml = "";
     if (status === "OFFICIAL") {
@@ -324,13 +346,17 @@ function renderTeamPage() {
                 <div style="font-family: 'Montserrat', sans-serif; font-size: 10px; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; border-bottom: 1px dashed var(--paper-line); padding-bottom: 3px;">Batting Order</div>
     `;
 
-    // Populate Compact Batting Order (42px height per row fits laptops without scrolling!)
-    const batters = projData.battingOrder || [];
+    // 🛡️ THE LINEUP SOURCE FIX: If official, grab the official lineup. Otherwise, grab projections.
+    const isOfficial = (status === "OFFICIAL" || status === "MODIFIED");
+    const batters = (isOfficial && raw.lineups && raw.lineups[`${targetSide}Players`]) 
+        ? raw.lineups[`${targetSide}Players`] 
+        : (projData.battingOrder || []);
+
     if (batters.length === 0) {
         cardHtml += `<div style="padding: 15px; text-align: center; font-family: 'Montserrat', sans-serif; color: #666; font-style: italic;">Batting order not populated yet.</div>`;
     } else {
         batters.forEach((b, idx) => {
-            // Pull REAL baseball fielding position (SS, CF, 2B) instead of C/1B fantasy slots!
+            const playerName = b.name || b.fullName || "Unknown";
             const pos = posMap[b.id] || posMap[String(b.id)] || b.fd_positions || b.dk_positions || "DH";
             const hand = handMap[b.id] || handMap[String(b.id)] || b.hand || "";
             const handDisplay = hand ? `(${hand}) ` : "";
@@ -350,7 +376,7 @@ function renderTeamPage() {
                     </div>
                     
                     <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(15px, 3.8vw, 17px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span>${b.name}
+                        <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span>${playerName}
                     </div>
                     
                     <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
@@ -362,11 +388,10 @@ function renderTeamPage() {
         });
     }
 
-    // Starting Pitcher Section (Compact 50px Box)
-    const pitcher = projData.startingPitcher || {};
-    const pName = pitcher.name || "To Be Determined";
-    const pHand = pitcher.hand ? `(${pitcher.hand}) ` : "";
-    const pHeadshot = getHeadshotUrl(pitcher.id);
+    const safePitcher = getSafePitcher(targetGame, targetSide, gameNum);
+    const pName = safePitcher.name;
+    const pHand = safePitcher.hand ? `(${safePitcher.hand}) ` : "";
+    const pHeadshot = getHeadshotUrl(safePitcher.id);
 
     cardHtml += `
             </div>
@@ -400,11 +425,10 @@ function renderTeamPage() {
         </div>
     `;
 
-    // Inside renderTeamPage()
     captureArea.innerHTML = cardHtml;
 
-    // ADD THIS LINE HERE:
-    renderAnalyticsSection(targetGame, targetSide, projData);
+    // Pass the active batters array to keep the Analytics synced with the display
+    renderAnalyticsSection(targetGame, targetSide, batters, gameNum);
 }
 
 // ==========================================
@@ -449,7 +473,7 @@ function getSlugFromId(id) {
 // ==========================================
 // 6. RENDER ADVANCED ANALYTICS SECTION
 // ==========================================
-function renderAnalyticsSection(targetGame, targetSide, projData) {
+function renderAnalyticsSection(targetGame, targetSide, batters, gameNum) {
     const container = document.getElementById("public-analytics-section");
     if (!container) return;
 
@@ -462,9 +486,9 @@ function renderAnalyticsSection(targetGame, targetSide, projData) {
     const umpStats = targetGame.umpStats || {};
     const parkStats = targetGame.parkStats || {};
     
-    // Identify Opposing Pitcher
+    // Identify Opposing Pitcher using safe doubleheader logic
     const oppSide = targetSide === 'away' ? 'home' : 'away';
-    const oppPitcher = targetGame.projectedLineups?.[oppSide]?.startingPitcher || {};
+    const oppPitcher = getSafePitcher(targetGame, oppSide, gameNum);
     const pStats = oppPitcher.id ? deepStats[oppPitcher.id] : null;
     const pitcherHand = oppPitcher.hand || 'R'; 
     
@@ -488,11 +512,10 @@ function renderAnalyticsSection(targetGame, targetSide, projData) {
         </style>
     `;
 
-    const batters = projData.battingOrder || [];
-
     // 1. BUILD DFS TABLE
     let dfsRows = '';
     batters.forEach(b => {
+        const playerName = b.name || b.fullName || "Unknown";
         const fdSal = b.salary ? `$${b.salary}` : '-';
         const fdProj = b.proj ? parseFloat(b.proj).toFixed(1) : '-';
         const dkSal = b.dk_salary ? `$${b.dk_salary}` : '-';
@@ -500,7 +523,7 @@ function renderAnalyticsSection(targetGame, targetSide, projData) {
         const pos = b.fd_positions || b.dk_positions || 'FLEX';
         
         dfsRows += `<tr>
-            <td>${b.name}</td>
+            <td>${playerName}</td>
             <td style="color: #8892a3;">${pos}</td>
             <td>${fdSal}</td>
             <td class="highlight-text">${fdProj}</td>
@@ -545,11 +568,18 @@ function renderAnalyticsSection(targetGame, targetSide, projData) {
                 <span>${season.k || '-'} SO</span>
             </div>
         </div>`;
+    } else {
+        pitcherHtml = `
+        <div class="stat-card">
+            <div class="stat-header">Opposing Pitcher: TBD / Bullpen Game</div>
+            <div style="padding: 20px; text-align: center; color: #8892a3; font-size: 13px;">Advanced split stats will populate once an official starting pitcher is announced.</div>
+        </div>`;
     }
 
     // 3. BUILD BATTER SPLITS TABLE
     let splitRows = '';
     batters.forEach(b => {
+        const playerName = b.name || b.fullName || "Unknown";
         const bStats = deepStats[b.id] || {};
         const splitData = pitcherHand === 'L' ? (bStats.split_vL || {}) : (bStats.split_vR || {});
         const ops = splitData.ops || '-';
@@ -559,7 +589,7 @@ function renderAnalyticsSection(targetGame, targetSide, projData) {
         const bvpHr = bvp.hr !== undefined ? bvp.hr : '-';
         
         splitRows += `<tr>
-            <td>${b.name}</td>
+            <td>${playerName}</td>
             <td class="${ops > '.800' ? 'highlight-text' : ''}">${ops}</td>
             <td>${bvpAb}</td>
             <td>${bvpAvg}</td>
