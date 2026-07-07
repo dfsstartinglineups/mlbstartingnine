@@ -578,14 +578,34 @@ async def run_engines(memory):
         team_url = f"https://mlbstartingnine.com/lineups/{team_slug}/"
         reply_text = f"View the {full_team_name} daily starting lineups at our new team lineup page:\n{team_url}"
 
-        # 2. BUILD THE MAIN TWEET (Removed the link from the main text!)
-        tweet_text = f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n"
-        if team_odds != "TBD": tweet_text += f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
+        # 2. BUILD THE MAIN TWEET (Link at the top!)
+        main_link = f"https://mlbstartingnine.com/#game-{game_pk}"
+        
+        # --- Build X (Twitter) Text ---
+        if alert_header:
+            tweet_text = f"{alert_header}\n\nLive matchups & stats provided by:\n{main_link}\n\n"
+        else:
+            tweet_text = f"{game_date_short} ⚾ {team_short} Lineup is Out provided by:\n{main_link}\n\n"
+            
+        if team_odds != "TBD": 
+            tweet_text += f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
+            
         tweet_text += f"#{team_hash} #{team_hash}Lineup #MLB"
         
+        # --- Build Bluesky Rich Text ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{alert_header}\n\n" if alert_header else f"{game_date_short} ⚾ {team_short} Lineup is Out\n\n")
-        if team_odds != "TBD": bsky_tb.text(f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n")
+        
+        if alert_header:
+            bsky_tb.text(f"{alert_header}\n\nLive matchups & stats provided by:\n")
+        else:
+            bsky_tb.text(f"{game_date_short} ⚾ {team_short} Lineup is Out provided by:\n")
+            
+        bsky_tb.link(main_link, main_link)
+        bsky_tb.text("\n\n")
+        
+        if team_odds != "TBD": 
+            bsky_tb.text(f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n")
+            
         bsky_tb.text(f"#{team_hash} #{team_hash}Lineup #MLB")
 
         # 3. GENERATE SCREENSHOT
