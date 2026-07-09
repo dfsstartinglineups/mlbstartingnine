@@ -324,12 +324,18 @@ async def run_engines(memory):
                 print(f"🧹 Janitor: Deleted old log '{k}' from Firebase.")
             except: pass
 
-    if date_str not in memory: memory[date_str] = []
-    log_today = memory[date_str]
+    if date_str not in memory or not isinstance(memory[date_str], list): 
+        memory[date_str] = []
+    
+    # Scrub any None values out of today's log immediately
+    log_today = [item for item in memory[date_str] if item]
+    memory[date_str] = log_today
     
     tweeted_recently = []
     for date_list in memory.values():
-        tweeted_recently.extend(date_list)
+        if isinstance(date_list, list):
+            # Only extend valid strings, filtering out Firebase nulls
+            tweeted_recently.extend([item for item in date_list if item and isinstance(item, str)])
 
     new_tweets_sent = False
 
@@ -794,7 +800,7 @@ async def run_engines(memory):
             mlb_alt_parts.append(f"Starting Pitcher: {team_p_ref}.")
             mlb_alt_text = " ".join(mlb_alt_parts)[:1000]
 
-            previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
+            previously_tweeted_keys = [k for k in tweeted_recently if k and isinstance(k, str) and k.startswith(base_key + "_")]
 
             if not previously_tweeted_keys:
                 if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
