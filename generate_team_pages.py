@@ -55,7 +55,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     
     <title>{team_name} Starting Lineup Today | Batting Order & Pitcher</title>
     <meta name="description" content="View the official {team_name} starting lineup, projected batting order, confirmed starting pitcher, live Vegas odds, and DFS matchup stats for today's game.">
-    <link rel="canonical" href="https://mlbstartingnine.com/lineups/{team_slug}">
+    <link rel="canonical" href="https://mlbstartingnine.com/lineups/{team_slug}/">
     
     <meta property="og:type" content="website">
     <meta property="og:title" content="{team_name} Starting 9 | Today's Lineup & Stats">
