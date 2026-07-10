@@ -324,18 +324,12 @@ async def run_engines(memory):
                 print(f"🧹 Janitor: Deleted old log '{k}' from Firebase.")
             except: pass
 
-    if date_str not in memory or not isinstance(memory[date_str], list): 
-        memory[date_str] = []
-    
-    # Scrub any None values out of today's log immediately
-    log_today = [item for item in memory[date_str] if item]
-    memory[date_str] = log_today
+    if date_str not in memory: memory[date_str] = []
+    log_today = memory[date_str]
     
     tweeted_recently = []
     for date_list in memory.values():
-        if isinstance(date_list, list):
-            # Only extend valid strings, filtering out Firebase nulls
-            tweeted_recently.extend([item for item in date_list if item and isinstance(item, str)])
+        tweeted_recently.extend(date_list)
 
     new_tweets_sent = False
 
@@ -499,7 +493,74 @@ async def run_engines(memory):
     # ==========================================
     # MLB ENGINE
     # ==========================================
+    # ==========================================
     # DAILY MLB WEATHER REPORT (Fires after 10 AM EST)
+    # ==========================================
+    weather_key = f"WEATHER_REPORT_{date_str}"
+    
+    if weather_key not in memory.get(date_str, []) and today_est.hour >= 10:
+        weather_success = False
+        for attempt in range(2):
+            try:
+                b = await get_browser()
+                if await take_weather_screenshot(b):
+                    weather_success = True
+                    break
+                await asyncio.sleep(5)
+            except Exception as e:
+                print(f"⚠️ Weather screenshot attempt {attempt+1} failed: {e}")
+                await asyncio.sleep(5)
+            
+        if weather_success:
+            weather_text = f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nFull interactive radar & hourly forecasts:\nhttps://weathermlb.com\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather"
+            
+            if DRY_RUN:
+                print(f"\n[SHADOW] 🛑 Mocking Weather Tweet for {date_str}:\n{weather_text}")
+                upload_success = True
+            else:
+                twitter_success = False
+                bsky_success = False
+                
+                # --- X (Twitter) Upload -> @DailyMLBLineups ---
+                try:
+                    media = mlb_api_v1.media_upload("mlb_weather.png")
+                    mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
+                    mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
+                    twitter_success = True
+                    print("✅ Successfully tweeted MLB Weather Report to X!")
+                except Exception as e:
+                    print(f"⚠️ Failed to tweet weather on X: {e}")
+                    
+                # --- Bluesky Upload ---
+                config = LEAGUE_CONFIG.get("mlb")
+                if config and config.get("bsky_client"):
+                    try:
+                        with open("mlb_weather.jpg", "rb") as f:
+                            img_data = f.read()
+                        bsky_tb = client_utils.TextBuilder()
+                        bsky_tb.text(f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\nFull interactive radar & hourly forecasts:\n")
+                        bsky_tb.link("https://weathermlb.com", "https://weathermlb.com")
+                        bsky_tb.text("\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather")
+                        
+                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt="MLB Daily Weather Report & Stadium Wind Speeds")
+                        bsky_success = True
+                        print("✅ Successfully posted MLB Weather Report to Bluesky!")
+                    except Exception as e:
+                        print(f"⚠️ Failed to post weather on Bluesky: {e}")
+
+                upload_success = twitter_success or bsky_success
+
+            # Clean up images & log to persistent memory
+            if os.path.exists("mlb_weather.png"): os.remove("mlb_weather.png")
+            if os.path.exists("mlb_weather.jpg"): os.remove("mlb_weather.jpg")
+            
+            if upload_success:
+                log_today.append(weather_key)
+                tweeted_recently.append(weather_key)
+                new_tweets_sent = True
+                if firebase_admin._apps:
+                    try: db.reference('tweet_log').update({date_str: log_today})
+                    except: pass
     try:
         schedule_data = requests.get(MLB_API_URL).json()
         games = schedule_data['dates'][0]['games'] if schedule_data.get('dates') else []
@@ -733,7 +794,7 @@ async def run_engines(memory):
             mlb_alt_parts.append(f"Starting Pitcher: {team_p_ref}.")
             mlb_alt_text = " ".join(mlb_alt_parts)[:1000]
 
-            previously_tweeted_keys = [k for k in tweeted_recently if k and isinstance(k, str) and k.startswith(base_key + "_")]
+            previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
 
             if not previously_tweeted_keys:
                 if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
