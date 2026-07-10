@@ -438,22 +438,10 @@ function handleTeamSwitch(selectElement) {
     const selectedOption = selectElement.options[selectElement.selectedIndex];
     if (!selectedOption || !selectedOption.value) return;
 
-    const newId = parseInt(selectedOption.value);
     const newSlug = selectedOption.getAttribute("data-slug");
-    const newName = selectedOption.getAttribute("data-name");
 
-    currentTargetId = newId;
-    currentTargetSlug = newSlug;
-    currentTargetName = newName;
-    window.TARGET_TEAM_ID = newId;
-    window.TARGET_TEAM_SLUG = newSlug;
-    window.TARGET_TEAM_NAME = newName;
-
-    const newUrl = `/lineups/${newSlug}/`;
-    window.history.pushState({ teamId: newId }, "", newUrl);
-    
-    document.title = `${newName} Starting Lineup Today | Batting Order & Pitcher`;
-    renderTeamPage();
+    // Force a clean, direct static folder redirect with the trailing slash hardcoded!
+    window.location.href = `/lineups/${newSlug}/`;
 }
 
 function getSlugFromId(id) {
