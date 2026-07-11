@@ -6,8 +6,8 @@ from datetime import datetime, timedelta
 
 # --- CONFIGURATION ---
 DATA_DIR = 'data'
-LIVE_DIR = os.path.join(DATA_DIR, 'LIVE')
-MASTER_STATS_FILE = os.path.join(LIVE_DIR, 'player_master_data.json')
+LIVE_DIR = os.path.join(DATA_DIR, 'LIVE')  # Keeps yesterday's live game logs lookup path intact
+MASTER_STATS_FILE = os.path.join(DATA_DIR, 'player_master_data.json')  # Updated destination path 🚀
 
 os.makedirs(LIVE_DIR, exist_ok=True)
 
