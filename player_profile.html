@@ -76,7 +76,6 @@
             padding: 2px;
         }
         
-        /* Lineup Status Badge Overhauls */
         .status-badge-confirmed { background-color: #198754; color: #fff; }
         .status-badge-projected { background-color: #ffecb5; color: #1a1a1a; }
         .status-badge-scratched { background-color: #dc3545; color: #fff; }
@@ -120,7 +119,6 @@
                                 <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;">Shortstop • Milwaukee Brewers (#7)</p>
                             </div>
                             
-                            <!-- UPGRADED LINEUP POSITION STATUS BADGE -->
                             <div class="badge status-badge-confirmed d-flex flex-column align-items-center justify-content-center px-3 py-2 rounded shadow-sm text-center flex-shrink-0" style="min-width: 160px; line-height: 1.2;">
                                 <div class="fw-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">
                                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="me-1" style="vertical-align: -1px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -161,7 +159,27 @@
                 <div class="card-body p-3">
                     <h5 class="fw-bold mb-3 text-dark border-bottom pb-2" style="font-size: 1rem; letter-spacing: -0.2px;">📈 Split Analytics & Matchup Matrix</h5>
                     
-                    <!-- BvP Lifetime Matchup Card Component -->
+                    <!-- NEW HOME RUN PROBABILITY SCORE CARD -->
+                    <div class="row g-2 mb-3" id="hr-probability-card">
+                        <div class="col-12">
+                            <div class="border rounded p-3 bg-white shadow-sm">
+                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                    <span class="fw-bold text-dark" style="font-size: 0.85rem;">🚀 Home Run Model Predictor</span>
+                                    <span class="badge bg-danger fw-bold" id="hr-score-badge">HR Score: 18.5</span>
+                                </div>
+                                <div class="w-100">
+                                    <div class="progress rounded-pill" style="height: 12px; background-color: #e9ecef;">
+                                        <div class="progress-bar progress-bar-striped bg-danger progress-bar-animated" role="progressbar" style="width: 65%;" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100" id="hr-progress-bar"></div>
+                                    </div>
+                                    <div class="text-muted mt-2 lh-sm" style="font-size: 0.70rem;">
+                                        Calculated probability combines historical platoon launch angle distributions, opposing pitcher HR/9 velocity metrics vs. right-handed batters[cite: 3], historical lifetime BvP contact points[cite: 3], and customized ballpark dimensions factor weight variables[cite: 3].
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BvP Lifetime Matchup Component -->
                     <div class="row g-2 mb-3">
                         <div class="col-12">
                             <div class="border rounded p-3" style="background-color: #f8f9fa;" id="bvp-active-card">
