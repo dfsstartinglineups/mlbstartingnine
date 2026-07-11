@@ -494,7 +494,7 @@ async def run_engines(memory):
     # MLB ENGINE
     # ==========================================
     # ==========================================
-    # DAILY MLB WEATHER REPORT (Fires after 10 AM EST)
+    # DAILY MLB WEATHER REPORT (Fires after 10 AM EST with Retries)
     # ==========================================
     weather_key = f"WEATHER_REPORT_{date_str}"
     
@@ -521,32 +521,38 @@ async def run_engines(memory):
                 twitter_success = False
                 bsky_success = False
                 
-                # --- X (Twitter) Upload -> @DailyMLBLineups ---
-                try:
-                    media = mlb_api_v1.media_upload("mlb_weather.png")
-                    mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
-                    mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
-                    twitter_success = True
-                    print("✅ Successfully tweeted MLB Weather Report to X!")
-                except Exception as e:
-                    print(f"⚠️ Failed to tweet weather on X: {e}")
-                    
-                # --- Bluesky Upload ---
+                # --- X (Twitter) Upload with 2 Attempts ---
+                for attempt in range(2):
+                    try:
+                        if attempt == 1: await asyncio.sleep(3)
+                        media = mlb_api_v1.media_upload("mlb_weather.png")
+                        mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
+                        mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
+                        twitter_success = True
+                        print("✅ Successfully tweeted MLB Weather Report to X!")
+                        break
+                    except Exception as e:
+                        print(f"⚠️ X weather upload attempt {attempt+1} failed: {e}")
+                        
+                # --- Bluesky Upload with 2 Attempts ---
                 config = LEAGUE_CONFIG.get("mlb")
                 if config and config.get("bsky_client"):
-                    try:
-                        with open("mlb_weather.jpg", "rb") as f:
-                            img_data = f.read()
-                        bsky_tb = client_utils.TextBuilder()
-                        bsky_tb.text(f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\nFull interactive radar & hourly forecasts:\n")
-                        bsky_tb.link("https://weathermlb.com", "https://weathermlb.com")
-                        bsky_tb.text("\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather")
-                        
-                        config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt="MLB Daily Weather Report & Stadium Wind Speeds")
-                        bsky_success = True
-                        print("✅ Successfully posted MLB Weather Report to Bluesky!")
-                    except Exception as e:
-                        print(f"⚠️ Failed to post weather on Bluesky: {e}")
+                    for attempt in range(2):
+                        try:
+                            if attempt == 1: await asyncio.sleep(3)
+                            with open("mlb_weather.jpg", "rb") as f:
+                                img_data = f.read()
+                            bsky_tb = client_utils.TextBuilder()
+                            bsky_tb.text(f"🌤️ {game_date_short} MLB Daily Weather Report & Hitting Conditions\n\nTrack stadium wind speeds, rain delay risks, and live roof statuses for today's slate.\n\nFull interactive radar & hourly forecasts:\n")
+                            bsky_tb.link("https://weathermlb.com", "https://weathermlb.com")
+                            bsky_tb.text("\n\n#MLB #FantasyBaseball #SportsBetting #MLBWeather")
+                            
+                            config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt="MLB Daily Weather Report & Stadium Wind Speeds")
+                            bsky_success = True
+                            print("✅ Successfully posted MLB Weather Report to Bluesky!")
+                            break
+                        except Exception as e:
+                            print(f"⚠️ Bluesky weather upload attempt {attempt+1} failed: {e}")
 
                 upload_success = twitter_success or bsky_success
 
