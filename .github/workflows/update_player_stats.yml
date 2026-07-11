@@ -2,10 +2,9 @@ name: Nightly Player Data Update
 
 on:
   schedule:
-    - cron: '30 8 * * *'  # Runs natively at 8:30 AM UTC / 4:30 AM EST as a fallback
-  repository_dispatch:
-    types: [trigger-player-update] # Allows cronjob.org to ping an API webhook to run this job
-  workflow_dispatch: # Allows you to manually run it via the GitHub UI
+    # 9:00 AM UTC is exactly 5:00 AM Eastern Time in the summer (EDT)
+    - cron: '0 7 * * *'
+  workflow_dispatch: # Keeps the manual button in GitHub UI just in case you need to force a run
 
 permissions:
   contents: write
