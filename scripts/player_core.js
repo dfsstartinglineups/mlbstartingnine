@@ -7,7 +7,6 @@ function getTargetSlateDate() {
     const now = new Date();
     const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
     const estDate = new Date(estStr);
-    // If it's before 7:00 AM Eastern, lock onto yesterday's file
     if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
     const yyyy = estDate.getFullYear();
     const mm = String(estDate.getMonth() + 1).padStart(2, '0');
@@ -127,13 +126,19 @@ async function loadPlayerProfileData() {
                     const teamSide = isAway ? "away" : "home";
                     const oppSide = isAway ? "home" : "away";
                     const sideLabelUpper = isAway ? "AWAY" : "HOME";
-                    const oppSideLabelUpper = isAway ? "HOME" : "AWAY";
+                    const oppSideKey = isAway ? "home" : "away";
                     
                     const tracking = game.lineupTracking || {};
                     const trackingNode = tracking[teamSide] || {};
                     const oppPitcherName = gameRaw.teams?.[oppSide]?.probablePitcher?.fullName || "TBD";
                     const oppPitcherId = String(gameRaw.teams?.[oppSide]?.probablePitcher?.id);
                     
+                    const pDeepStats = game.deepStats[PLAYER_ID] || {};
+                    
+                    // Safely fall back to a dash if projections aren't compiled yet for a player
+                    const dkProjectionValue = pDeepStats.dk_proj !== undefined ? pDeepStats.dk_proj.toFixed(1) : '--';
+                    const fdProjectionValue = pDeepStats.fd_proj !== undefined ? pDeepStats.fd_proj.toFixed(1) : '--';
+
                     // Batting Order Position Math
                     let isConfirmed = trackingNode.status === "OFFICIAL";
                     let slotIndex = -1;
@@ -184,43 +189,69 @@ async function loadPlayerProfileData() {
                                         <span class="badge bg-primary text-uppercase me-2" style="font-size:0.65rem;">${labelPrefix}Box Score</span>
                                         <strong class="text-dark" style="font-size: 0.9rem;">${profile.summary}</strong>
                                     </div>
-                                    <div class="d-flex align-items-center gap-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <!-- DK Dynamic Box -->
                                         <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
-                                            <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700;">DK Pts</span>
-                                            <span class="dk-accent" style="font-size: 1rem;">${playerBox.dk_pts.toFixed(1)}</span>
+                                            <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DraftKings</span>
+                                            <div class="d-flex align-items-baseline gap-1">
+                                                <span class="dk-accent" style="font-size: 1.1rem;">${playerBox.dk_pts.toFixed(1)}</span>
+                                                <span class="text-muted" style="font-size:0.75rem;">/</span>
+                                                <span class="text-secondary fw-bold" style="font-size:0.85rem;">${dkProjectionValue}</span>
+                                            </div>
                                         </div>
+                                        <!-- FD Dynamic Box -->
                                         <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
-                                            <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700;">FD Pts</span>
-                                            <span class="fd-accent" style="font-size: 1rem;">${playerBox.fd_pts.toFixed(1)}</span>
+                                            <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">FanDuel</span>
+                                            <div class="d-flex align-items-baseline gap-1">
+                                                <span class="fd-accent" style="font-size: 1.1rem;">${playerBox.fd_pts.toFixed(1)}</span>
+                                                <span class="text-muted" style="font-size:0.75rem;">/</span>
+                                                <span class="text-secondary fw-bold" style="font-size:0.85rem;">${fdProjectionValue}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>`;
                         }
-                    } else { globalGameStatusStrings.push(`${labelPrefix}Scheduled`); }
+                    } else { 
+                        // If game hasn't started yet, display clean upcoming card showing just projections
+                        globalGameStatusStrings.push(`${labelPrefix}Scheduled`);
+                        liveConsoleZone.innerHTML += `
+                        <div class="p-3 border-bottom" style="background-color: #edf4f8;">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                <div>
+                                    <span class="badge bg-secondary text-uppercase me-2" style="font-size:0.65rem;">Upcoming Matchup</span>
+                                    <span class="text-dark fw-semibold" style="font-size: 0.85rem;">vs. ${oppPitcherName}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                                        <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DK Proj</span>
+                                        <span class="text-dark fw-bold" style="font-size: 1rem;">${dkProjectionValue}</span>
+                                    </div>
+                                    <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                                        <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">FD Proj</span>
+                                        <span class="text-dark fw-bold" style="font-size: 1rem;">${fdProjectionValue}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
 
-                    // DYNAMIC DATA METRICS MATRIX ENGINE (HITTERS VS PITCHERS FLOPS)
+                    // DYNAMIC DATA METRICS MATRIX ENGINE
                     if (masterDataProfile) {
-                        const pDeepStats = game.deepStats[PLAYER_ID] || {};
-                        
                         if (!masterDataProfile.is_pitcher) {
                             // --- HITTER POWER PREDICTOR FORMULA ---
-                            let hitHrRate = 0.03; // Base League Average ~3%
-                            
+                            let hitHrRate = 0.03; 
                             if (game.lineupHandedness && game.lineupHandedness[oppPitcherId] === 'R') {
                                 hitHrRate = (pDeepStats.split_vR && pDeepStats.split_vR.ab > 0) ? (pDeepStats.split_vR.hr || 0) / pDeepStats.split_vR.ab : 0.03;
                             } else if (game.lineupHandedness && game.lineupHandedness[oppPitcherId] === 'L') {
                                 hitHrRate = (pDeepStats.split_vL && pDeepStats.split_vL.ab > 0) ? (pDeepStats.split_vL.hr || 0) / pDeepStats.split_vL.ab : 0.03;
                             } else {
-                                // Fallback: Aggregate Season HR Rate
                                 const tHr = (pDeepStats.split_vR?.hr || 0) + (pDeepStats.split_vL?.hr || 0);
                                 const tAb = (pDeepStats.split_vR?.ab || 0) + (pDeepStats.split_vL?.ab || 0);
                                 hitHrRate = tAb > 0 ? tHr / tAb : 0.03;
                             }
 
-                            // Normalize to 10.0 baseline based on actual HR rate
                             let baseScore = (hitHrRate / 0.03) * 10.0;
-                            
                             if (game.parkStats) {
                                 const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
                                 baseScore = baseScore * (rawFactor / 100);
@@ -264,7 +295,6 @@ async function loadPlayerProfileData() {
                             const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0.03;
 
                             let baseDangerScore = (pitchHrRate / 0.03) * 10.0;
-
                             if (game.parkStats) {
                                 const rawFactor = ((game.parkStats.hr_l || 100) + (game.parkStats.hr_r || 100)) / 2;
                                 baseDangerScore = baseDangerScore * (rawFactor / 100);
@@ -299,13 +329,10 @@ async function loadPlayerProfileData() {
                     }
 
                     // ==========================================
-                    // STEP 3: RE-CONFIGURED BVP LOOKUP ROUTER
+                    // STEP 3: BVP LOOKUP ROUTER
                     // ==========================================
                     if (masterDataProfile && !masterDataProfile.is_pitcher) {
-                        // --- HITTER LOOKUP PERSPECTIVE (Standard Card) ---
-                        const pDeepStats = game.deepStats[PLAYER_ID] || {};
                         const bvp = pDeepStats.bvp || {};
-                        
                         if (bvp && bvp.ab > 0) {
                             bvpZone.innerHTML += `
                             <div class="border rounded p-3 bg-white shadow-sm mb-2">
@@ -327,9 +354,6 @@ async function loadPlayerProfileData() {
                             </div>`;
                         }
                     } else {
-                        // --- PITCHER LOOKUP PERSPECTIVE (Dynamic Roster Matchup Matrix Table) ---
-                        const oppSideKey = isAway ? "home" : "away";
-                        
                         let orderList = game.lineupTracking?.[oppSideKey]?.hash ? game.lineupTracking[oppSideKey].hash.split('-') : [];
                         if (orderList.length === 0) {
                             orderList = (game.projectedLineups?.[oppSideKey]?.battingOrder || []).map(p => String(p.id));
