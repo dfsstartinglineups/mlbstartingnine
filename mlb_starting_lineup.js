@@ -5,6 +5,16 @@
  * ============================================================================
  */
 
+// --- URL SLUG GENERATOR ---
+function slugify(text) {
+    if (!text) return "";
+    return text.toString().toLowerCase()
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g, '') 
+        .replace(/[^\w\s-]/g, '')                          
+        .replace(/[\s-]+/g, '-')                           
+        .trim();
+}
+
 // ==========================================
 // 1. MASTER THEME DICTIONARY
 // ==========================================
@@ -376,7 +386,7 @@ function renderTeamPage() {
                     </div>
                     
                     <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(15px, 3.8vw, 17px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span>${playerName}
+                        <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span><a href="/players/${slugify(playerName)}/" style="color: inherit; text-decoration: none;">${playerName}</a>
                     </div>
                     
                     <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
@@ -412,7 +422,7 @@ function renderTeamPage() {
                     </div>
                     
                     <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(16px, 4vw, 18px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${pHand}</span>${pName}
+                        <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${pHand}</span><a href="/players/${slugify(pName)}/" style="color: inherit; text-decoration: none;">${pName}</a>
                     </div>
                     
                     <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
@@ -511,7 +521,7 @@ function renderAnalyticsSection(targetGame, targetSide, batters, gameNum) {
         const pos = b.fd_positions || b.dk_positions || 'FLEX';
         
         dfsRows += `<tr>
-            <td>${playerName}</td>
+            <td><a href="/players/${slugify(playerName)}/" style="color: inherit; text-decoration: none;">${playerName}</a></td>
             <td style="color: #8892a3;">${pos}</td>
             <td>${fdSal}</td>
             <td class="highlight-text">${fdProj}</td>
@@ -526,9 +536,11 @@ function renderAnalyticsSection(targetGame, targetSide, batters, gameNum) {
         const vL = pStats.split_vL || {};
         const vR = pStats.split_vR || {};
         const season = pStats.season || {};
+        const oppPitcherLink = oppPitcher.name ? `<a href="/players/${slugify(oppPitcher.name)}/" style="color: inherit; text-decoration: none;">${oppPitcher.name}</a>` : 'TBD';
+        
         pitcherHtml = `
         <div class="stat-card">
-            <div class="stat-header">Opposing Pitcher: ${oppPitcher.name || 'TBD'}</div>
+            <div class="stat-header">Opposing Pitcher: ${oppPitcherLink}</div>
             <table class="stat-table">
                 <thead><tr><th>Split</th><th>AVG</th><th>OPS</th><th>HR</th><th>K</th></tr></thead>
                 <tbody>
@@ -577,7 +589,7 @@ function renderAnalyticsSection(targetGame, targetSide, batters, gameNum) {
         const bvpHr = bvp.hr !== undefined ? bvp.hr : '-';
         
         splitRows += `<tr>
-            <td>${playerName}</td>
+            <td><a href="/players/${slugify(playerName)}/" style="color: inherit; text-decoration: none;">${playerName}</a></td>
             <td class="${ops > '.800' ? 'highlight-text' : ''}">${ops}</td>
             <td>${bvpAb}</td>
             <td>${bvpAvg}</td>
