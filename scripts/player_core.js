@@ -7,6 +7,7 @@ function getTargetSlateDate() {
     const now = new Date();
     const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
     const estDate = new Date(estStr);
+    // If it's before 7:00 AM Eastern, lock onto yesterday's file
     if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
     const yyyy = estDate.getFullYear();
     const mm = String(estDate.getMonth() + 1).padStart(2, '0');
@@ -130,6 +131,7 @@ async function loadPlayerProfileData() {
                     const tracking = game.lineupTracking || {};
                     const trackingNode = tracking[teamSide] || {};
                     const oppPitcherName = gameRaw.teams?.[oppSide]?.probablePitcher?.fullName || "TBD";
+                    const oppPitcherId = String(gameRaw.teams?.[oppSide]?.probablePitcher?.id);
                     
                     // Batting Order Position Math
                     let isConfirmed = trackingNode.status === "OFFICIAL";
@@ -196,30 +198,25 @@ async function loadPlayerProfileData() {
                         }
                     } else { globalGameStatusStrings.push(`${labelPrefix}Scheduled`); }
 
-                    // DYNAMIC HR PREDICTOR DATA ENGINE
+                    // FIXED DYNAMIC HR PREDICTOR DATA ENGINE
                     if (masterDataProfile && !masterDataProfile.is_pitcher) {
-                        // Access your unique main page formula calculation variables out of the daily payload nodes
                         const pDeepStats = game.deepStats[PLAYER_ID] || {};
-                        const pitcherDeepStats = game.deepStats[String(gameRaw.teams?.[oppSide]?.probablePitcher?.id)] || {};
+                        let baseScore = 10.0; 
                         
-                        let baseScore = 10.0; // Default League Baseline Context Matchup 
-                        
-                        // Calculate dynamically using your main script formula variables if populated
-                        if (pDeepStats.split_vR && game.lineupHandedness?.[String(gameRaw.teams?.[oppSide]?.probablePitcher?.id)] === 'R') {
+                        if (pDeepStats.split_vR && game.lineupHandedness?.[oppPitcherId] === 'R') {
                             baseScore += (pDeepStats.split_vR.hr || 0) * 0.8;
                         } else if (pDeepStats.split_vL) {
                             baseScore += (pDeepStats.split_vL.hr || 0) * 0.8;
                         }
                         
                         if (game.parkStats) {
-                            const hrFactor = isAway ? (game.parkStats.hr_l || 1.0) : (game.parkStats.hr_r || 1.0);
-                            baseScore = baseScore * hrFactor;
+                            const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
+                            baseScore = baseScore * (rawFactor / 100);
                         }
 
-                        // Set display configurations matching thresholds
                         let ratingLabel = "AVERAGE MATCHUP";
                         let barColorClass = "bg-primary";
-                        let progressPct = Math.min(Math.max((baseScore / 35.0) * 100, 15), 100);
+                        let progressPct = Math.min(Math.max((baseScore / 30.0) * 100, 10), 100);
 
                         if (baseScore >= 22.0) { ratingLabel = "ELITE POWER PLAY"; barColorClass = "bg-danger text-white"; }
                         else if (baseScore >= 14.0) { ratingLabel = "HIGH PROBABILITY"; barColorClass = "bg-success text-white"; }
