@@ -16,7 +16,7 @@ def slugify(text):
     text = text.lower()
     # Normalize accents (e.g., James Domínguez -> james dominguez)
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
-    # Strip out punctuation like apostrophes or periods (e.g., Ryan O'Hearn -> ryan ohearn)
+    # Strip out punctuation like apostrophes or periods
     text = re.sub(r"[^\w\s-]", "", text)
     # Replace spaces with standard clean dashes
     text = re.sub(r"[\s-]+", "-", text).strip("-")
@@ -47,7 +47,7 @@ def update_sitemap(new_player_urls):
     home_url = f"{DOMAIN}/"
     existing_urls.add(home_url)
 
-    # 3. Merge new player urls into the master tracking set (Sets naturally prevent duplicates)
+    # 3. Merge new player urls into the master tracking set
     new_additions_count = 0
     for url in new_player_urls:
         if url not in existing_urls:
@@ -68,14 +68,12 @@ def update_sitemap(new_player_urls):
             ET.SubElement(url_node, 'changefreq').text = "always"
             ET.SubElement(url_node, 'priority').text = "1.0"
         elif "/lineups/" in url:
-            # Explicit rule to preserve your critical team page configurations
             ET.SubElement(url_node, 'changefreq').text = "daily"
             ET.SubElement(url_node, 'priority').text = "0.9"
         elif "/players/" in url:
             ET.SubElement(url_node, 'changefreq').text = "daily"
             ET.SubElement(url_node, 'priority').text = "0.8"
         else:
-            # Fallback for generic text articles, privacy policy, contact pages, etc.
             ET.SubElement(url_node, 'changefreq').text = "weekly"
             ET.SubElement(url_node, 'priority').text = "0.6"
 
@@ -90,17 +88,73 @@ def update_sitemap(new_player_urls):
         
     print(f"✅ Sitemap successfully compiled. Total active URLs: {len(existing_urls)}")
 
-def generate_player_html(player_id, p_name, is_pitcher, slug):
-    """Generates a static HTML skeleton optimized specifically for player type."""
+def generate_player_html(profile, slug):
+    """Generates a static HTML skeleton with baked-in data optimized specifically for player type."""
     player_url = f"{DOMAIN}/players/{slug}/"
     
-    # Contextual SEO Meta switches
+    # Extract Core Profile Data
+    player_id = profile.get("player_id", "")
+    p_name = profile.get("name", "Unknown Player")
+    is_pitcher = profile.get("is_pitcher", False)
+    team_name = profile.get("team_name", "Free Agent")
+    position = profile.get("position", "Unknown Position")
+    
+    # Pre-Bake Season Strings & Headers based on Player Role
     if is_pitcher:
         title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
         desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
+        
+        wins = profile.get("season", {}).get("w", 0)
+        losses = profile.get("season", {}).get("l", 0)
+        era = profile.get("season", {}).get("era", "-")
+        season_string = f"{position} • {team_name} • {wins}-{losses} • {era} ERA"
+        
+        split_vl_header = '<span class="badge bg-secondary me-1">LHB</span> vs. Left-Handed Batters'
+        split_vr_header = '<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters'
+        split_vol_label = "Batters Faced:"
+        split_hr_label = "HR Allowed:"
     else:
         title = f"Is {p_name} Playing Today? Lineup Status, BvP & Matchup Stats"
         desc = f"Find out if {p_name} is in today's starting lineup. View real-time lineup status, lifetime matchup analytics, daily HR probability scores, and live box scores."
+        
+        avg = profile.get("season", {}).get("avg", "-")
+        hr = profile.get("season", {}).get("hr", 0)
+        season_string = f"{position} • {team_name} • {avg} AVG • {hr} HR"
+        
+        split_vl_header = 'Splits VS Left-Handed'
+        split_vr_header = 'Splits VS Right-Handed'
+        split_vol_label = "Volume:"
+        split_hr_label = "Power Stat:"
+
+    # Pre-Bake Platoon Splits
+    vl = profile.get("split_vL", {})
+    vr = profile.get("split_vR", {})
+    
+    vl_vol = vl.get("ab", 0)
+    vl_avg = vl.get("avg", "-")
+    vl_ops = vl.get("ops", "-")
+    vl_hr = vl.get("hr", 0)
+    
+    vr_vol = vr.get("ab", 0)
+    vr_avg = vr.get("avg", "-")
+    vr_ops = vr.get("ops", "-")
+    vr_hr = vr.get("hr", 0)
+
+    # Pre-Bake Historical Table Log Rows
+    historical_table_rows = ""
+    for log in profile.get("game_log", []):
+        dk_pts = log.get('dk_pts', 0.0)
+        fd_pts = log.get('fd_pts', 0.0)
+        historical_table_rows += f"""
+                            <tr>
+                                <td class="text-start ps-3 fw-bold">{log.get('date', '')}</td>
+                                <td>{log.get('summary', '')}</td>
+                                <td class="dk-accent">{dk_pts:.2f}</td>
+                                <td class="fd-accent">{fd_pts:.1f}</td>
+                            </tr>"""
+                            
+    if not historical_table_rows:
+        historical_table_rows = '<tr><td colspan="4" class="text-center p-3 text-muted">No recent history logged.</td></tr>'
 
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -174,12 +228,12 @@ def generate_player_html(player_id, p_name, is_pitcher, slug):
                         <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-center align-items-sm-start gap-3">
                             <div>
                                 <h1 class="h3 fw-black mb-1 italic text-white" id="player-name-header">{p_name}</h1>
-                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">Synchronizing Player Data...</p>
+                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">{season_string}</p>
                             </div>
                             <div class="d-flex flex-column gap-2 flex-shrink-0" style="min-width: 180px;" id="badge-matrix-zone"></div>
                         </div>
                         <div class="border-top border-secondary mt-3 pt-2 text-muted" style="color: #dee2e6 !important; font-size: 0.8rem;">
-                            <span id="live-game-state-label"><strong>Game Status:</strong> Syncing Today's Slate Profiles...</span>
+                            <span id="live-game-state-label"><strong>Game Status:</strong> Checking Today's Lineups...</span>
                         </div>
                     </div>
                 </div>
@@ -195,20 +249,20 @@ def generate_player_html(player_id, p_name, is_pitcher, slug):
                     <div class="row g-2">
                         <div class="col-md-6">
                             <div class="border rounded p-2 bg-light">
-                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vl-header">Splits VS Left-Handed</div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-volume">Volume:</span><strong class="text-dark" id="split-vl-vol">--</strong></div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vl-avg">--</strong></div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vl-ops">--</strong></div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-hr">Power Stat:</span><strong class="text-dark" id="split-vl-hr">--</strong></div>
+                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vl-header">{split_vl_header}</div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-volume">{split_vol_label}</span><strong class="text-dark" id="split-vl-vol">{vl_vol}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vl-avg">{vl_avg}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vl-ops">{vl_ops}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-hr">{split_hr_label}</span><strong class="text-dark" id="split-vl-hr">{vl_hr}</strong></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="border rounded p-2 bg-light">
-                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vr-header">Splits VS Right-Handed</div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-volume">Volume:</span><strong class="text-dark" id="split-vr-vol">--</strong></div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vr-avg">--</strong></div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vr-ops">--</strong></div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-hr">Power Stat:</span><strong class="text-dark" id="split-vr-hr">--</strong></div>
+                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vr-header">{split_vr_header}</div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-volume">{split_vol_label}</span><strong class="text-dark" id="split-vr-vol">{vr_vol}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vr-avg">{vr_avg}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vr-ops">{vr_ops}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-hr">{split_hr_label}</span><strong class="text-dark" id="split-vr-hr">{vr_hr}</strong></div>
                             </div>
                         </div>
                     </div>
@@ -222,7 +276,9 @@ def generate_player_html(player_id, p_name, is_pitcher, slug):
                         <thead class="table-light fw-bold text-secondary">
                             <tr><th class="text-start ps-3">Date</th><th>Game Line Performance</th><th>DraftKings Pts</th><th>FanDuel Pts</th></tr>
                         </thead>
-                        <tbody id="game-historical-tbody"></tbody>
+                        <tbody id="game-historical-tbody">
+{historical_table_rows}
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -248,36 +304,29 @@ def main():
 
     all_player_urls = []
     created_count = 0
-    skipped_count = 0
 
     print(f"📦 Commencing deployment processing loop for {len(master_data)} baseline player records...")
 
     for key, profile in master_data.items():
-        raw_player_id = key.replace("ID", "")
         player_name = profile.get("name", "Unknown Player")
-        is_pitcher = profile.get("is_pitcher", False)
-
         player_slug = slugify(player_name)
         player_dir = os.path.join(OUTPUT_PLAYERS_DIR, player_slug)
         index_file_path = os.path.join(player_dir, "index.html")
         
         all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-        if os.path.exists(index_file_path):
-            skipped_count += 1
-            continue
-
+        # Overwrites the static files cleanly each night to update cumulative stats
         os.makedirs(player_dir, exist_ok=True)
 
-        html_code = generate_player_html(raw_player_id, player_name, is_pitcher, player_slug)
+        html_code = generate_player_html(profile, player_slug)
         with open(index_file_path, "w", encoding="utf-8") as html_out:
             html_out.write(html_code)
         
         created_count += 1
+        if created_count % 200 == 0:
+            print(f"   ... baked {created_count} static HTML index layouts ...")
 
-    print(f"⚡ Loop Complete. Created: {created_count} profiles | Skipped: {skipped_count} existing profiles.")
-
-    # Execute safe sitemap merger process
+    print(f"⚡ Loop Complete. Pre-baked stats for {created_count} player profile files.")
     update_sitemap(all_player_urls)
 
 if __name__ == "__main__":
