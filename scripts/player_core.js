@@ -205,12 +205,22 @@ async function loadPlayerProfileData() {
                         
                         if (!masterDataProfile.is_pitcher) {
                             // --- HITTER POWER PREDICTOR FORMULA ---
-                            let baseScore = 10.0; 
-                            if (pDeepStats.split_vR && game.lineupHandedness?.[oppPitcherId] === 'R') {
-                                baseScore += (pDeepStats.split_vR.hr || 0) * 0.8;
-                            } else if (pDeepStats.split_vL) {
-                                baseScore += (pDeepStats.split_vL.hr || 0) * 0.8;
+                            let hitHrRate = 0.03; // Base League Average ~3%
+                            
+                            if (game.lineupHandedness && game.lineupHandedness[oppPitcherId] === 'R') {
+                                hitHrRate = (pDeepStats.split_vR && pDeepStats.split_vR.ab > 0) ? (pDeepStats.split_vR.hr || 0) / pDeepStats.split_vR.ab : 0.03;
+                            } else if (game.lineupHandedness && game.lineupHandedness[oppPitcherId] === 'L') {
+                                hitHrRate = (pDeepStats.split_vL && pDeepStats.split_vL.ab > 0) ? (pDeepStats.split_vL.hr || 0) / pDeepStats.split_vL.ab : 0.03;
+                            } else {
+                                // Fallback: Aggregate Season HR Rate
+                                const tHr = (pDeepStats.split_vR?.hr || 0) + (pDeepStats.split_vL?.hr || 0);
+                                const tAb = (pDeepStats.split_vR?.ab || 0) + (pDeepStats.split_vL?.ab || 0);
+                                hitHrRate = tAb > 0 ? tHr / tAb : 0.03;
                             }
+
+                            // Normalize to 10.0 baseline based on actual HR rate
+                            let baseScore = (hitHrRate / 0.03) * 10.0;
+                            
                             if (game.parkStats) {
                                 const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
                                 baseScore = baseScore * (rawFactor / 100);
@@ -244,10 +254,16 @@ async function loadPlayerProfileData() {
                             </div>`;
                         } else {
                             // --- PITCHER HR SUPPRESSION GAUGE FORMULA ---
-                            let baseDangerScore = 8.0; 
-                            const vlDanger = pDeepStats.split_vL ? (pDeepStats.split_vL.hr || 0) * 0.9 : 0;
-                            const vrDanger = pDeepStats.split_vR ? (pDeepStats.split_vR.hr || 0) * 0.9 : 0;
-                            baseDangerScore += (vlDanger + vrDanger);
+                            const vlHr = pDeepStats.split_vL ? (pDeepStats.split_vL.hr || 0) : 0;
+                            const vrHr = pDeepStats.split_vR ? (pDeepStats.split_vR.hr || 0) : 0;
+                            const vlAb = pDeepStats.split_vL ? (pDeepStats.split_vL.ab || 0) : 0;
+                            const vrAb = pDeepStats.split_vR ? (pDeepStats.split_vR.ab || 0) : 0;
+                            
+                            const totalHr = vlHr + vrHr;
+                            const totalAb = vlAb + vrAb;
+                            const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0.03;
+
+                            let baseDangerScore = (pitchHrRate / 0.03) * 10.0;
 
                             if (game.parkStats) {
                                 const rawFactor = ((game.parkStats.hr_l || 100) + (game.parkStats.hr_r || 100)) / 2;
@@ -314,7 +330,6 @@ async function loadPlayerProfileData() {
                         // --- PITCHER LOOKUP PERSPECTIVE (Dynamic Roster Matchup Matrix Table) ---
                         const oppSideKey = isAway ? "home" : "away";
                         
-                        // Extract ordered arrays prioritizing confirmed bats, falling back to predictions
                         let orderList = game.lineupTracking?.[oppSideKey]?.hash ? game.lineupTracking[oppSideKey].hash.split('-') : [];
                         if (orderList.length === 0) {
                             orderList = (game.projectedLineups?.[oppSideKey]?.battingOrder || []).map(p => String(p.id));
