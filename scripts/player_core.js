@@ -15,6 +15,7 @@ function getTargetSlateDate() {
 }
 
 // --- TEAM SLUG ROUTING HELPER ---
+// --- TEAM SLUG ROUTING HELPER ---
 function getSlugFromId(id) {
     const slugMap = {
         108: "los-angeles-angels", 109: "arizona-diamondbacks", 110: "baltimore-orioles", 111: "boston-red-sox",
@@ -24,7 +25,7 @@ function getSlugFromId(id) {
         135: "san-diego-padres", 136: "seattle-mariners", 137: "san-francisco-giants", 138: "st-louis-cardinals",
         139: "tampa-bay-rays", 140: "texas-rangers", 141: "toronto-blue-jays", 142: "minnesota-twins",
         143: "philadelphia-phillies", 144: "atlanta-braves", 145: "chicago-white-sox", 146: "miami-marlins",
-        147: "new-york-yankees"
+        147: "new-york-yankees", 158: "milwaukee-brewers" // <-- Restored the Brewers!
     };
     return slugMap[id] || "los-angeles-dodgers";
 }
