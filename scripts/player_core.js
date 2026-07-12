@@ -14,6 +14,21 @@ function getTargetSlateDate() {
     return `${yyyy}-${mm}-${dd}`;
 }
 
+// --- TEAM SLUG ROUTING HELPER ---
+function getSlugFromId(id) {
+    const slugMap = {
+        108: "los-angeles-angels", 109: "arizona-diamondbacks", 110: "baltimore-orioles", 111: "boston-red-sox",
+        112: "chicago-cubs", 113: "cincinnati-reds", 114: "cleveland-guardians", 115: "colorado-rockies",
+        116: "detroit-tigers", 117: "houston-astros", 118: "kansas-city-royals", 119: "los-angeles-dodgers",
+        120: "washington-nationals", 121: "new-york-mets", 133: "athletics", 134: "pittsburgh-pirates",
+        135: "san-diego-padres", 136: "seattle-mariners", 137: "san-francisco-giants", 138: "st-louis-cardinals",
+        139: "tampa-bay-rays", 140: "texas-rangers", 141: "toronto-blue-jays", 142: "minnesota-twins",
+        143: "philadelphia-phillies", 144: "atlanta-braves", 145: "chicago-white-sox", 146: "miami-marlins",
+        147: "new-york-yankees"
+    };
+    return slugMap[id] || "los-angeles-dodgers";
+}
+
 async function loadPlayerProfileData() {
     if (typeof PLAYER_ID === 'undefined') {
         console.error("Core Error: PLAYER_ID token missing from static index configuration.");
@@ -212,7 +227,15 @@ async function loadPlayerProfileData() {
                             badgeHtml = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Not Projected to Start</div>`;
                         }
                     }
-                    badgeZone.innerHTML += badgeHtml;
+                    
+                    // --- DYNAMIC LINEUP BUTTON INJECTION ---
+                    const myTeamId = masterDataProfile?.team_id || gameRaw.teams?.[teamSide]?.team?.id;
+                    const teamSlug = getSlugFromId(myTeamId);
+                    const lineupLinkText = isConfirmed ? "View Official Lineup" : "View Projected Lineup";
+                    const lineupLinkHtml = `<a href="https://mlbstartingnine.com/lineups/${teamSlug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 ${lineupLinkText}</a>`;
+
+                    // Bundle them together into the badge zone
+                    badgeZone.innerHTML += `<div class="mb-3">${badgeHtml}${lineupLinkHtml}</div>`;
 
                     const activeLiveGame = liveData[gamePk];
                     if (activeLiveGame) {
