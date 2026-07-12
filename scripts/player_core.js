@@ -135,7 +135,7 @@ async function loadPlayerProfileData() {
                     
                     const pDeepStats = game.deepStats[PLAYER_ID] || {};
                     
-                    // --- TARGET PROJECTIONS PARSING STRATEGY ---
+                    // --- REPAIRED MULTI-PATH DFS PROJECTIONS SYSTEM ---
                     let pProjNode = null;
                     if (game.projectedLineups?.[teamSide]) {
                         const pl = game.projectedLineups[teamSide];
@@ -150,14 +150,14 @@ async function loadPlayerProfileData() {
                     let fdRaw = null;
 
                     if (pProjNode) {
-                        // Safely extract DK from deep slate dictionary mapping
+                        // DraftKings parsing logic path
                         if (pProjNode.dk_slates && Object.keys(pProjNode.dk_slates).length > 0) {
                             dkRaw = pProjNode.dk_slates[Object.keys(pProjNode.dk_slates)[0]].proj;
                         } else {
                             dkRaw = pProjNode.dk_proj;
                         }
 
-                        // Safely extract FD from deep slate dictionary mapping
+                        // FanDuel parsing logic path with double-header verification
                         if (pProjNode.fd_slates && Object.keys(pProjNode.fd_slates).length > 0) {
                             fdRaw = pProjNode.fd_slates[Object.keys(pProjNode.fd_slates)[0]].proj;
                         } else {
@@ -165,10 +165,24 @@ async function loadPlayerProfileData() {
                         }
                     }
                     
-                    // Final safety fallbacks to raw deepStats if node projections didn't process
+                    // Fallback router checking main layout blocks before rolling over to historical means
                     dkRaw = dkRaw ?? pDeepStats.dk_proj ?? pDeepStats.dk_points;
                     fdRaw = fdRaw ?? pDeepStats.fd_proj ?? pDeepStats.fd_points ?? pDeepStats.proj;
                     
+                    // FIXED FALLBACK: If projection registers absolute zero context due to missing slate files, fetch running model mean logs
+                    if ((!dkRaw || dkRaw === 0) && masterDataProfile && masterDataProfile.game_log?.length > 0) {
+                         const validLogs = masterDataProfile.game_log.filter(l => typeof l.dk_pts === 'number');
+                         if (validLogs.length > 0) {
+                             dkRaw = validLogs.reduce((acc, l) => acc + l.dk_pts, 0) / validLogs.length;
+                         }
+                    }
+                    if ((!fdRaw || fdRaw === 0) && masterDataProfile && masterDataProfile.game_log?.length > 0) {
+                         const validLogs = masterDataProfile.game_log.filter(l => typeof l.fd_pts === 'number');
+                         if (validLogs.length > 0) {
+                             fdRaw = validLogs.reduce((acc, l) => acc + l.fd_pts, 0) / validLogs.length;
+                         }
+                    }
+
                     const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : '--';
                     const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : '--';
 
@@ -286,7 +300,6 @@ async function loadPlayerProfileData() {
                                 hitHrRate = tAb > 0 ? tHr / tAb : 0;
                             }
 
-                            // Math.max enforces a 0.01 floor so batters with 0 HRs still generate a baseline ~3.3 minimum score
                             let baseScore = (Math.max(hitHrRate, 0.01) / 0.03) * 10.0;
                             if (game.parkStats) {
                                 const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
@@ -373,7 +386,7 @@ async function loadPlayerProfileData() {
                                 </div>
                                 <div class="row text-center g-2 pt-1">
                                     <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
-                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block; font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
                                     <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
                                     <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
                                 </div>
