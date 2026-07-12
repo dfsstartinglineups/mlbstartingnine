@@ -7,7 +7,7 @@ function getTargetSlateDate() {
     const now = new Date();
     const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
     const estDate = new Date(estStr);
-    if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
+    if (estDate.getHours() < 4) { estDate.setDate(estDate.getDate() - 1); }
     const yyyy = estDate.getFullYear();
     const mm = String(estDate.getMonth() + 1).padStart(2, '0');
     const dd = String(estDate.getDate()).padStart(2, '0');
