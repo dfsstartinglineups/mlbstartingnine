@@ -325,7 +325,7 @@ async function loadPlayerProfileData() {
                                 baseScore = baseScore * (rawFactor / 100);
                             }
 
-                            let ratingLabel = "AVERAGE MATCHUP";
+                            let ratingLabel = "AVERAGE";
                             let barColorClass = "bg-primary";
 
                             // --- PIECEWISE MATH ALIGNMENT FIX (BATTERS) ---
@@ -339,9 +339,10 @@ async function loadPlayerProfileData() {
                             }
                             progressPct = Math.min(Math.max(progressPct, 10), 100);
 
-                            if (baseScore >= 22.0) { ratingLabel = "ELITE POWER PLAY"; barColorClass = "bg-danger text-white"; }
-                            else if (baseScore >= 14.0) { ratingLabel = "HIGH PROBABILITY"; barColorClass = "bg-success text-white"; }
-                            else if (baseScore < 6.0) { ratingLabel = "LOW PROBABILITY"; barColorClass = "bg-secondary text-white"; }
+                            // Adjusted thresholds and labels to match the chart legend exactly
+                            if (baseScore >= 25.0) { ratingLabel = "ELITE"; barColorClass = "bg-danger text-white"; }
+                            else if (baseScore >= 15.0) { ratingLabel = "GOOD"; barColorClass = "bg-success text-white"; }
+                            else if (baseScore < 5.0) { ratingLabel = "LOW"; barColorClass = "bg-secondary text-white"; }
 
                             hrZone.innerHTML += `
                             <div class="border rounded p-3 bg-white shadow-sm mb-2">
@@ -372,7 +373,7 @@ async function loadPlayerProfileData() {
                                 baseDangerScore = baseDangerScore * (rawFactor / 100);
                             }
 
-                            let ratingLabel = "AVERAGE DANGER";
+                            let ratingLabel = "AVERAGE";
                             let barColorClass = "bg-warning text-dark"; 
                             
                             // --- PIECEWISE MATH ALIGNMENT FIX (PITCHERS) ---
@@ -386,8 +387,9 @@ async function loadPlayerProfileData() {
                             }
                             progressPct = Math.min(Math.max(progressPct, 10), 100);
 
-                            if (baseDangerScore >= 18.0) { ratingLabel = "HIGH DANGER MATCHUP"; barColorClass = "bg-danger text-white"; }
-                            else if (baseDangerScore < 10.0) { ratingLabel = "ELITE SAFETY PLAY"; barColorClass = "bg-success text-white"; }
+                            // Adjusted labels to match the chart legend exactly
+                            if (baseDangerScore >= 18.0) { ratingLabel = "DANGEROUS"; barColorClass = "bg-danger text-white"; }
+                            else if (baseDangerScore < 10.0) { ratingLabel = "SAFE"; barColorClass = "bg-success text-white"; }
 
                             hrZone.innerHTML += `
                             <div class="border rounded p-3 bg-white shadow-sm mb-2">
