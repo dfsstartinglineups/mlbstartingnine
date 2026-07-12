@@ -14,21 +14,40 @@ os.makedirs(LIVE_DIR, exist_ok=True)
 # ==========================================
 # --- CORE DATA FETCHERS (MLB API) ---
 # ==========================================
-def fetch_player_meta_info(session, player_id):
+def fetch_all_active_rosters(session):
     """
-    Fetches the official MLB current team ID, Team Name, and Primary Position.
+    Hits the MLB API for all 30 teams and grabs their 40-man rosters.
+    Returns a dictionary of all active players with their team and position data.
     """
-    url = f"https://statsapi.mlb.com/api/v1/people/{player_id}?hydrate=currentTeam"
+    print("⚾ Fetching all 30 MLB team rosters...")
+    players = {}
+    teams_url = "https://statsapi.mlb.com/api/v1/teams?sportId=1"
+    
     try:
-        res = session.get(url, timeout=5).json()
-        person = res.get('people', [{}])[0]
-        
-        team = person.get('currentTeam', {})
-        position = person.get('primaryPosition', {})
-        
-        return team.get('id'), team.get('name'), position.get('name')
-    except Exception:
-        return None, None, None
+        teams_res = session.get(teams_url, timeout=10).json()
+        for team in teams_res.get('teams', []):
+            team_id = team['id']
+            team_name = team['name']
+            
+            # Fetch the 40-Man roster for each team
+            roster_url = f"https://statsapi.mlb.com/api/v1/teams/{team_id}/roster/40Man"
+            roster_res = session.get(roster_url, timeout=10).json()
+            
+            for p in roster_res.get('roster', []):
+                pid = str(p['person']['id'])
+                players[pid] = {
+                    "name": p['person']['fullName'],
+                    "team_id": team_id,
+                    "team_name": team_name,
+                    "position": p['position']['name'],
+                    "is_pitcher": p['position']['abbreviation'] == 'P'
+                }
+            time.sleep(0.05) # Polite pacing to not overload the MLB servers
+    except Exception as e:
+        print(f"❌ Error fetching rosters: {e}")
+    
+    print(f"✅ Successfully loaded {len(players)} players from official rosters.")
+    return players
 
 def fetch_mlb_season_and_splits(session, player_id, group_type="hitting"):
     """
@@ -97,17 +116,7 @@ def fetch_mlb_season_and_splits(session, player_id, group_type="hitting"):
 # ==========================================
 def main():
     session = requests.Session()
-    session.headers.update({"User-Agent": "MLBStartingNine-OvernightLogBot/1.0"})
-
-    yesterday_str = (datetime.utcnow() - timedelta(days=1)).strftime('%Y-%m-%d')
-    live_file_name = f"live_mlb_{yesterday_str}.json"
-    live_file_path = os.path.join(LIVE_DIR, live_file_name)
-
-    print(f"🔄 Starting overnight sync loop using reference file: {live_file_path}")
-
-    if not os.path.exists(live_file_path):
-        print(f"🛑 Aborting: Finalized log target '{live_file_name}' not found on server.")
-        return
+    session.headers.update({"User-Agent": "MLBStartingNine-OvernightLogBot/2.0"})
 
     if os.path.exists(MASTER_STATS_FILE):
         with open(MASTER_STATS_FILE, 'r') as f:
@@ -115,80 +124,116 @@ def main():
     else:
         master_registry = {}
 
-    with open(live_file_path, 'r') as f:
-        yesterday_live_data = json.load(f)
+    # 1. Gather Yesterday's Game Logs for Fantasy Points
+    yesterday_str = (datetime.utcnow() - timedelta(days=1)).strftime('%Y-%m-%d')
+    live_file_name = f"live_mlb_{yesterday_str}.json"
+    live_file_path = os.path.join(LIVE_DIR, live_file_name)
 
+    yesterday_performances = {}
+    if os.path.exists(live_file_path):
+        print(f"📖 Reading live logs to extract fantasy points from: {live_file_name}")
+        with open(live_file_path, 'r') as f:
+            yesterday_live_data = json.load(f)
+            
+        for game_id, game_ctx in yesterday_live_data.items():
+            players_box = game_ctx.get("players", {})
+            all_game_players = {**players_box.get("AWAY", {}), **players_box.get("HOME", {})}
+            
+            for api_id_key, player_data in all_game_players.items():
+                pid = api_id_key.replace("ID", "")
+                is_pitcher = player_data.get("batting") is None
+                stats_block = player_data.get("pitching") if is_pitcher else player_data.get("batting")
+                
+                if stats_block and stats_block.get("summary"):
+                    yesterday_performances[pid] = {
+                        "name": player_data.get("name", "Unknown"),
+                        "summary": stats_block.get("summary"),
+                        "dk_pts": player_data.get("dk_pts", 0.0),
+                        "fd_pts": player_data.get("fd_pts", 0.0),
+                        "is_pitcher": is_pitcher
+                    }
+    else:
+        print(f"⚠️ Live log target '{live_file_name}' not found. Skipping fantasy points logging.")
+
+    # 2. Grab the full league roster
+    roster_players = fetch_all_active_rosters(session)
+
+    # 3. Combine roster players and anyone who played yesterday (in case they were just sent down)
+    all_target_ids = set(roster_players.keys()).union(set(yesterday_performances.keys()))
+
+    print(f"🔄 Commencing deep-stat updates for {len(all_target_ids)} total players...")
     updated_players_count = 0
 
-    for game_id, game_ctx in yesterday_live_data.items():
-        if game_ctx.get("status") != "Final":
-            print(f"⚠️ Warning: Game {game_id} is not marked Final. Processing metrics anyway.")
+    for player_id in all_target_ids:
+        api_id_key = f"ID{player_id}"
+        
+        # Determine player meta context safely
+        if player_id in roster_players:
+            meta = roster_players[player_id]
+        else:
+            # Fallback for players who played yesterday but are no longer on a 40-man roster today
+            meta = {
+                "name": yesterday_performances[player_id]["name"],
+                "team_id": master_registry.get(api_id_key, {}).get("team_id"),
+                "team_name": master_registry.get(api_id_key, {}).get("team_name", "Free Agent/Minors"),
+                "position": master_registry.get(api_id_key, {}).get("position", "Unknown"),
+                "is_pitcher": yesterday_performances[player_id]["is_pitcher"]
+            }
 
-        players_box = game_ctx.get("players", {})
-        all_game_players = {**players_box.get("AWAY", {}), **players_box.get("HOME", {})}
+        # Initialize missing players
+        if api_id_key not in master_registry:
+            master_registry[api_id_key] = {
+                "player_id": player_id,
+                "name": meta["name"],
+                "team_id": meta["team_id"],
+                "team_name": meta["team_name"],
+                "position": meta["position"],
+                "is_pitcher": meta["is_pitcher"],
+                "season": {},
+                "split_vL": {},
+                "split_vR": {},
+                "game_log": []
+            }
+        else:
+            # Update meta in case of mid-season trades or position changes
+            if meta.get("team_id"):
+                master_registry[api_id_key]["team_id"] = meta["team_id"]
+                master_registry[api_id_key]["team_name"] = meta["team_name"]
+            if meta.get("position"):
+                master_registry[api_id_key]["position"] = meta["position"]
 
-        for api_id_key, player_data in all_game_players.items():
-            player_id = api_id_key.replace("ID", "")
-            player_name = player_data.get("name")
-            
-            is_pitcher = player_data.get("batting") is None
-            stats_block = player_data.get("pitching") if is_pitcher else player_data.get("batting")
-
-            if not stats_block or not stats_block.get("summary"):
-                continue
-
-            game_summary_line = stats_block.get("summary")
-            dk_score = player_data.get("dk_pts", 0.0)
-            fd_score = player_data.get("fd_pts", 0.0)
-
-            if api_id_key not in master_registry:
-                master_registry[api_id_key] = {
-                    "player_id": player_id,
-                    "name": player_name,
-                    "team_id": None,
-                    "team_name": None,
-                    "position": None,
-                    "is_pitcher": is_pitcher,
-                    "season": {},
-                    "split_vL": {},
-                    "split_vR": {},
-                    "game_log": []
-                }
-
-            # --- DYNAMIC META UPDATE ---
-            t_id, t_name, pos_name = fetch_player_meta_info(session, player_id)
-            if t_id and t_name:
-                master_registry[api_id_key]["team_id"] = t_id
-                master_registry[api_id_key]["team_name"] = t_name
-            if pos_name:
-                master_registry[api_id_key]["position"] = pos_name
-
+        # 4. Check if they played yesterday and need a log update
+        if player_id in yesterday_performances:
             existing_log = master_registry[api_id_key].get("game_log", [])
-            if any(log.get("date") == yesterday_str for log in existing_log):
-                print(f"⏩ Line entry for {player_name} on {yesterday_str} already exists. Skipping log insertion.")
-            else:
+            # Prevent duplicate logging if action is re-run
+            if not any(log.get("date") == yesterday_str for log in existing_log):
                 new_log_entry = {
                     "date": yesterday_str,
-                    "summary": game_summary_line,
-                    "dk_pts": dk_score,
-                    "fd_pts": fd_score
+                    "summary": yesterday_performances[player_id]["summary"],
+                    "dk_pts": yesterday_performances[player_id]["dk_pts"],
+                    "fd_pts": yesterday_performances[player_id]["fd_pts"]
                 }
                 existing_log.append(new_log_entry)
                 
+                # Re-sort chronological tracking (newest date first) and slice down to standard 10 logs
                 existing_log.sort(key=lambda x: x['date'], reverse=True)
                 master_registry[api_id_key]["game_log"] = existing_log[:10]
 
-            print(f"   📊 Refreshing seasonal cumulative splits tracking for: {player_name}")
-            role_label = "pitching" if is_pitcher else "hitting"
-            updated_stats = fetch_mlb_season_and_splits(session, player_id, group_type=role_label)
-            
-            master_registry[api_id_key]["season"] = updated_stats["season"]
-            master_registry[api_id_key]["split_vL"] = updated_stats["split_vL"]
-            master_registry[api_id_key]["split_vR"] = updated_stats["split_vR"]
-            
-            updated_players_count += 1
-            time.sleep(0.1) 
+        # 5. Call MLB API to update cumulative statistics
+        role_label = "pitching" if meta["is_pitcher"] else "hitting"
+        updated_stats = fetch_mlb_season_and_splits(session, player_id, group_type=role_label)
+        
+        master_registry[api_id_key]["season"] = updated_stats["season"]
+        master_registry[api_id_key]["split_vL"] = updated_stats["split_vL"]
+        master_registry[api_id_key]["split_vR"] = updated_stats["split_vR"]
+        
+        updated_players_count += 1
+        
+        # Log progress so GitHub Actions doesn't look frozen
+        if updated_players_count % 100 == 0:
+            print(f"   ... processed {updated_players_count} players ...")
 
+    # 6. Save data structure state back to disk
     with open(MASTER_STATS_FILE, 'w') as f:
         json.dump(master_registry, f, indent=4)
 
