@@ -32,12 +32,23 @@ async function loadPlayerProfileData() {
             const masterRegistry = await masterRes.json();
             masterDataProfile = masterRegistry["ID" + PLAYER_ID];
             if (masterDataProfile) {
+                
+                // --- TEAM BRANDING FROM MASTER JSON ---
+                const teamName = masterDataProfile.team_name || "";
+                const teamId = masterDataProfile.team_id || "";
+                const tNamePrefix = teamName ? `${teamName} • ` : "";
+
+                if (teamId) {
+                    const logoEl = document.getElementById('player-team-logo');
+                    if (logoEl) logoEl.src = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${teamId}.svg`;
+                }
+
                 if (masterDataProfile.is_pitcher) {
                     const wins = masterDataProfile.season?.w !== undefined ? masterDataProfile.season.w : 0;
                     const losses = masterDataProfile.season?.l !== undefined ? masterDataProfile.season.l : 0;
                     const era = masterDataProfile.season?.era || '-';
                     
-                    safeText('player-meta-sub', `Pitcher • ${wins}-${losses} • ${era} ERA`);
+                    safeText('player-meta-sub', `Pitcher • ${tNamePrefix}${wins}-${losses} • ${era} ERA`);
                     safeHtml('split-vl-header', `<span class="badge bg-secondary me-1">LHB</span> vs. Left-Handed Batters`);
                     safeHtml('split-vr-header', `<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters`);
                     safeText('split-vl-label-volume', "Batters Faced:");
@@ -47,7 +58,7 @@ async function loadPlayerProfileData() {
                 } else {
                     const avg = masterDataProfile.season?.avg || '-';
                     const hr = masterDataProfile.season?.hr ?? 0;
-                    safeText('player-meta-sub', `Position Player • ${avg} AVG • ${hr} HR`);
+                    safeText('player-meta-sub', `Position Player • ${tNamePrefix}${avg} AVG • ${hr} HR`);
                 }
                 
                 const vl = masterDataProfile.split_vL || {};
@@ -135,7 +146,6 @@ async function loadPlayerProfileData() {
                     
                     const pDeepStats = game.deepStats[PLAYER_ID] || {};
                     
-                    // --- TARGET PROJECTIONS PARSING STRATEGY ---
                     let pProjNode = null;
                     if (game.projectedLineups?.[teamSide]) {
                         const pl = game.projectedLineups[teamSide];
@@ -150,14 +160,12 @@ async function loadPlayerProfileData() {
                     let fdRaw = null;
 
                     if (pProjNode) {
-                        // Safely extract DK from deep slate dictionary mapping
                         if (pProjNode.dk_slates && Object.keys(pProjNode.dk_slates).length > 0) {
                             dkRaw = pProjNode.dk_slates[Object.keys(pProjNode.dk_slates)[0]].proj;
                         } else {
                             dkRaw = pProjNode.dk_proj;
                         }
 
-                        // Safely extract FD from deep slate dictionary mapping
                         if (pProjNode.fd_slates && Object.keys(pProjNode.fd_slates).length > 0) {
                             fdRaw = pProjNode.fd_slates[Object.keys(pProjNode.fd_slates)[0]].proj;
                         } else {
@@ -165,14 +173,12 @@ async function loadPlayerProfileData() {
                         }
                     }
                     
-                    // Final safety fallbacks to raw deepStats if node projections didn't process
                     dkRaw = dkRaw ?? pDeepStats.dk_proj ?? pDeepStats.dk_points;
                     fdRaw = fdRaw ?? pDeepStats.fd_proj ?? pDeepStats.fd_points ?? pDeepStats.proj;
                     
-                    const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : '--';
-                    const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : '--';
+                    const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : 'NA';
+                    const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : 'NA';
 
-                    // Batting Order Position Math
                     let isConfirmed = trackingNode.status === "OFFICIAL";
                     let slotIndex = -1;
                     
@@ -184,7 +190,6 @@ async function loadPlayerProfileData() {
                         slotIndex = projectedList.findIndex(p => String(p.id) === PLAYER_ID);
                     }
 
-                    // Construct Badge UI Cores
                     let badgeHtml = '';
                     const isStartingPitcher = String(gameRaw.teams?.[teamSide]?.probablePitcher?.id) === PLAYER_ID || 
                                               String(game.projectedLineups?.[teamSide]?.startingPitcher?.id) === PLAYER_ID;
@@ -202,7 +207,6 @@ async function loadPlayerProfileData() {
                     }
                     badgeZone.innerHTML += badgeHtml;
 
-                    // Compile Real-Time Match Data Loops
                     const activeLiveGame = liveData[gamePk];
                     if (activeLiveGame) {
                         if (activeLiveGame.status === "Final") {
@@ -266,13 +270,11 @@ async function loadPlayerProfileData() {
                         </div>`;
                     }
 
-                    // DYNAMIC DATA METRICS MATRIX ENGINE
                     if (pDeepStats) {
                         const splitR = pDeepStats.split_vR || {};
                         const splitL = pDeepStats.split_vL || {};
                         
                         if (!pDeepStats.is_pitcher) {
-                            // Hitter Power Predictor Formula (Smoothed Baseline to prevent 0.0 scores)
                             let hitHrRate = 0; 
                             const oppHand = game.lineupHandedness ? game.lineupHandedness[oppPitcherId] : 'R';
                             
@@ -286,7 +288,6 @@ async function loadPlayerProfileData() {
                                 hitHrRate = tAb > 0 ? tHr / tAb : 0;
                             }
 
-                            // Math.max enforces a 0.01 floor so batters with 0 HRs still generate a baseline ~3.3 minimum score
                             let baseScore = (Math.max(hitHrRate, 0.01) / 0.03) * 10.0;
                             if (game.parkStats) {
                                 const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
@@ -320,7 +321,6 @@ async function loadPlayerProfileData() {
                                 </div>
                             </div>`;
                         } else {
-                            // Pitcher HR Suppression Gauge Formula
                             const totalHr = (Number(splitL.hr) || 0) + (Number(splitR.hr) || 0);
                             const totalAb = (Number(splitL.ab) || 0) + (Number(splitR.ab) || 0);
                             const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0;
@@ -359,9 +359,6 @@ async function loadPlayerProfileData() {
                         }
                     }
 
-                    // ==========================================
-                    // STEP 3: BVP LOOKUP ROUTER
-                    // ==========================================
                     if (pDeepStats && !pDeepStats.is_pitcher) {
                         const bvp = pDeepStats.bvp || {};
                         if (bvp && bvp.ab > 0) {
@@ -373,7 +370,7 @@ async function loadPlayerProfileData() {
                                 </div>
                                 <div class="row text-center g-2 pt-1">
                                     <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
-                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block; font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
                                     <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
                                     <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
                                 </div>
