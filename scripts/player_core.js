@@ -135,7 +135,7 @@ async function loadPlayerProfileData() {
                     
                     const pDeepStats = game.deepStats[PLAYER_ID] || {};
                     
-                    // --- REPAIRED MULTI-PATH DFS PROJECTIONS SYSTEM ---
+                    // --- TARGET PROJECTIONS PARSING STRATEGY ---
                     let pProjNode = null;
                     if (game.projectedLineups?.[teamSide]) {
                         const pl = game.projectedLineups[teamSide];
@@ -150,58 +150,45 @@ async function loadPlayerProfileData() {
                     let fdRaw = null;
 
                     if (pProjNode) {
-                        // DraftKings parsing logic path
+                        // DraftKings parsing logic path[cite: 1]
                         if (pProjNode.dk_slates && Object.keys(pProjNode.dk_slates).length > 0) {
-                            dkRaw = pProjNode.dk_slates[Object.keys(pProjNode.dk_slates)[0]].proj;
+                            dkRaw = pProjNode.dk_slates[Object.keys(pProjNode.dk_slates)[0]].proj;[cite: 1]
                         } else {
-                            dkRaw = pProjNode.dk_proj;
+                            dkRaw = pProjNode.dk_proj;[cite: 1]
                         }
 
-                        // FanDuel parsing logic path with double-header verification
+                        // FanDuel parsing logic path[cite: 1]
                         if (pProjNode.fd_slates && Object.keys(pProjNode.fd_slates).length > 0) {
-                            fdRaw = pProjNode.fd_slates[Object.keys(pProjNode.fd_slates)[0]].proj;
+                            fdRaw = pProjNode.fd_slates[Object.keys(pProjNode.fd_slates)[0]].proj;[cite: 1]
                         } else {
-                            fdRaw = pProjNode.proj;
+                            fdRaw = pProjNode.proj;[cite: 1]
                         }
                     }
                     
-                    // Fallback router checking main layout blocks before rolling over to historical means
-                    dkRaw = dkRaw ?? pDeepStats.dk_proj ?? pDeepStats.dk_points;
-                    fdRaw = fdRaw ?? pDeepStats.fd_proj ?? pDeepStats.fd_points ?? pDeepStats.proj;
+                    // Fallback to raw deepStats top-level values if explicit array markers aren't populated[cite: 1]
+                    dkRaw = dkRaw ?? pDeepStats.dk_proj ?? pDeepStats.dk_points;[cite: 1]
+                    fdRaw = fdRaw ?? pDeepStats.fd_proj ?? pDeepStats.fd_points ?? pDeepStats.proj;[cite: 1]
                     
-                    // FIXED FALLBACK: If projection registers absolute zero context due to missing slate files, fetch running model mean logs
-                    if ((!dkRaw || dkRaw === 0) && masterDataProfile && masterDataProfile.game_log?.length > 0) {
-                         const validLogs = masterDataProfile.game_log.filter(l => typeof l.dk_pts === 'number');
-                         if (validLogs.length > 0) {
-                             dkRaw = validLogs.reduce((acc, l) => acc + l.dk_pts, 0) / validLogs.length;
-                         }
-                    }
-                    if ((!fdRaw || fdRaw === 0) && masterDataProfile && masterDataProfile.game_log?.length > 0) {
-                         const validLogs = masterDataProfile.game_log.filter(l => typeof l.fd_pts === 'number');
-                         if (validLogs.length > 0) {
-                             fdRaw = validLogs.reduce((acc, l) => acc + l.fd_pts, 0) / validLogs.length;
-                         }
-                    }
+                    // STRICT ENFORCEMENT: Output explicit NA strings if missing or unregistered on slates[cite: 1]
+                    const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : 'NA';
+                    const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : 'NA';
 
-                    const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : '--';
-                    const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : '--';
-
-                    // Batting Order Position Math
-                    let isConfirmed = trackingNode.status === "OFFICIAL";
+                    // Batting Order Position Math[cite: 1]
+                    let isConfirmed = trackingNode.status === "OFFICIAL";[cite: 1]
                     let slotIndex = -1;
                     
                     if (isConfirmed && trackingNode.hash) {
-                        slotIndex = trackingNode.hash.split('-').indexOf(PLAYER_ID);
+                        slotIndex = trackingNode.hash.split('-').indexOf(PLAYER_ID);[cite: 1]
                     }
                     if (slotIndex === -1) {
-                        const projectedList = game.projectedLineups?.[teamSide]?.battingOrder || [];
-                        slotIndex = projectedList.findIndex(p => String(p.id) === PLAYER_ID);
+                        const projectedList = game.projectedLineups?.[teamSide]?.battingOrder || [];[cite: 1]
+                        slotIndex = projectedList.findIndex(p => String(p.id) === PLAYER_ID);[cite: 1]
                     }
 
-                    // Construct Badge UI Cores
+                    // Construct Badge UI Cores[cite: 1]
                     let badgeHtml = '';
-                    const isStartingPitcher = String(gameRaw.teams?.[teamSide]?.probablePitcher?.id) === PLAYER_ID || 
-                                              String(game.projectedLineups?.[teamSide]?.startingPitcher?.id) === PLAYER_ID;
+                    const isStartingPitcher = String(gameRaw.teams?.[teamSide]?.probablePitcher?.id) === PLAYER_ID ||[cite: 1]
+                                              String(game.projectedLineups?.[teamSide]?.startingPitcher?.id) === PLAYER_ID;[cite: 1]
 
                     if (isStartingPitcher) {
                         badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Starting Pitcher</div>`;
@@ -216,7 +203,7 @@ async function loadPlayerProfileData() {
                     }
                     badgeZone.innerHTML += badgeHtml;
 
-                    // Compile Real-Time Match Data Loops
+                    // Compile Real-Time Match Data Loops[cite: 1]
                     const activeLiveGame = liveData[gamePk];
                     if (activeLiveGame) {
                         if (activeLiveGame.status === "Final") {
@@ -258,13 +245,13 @@ async function loadPlayerProfileData() {
                             </div>`;
                         }
                     } else { 
-                        globalGameStatusStrings.push(`${labelPrefix}${gameRaw.status?.abstractGameState || 'Scheduled'}`);
+                        globalGameStatusStrings.push(`${labelPrefix}${gameRaw.status?.abstractGameState || 'Scheduled'}`);[cite: 1]
                         liveConsoleZone.innerHTML += `
                         <div class="p-3 border-bottom" style="background-color: #edf4f8;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                                 <div>
                                     <span class="badge bg-secondary text-uppercase me-2" style="font-size:0.65rem;">Upcoming Matchup</span>
-                                    <span class="text-dark fw-semibold" style="font-size: 0.85rem;">vs. ${oppPitcherName}</span>
+                                    <span class="text-dark fw-semibold" style="font-size: 0.85rem;">vs. ${oppPitcherName}</span>[cite: 1]
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
@@ -280,30 +267,30 @@ async function loadPlayerProfileData() {
                         </div>`;
                     }
 
-                    // DYNAMIC DATA METRICS MATRIX ENGINE
+                    // DYNAMIC DATA METRICS MATRIX ENGINE[cite: 1]
                     if (pDeepStats) {
-                        const splitR = pDeepStats.split_vR || {};
-                        const splitL = pDeepStats.split_vL || {};
+                        const splitR = pDeepStats.split_vR || {};[cite: 1]
+                        const splitL = pDeepStats.split_vL || {};[cite: 1]
                         
-                        if (!pDeepStats.is_pitcher) {
+                        if (!pDeepStats.is_pitcher) {[cite: 1]
                             // Hitter Power Predictor Formula (Smoothed Baseline to prevent 0.0 scores)
                             let hitHrRate = 0; 
-                            const oppHand = game.lineupHandedness ? game.lineupHandedness[oppPitcherId] : 'R';
+                            const oppHand = game.lineupHandedness ? game.lineupHandedness[oppPitcherId] : 'R';[cite: 1]
                             
                             if (oppHand === 'R') {
-                                hitHrRate = (Number(splitR.ab) > 0) ? (Number(splitR.hr) || 0) / Number(splitR.ab) : 0;
+                                hitHrRate = (Number(splitR.ab) > 0) ? (Number(splitR.hr) || 0) / Number(splitR.ab) : 0;[cite: 1]
                             } else if (oppHand === 'L') {
-                                hitHrRate = (Number(splitL.ab) > 0) ? (Number(splitL.hr) || 0) / Number(splitL.ab) : 0;
+                                hitHrRate = (Number(splitL.ab) > 0) ? (Number(splitL.hr) || 0) / Number(splitL.ab) : 0;[cite: 1]
                             } else {
-                                const tHr = (Number(splitR.hr) || 0) + (Number(splitL.hr) || 0);
-                                const tAb = (Number(splitR.ab) || 0) + (Number(splitL.ab) || 0);
+                                const tHr = (Number(splitR.hr) || 0) + (Number(splitL.hr) || 0);[cite: 1]
+                                const tAb = (Number(splitR.ab) || 0) + (Number(splitL.ab) || 0);[cite: 1]
                                 hitHrRate = tAb > 0 ? tHr / tAb : 0;
                             }
 
                             let baseScore = (Math.max(hitHrRate, 0.01) / 0.03) * 10.0;
                             if (game.parkStats) {
-                                const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
-                                baseScore = baseScore * (rawFactor / 100);
+                                const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);[cite: 1]
+                                baseScore = baseScore * (rawFactor / 100);[cite: 1]
                             }
 
                             let ratingLabel = "AVERAGE MATCHUP";
@@ -333,15 +320,15 @@ async function loadPlayerProfileData() {
                                 </div>
                             </div>`;
                         } else {
-                            // Pitcher HR Suppression Gauge Formula
-                            const totalHr = (Number(splitL.hr) || 0) + (Number(splitR.hr) || 0);
-                            const totalAb = (Number(splitL.ab) || 0) + (Number(splitR.ab) || 0);
+                            // Pitcher HR Suppression Gauge Formula[cite: 1]
+                            const totalHr = (Number(splitL.hr) || 0) + (Number(splitR.hr) || 0);[cite: 1]
+                            const totalAb = (Number(splitL.ab) || 0) + (Number(splitR.ab) || 0);[cite: 1]
                             const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0;
 
                             let baseDangerScore = (Math.max(pitchHrRate, 0.01) / 0.03) * 10.0;
                             if (game.parkStats) {
-                                const rawFactor = ((game.parkStats.hr_l || 100) + (game.parkStats.hr_r || 100)) / 2;
-                                baseDangerScore = baseDangerScore * (rawFactor / 100);
+                                const rawFactor = ((game.parkStats.hr_l || 100) + (game.parkStats.hr_r || 100)) / 2;[cite: 1]
+                                baseDangerScore = baseDangerScore * (rawFactor / 100);[cite: 1]
                             }
 
                             let ratingLabel = "AVERAGE DANGER";
@@ -373,58 +360,58 @@ async function loadPlayerProfileData() {
                     }
 
                     // ==========================================
-                    // STEP 3: BVP LOOKUP ROUTER
+                    // STEP 3: BVP LOOKUP ROUTER[cite: 1]
                     // ==========================================
-                    if (pDeepStats && !pDeepStats.is_pitcher) {
-                        const bvp = pDeepStats.bvp || {};
-                        if (bvp && bvp.ab > 0) {
+                    if (pDeepStats && !pDeepStats.is_pitcher) {[cite: 1]
+                        const bvp = pDeepStats.bvp || {};[cite: 1]
+                        if (bvp && bvp.ab > 0) {[cite: 1]
                             bvpZone.innerHTML += `
                             <div class="border rounded p-3 bg-white shadow-sm mb-2">
                                 <div class="fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
                                     <span>⚔️ ${labelPrefix}Lifetime Matchup Analysis</span>
-                                    <span class="badge bg-primary">vs. ${oppPitcherName}</span>
+                                    <span class="badge bg-primary">vs. ${oppPitcherName}</span>[cite: 1]
                                 </div>
                                 <div class="row text-center g-2 pt-1">
-                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
-                                    <div class="col-3 border-end"><span class="text-muted d-block; font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
-                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
-                                    <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>[cite: 1]
+                                    <div class="col-3 border-end"><span class="text-muted d-block; font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>[cite: 1]
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>[cite: 1]
+                                    <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>[cite: 1]
                                 </div>
                             </div>`;
                         } else {
                             bvpZone.innerHTML += `
                             <div class="border rounded p-2 text-center text-muted fst-italic bg-white shadow-sm mb-2" style="font-size: 0.8rem;">
-                                🚫 ${labelPrefix}No previous history recorded against starting pitcher <strong>${oppPitcherName}</strong>.
+                                🚫 ${labelPrefix}No previous history recorded against starting pitcher <strong>${oppPitcherName}</strong>.[cite: 1]
                             </div>`;
                         }
                     } else {
-                        let orderList = game.lineupTracking?.[oppSideKey]?.hash ? game.lineupTracking[oppSideKey].hash.split('-') : [];
+                        let orderList = game.lineupTracking?.[oppSideKey]?.hash ? game.lineupTracking[oppSideKey].hash.split('-') : [];[cite: 1]
                         if (orderList.length === 0) {
-                            orderList = (game.projectedLineups?.[oppSideKey]?.battingOrder || []).map(p => String(p.id));
+                            orderList = (game.projectedLineups?.[oppSideKey]?.battingOrder || []).map(p => String(p.id));[cite: 1]
                         }
 
                         let tableRowsHtml = '';
                         let historyCount = 0;
 
                         orderList.forEach((batterId, idx) => {
-                            const batterStats = game.deepStats[batterId] || {};
-                            const bvp = batterStats.bvp || {};
-                            const batterName = batterStats.name || game.projectedLineups?.[oppSideKey]?.battingOrder?.find(p => String(p.id) === batterId)?.name || `Batter #${idx+1}`;
+                            const batterStats = game.deepStats[batterId] || {};[cite: 1]
+                            const bvp = batterStats.bvp || {};[cite: 1]
+                            const batterName = batterStats.name || game.projectedLineups?.[oppSideKey]?.battingOrder?.find(p => String(p.id) === batterId)?.name || `Batter #${idx+1}`;[cite: 1]
 
-                            if (bvp && bvp.ab > 0) {
+                            if (bvp && bvp.ab > 0) {[cite: 1]
                                 historyCount++;
                                 tableRowsHtml += `
                                 <tr>
-                                    <td class="text-start fw-semibold">${idx + 1}. ${batterName}</td>
-                                    <td><strong>${bvp.ab}</strong></td>
-                                    <td>${bvp.hits}</td>
-                                    <td>${bvp.hr}</td>
-                                    <td class="text-success fw-bold">${bvp.ops}</td>
+                                    <td class="text-start fw-semibold">${idx + 1}. ${batterName}</td>[cite: 1]
+                                    <td><strong>${bvp.ab}</strong></td>[cite: 1]
+                                    <td>${bvp.hits}</td>[cite: 1]
+                                    <td>${bvp.hr}</td>[cite: 1]
+                                    <td class="text-success fw-bold">${bvp.ops}</td>[cite: 1]
                                 </tr>`;
                             } else {
                                 tableRowsHtml += `
                                 <tr>
-                                    <td class="text-start text-muted">${idx + 1}. ${batterName}</td>
+                                    <td class="text-start text-muted">${idx + 1}. ${batterName}</td>[cite: 1]
                                     <td colspan="4" class="text-muted fst-italic text-center" style="font-size: 0.7rem;">No historic matchups recorded</td>
                                 </tr>`;
                             }
