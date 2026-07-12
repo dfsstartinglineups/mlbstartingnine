@@ -30,15 +30,20 @@ jobs:
       - name: Run Player Master Data Script
         run: python scripts/build_player_master_data.py
 
+      - name: Automatically Generate Missing Player Profiles & Sitemap
+        run: python scripts/generate_all_profiles.py
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/player_master_data.json
+          
+          # Stage the json core, the entire players directory tree, and the sitemap file
+          git add data/player_master_data.json players/ sitemap.xml
           
           # Check if there are staged changes ready to be committed
           if ! git diff --quiet --staged; then
-            git commit -m "Automated update: Player master metrics and logs [skip ci]"
+            git commit -m "Automated update: Master metrics, profiles, and sitemap sync [skip ci]"
             
             # Pull latest changes and rebase BEFORE pushing
             git pull --rebase origin main || echo "Nothing to pull"
@@ -46,5 +51,5 @@ jobs:
             # Try pushing. If rejected, pull again and immediately push.
             git push origin main || (git pull --rebase origin main && git push origin main)
           else
-            echo "No new player changes detected. Skipping commit."
+            echo "No new player modifications or static additions detected. Skipping commit."
           fi
