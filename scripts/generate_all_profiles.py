@@ -67,10 +67,15 @@ def update_sitemap(new_player_urls):
         if url == home_url:
             ET.SubElement(url_node, 'changefreq').text = "always"
             ET.SubElement(url_node, 'priority').text = "1.0"
+        elif "/lineups/" in url:
+            # Explicit rule to preserve your critical team page configurations
+            ET.SubElement(url_node, 'changefreq').text = "daily"
+            ET.SubElement(url_node, 'priority').text = "0.9"
         elif "/players/" in url:
             ET.SubElement(url_node, 'changefreq').text = "daily"
             ET.SubElement(url_node, 'priority').text = "0.8"
         else:
+            # Fallback for generic text articles, privacy policy, contact pages, etc.
             ET.SubElement(url_node, 'changefreq').text = "weekly"
             ET.SubElement(url_node, 'priority').text = "0.6"
 
@@ -248,28 +253,22 @@ def main():
     print(f"📦 Commencing deployment processing loop for {len(master_data)} baseline player records...")
 
     for key, profile in master_data.items():
-        # Strip out 'ID' prefix string to extract raw MLB index digits
         raw_player_id = key.replace("ID", "")
         player_name = profile.get("name", "Unknown Player")
         is_pitcher = profile.get("is_pitcher", False)
 
-        # Standardize slug and directory trees
         player_slug = slugify(player_name)
         player_dir = os.path.join(OUTPUT_PLAYERS_DIR, player_slug)
         index_file_path = os.path.join(player_dir, "index.html")
         
-        # Track the absolute destination URL for sitemap inclusion regardless of creation status
         all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-        # CRITICAL CHECK: Verify if file path already exists to skip unnecessary computation
         if os.path.exists(index_file_path):
             skipped_count += 1
             continue
 
-        # Safely create directory tree branch
         os.makedirs(player_dir, exist_ok=True)
 
-        # Write fresh file assets
         html_code = generate_player_html(raw_player_id, player_name, is_pitcher, player_slug)
         with open(index_file_path, "w", encoding="utf-8") as html_out:
             html_out.write(html_code)
