@@ -76,10 +76,10 @@
             padding: 2px;
         }
         
-        .status-badge-confirmed { background-color: #198754; color: #fff; }
-        .status-badge-projected { background-color: #ffecb5; color: #1a1a1a; }
-        .status-badge-scratched { background-color: #dc3545; color: #fff; }
-        .status-badge-none { background-color: #6c757d; color: #fff; }
+        .status-badge-confirmed { background-color: #198754; color: #fff; font-size: 0.75rem; font-weight: 700; }
+        .status-badge-projected { background-color: #ffecb5; color: #1a1a1a; font-size: 0.75rem; font-weight: 700; }
+        .status-badge-scratched { background-color: #dc3545; color: #fff; font-size: 0.75rem; font-weight: 700; }
+        .status-badge-none { background-color: #6c757d; color: #fff; font-size: 0.75rem; font-weight: 700; }
 
         .dk-accent { color: #6c9d2f; font-weight: 800; }
         .fd-accent { color: #0d6efd; font-weight: 800; }
@@ -115,114 +115,37 @@
                     <div class="w-100 text-white">
                         <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-center align-items-sm-start gap-3">
                             <div>
-                                <h1 class="h3 fw-black mb-1 italic text-white" id="player-name-header">Loading...</h1>
-                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">Position • Team</p>
+                                <h1 class="h3 fw-black mb-1 italic text-white" id="player-name-header">Cooper Pratt</h1>
+                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">Shortstop • Milwaukee Brewers</p>
                             </div>
                             
-                            <div class="badge status-badge-none d-flex flex-column align-items-center justify-content-center px-3 py-2 rounded shadow-sm text-center flex-shrink-0" style="min-width: 160px; line-height: 1.2;" id="live-lineup-badge">
-                                <div class="fw-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">⬜ CHECKING</div>
-                                <div class="text-uppercase mt-1 opacity-90 fw-semibold" style="font-size: 0.7rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 2px; width: 100%;">Lineup Status</div>
+                            <!-- FLEX TARGET CONTAINER FOR MULTIPLE BADGES IN DOUBLE HEADERS -->
+                            <div class="d-flex flex-column gap-2 flex-shrink-0" style="min-width: 180px;" id="badge-matrix-zone">
+                                <div class="badge status-badge-none p-2 rounded shadow-sm text-center">NOT ON TODAY'S SLATE</div>
                             </div>
                         </div>
                         <div class="border-top border-secondary mt-3 pt-2 text-muted" style="color: #dee2e6 !important; font-size: 0.8rem;">
-                            <span id="live-game-state-label"><strong>Game Status:</strong> Verifying Slate Profile...</span>
+                            <span id="live-game-state-label"><strong>Game Status:</strong> Off-Day Context</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. LIVE TRACKING / LAST PERFORMANCE HUD CONSOLE -->
-                <div class="p-3 border-bottom" style="background-color: #edf4f8; display: none;" id="live-console-hub">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <div>
-                            <span class="badge bg-primary text-uppercase me-2" style="font-size:0.65rem; vertical-align: 1px;">Live Box Score</span>
-                            <strong class="text-dark" style="font-size: 0.9rem;" id="live-summary-string">--</strong>
-                        </div>
-                        <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <div class="bg-white border rounded px-3 py-1 text-center shadow-sm">
-                                <span class="text-muted d-block" style="font-size: 0.6rem; font-weight: 700; text-transform: uppercase;">DraftKings</span>
-                                <span class="dk-accent" style="font-size: 1.1rem;" id="live-dk-points">0.0 <span style="font-size:0.65rem; font-weight: normal; color:#6c757d;">Pts</span></span>
-                            </div>
-                            <div class="bg-white border rounded px-3 py-1 text-center shadow-sm">
-                                <span class="text-muted d-block" style="font-size: 0.6rem; font-weight: 700; text-transform: uppercase;">FanDuel</span>
-                                <span class="fd-accent" style="font-size: 1.1rem;" id="live-fd-points">0.0 <span style="font-size:0.65rem; font-weight: normal; color:#6c757d;">Pts</span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- 2. MULTI-GAME LIVE HUD HUB (Appends loops for Double Headers) -->
+                <div id="live-consoles-container"></div>
 
                 <!-- 3. SPLITS & MATRICES GRID COMPONENT -->
                 <div class="card-body p-3">
                     <h5 class="fw-bold mb-3 text-dark border-bottom pb-2" style="font-size: 1rem; letter-spacing: -0.2px;">📈 Split Analytics & Matchup Matrix</h5>
                     
-                    <!-- HOME RUN PROBABILITY SCORE CARD -->
-                    <div class="row g-2 mb-3 d-none" id="hr-probability-card">
-                        <div class="col-12">
-                            <div class="border rounded p-3 bg-white shadow-sm">
-                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="fw-bold text-dark" style="font-size: 0.85rem;">🚀 Home Run Power Predictor</span>
-                                        <span class="badge fw-bold text-uppercase" style="font-size: 0.65rem;" id="hr-rating-label">AVERAGE</span>
-                                    </div>
-                                    <span class="badge fw-bold shadow-sm" id="hr-score-badge" style="font-size:0.8rem; padding: 4px 8px;">HR Score: --</span>
-                                </div>
-                                <div class="w-100">
-                                    <div class="progress rounded-pill" style="height: 12px; background-color: #e9ecef;">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="hr-progress-bar"></div>
-                                    </div>
-                                    <div class="d-flex justify-content-between text-muted px-1 mt-1 font-monospace" style="font-size: 0.6rem;">
-                                        <span>Low (< 5.0)</span>
-                                        <span>Average (10.0)</span>
-                                        <span>Good (15.0+)</span>
-                                        <span>Elite (25.0+)</span>
-                                    </div>
-                                    <div class="text-muted mt-2 lh-sm pt-2 border-top" style="font-size: 0.70rem;">
-                                        Our baseline power metric weights the hitter's platoon splits against the pitching hand, the pitcher's localized data limits against same-sided bats, historical BvP match trends, and stadium dimensions weight metrics. Higher scores pinpoint enhanced power projection values on today's active slate.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BvP Lifetime Matchup Component -->
-                    <div class="row g-2 mb-3">
-                        <div class="col-12">
-                            <div class="border rounded p-3 d-none" style="background-color: #f8f9fa;" id="bvp-active-card">
-                                <div class="fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
-                                    <span>⚔️ Lifetime Batter vs. Pitcher (BvP) Matchup</span>
-                                    <span class="badge bg-primary" id="bvp-pitcher-name">vs. Pitcher</span>
-                                </div>
-                                <div class="row text-center g-2 pt-1">
-                                    <div class="col-3 border-end">
-                                        <span class="text-muted d-block" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase;">At Bats</span>
-                                        <strong class="text-dark h5 mb-0" id="bvp-ab">--</strong>
-                                    </div>
-                                    <div class="col-3 border-end">
-                                        <span class="text-muted d-block" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase;">Hits</span>
-                                        <strong class="text-dark h5 mb-0" id="bvp-hits">--</strong>
-                                    </div>
-                                    <div class="col-3 border-end">
-                                        <span class="text-muted d-block" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase;">Home Runs</span>
-                                        <strong class="text-dark h5 mb-0" id="bvp-hr">--</strong>
-                                    </div>
-                                    <div class="col-3">
-                                        <span class="text-muted d-block" style="font-size: 0.65rem; font-weight:700; text-transform:uppercase;">OPS</span>
-                                        <strong class="h5 mb-0" id="bvp-ops">--</strong>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="border rounded p-3 text-center text-muted fst-italic shadow-sm" style="background-color: #f8f9fa; font-size: 0.8rem;" id="bvp-fallback-card">
-                                🚫 No active matchup setup or lifetime history verified against today's starting pitcher.
-                            </div>
-                        </div>
-                    </div>
+                    <!-- DYNAMIC BVP ROOT (Appends multiple cards if double header is running) -->
+                    <div id="bvp-cards-container" class="mb-3"></div>
 
                     <!-- Platoon Splits Container -->
                     <div class="row g-2">
                         <div class="col-md-6">
                             <div class="border rounded p-2 bg-light">
-                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" style="font-size: 0.8rem;" id="split-vl-header"><span class="badge bg-secondary me-1">LHP</span> vs. Left-Handed</div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-volume">At Bats / Hits:</span><strong class="text-dark" id="split-vl-vol">--</strong></div>
+                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vl-header"><span class="badge bg-secondary me-1">LHP</span> vs. Left-Handed</div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-volume">At Bats:</span><strong class="text-dark" id="split-vl-vol">--</strong></div>
                                 <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vl-avg">--</strong></div>
                                 <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vl-ops">--</strong></div>
                                 <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-hr">Home Runs:</span><strong class="text-dark" id="split-vl-hr">--</strong></div>
@@ -230,8 +153,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="border rounded p-2 bg-light">
-                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" style="font-size: 0.8rem;" id="split-vr-header"><span class="badge bg-dark me-1">RHP</span> vs. Right-Handed</div>
-                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-volume">At Bats / Hits:</span><strong class="text-dark" id="split-vr-vol">--</strong></div>
+                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vr-header"><span class="badge bg-dark me-1">RHP</span> vs. Right-Handed</div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-volume">At Bats:</span><strong class="text-dark" id="split-vr-vol">--</strong></div>
                                 <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vr-avg">--</strong></div>
                                 <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vr-ops">--</strong></div>
                                 <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-hr">Home Runs:</span><strong class="text-dark" id="split-vr-hr">--</strong></div>
@@ -257,7 +180,7 @@
                             </tr>
                         </thead>
                         <tbody id="game-historical-tbody">
-                            <tr><td colspan="4" class="text-center p-3 text-muted">Syncing historical logs...</td></tr>
+                            <!-- Injected by master file loop -->
                         </tbody>
                     </table>
                 </div>
@@ -274,156 +197,54 @@
 </footer>
 
 <script>
-    // System Parameters - Hardcoded at generation time per player directory
     const PLAYER_ID = "806198"; 
 
-    // Safe DOM manipulation helpers to prevent null pointer crashes
-    const safeText = (id, text) => {
-        const el = document.getElementById(id);
-        if (el) el.textContent = text;
-    };
-    const safeHtml = (id, html) => {
-        const el = document.getElementById(id);
-        if (el) el.innerHTML = html;
-    };
+    const safeText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    const safeHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
 
     function getTargetSlateDate() {
         const now = new Date();
         const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
         const estDate = new Date(estStr);
-        
-        // If it's before 7:00 AM Eastern, stick to yesterday's date
-        if (estDate.getHours() < 7) {
-            estDate.setDate(estDate.getDate() - 1);
-        }
-        
+        if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
         const yyyy = estDate.getFullYear();
         const mm = String(estDate.getMonth() + 1).padStart(2, '0');
-        const day = String(estDate.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${day}`;
+        const dd = String(estDate.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
     }
 
     async function loadPlayerProfileData() {
         const targetDateStr = getTargetSlateDate();
-        let foundOnActiveSlate = false;
+        let masterDataProfile = null;
 
         // ==========================================
-        // 1. SAFE LIVE ENGINE LOOKUP LOOP
-        // ==========================================
-        try {
-            const liveRes = await fetch(`https://mlbstartingnine.com/data/LIVE/live_mlb_${targetDateStr}.json?v=` + Date.now());
-            
-            if (liveRes.ok) {
-                const liveData = await liveRes.json();
-                
-                for (const [gamePk, gameCtx] of Object.entries(liveData)) {
-                    const awayBox = gameCtx.players?.AWAY || {};
-                    const homeBox = gameCtx.players?.HOME || {};
-                    
-                    if (awayBox["ID" + PLAYER_ID] || homeBox["ID" + PLAYER_ID]) {
-                        foundOnActiveSlate = true;
-                        
-                        const sideLabel = awayBox["ID" + PLAYER_ID] ? "AWAY" : "HOME";
-                        const playerBox = gameCtx.players[sideLabel]["ID" + PLAYER_ID];
-                        const roleProfile = playerBox.batting || playerBox.pitching;
-
-                        if (roleProfile && roleProfile.summary) {
-                            const consoleHub = document.getElementById('live-console-hub');
-                            if (consoleHub) consoleHub.style.display = "block";
-                            
-                            safeText('live-summary-string', roleProfile.summary);
-                            safeHtml('live-dk-points', `${playerBox.dk_pts.toFixed(1)} <span style="font-size:0.65rem; font-weight: normal; color:#6c757d;">Pts</span>`);
-                            safeHtml('live-fd-points', `${playerBox.fd_pts.toFixed(1)} <span style="font-size:0.65rem; font-weight: normal; color:#6c757d;">Pts</span>`);
-                        }
-
-                        if (gameCtx.status === "Final") {
-                            safeHtml('live-game-state-label', `<strong>Game Status:</strong> Final`);
-                        } else {
-                            let half = gameCtx.half || "";
-                            let inning = gameCtx.inning ? gameCtx.inning.replace(/\D/g, '') : "";
-                            safeHtml('live-game-state-label', `<strong>Game Status:</strong> Live (${half} ${inning})`);
-                        }
-                        break;
-                    }
-                }
-            }
-        } catch (e) {
-            console.log("Live slate lookup bypassed or file not ready.");
-        }
-
-        if (!foundOnActiveSlate) {
-            const badge = document.getElementById('live-lineup-badge');
-            if (badge) {
-                badge.className = "badge status-badge-none d-flex flex-column align-items-center justify-content-center px-3 py-2 rounded shadow-sm text-center flex-shrink-0";
-                badge.innerHTML = `<div class="fw-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">⬜ INACTIVE</div><div class="text-uppercase mt-1 opacity-90 fw-semibold" style="font-size: 0.7rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 2px; width: 100%;">Not on Slate</div>`;
-            }
-            
-            safeHtml('live-game-state-label', `<strong>Game Status:</strong> Completed / Off-Day`);
-            
-            const consoleHub = document.getElementById('live-console-hub');
-            if (consoleHub) consoleHub.style.display = "none";
-            
-            const bvpActive = document.getElementById('bvp-active-card');
-            if (bvpActive) bvpActive.classList.add('d-none');
-            
-            const bvpFallback = document.getElementById('bvp-fallback-card');
-            if (bvpFallback) bvpFallback.classList.remove('d-none');
-            
-            const hrCard = document.getElementById('hr-probability-card');
-            if (hrCard) hrCard.classList.add('d-none');
-        }
-
-        // ==========================================
-        // 2. SAFE MASTER LOG COMPILATION LOOKUP
+        // STEP 1: INITIALIZE STABLE MASTER CORES
         // ==========================================
         try {
             const masterRes = await fetch(`https://mlbstartingnine.com/data/player_master_data.json`);
             if (masterRes.ok) {
-                const masterData = await masterRes.json();
-                const p = masterData["ID" + PLAYER_ID];
-
-                if (p) {
-                    // Update Identity Strings Safely
-                    safeText('player-name-header', p.name);
-                    const headshotImg = document.getElementById('player-headshot-img');
-                    if (headshotImg) headshotImg.alt = p.name;
-                    
-                    if (p.is_pitcher) {
-                        const wins = p.season?.w !== undefined ? p.season.w : 0;
-                        const losses = p.season?.l !== undefined ? p.season.l : 0;
-                        const era = p.season?.era || '-';
-                        
-                        safeText('player-meta-sub', `Pitcher • ${wins}-${losses} • ${era} ERA`);
-                        safeHtml('split-vl-header', `<span class="badge bg-secondary me-1">LHB</span> vs. Left-Handed Batters`);
-                        safeHtml('split-vr-header', `<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters`);
-                        safeText('split-vl-label-volume', "Batters Faced:");
-                        safeText('split-vr-label-volume', "Batters Faced:");
-                        safeText('split-vl-label-hr', "HR Allowed:");
-                        safeText('split-vr-label-hr', "HR Allowed:");
-                    } else {
-                        const avg = p.season?.avg || '-';
-                        const hr = p.season?.hr !== undefined ? p.season.hr : 0;
+                const masterRegistry = await masterRes.json();
+                masterDataProfile = masterRegistry["ID" + PLAYER_ID];
+                if (masterDataProfile) {
+                    safeText('player-name-header', masterDataProfile.name);
+                    if (!masterDataProfile.is_pitcher) {
+                        const avg = masterDataProfile.season?.avg || '-';
+                        const hr = masterDataProfile.season?.hr ?? 0;
                         safeText('player-meta-sub', `Position Player • ${avg} AVG • ${hr} HR`);
                     }
-
-                    // Populate Split Metrics Safely
-                    const vl = p.split_vL || {};
-                    const vr = p.split_vR || {};
                     
-                    safeText('split-vl-vol', vl.ab || 0);
-                    safeText('split-vl-avg', vl.avg || '-');
-                    safeText('split-vl-ops', vl.ops || '-');
-                    safeText('split-vl-hr', vl.hr || 0);
+                    // Render Splits Matrix
+                    const vl = masterDataProfile.split_vL || {};
+                    const vr = masterDataProfile.split_vR || {};
+                    safeText('split-vl-vol', vl.ab || 0); safeText('split-vl-avg', vl.avg || '-');
+                    safeText('split-vl-ops', vl.ops || '-'); safeText('split-vl-hr', vl.hr || 0);
+                    safeText('split-vr-vol', vr.ab || 0); safeText('split-vr-avg', vr.avg || '-');
+                    safeText('split-vr-ops', vr.ops || '-'); safeText('split-vr-hr', vr.hr || 0);
 
-                    safeText('split-vr-vol', vr.ab || 0);
-                    safeText('split-vr-avg', vr.avg || '-');
-                    safeText('split-vr-ops', vr.ops || '-');
-                    safeText('split-vr-hr', vr.hr || 0);
-
-                    // Populate Historical Log Table Safely
+                    // Render Logs Table
+                    const logs = masterDataProfile.game_log || [];
                     const logTableBody = document.getElementById('game-historical-tbody');
                     if (logTableBody) {
-                        const logs = p.game_log || [];
                         if (logs.length > 0) {
                             logTableBody.innerHTML = logs.map(log => `
                                 <tr>
@@ -434,14 +255,156 @@
                                 </tr>
                             `).join('');
                         } else {
-                            logTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-3 text-muted">No recent game lines logged.</td></tr>`;
+                            logTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-3 text-muted">No recent history logged.</td></tr>`;
                         }
                     }
                 }
             }
-        } catch (e) {
-            console.error("Error processing master data registry lookup:", e);
-        }
+        } catch(e) { console.error("Error loading master logs dictionary.", e); }
+
+        // ==========================================
+        // STEP 2: LOOKUP TODAY'S ACTION MATRIX FILES
+        // ==========================================
+        try {
+            const dailyRes = await fetch(`https://mlbstartingnine.com/data/daily_files/games_${targetDateStr}.json`);
+            const liveRes = await fetch(`https://mlbstartingnine.com/data/LIVE/live_mlb_${targetDateStr}.json?v=` + Date.now()).catch(() => ({ ok: false }));
+            
+            if (dailyRes.ok) {
+                const dailyData = await dailyRes.json();
+                const liveData = liveRes.ok ? await liveRes.json() : {};
+                
+                let activeMatchNodes = [];
+                
+                // Scan loop looking for any match containing this player
+                (dailyData.games || []).forEach(game => {
+                    const deepStats = game.deepStats || {};
+                    if (deepStats["ID" + PLAYER_ID]) {
+                        activeMatchNodes.push(game);
+                    }
+                });
+
+                if (activeMatchNodes.length > 0) {
+                    const badgeZone = document.getElementById('badge-matrix-zone');
+                    const bvpZone = document.getElementById('bvp-cards-container');
+                    const liveConsoleZone = document.getElementById('live-consoles-container');
+                    
+                    badgeZone.innerHTML = '';
+                    bvpZone.innerHTML = '';
+                    liveConsoleZone.innerHTML = '';
+                    
+                    let globalGameStatusStrings = [];
+
+                    activeMatchNodes.forEach((game, index) => {
+                        const gameRaw = game.gameRaw || {};
+                        const gamePk = String(gameRaw.gamePk);
+                        const gameNum = gameRaw.gameNumber || 1;
+                        const labelPrefix = activeMatchNodes.length > 1 ? `G${gameNum}: ` : '';
+                        
+                        const tracking = game.lineupTracking || {};
+                        const isAway = game.deepStats["ID" + PLAYER_ID].is_pitcher ? false : Object.keys(gameRaw.lineups?.awayPlayers || {}).some(k => k === "ID"+PLAYER_ID);
+                        
+                        const teamSide = isAway ? "away" : "home";
+                        const oppSide = isAway ? "home" : "away";
+                        const sideLabelUpper = isAway ? "AWAY" : "HOME";
+                        
+                        const trackingNode = tracking[teamSide] || {};
+                        const oppPitcherName = gameRaw.teams?.[oppSide]?.probablePitcher?.fullName || "TBD";
+                        
+                        // 1. EXTRACT BATTING ORDER POSITION
+                        let isConfirmed = trackingNode.status === "OFFICIAL";
+                        let slotIndex = -1;
+                        
+                        if (isConfirmed && trackingNode.hash) {
+                            slotIndex = trackingNode.hash.split('-').indexOf(PLAYER_ID);
+                        }
+                        
+                        // Fallback checking logic for projected nodes
+                        if (slotIndex === -1) {
+                            const projectedList = game.projectedLineups?.[teamSide]?.battingOrder || [];
+                            slotIndex = projectedList.findIndex(p => String(p.id) === PLAYER_ID);
+                        }
+
+                        // 2. CONSTRUCT BADGE DESIGN CORES
+                        let badgeHtml = '';
+                        if (isConfirmed && slotIndex !== -1) {
+                            badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Batting #${slotIndex + 1}</div>`;
+                        } else if (slotIndex !== -1) {
+                            badgeHtml = `<div class="badge status-badge-projected p-2 w-100 shadow-sm text-uppercase text-dark">${labelPrefix}Projected #${slotIndex + 1}</div>`;
+                        } else {
+                            badgeHtml = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Not Projected to Start</div>`;
+                        }
+                        badgeZone.innerHTML += badgeHtml;
+
+                        // 3. COMPILE LATEST MATCH SCORE LOGS
+                        const activeLiveGame = liveData[gamePk];
+                        if (activeLiveGame) {
+                            if (activeLiveGame.status === "Final") {
+                                globalGameStatusStrings.push(`${labelPrefix}Final`);
+                            } else {
+                                globalGameStatusStrings.push(`${labelPrefix}${activeLiveGame.half || ''} ${activeLiveGame.inning ? activeLiveGame.inning.replace(/\D/g, '') : ''}`);
+                            }
+
+                            const playerBox = activeLiveGame.players?.[sideLabelUpper]?.[`ID${PLAYER_ID}`];
+                            const profile = playerBox?.batting || playerBox?.pitching;
+                            
+                            if (playerBox && profile?.summary) {
+                                liveConsoleZone.innerHTML += `
+                                <div class="p-3 border-bottom" style="background-color: #edf4f8;">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <div>
+                                            <span class="badge bg-primary text-uppercase me-2" style="font-size:0.65rem;">${labelPrefix}Box Score</span>
+                                            <strong class="text-dark" style="font-size: 0.9rem;">${profile.summary}</strong>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                                                <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700;">DK Pts</span>
+                                                <span class="dk-accent" style="font-size: 1rem;">${playerBox.dk_pts.toFixed(1)}</span>
+                                            </div>
+                                            <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                                                <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700;">FD Pts</span>
+                                                <span class="fd-accent" style="font-size: 1rem;">${playerBox.fd_pts.toFixed(1)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            }
+                        } else {
+                            globalGameStatusStrings.push(`${labelPrefix}Scheduled`);
+                        }
+
+                        // 4. GENERATE DISTINCT BVP CARDS FOR BOTH MATCHUPS
+                        const pDeepStats = game.deepStats["ID" + PLAYER_ID] || {};
+                        const bvp = pDeepStats.bvp || {};
+                        
+                        if (bvp && bvp.ab > 0) {
+                            bvpZone.innerHTML += `
+                            <div class="border rounded p-3 bg-white shadow-sm mb-2">
+                                <div class="fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+                                    <span>⚔️ ${labelPrefix}Lifetime Batter vs. Pitcher Matchup</span>
+                                    <span class="badge bg-primary">vs. ${oppPitcherName}</span>
+                                </div>
+                                <div class="row text-center g-2 pt-1">
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
+                                    <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
+                                </div>
+                            </div>`;
+                        } else {
+                            bvpZone.innerHTML += `
+                            <div class="border rounded p-2 text-center text-muted fst-italic bg-white shadow-sm mb-2" style="font-size: 0.8rem;">
+                                🚫 ${labelPrefix}No previous history recorded against starting pitcher <strong>${oppPitcherName}</strong>.
+                            </div>`;
+                        }
+                    });
+
+                    safeHtml('live-game-state-label', `<strong>Game Status:</strong> ${globalGameStatusStrings.join(' | ')}`);
+                } else {
+                    // Fallback block if file loads but player isn't inside today's roster array context mapping
+                    safeHtml('bvp-cards-container', `<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup or lifetime history verified against today's starting pitcher.</div>`);
+                }
+            }
+        } catch(e) { console.error("Error evaluating live tracking loops.", e); }
     }
 
     window.addEventListener('DOMContentLoaded', loadPlayerProfileData);
