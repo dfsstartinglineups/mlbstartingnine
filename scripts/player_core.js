@@ -303,7 +303,17 @@ async function loadPlayerProfileData() {
 
                             let ratingLabel = "AVERAGE MATCHUP";
                             let barColorClass = "bg-primary";
-                            let progressPct = Math.min(Math.max((baseScore / 30.0) * 100, 10), 100);
+
+                            // --- PIECEWISE MATH ALIGNMENT FIX (BATTERS) ---
+                            let progressPct = 0;
+                            if (baseScore <= 10.0) {
+                                progressPct = (baseScore / 10.0) * 33.33;
+                            } else if (baseScore <= 15.0) {
+                                progressPct = 33.33 + ((baseScore - 10.0) / 5.0) * 33.33;
+                            } else {
+                                progressPct = 66.66 + ((baseScore - 15.0) / 10.0) * 33.33;
+                            }
+                            progressPct = Math.min(Math.max(progressPct, 10), 100);
 
                             if (baseScore >= 22.0) { ratingLabel = "ELITE POWER PLAY"; barColorClass = "bg-danger text-white"; }
                             else if (baseScore >= 14.0) { ratingLabel = "HIGH PROBABILITY"; barColorClass = "bg-success text-white"; }
@@ -340,7 +350,17 @@ async function loadPlayerProfileData() {
 
                             let ratingLabel = "AVERAGE DANGER";
                             let barColorClass = "bg-warning text-dark"; 
-                            let progressPct = Math.min(Math.max((baseDangerScore / 25.0) * 100, 10), 100);
+                            
+                            // --- PIECEWISE MATH ALIGNMENT FIX (PITCHERS) ---
+                            let progressPct = 0;
+                            if (baseDangerScore <= 10.0) {
+                                progressPct = (baseDangerScore / 10.0) * 33.33;
+                            } else if (baseDangerScore <= 18.0) {
+                                progressPct = 33.33 + ((baseDangerScore - 10.0) / 8.0) * 33.33;
+                            } else {
+                                progressPct = 66.66 + ((baseDangerScore - 18.0) / 7.0) * 33.33;
+                            }
+                            progressPct = Math.min(Math.max(progressPct, 10), 100);
 
                             if (baseDangerScore >= 18.0) { ratingLabel = "HIGH DANGER MATCHUP"; barColorClass = "bg-danger text-white"; }
                             else if (baseDangerScore < 10.0) { ratingLabel = "ELITE SAFETY PLAY"; barColorClass = "bg-success text-white"; }
