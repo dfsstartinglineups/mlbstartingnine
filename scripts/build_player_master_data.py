@@ -14,6 +14,19 @@ os.makedirs(LIVE_DIR, exist_ok=True)
 # ==========================================
 # --- CORE DATA FETCHERS (MLB API) ---
 # ==========================================
+def fetch_player_team_info(session, player_id):
+    """
+    Fetches the official MLB current team ID and Name for a player to ensure
+    accurate branding and handle mid-season trades smoothly.
+    """
+    url = f"https://statsapi.mlb.com/api/v1/people/{player_id}"
+    try:
+        res = session.get(url, timeout=5).json()
+        team = res.get('people', [{}])[0].get('currentTeam', {})
+        return team.get('id'), team.get('name')
+    except Exception:
+        return None, None
+
 def fetch_mlb_season_and_splits(session, player_id, group_type="hitting"):
     """
     Queries MLB API to compile season totals alongside left/right splits 
@@ -115,7 +128,7 @@ def main():
         players_box = game_ctx.get("players", {})
         all_game_players = {**players_box.get("AWAY", {}), **players_box.get("HOME", {})}
 
-    	# Iterate through every player record from yesterday's slate
+        # Iterate through every player record from yesterday's slate
         for api_id_key, player_data in all_game_players.items():
             player_id = api_id_key.replace("ID", "")
             player_name = player_data.get("name")
@@ -137,12 +150,21 @@ def main():
                 master_registry[api_id_key] = {
                     "player_id": player_id,
                     "name": player_name,
+                    "team_id": None,
+                    "team_name": None,
                     "is_pitcher": is_pitcher,
                     "season": {},
                     "split_vL": {},
                     "split_vR": {},
                     "game_log": []
                 }
+
+            # --- DYNAMIC TEAM UPDATE ---
+            # Automatically grabs team logo id & name, naturally updating mid-season trades
+            t_id, t_name = fetch_player_team_info(session, player_id)
+            if t_id and t_name:
+                master_registry[api_id_key]["team_id"] = t_id
+                master_registry[api_id_key]["team_name"] = t_name
 
             # 4. Check for duplicate logs before appending
             existing_log = master_registry[api_id_key].get("game_log", [])
