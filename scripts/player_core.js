@@ -7,6 +7,7 @@ function getTargetSlateDate() {
     const now = new Date();
     const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
     const estDate = new Date(estStr);
+    // If it's before 7:00 AM Eastern, lock onto yesterday's file
     if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
     const yyyy = estDate.getFullYear();
     const mm = String(estDate.getMonth() + 1).padStart(2, '0');
@@ -135,9 +136,22 @@ async function loadPlayerProfileData() {
                     
                     const pDeepStats = game.deepStats[PLAYER_ID] || {};
                     
-                    // Safely fall back to a dash if projections aren't compiled yet for a player
-                    const dkProjectionValue = pDeepStats.dk_proj !== undefined ? pDeepStats.dk_proj.toFixed(1) : '--';
-                    const fdProjectionValue = pDeepStats.fd_proj !== undefined ? pDeepStats.fd_proj.toFixed(1) : '--';
+                    // --- TARGET PROJECTIONS PARSING STRATEGY ---
+                    let pProjNode = null;
+                    if (game.projectedLineups?.[teamSide]) {
+                        const pl = game.projectedLineups[teamSide];
+                        if (String(pl.startingPitcher?.id) === PLAYER_ID) {
+                            pProjNode = pl.startingPitcher;
+                        } else {
+                            pProjNode = (pl.battingOrder || []).find(p => String(p.id) === PLAYER_ID);
+                        }
+                    }
+                    
+                    const dkRaw = pDeepStats.dk_proj ?? pProjNode?.dk_proj ?? pDeepStats.proj ?? pProjNode?.proj;
+                    const fdRaw = pDeepStats.fd_proj ?? pProjNode?.fd_proj ?? pDeepStats.proj ?? pProjNode?.proj;
+                    
+                    const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : '--';
+                    const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : '--';
 
                     // Batting Order Position Math
                     let isConfirmed = trackingNode.status === "OFFICIAL";
@@ -190,7 +204,6 @@ async function loadPlayerProfileData() {
                                         <strong class="text-dark" style="font-size: 0.9rem;">${profile.summary}</strong>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <!-- DK Dynamic Box -->
                                         <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
                                             <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DraftKings</span>
                                             <div class="d-flex align-items-baseline gap-1">
@@ -199,7 +212,6 @@ async function loadPlayerProfileData() {
                                                 <span class="text-secondary fw-bold" style="font-size:0.85rem;">${dkProjectionValue}</span>
                                             </div>
                                         </div>
-                                        <!-- FD Dynamic Box -->
                                         <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
                                             <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">FanDuel</span>
                                             <div class="d-flex align-items-baseline gap-1">
@@ -213,8 +225,7 @@ async function loadPlayerProfileData() {
                             </div>`;
                         }
                     } else { 
-                        // If game hasn't started yet, display clean upcoming card showing just projections
-                        globalGameStatusStrings.push(`${labelPrefix}Scheduled`);
+                        globalGameStatusStrings.push(`${labelPrefix}${gameRaw.status?.abstractGameState || 'Scheduled'}`);
                         liveConsoleZone.innerHTML += `
                         <div class="p-3 border-bottom" style="background-color: #edf4f8;">
                             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -237,17 +248,22 @@ async function loadPlayerProfileData() {
                     }
 
                     // DYNAMIC DATA METRICS MATRIX ENGINE
-                    if (masterDataProfile) {
-                        if (!masterDataProfile.is_pitcher) {
-                            // --- HITTER POWER PREDICTOR FORMULA ---
+                    if (pDeepStats) {
+                        const splitR = pDeepStats.split_vR || {};
+                        const splitL = pDeepStats.split_vL || {};
+                        
+                        if (!pDeepStats.is_pitcher) {
+                            // Hitter Power Predictor Formula
                             let hitHrRate = 0.03; 
-                            if (game.lineupHandedness && game.lineupHandedness[oppPitcherId] === 'R') {
-                                hitHrRate = (pDeepStats.split_vR && pDeepStats.split_vR.ab > 0) ? (pDeepStats.split_vR.hr || 0) / pDeepStats.split_vR.ab : 0.03;
-                            } else if (game.lineupHandedness && game.lineupHandedness[oppPitcherId] === 'L') {
-                                hitHrRate = (pDeepStats.split_vL && pDeepStats.split_vL.ab > 0) ? (pDeepStats.split_vL.hr || 0) / pDeepStats.split_vL.ab : 0.03;
+                            const oppHand = game.lineupHandedness ? game.lineupHandedness[oppPitcherId] : 'R';
+                            
+                            if (oppHand === 'R') {
+                                hitHrRate = (Number(splitR.ab) > 0) ? (Number(splitR.hr) || 0) / Number(splitR.ab) : 0.03;
+                            } else if (oppHand === 'L') {
+                                hitHrRate = (Number(splitL.ab) > 0) ? (Number(splitL.hr) || 0) / Number(splitL.ab) : 0.03;
                             } else {
-                                const tHr = (pDeepStats.split_vR?.hr || 0) + (pDeepStats.split_vL?.hr || 0);
-                                const tAb = (pDeepStats.split_vR?.ab || 0) + (pDeepStats.split_vL?.ab || 0);
+                                const tHr = (Number(splitR.hr) || 0) + (Number(splitL.hr) || 0);
+                                const tAb = (Number(splitR.ab) || 0) + (Number(splitL.ab) || 0);
                                 hitHrRate = tAb > 0 ? tHr / tAb : 0.03;
                             }
 
@@ -284,14 +300,9 @@ async function loadPlayerProfileData() {
                                 </div>
                             </div>`;
                         } else {
-                            // --- PITCHER HR SUPPRESSION GAUGE FORMULA ---
-                            const vlHr = pDeepStats.split_vL ? (pDeepStats.split_vL.hr || 0) : 0;
-                            const vrHr = pDeepStats.split_vR ? (pDeepStats.split_vR.hr || 0) : 0;
-                            const vlAb = pDeepStats.split_vL ? (pDeepStats.split_vL.ab || 0) : 0;
-                            const vrAb = pDeepStats.split_vR ? (pDeepStats.split_vR.ab || 0) : 0;
-                            
-                            const totalHr = vlHr + vrHr;
-                            const totalAb = vlAb + vrAb;
+                            // Pitcher HR Suppression Gauge Formula
+                            const totalHr = (Number(splitL.hr) || 0) + (Number(splitR.hr) || 0);
+                            const totalAb = (Number(splitL.ab) || 0) + (Number(splitR.ab) || 0);
                             const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0.03;
 
                             let baseDangerScore = (pitchHrRate / 0.03) * 10.0;
@@ -331,7 +342,7 @@ async function loadPlayerProfileData() {
                     // ==========================================
                     // STEP 3: BVP LOOKUP ROUTER
                     // ==========================================
-                    if (masterDataProfile && !masterDataProfile.is_pitcher) {
+                    if (pDeepStats && !pDeepStats.is_pitcher) {
                         const bvp = pDeepStats.bvp || {};
                         if (bvp && bvp.ab > 0) {
                             bvpZone.innerHTML += `
