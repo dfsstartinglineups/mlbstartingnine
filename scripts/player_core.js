@@ -127,6 +127,7 @@ async function loadPlayerProfileData() {
                     const teamSide = isAway ? "away" : "home";
                     const oppSide = isAway ? "home" : "away";
                     const sideLabelUpper = isAway ? "AWAY" : "HOME";
+                    const oppSideLabelUpper = isAway ? "HOME" : "AWAY";
                     
                     const tracking = game.lineupTracking || {};
                     const trackingNode = tracking[teamSide] || {};
@@ -198,72 +199,178 @@ async function loadPlayerProfileData() {
                         }
                     } else { globalGameStatusStrings.push(`${labelPrefix}Scheduled`); }
 
-                    // FIXED DYNAMIC HR PREDICTOR DATA ENGINE
-                    if (masterDataProfile && !masterDataProfile.is_pitcher) {
+                    // DYNAMIC DATA METRICS MATRIX ENGINE (HITTERS VS PITCHERS FLOPS)
+                    if (masterDataProfile) {
                         const pDeepStats = game.deepStats[PLAYER_ID] || {};
-                        let baseScore = 10.0; 
                         
-                        if (pDeepStats.split_vR && game.lineupHandedness?.[oppPitcherId] === 'R') {
-                            baseScore += (pDeepStats.split_vR.hr || 0) * 0.8;
-                        } else if (pDeepStats.split_vL) {
-                            baseScore += (pDeepStats.split_vL.hr || 0) * 0.8;
+                        if (!masterDataProfile.is_pitcher) {
+                            // --- HITTER POWER PREDICTOR FORMULA ---
+                            let baseScore = 10.0; 
+                            if (pDeepStats.split_vR && game.lineupHandedness?.[oppPitcherId] === 'R') {
+                                baseScore += (pDeepStats.split_vR.hr || 0) * 0.8;
+                            } else if (pDeepStats.split_vL) {
+                                baseScore += (pDeepStats.split_vL.hr || 0) * 0.8;
+                            }
+                            if (game.parkStats) {
+                                const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
+                                baseScore = baseScore * (rawFactor / 100);
+                            }
+
+                            let ratingLabel = "AVERAGE MATCHUP";
+                            let barColorClass = "bg-primary";
+                            let progressPct = Math.min(Math.max((baseScore / 30.0) * 100, 10), 100);
+
+                            if (baseScore >= 22.0) { ratingLabel = "ELITE POWER PLAY"; barColorClass = "bg-danger text-white"; }
+                            else if (baseScore >= 14.0) { ratingLabel = "HIGH PROBABILITY"; barColorClass = "bg-success text-white"; }
+                            else if (baseScore < 6.0) { ratingLabel = "LOW PROBABILITY"; barColorClass = "bg-secondary text-white"; }
+
+                            hrZone.innerHTML += `
+                            <div class="border rounded p-3 bg-white shadow-sm mb-2">
+                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fw-bold text-dark" style="font-size: 0.85rem;">🚀 ${labelPrefix}Home Run Power Predictor</span>
+                                        <span class="badge ${barColorClass} fw-bold" style="font-size: 0.65rem;">${ratingLabel}</span>
+                                    </div>
+                                    <span class="badge bg-dark fw-bold shadow-sm" style="font-size:0.8rem; padding: 4px 8px;">HR Score: ${baseScore.toFixed(1)}</span>
+                                </div>
+                                <div class="w-100">
+                                    <div class="progress rounded-pill" style="height: 12px; background-color: #e9ecef;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated ${barColorClass}" role="progressbar" style="width: ${progressPct}%;" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted px-1 mt-1 font-monospace" style="font-size: 0.6rem;">
+                                        <span>Low (< 5.0)</span><span>Average (10.0)</span><span>Good (15.0+)</span><span>Elite (25.0+)</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } else {
+                            // --- PITCHER HR SUPPRESSION GAUGE FORMULA ---
+                            let baseDangerScore = 8.0; 
+                            const vlDanger = pDeepStats.split_vL ? (pDeepStats.split_vL.hr || 0) * 0.9 : 0;
+                            const vrDanger = pDeepStats.split_vR ? (pDeepStats.split_vR.hr || 0) * 0.9 : 0;
+                            baseDangerScore += (vlDanger + vrDanger);
+
+                            if (game.parkStats) {
+                                const rawFactor = ((game.parkStats.hr_l || 100) + (game.parkStats.hr_r || 100)) / 2;
+                                baseDangerScore = baseDangerScore * (rawFactor / 100);
+                            }
+
+                            let ratingLabel = "AVERAGE DANGER";
+                            let barColorClass = "bg-warning text-dark"; 
+                            let progressPct = Math.min(Math.max((baseDangerScore / 25.0) * 100, 10), 100);
+
+                            if (baseDangerScore >= 18.0) { ratingLabel = "HIGH DANGER MATCHUP"; barColorClass = "bg-danger text-white"; }
+                            else if (baseDangerScore < 10.0) { ratingLabel = "ELITE SAFETY PLAY"; barColorClass = "bg-success text-white"; }
+
+                            hrZone.innerHTML += `
+                            <div class="border rounded p-3 bg-white shadow-sm mb-2">
+                                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="fw-bold text-dark" style="font-size: 0.85rem;">🛡️ ${labelPrefix}HR Suppression Gauge</span>
+                                        <span class="badge ${barColorClass} fw-bold" style="font-size: 0.65rem;">${ratingLabel}</span>
+                                    </div>
+                                    <span class="badge bg-dark fw-bold shadow-sm" style="font-size:0.8rem; padding: 4px 8px;">Danger Score: ${baseDangerScore.toFixed(1)}</span>
+                                </div>
+                                <div class="w-100">
+                                    <div class="progress rounded-pill" style="height: 12px; background-color: #e9ecef;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated ${barColorClass}" role="progressbar" style="width: ${progressPct}%;" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted px-1 mt-1 font-monospace" style="font-size: 0.6rem;">
+                                        <span>Safe (< 10.0)</span><span>Average</span><span>Dangerous (18.0+)</span>
+                                    </div>
+                                </div>
+                            </div>`;
                         }
-                        
-                        if (game.parkStats) {
-                            const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
-                            baseScore = baseScore * (rawFactor / 100);
-                        }
-
-                        let ratingLabel = "AVERAGE MATCHUP";
-                        let barColorClass = "bg-primary";
-                        let progressPct = Math.min(Math.max((baseScore / 30.0) * 100, 10), 100);
-
-                        if (baseScore >= 22.0) { ratingLabel = "ELITE POWER PLAY"; barColorClass = "bg-danger text-white"; }
-                        else if (baseScore >= 14.0) { ratingLabel = "HIGH PROBABILITY"; barColorClass = "bg-success text-white"; }
-                        else if (baseScore < 6.0) { ratingLabel = "LOW PROBABILITY"; barColorClass = "bg-secondary text-white"; }
-
-                        hrZone.innerHTML += `
-                        <div class="border rounded p-3 bg-white shadow-sm mb-2">
-                            <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="fw-bold text-dark" style="font-size: 0.85rem;">🚀 ${labelPrefix}Home Run Power Predictor</span>
-                                    <span class="badge ${barColorClass} fw-bold" style="font-size: 0.65rem;">${ratingLabel}</span>
-                                </div>
-                                <span class="badge bg-dark fw-bold shadow-sm" style="font-size:0.8rem; padding: 4px 8px;">HR Score: ${baseScore.toFixed(1)}</span>
-                            </div>
-                            <div class="w-100">
-                                <div class="progress rounded-pill" style="height: 12px; background-color: #e9ecef;">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated ${barColorClass}" role="progressbar" style="width: ${progressPct}%;" aria-valuenow="${progressPct}" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <div class="d-flex justify-content-between text-muted px-1 mt-1 font-monospace" style="font-size: 0.6rem;">
-                                    <span>Low (< 5.0)</span><span>Average (10.0)</span><span>Good (15.0+)</span><span>Elite (25.0+)</span>
-                                </div>
-                            </div>
-                        </div>`;
                     }
 
-                    // BvP Layout Render Block
-                    const pDeepStats = game.deepStats[PLAYER_ID] || {};
-                    const bvp = pDeepStats.bvp || {};
-                    
-                    if (bvp && bvp.ab > 0) {
-                        bvpZone.innerHTML += `
-                        <div class="border rounded p-3 bg-white shadow-sm mb-2">
-                            <div class="fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
-                                <span>⚔️ ${labelPrefix}Lifetime Matchup Analysis</span>
-                                <span class="badge bg-primary">vs. ${oppPitcherName}</span>
-                            </div>
-                            <div class="row text-center g-2 pt-1">
-                                <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
-                                <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
-                                <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
-                                <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
-                            </div>
-                        </div>`;
+                    // ==========================================
+                    // STEP 3: RE-CONFIGURED BVP LOOKUP ROUTER
+                    // ==========================================
+                    if (masterDataProfile && !masterDataProfile.is_pitcher) {
+                        // --- HITTER LOOKUP PERSPECTIVE (Standard Card) ---
+                        const pDeepStats = game.deepStats[PLAYER_ID] || {};
+                        const bvp = pDeepStats.bvp || {};
+                        
+                        if (bvp && bvp.ab > 0) {
+                            bvpZone.innerHTML += `
+                            <div class="border rounded p-3 bg-white shadow-sm mb-2">
+                                <div class="fw-bold text-dark border-bottom pb-2 mb-2 d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
+                                    <span>⚔️ ${labelPrefix}Lifetime Matchup Analysis</span>
+                                    <span class="badge bg-primary">vs. ${oppPitcherName}</span>
+                                </div>
+                                <div class="row text-center g-2 pt-1">
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
+                                    <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
+                                </div>
+                            </div>`;
+                        } else {
+                            bvpZone.innerHTML += `
+                            <div class="border rounded p-2 text-center text-muted fst-italic bg-white shadow-sm mb-2" style="font-size: 0.8rem;">
+                                🚫 ${labelPrefix}No previous history recorded against starting pitcher <strong>${oppPitcherName}</strong>.
+                            </div>`;
+                        }
                     } else {
+                        // --- PITCHER LOOKUP PERSPECTIVE (Dynamic Roster Matchup Matrix Table) ---
+                        const oppSideKey = isAway ? "home" : "away";
+                        
+                        // Extract ordered arrays prioritizing confirmed bats, falling back to predictions
+                        let orderList = game.lineupTracking?.[oppSideKey]?.hash ? game.lineupTracking[oppSideKey].hash.split('-') : [];
+                        if (orderList.length === 0) {
+                            orderList = (game.projectedLineups?.[oppSideKey]?.battingOrder || []).map(p => String(p.id));
+                        }
+
+                        let tableRowsHtml = '';
+                        let historyCount = 0;
+
+                        orderList.forEach((batterId, idx) => {
+                            const batterStats = game.deepStats[batterId] || {};
+                            const bvp = batterStats.bvp || {};
+                            const batterName = batterStats.name || game.projectedLineups?.[oppSideKey]?.battingOrder?.find(p => String(p.id) === batterId)?.name || `Batter #${idx+1}`;
+
+                            if (bvp && bvp.ab > 0) {
+                                historyCount++;
+                                tableRowsHtml += `
+                                <tr>
+                                    <td class="text-start fw-semibold">${idx + 1}. ${batterName}</td>
+                                    <td><strong>${bvp.ab}</strong></td>
+                                    <td>${bvp.hits}</td>
+                                    <td>${bvp.hr}</td>
+                                    <td class="text-success fw-bold">${bvp.ops}</td>
+                                </tr>`;
+                            } else {
+                                tableRowsHtml += `
+                                <tr>
+                                    <td class="text-start text-muted">${idx + 1}. ${batterName}</td>
+                                    <td colspan="4" class="text-muted fst-italic text-center" style="font-size: 0.7rem;">No historic matchups recorded</td>
+                                </tr>`;
+                            }
+                        });
+
+                        const oppTeamName = gameRaw.teams?.[oppSideKey]?.teamName || "Opponent";
+
                         bvpZone.innerHTML += `
-                        <div class="border rounded p-2 text-center text-muted fst-italic bg-white shadow-sm mb-2" style="font-size: 0.8rem;">
-                            🚫 ${labelPrefix}No previous history recorded against starting pitcher <strong>${oppPitcherName}</strong>.
+                        <div class="card shadow-sm border rounded overflow-hidden mb-2">
+                            <div class="card-header bg-primary text-white py-2 d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold" style="font-size: 0.8rem;">⚔️ ${labelPrefix}Head-to-Head vs Opposing ${oppTeamName} Lineup</h6>
+                                <span class="badge bg-light text-primary fw-bold" style="font-size:0.65rem;">${historyCount} Bats Tracked</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped text-center align-middle mb-0" style="font-size:0.75rem; min-width: 450px;">
+                                    <thead class="table-light text-secondary font-weight-bold">
+                                        <tr>
+                                            <th class="text-start ps-2">Lineup Position & Batter</th>
+                                            <th>AB</th>
+                                            <th>H</th>
+                                            <th>HR</th>
+                                            <th>Lifetime OPS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${tableRowsHtml}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>`;
                     }
                 });
