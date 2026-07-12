@@ -115,8 +115,8 @@
                     <div class="w-100 text-white">
                         <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-center align-items-sm-start gap-3">
                             <div>
-                                <h1 class="h3 fw-black mb-1 italic text-white" id="player-name-header">Cooper Pratt</h1>
-                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">Shortstop • Milwaukee Brewers</p>
+                                <h1 class="h3 fw-black mb-1 italic text-white" id="player-name-header">Loading...</h1>
+                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">Position • Team</p>
                             </div>
                             
                             <!-- FLEX TARGET CONTAINER FOR MULTIPLE BADGES IN DOUBLE HEADERS -->
@@ -206,6 +206,7 @@
         const now = new Date();
         const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
         const estDate = new Date(estStr);
+        // The script successfully locks onto the previous day if it's past midnight but before 7:00 AM EST
         if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
         const yyyy = estDate.getFullYear();
         const mm = String(estDate.getMonth() + 1).padStart(2, '0');
@@ -278,7 +279,8 @@
                 // Scan loop looking for any match containing this player
                 (dailyData.games || []).forEach(game => {
                     const deepStats = game.deepStats || {};
-                    if (deepStats["ID" + PLAYER_ID]) {
+                    // KEY FIX: Python dicts use "806198" as the key, NOT "ID806198"
+                    if (deepStats[PLAYER_ID]) {
                         activeMatchNodes.push(game);
                     }
                 });
@@ -294,19 +296,33 @@
                     
                     let globalGameStatusStrings = [];
 
-                    activeMatchNodes.forEach((game, index) => {
+                    activeMatchNodes.forEach((game) => {
                         const gameRaw = game.gameRaw || {};
                         const gamePk = String(gameRaw.gamePk);
                         const gameNum = gameRaw.gameNumber || 1;
                         const labelPrefix = activeMatchNodes.length > 1 ? `G${gameNum}: ` : '';
                         
-                        const tracking = game.lineupTracking || {};
-                        const isAway = game.deepStats["ID" + PLAYER_ID].is_pitcher ? false : Object.keys(gameRaw.lineups?.awayPlayers || {}).some(k => k === "ID"+PLAYER_ID);
+                        // KEY FIX: Safely identify the player's team by looking at both official and projected lists natively
+                        const awayLineup = gameRaw.lineups?.awayPlayers || [];
+                        const awayProj = game.projectedLineups?.away?.battingOrder || [];
+                        const awayProjP = game.projectedLineups?.away?.startingPitcher || {};
+                        const awayOffP = gameRaw.teams?.away?.probablePitcher || {};
+
+                        let isAway = false;
+                        if (
+                            awayLineup.some(p => String(p.id) === PLAYER_ID) ||
+                            awayProj.some(p => String(p.id) === PLAYER_ID) ||
+                            String(awayProjP.id) === PLAYER_ID ||
+                            String(awayOffP.id) === PLAYER_ID
+                        ) {
+                            isAway = true;
+                        }
                         
                         const teamSide = isAway ? "away" : "home";
                         const oppSide = isAway ? "home" : "away";
                         const sideLabelUpper = isAway ? "AWAY" : "HOME";
                         
+                        const tracking = game.lineupTracking || {};
                         const trackingNode = tracking[teamSide] || {};
                         const oppPitcherName = gameRaw.teams?.[oppSide]?.probablePitcher?.fullName || "TBD";
                         
@@ -318,7 +334,6 @@
                             slotIndex = trackingNode.hash.split('-').indexOf(PLAYER_ID);
                         }
                         
-                        // Fallback checking logic for projected nodes
                         if (slotIndex === -1) {
                             const projectedList = game.projectedLineups?.[teamSide]?.battingOrder || [];
                             slotIndex = projectedList.findIndex(p => String(p.id) === PLAYER_ID);
@@ -326,12 +341,19 @@
 
                         // 2. CONSTRUCT BADGE DESIGN CORES
                         let badgeHtml = '';
-                        if (isConfirmed && slotIndex !== -1) {
-                            badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Batting #${slotIndex + 1}</div>`;
-                        } else if (slotIndex !== -1) {
-                            badgeHtml = `<div class="badge status-badge-projected p-2 w-100 shadow-sm text-uppercase text-dark">${labelPrefix}Projected #${slotIndex + 1}</div>`;
+                        const isStartingPitcher = String(gameRaw.teams?.[teamSide]?.probablePitcher?.id) === PLAYER_ID || 
+                                                  String(game.projectedLineups?.[teamSide]?.startingPitcher?.id) === PLAYER_ID;
+
+                        if (isStartingPitcher) {
+                            badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Starting Pitcher</div>`;
                         } else {
-                            badgeHtml = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Not Projected to Start</div>`;
+                            if (isConfirmed && slotIndex !== -1) {
+                                badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Batting #${slotIndex + 1}</div>`;
+                            } else if (slotIndex !== -1) {
+                                badgeHtml = `<div class="badge status-badge-projected p-2 w-100 shadow-sm text-uppercase text-dark">${labelPrefix}Projected #${slotIndex + 1}</div>`;
+                            } else {
+                                badgeHtml = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">${labelPrefix}Not Projected to Start</div>`;
+                            }
                         }
                         badgeZone.innerHTML += badgeHtml;
 
@@ -373,7 +395,7 @@
                         }
 
                         // 4. GENERATE DISTINCT BVP CARDS FOR BOTH MATCHUPS
-                        const pDeepStats = game.deepStats["ID" + PLAYER_ID] || {};
+                        const pDeepStats = game.deepStats[PLAYER_ID] || {};
                         const bvp = pDeepStats.bvp || {};
                         
                         if (bvp && bvp.ab > 0) {
@@ -400,7 +422,6 @@
 
                     safeHtml('live-game-state-label', `<strong>Game Status:</strong> ${globalGameStatusStrings.join(' | ')}`);
                 } else {
-                    // Fallback block if file loads but player isn't inside today's roster array context mapping
                     safeHtml('bvp-cards-container', `<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup or lifetime history verified against today's starting pitcher.</div>`);
                 }
             }
