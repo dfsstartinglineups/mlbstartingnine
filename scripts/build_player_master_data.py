@@ -19,7 +19,8 @@ def fetch_player_team_info(session, player_id):
     Fetches the official MLB current team ID and Name for a player to ensure
     accurate branding and handle mid-season trades smoothly.
     """
-    url = f"https://statsapi.mlb.com/api/v1/people/{player_id}"
+    # Added ?hydrate=currentTeam so the API actually returns the team's name string
+    url = f"https://statsapi.mlb.com/api/v1/people/{player_id}?hydrate=currentTeam"
     try:
         res = session.get(url, timeout=5).json()
         team = res.get('people', [{}])[0].get('currentTeam', {})
