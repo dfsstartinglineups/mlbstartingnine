@@ -33,10 +33,13 @@ async function loadPlayerProfileData() {
             masterDataProfile = masterRegistry["ID" + PLAYER_ID];
             if (masterDataProfile) {
                 
-                // --- TEAM BRANDING FROM MASTER JSON ---
+                // --- TEAM & POSITION BRANDING ---
                 const teamName = masterDataProfile.team_name || "";
                 const teamId = masterDataProfile.team_id || "";
                 const tNamePrefix = teamName ? `${teamName} • ` : "";
+                
+                // Fallbacks if position is somehow completely missing
+                const pos = masterDataProfile.position || (masterDataProfile.is_pitcher ? "Pitcher" : "Position Player");
 
                 if (teamId) {
                     const logoEl = document.getElementById('player-team-logo');
@@ -48,7 +51,9 @@ async function loadPlayerProfileData() {
                     const losses = masterDataProfile.season?.l !== undefined ? masterDataProfile.season.l : 0;
                     const era = masterDataProfile.season?.era || '-';
                     
-                    safeText('player-meta-sub', `Pitcher • ${tNamePrefix}${wins}-${losses} • ${era} ERA`);
+                    // Now injects exact position (e.g., Pitcher • Boston Red Sox • 10-2 • 2.45 ERA)
+                    safeText('player-meta-sub', `${pos} • ${tNamePrefix}${wins}-${losses} • ${era} ERA`);
+                    
                     safeHtml('split-vl-header', `<span class="badge bg-secondary me-1">LHB</span> vs. Left-Handed Batters`);
                     safeHtml('split-vr-header', `<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters`);
                     safeText('split-vl-label-volume', "Batters Faced:");
@@ -58,7 +63,9 @@ async function loadPlayerProfileData() {
                 } else {
                     const avg = masterDataProfile.season?.avg || '-';
                     const hr = masterDataProfile.season?.hr ?? 0;
-                    safeText('player-meta-sub', `Position Player • ${tNamePrefix}${avg} AVG • ${hr} HR`);
+                    
+                    // Now injects exact position (e.g., Third Base • Boston Red Sox • .251 AVG • 19 HR)
+                    safeText('player-meta-sub', `${pos} • ${tNamePrefix}${avg} AVG • ${hr} HR`);
                 }
                 
                 const vl = masterDataProfile.split_vL || {};
