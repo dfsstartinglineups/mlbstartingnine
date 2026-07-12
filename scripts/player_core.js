@@ -7,7 +7,6 @@ function getTargetSlateDate() {
     const now = new Date();
     const estStr = now.toLocaleString("en-US", { timeZone: "America/New_York" });
     const estDate = new Date(estStr);
-    // If it's before 7:00 AM Eastern, lock onto yesterday's file
     if (estDate.getHours() < 7) { estDate.setDate(estDate.getDate() - 1); }
     const yyyy = estDate.getFullYear();
     const mm = String(estDate.getMonth() + 1).padStart(2, '0');
@@ -147,8 +146,28 @@ async function loadPlayerProfileData() {
                         }
                     }
                     
-                    const dkRaw = pDeepStats.dk_proj ?? pProjNode?.dk_proj ?? pDeepStats.proj ?? pProjNode?.proj;
-                    const fdRaw = pDeepStats.fd_proj ?? pProjNode?.fd_proj ?? pDeepStats.proj ?? pProjNode?.proj;
+                    let dkRaw = null;
+                    let fdRaw = null;
+
+                    if (pProjNode) {
+                        // Safely extract DK from deep slate dictionary mapping
+                        if (pProjNode.dk_slates && Object.keys(pProjNode.dk_slates).length > 0) {
+                            dkRaw = pProjNode.dk_slates[Object.keys(pProjNode.dk_slates)[0]].proj;
+                        } else {
+                            dkRaw = pProjNode.dk_proj;
+                        }
+
+                        // Safely extract FD from deep slate dictionary mapping
+                        if (pProjNode.fd_slates && Object.keys(pProjNode.fd_slates).length > 0) {
+                            fdRaw = pProjNode.fd_slates[Object.keys(pProjNode.fd_slates)[0]].proj;
+                        } else {
+                            fdRaw = pProjNode.proj;
+                        }
+                    }
+                    
+                    // Final safety fallbacks to raw deepStats if node projections didn't process
+                    dkRaw = dkRaw ?? pDeepStats.dk_proj ?? pDeepStats.dk_points;
+                    fdRaw = fdRaw ?? pDeepStats.fd_proj ?? pDeepStats.fd_points ?? pDeepStats.proj;
                     
                     const dkProjectionValue = (dkRaw !== undefined && dkRaw !== null && dkRaw !== 0) ? Number(dkRaw).toFixed(1) : '--';
                     const fdProjectionValue = (fdRaw !== undefined && fdRaw !== null && fdRaw !== 0) ? Number(fdRaw).toFixed(1) : '--';
@@ -253,21 +272,22 @@ async function loadPlayerProfileData() {
                         const splitL = pDeepStats.split_vL || {};
                         
                         if (!pDeepStats.is_pitcher) {
-                            // Hitter Power Predictor Formula
-                            let hitHrRate = 0.03; 
+                            // Hitter Power Predictor Formula (Smoothed Baseline to prevent 0.0 scores)
+                            let hitHrRate = 0; 
                             const oppHand = game.lineupHandedness ? game.lineupHandedness[oppPitcherId] : 'R';
                             
                             if (oppHand === 'R') {
-                                hitHrRate = (Number(splitR.ab) > 0) ? (Number(splitR.hr) || 0) / Number(splitR.ab) : 0.03;
+                                hitHrRate = (Number(splitR.ab) > 0) ? (Number(splitR.hr) || 0) / Number(splitR.ab) : 0;
                             } else if (oppHand === 'L') {
-                                hitHrRate = (Number(splitL.ab) > 0) ? (Number(splitL.hr) || 0) / Number(splitL.ab) : 0.03;
+                                hitHrRate = (Number(splitL.ab) > 0) ? (Number(splitL.hr) || 0) / Number(splitL.ab) : 0;
                             } else {
                                 const tHr = (Number(splitR.hr) || 0) + (Number(splitL.hr) || 0);
                                 const tAb = (Number(splitR.ab) || 0) + (Number(splitL.ab) || 0);
-                                hitHrRate = tAb > 0 ? tHr / tAb : 0.03;
+                                hitHrRate = tAb > 0 ? tHr / tAb : 0;
                             }
 
-                            let baseScore = (hitHrRate / 0.03) * 10.0;
+                            // Math.max enforces a 0.01 floor so batters with 0 HRs still generate a baseline ~3.3 minimum score
+                            let baseScore = (Math.max(hitHrRate, 0.01) / 0.03) * 10.0;
                             if (game.parkStats) {
                                 const rawFactor = isAway ? (game.parkStats.hr_l || 100) : (game.parkStats.hr_r || 100);
                                 baseScore = baseScore * (rawFactor / 100);
@@ -303,9 +323,9 @@ async function loadPlayerProfileData() {
                             // Pitcher HR Suppression Gauge Formula
                             const totalHr = (Number(splitL.hr) || 0) + (Number(splitR.hr) || 0);
                             const totalAb = (Number(splitL.ab) || 0) + (Number(splitR.ab) || 0);
-                            const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0.03;
+                            const pitchHrRate = totalAb > 0 ? (totalHr / totalAb) : 0;
 
-                            let baseDangerScore = (pitchHrRate / 0.03) * 10.0;
+                            let baseDangerScore = (Math.max(pitchHrRate, 0.01) / 0.03) * 10.0;
                             if (game.parkStats) {
                                 const rawFactor = ((game.parkStats.hr_l || 100) + (game.parkStats.hr_r || 100)) / 2;
                                 baseDangerScore = baseDangerScore * (rawFactor / 100);
