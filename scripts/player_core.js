@@ -377,7 +377,8 @@ async function loadPlayerProfileData() {
                                 </div>
                                 <div class="row text-center g-2 pt-1">
                                     <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
-                                    <div class="col-3 border-end"><span class="text-muted d-block; font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
+                                    <!-- Fixed the quote-separation typo below to correctly restore display block alignment -->
+                                    <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
                                     <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
                                     <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
                                 </div>
