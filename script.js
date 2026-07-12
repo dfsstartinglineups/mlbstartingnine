@@ -10,6 +10,17 @@ let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'tr
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
+// --- URL SLUG GENERATOR ---
+// Accurately mirrors Python's string serialization loops for clean isolated directory matches
+function slugify(text) {
+    if (!text) return "";
+    return text.toString().toLowerCase()
+        .normalize('NFKD').replace(/[\u0300-\u036f]/g, '') // Strip accents (e.g., Domínguez -> dominguez)
+        .replace(/[^\w\s-]/g, '')                          // Remove special characters and punctuation
+        .replace(/[\s-]+/g, '-')                           // Convert spaces/dashes to single standard dashes
+        .trim();
+}
+
 // --- CSS INJECTIONS FOR LEADERBOARD & CONTROLS ---
 const style = document.createElement('style');
 style.innerHTML = `
@@ -88,12 +99,11 @@ async function pollLiveData(dateToFetch) {
         if (response.ok) {
             LIVE_GAMES_DATA = await response.json();
         } else {
-            LIVE_GAMES_DATA = {}; // Clear if file doesn't exist (e.g., future dates)
+            LIVE_GAMES_DATA = {}; 
         }
-        // Re-render the Top Plays list silently to update the checkmarks
         if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView(); 
     } catch (e) {
-        LIVE_GAMES_DATA = {}; // Clear on network error
+        LIVE_GAMES_DATA = {}; 
         if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView();
         console.log("Live MLB data not available yet.");
     }
@@ -205,10 +215,9 @@ async function init(dateToFetch, isSilentRefresh = false) {
     
     if (datePicker && !isSilentRefresh) datePicker.value = dateToFetch;
 
-    // Only show the loading spinner if this is a manual/initial load, NOT a background refresh
     if (container && !isSilentRefresh) {
-        ALL_GAMES_DATA = [];  // Clear old games
-        LIVE_GAMES_DATA = {}; // Clear old live stats immediately
+        ALL_GAMES_DATA = [];  
+        LIVE_GAMES_DATA = {}; 
 
         container.innerHTML = `
             <div class="col-12 text-center mt-5 pt-5">
@@ -265,10 +274,8 @@ async function init(dateToFetch, isSilentRefresh = false) {
         return;
     }
 
-    // PASS THE FLAG HERE
     renderGames(isSilentRefresh); 
     
-    // --- NEW: START LIVE POLLER ---
     if (!isSilentRefresh) {
         pollLiveData(dateToFetch);
         clearInterval(livePollInterval);
@@ -304,7 +311,6 @@ window.updateTopPlaysView = function() {
     const bvpTab = document.querySelector('.leaderboard-tab[data-tab="bvp"]');
     const hrTab = document.querySelector('.leaderboard-tab[data-tab="hr"]');
 
-    // 1. Quarantining Pitchers & Tabs
     if (pos === 'P') {
         if (bvpTab) bvpTab.style.display = 'none';
         if (hrTab) hrTab.style.display = 'none';
@@ -321,7 +327,6 @@ window.updateTopPlaysView = function() {
     const platform = window.TOP_PLAYS_DATA.platform;
     const posKey = platform === 'dk' ? 'dk_positions' : 'fd_positions';
 
-    // 2. Select Source Array (Pitchers are permanently separated from ALL)
     let sourceArray = [];
     if (pos === 'P') {
         sourceArray = window.TOP_PLAYS_DATA.pitchers;
@@ -331,7 +336,6 @@ window.updateTopPlaysView = function() {
         else if (tab === 'hr') sourceArray = window.TOP_PLAYS_DATA.hr;
     }
 
-    // 3. Filter by Position
     let filtered = sourceArray;
     if (pos !== 'ALL' && pos !== 'P') {
         const targetPositions = pos.split('/'); 
@@ -344,14 +348,12 @@ window.updateTopPlaysView = function() {
         });
     }
 
-    // 4. Sort by Active Metric
     let sorted = [...filtered];
     if (tab === 'value') sorted.sort((a, b) => (b.value || 0) - (a.value || 0));
     else if (tab === 'proj') sorted.sort((a, b) => (b.proj || 0) - (a.proj || 0));
     else if (tab === 'bvp') sorted.sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0));
     else if (tab === 'hr') sorted.sort((a, b) => (b.hrScore || 0) - (a.hrScore || 0));
 
-    // 5. Render top 20
     const top20 = sorted.slice(0, 20);
     const listContainer = document.getElementById('view-top-plays-list');
     if (listContainer) listContainer.innerHTML = window.buildTopPlaysListHtml(top20, tab, platform);
@@ -371,9 +373,6 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
         let tabSpecificHtml = '';
         let displayPos = p[posKey] || p.pos;
 
-        // ==========================================
-        // 1. FETCH LIVE DATA FOR THE PLAYER
-        // ==========================================
         let livePlayer = null;
         let liveGame = null;
         let isGameFinal = false;
@@ -388,13 +387,10 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                 livePlayer = lPlayer;
                 liveGame = lGame;
                 isGameFinal = (lGame.status === 'Final');
-                break; // Stop searching once found
+                break; 
             }
         }
 
-        // ==========================================
-        // 2. BUILD GAME STATUS BADGE
-        // ==========================================
         let gameStatusBadge = '';
         if (liveGame) {
             if (isGameFinal) {
@@ -410,9 +406,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             }
         }
 
-        // ==========================================
-        // 3. BUILD TAB-SPECIFIC CONTENT
-        // ==========================================
+        // --- WRAPPED IN LEADERBOARD META TILES ---
         if (mode === 'bvp') {
             let avg = p.bvp.avg;
             if (!avg || avg === "-" || avg === ".000") {
@@ -432,11 +426,11 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
 
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="fw-bold text-dark text-truncate pe-2" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                    <div class="text-truncate pe-2" style="font-size: 0.95rem;"><a href="/players/${slugify(p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
                     <div class="text-end fw-bold text-dark" style="font-size: 1.0rem;">${opsDisplay} <span class="text-muted" style="font-size:0.6rem;">OPS</span></div>
                 </div>
                 <div class="text-muted text-truncate w-100" style="font-size: 0.72rem; margin-top: -2px;">
-                    v. ${p_shortName} • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR
+                    v. <a href="/players/${slugify(p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR
                 </div>
             `;
             
@@ -457,15 +451,15 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             
             let pitcherSplitHtml = '';
             if (p.oppPitcherSplit && p.oppPitcherSplit.ab > 0) {
-                pitcherSplitHtml = `<span>${p_shortName} v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
+                pitcherSplitHtml = `<span><a href="/players/${slugify(p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
             } else {
-                pitcherSplitHtml = `<span>${p_shortName} v${p.activeBatSide}: No History</span>`;
+                pitcherSplitHtml = `<span><a href="/players/${slugify(p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: No History</span>`;
             }
             
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center pe-2" style="min-width: 0;">
-                        <div class="fw-bold text-dark text-truncate" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                        <div class="text-truncate" style="font-size: 0.95rem;"><a href="/players/${slugify(p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
                         ${gameStatusBadge}
                     </div>
                     <div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 20px;">${hrIcon}</div>
@@ -478,34 +472,28 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             `;
             
         } else {
-            // mode === 'value' OR 'proj'
             const isValue = mode === 'value';
             const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
             
-            // --- ROW 1: Name, Pos/Sal, & Projected ---
             let topMetric = isValue 
                 ? `<div class="text-success fw-bold" style="font-size: 0.95rem;">${parseFloat(p.value || 0).toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.6rem;">Proj</span></div>` 
                 : `<div class="text-primary fw-bold" style="font-size: 0.95rem;">${parseFloat(p.proj || 0).toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.6rem;">Proj</span></div>`;
 
-            // --- ROW 2: Live Stats & Actuals ---
             let actualPtsDisplay = `<div class="text-muted fw-bold" style="font-size: 0.95rem; opacity:0.4;">-- <span class="fw-normal" style="font-size:0.6rem;">Act</span></div>`;
             let liveStatHtml = '';
             
             if (livePlayer) {
-                // Actual points and value calculations
                 let actualPts = platform === 'dk' ? (livePlayer.dk_pts || 0) : (livePlayer.fd_pts || 0);
                 let actualValue = p.salary > 0 ? actualPts / (p.salary / 1000) : 0;
                 
                 let bat = livePlayer.batting;
                 let pit = livePlayer.pitching;
                 
-                // Track all stats that score or lose points
                 let statParts = [];
                 if (pit && pit.battersFaced > 0) {
                     statParts.push(`${pit.inningsPitched || '0.0'} IP`);
                     statParts.push(`${pit.strikeOuts || 0} K`);
                     statParts.push(`${pit.earnedRuns || 0} ER`);
-                    // Removed Hits, BB, and HBP to save space on the UI for Pitchers
                     if (pit.wins > 0) statParts.push(`W`);
                 } 
                 else if (bat && (bat.plateAppearances > 0 || bat.atBats > 0)) {
@@ -520,7 +508,6 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                     if (bat.stolenBases > 0) statParts.push(`${bat.stolenBases} SB`);
                 }
                 
-                // Adjusting the bottom row layout to prepend the game status badge
                 let bottomBadge = gameStatusBadge ? gameStatusBadge.replace('ms-2', 'me-2') : '';
 
                 if (statParts.length > 0) {
@@ -532,7 +519,6 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
                      liveStatHtml = `${bottomBadge}`;
                 }
                 
-                // Show actual points/value if the game has started
                 if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
                     if (isValue) {
                         actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size: 0.95rem;">${actualValue.toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.6rem;">Act</span></div>`;
@@ -545,7 +531,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center w-100">
                     <div class="d-flex align-items-baseline text-truncate pe-2" style="min-width: 0;">
-                        <div class="fw-bold text-dark text-truncate me-1" style="font-size: 0.95rem;" title="${p.name}">${shortName}</div>
+                        <div class="text-truncate me-1" style="font-size: 0.95rem;"><a href="/players/${slugify(p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
                         <div class="text-muted ms-1" style="font-size: 0.70rem; white-space: nowrap;">${displayPos} • ${salFmt}</div>
                     </div>
                     <div class="text-end flex-shrink-0 ms-2">${topMetric}</div>
@@ -580,12 +566,10 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
     let allHR = []; 
     
     filteredGames.forEach(game => {
-        // --- NEW: SKIP POSTPONED/CANCELLED GAMES FOR TOP PLAYS ---
         const gameState = game.gameRaw?.status?.detailedState || '';
         if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(gameState)) {
-            return; // Skip this iteration, keeping these players off the leaderboard
+            return; 
         }
-        // ---------------------------------------------------------
         const pl = game.gameRaw?.teams || {}; 
         const awayAbbr = pl.away?.team?.abbreviation || pl.away?.team?.name?.substring(0,3).toUpperCase();
         const homeAbbr = pl.home?.team?.abbreviation || pl.home?.team?.name?.substring(0,3).toUpperCase();
@@ -631,7 +615,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                 let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
                 let fieldPos = isPitcher ? 'P' : (posMap[p.id] || 'B');
                 
-                // Grab DFS Positions!
                 let fd_pos = p.fd_positions || '';
                 let dk_pos = p.dk_positions || '';
                 
@@ -663,7 +646,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
                     if (splitStats && splitStats.ab >= 10) splitHrRate = splitStats.hr / splitStats.ab;
                     if (bvpStats && bvpStats.ab > 0) bvpHrRate = bvpStats.hr / bvpStats.ab;
                     
-                    // Pitcher HR Rate given up to this batter's active side
                     if (opposingPitcherId && deepStats[String(opposingPitcherId)]) {
                         let oppPitcherStats = deepStats[String(opposingPitcherId)];
                         oppPitcherSplit = activeBatSide === 'L' ? oppPitcherStats.split_vL : oppPitcherStats.split_vR;
@@ -715,7 +697,6 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
 
     if (allHitters.length === 0 && allPitchers.length === 0) return '';
     
-    // Save to Global Variables for fast filtering
     window.TOP_PLAYS_DATA = {
         hitters: Array.from(new Map(allHitters.map(p => [p.id, p])).values()),
         pitchers: Array.from(new Map(allPitchers.map(p => [p.id, p])).values()),
@@ -724,12 +705,10 @@ function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
         platform: platform
     };
 
-    // Determine Buttons based on Platform
     const posButtonsFD = ['ALL', 'P', 'C/1B', '2B', '3B', 'SS', 'OF'];
     const posButtonsDK = ['ALL', 'P', 'C', '1B', '2B', '3B', 'SS', 'OF'];
     const buttonsToUse = platform === 'dk' ? posButtonsDK : posButtonsFD;
 
-    // Reset fallback if platform switches
     let activePos = window.CURRENT_TOP_PLAYS_POS || 'ALL';
     if (!buttonsToUse.includes(activePos)) activePos = 'ALL';
     window.CURRENT_TOP_PLAYS_POS = activePos;
@@ -774,13 +753,11 @@ window.switchGameTab = function(gamePk, tabName, btnEl) {
     const allBtns = card.querySelectorAll('.tab-btn');
     let isDeactivating = false;
     
-    // Toggle off if they click the already active button
     if (btnEl.classList.contains('active')) {
         btnEl.classList.remove('active', 'btn-primary', 'text-white');
         btnEl.classList.add('btn-outline-secondary', 'text-muted');
         isDeactivating = true;
     } else {
-        // Reset all buttons, activate the new one
         allBtns.forEach(b => {
             b.classList.remove('active', 'btn-primary', 'text-white');
             b.classList.add('btn-outline-secondary', 'text-muted');
@@ -790,11 +767,8 @@ window.switchGameTab = function(gamePk, tabName, btnEl) {
     }
 
     const targetView = isDeactivating ? 'default' : tabName;
-    
-    // Save the state globally so auto-refresh remembers it!
     window.ACTIVE_GAME_TABS[gamePk] = targetView;
 
-    // Hide all views, then show target
     const allViews = card.querySelectorAll('.player-view');
     allViews.forEach(v => v.classList.add('d-none'));
     
@@ -803,14 +777,10 @@ window.switchGameTab = function(gamePk, tabName, btnEl) {
 };
 
 function adjustOverflowingNames() {
-    // Give the browser a microsecond to calculate the true pixel widths
     requestAnimationFrame(() => {
         document.querySelectorAll('.batter-name').forEach(el => {
-            // If the text wants to take up more space than the box allows...
             if (el.scrollWidth > el.clientWidth) {
                 const shortName = el.getAttribute('data-shortname');
-                
-                // Swap the full name for the short name!
                 if (shortName && shortName !== el.textContent) {
                     el.textContent = shortName;
                 }
@@ -826,9 +796,8 @@ function renderGames(isSilentRefresh = false) {
     const container = document.getElementById('games-container');
     if (!container) return;
     
-    // --- 1. CAPTURE STATE (Only if silently refreshing) ---
     let scrollY = 0;
-    let activeTopPlaysTab = 'value'; // Default fallback
+    let activeTopPlaysTab = 'value'; 
     let openStatsIds = [];
     let expandedCardIds = [];
     let listViewScrollPositions = {}; 
@@ -836,23 +805,17 @@ function renderGames(isSilentRefresh = false) {
      if (isSilentRefresh) {
         scrollY = window.scrollY;
         
-        // Capture Top Plays Tab
         const activeTabEl = document.querySelector('.leaderboard-tab.active');
         if (activeTabEl) activeTopPlaysTab = activeTabEl.getAttribute('data-tab');
 
-        // Capture inner scroll positions of the Top Plays lists
         document.querySelectorAll('.list-view').forEach(el => {
             if (el.id) listViewScrollPositions[el.id] = el.scrollTop;
         });
 
-        // Capture Individual Expanded Players
         document.querySelectorAll('.stats-collapse:not(.d-none)').forEach(el => {
             if (el.id) openStatsIds.push(el.id);
         });
 
-        
-
-        // Capture Fully Expanded Cards (Card toggle buttons)
         document.querySelectorAll('.card-toggle-btn').forEach(btn => {
             if (btn.textContent.includes('[-]')) {
                 const card = btn.closest('.lineup-card');
@@ -860,9 +823,7 @@ function renderGames(isSilentRefresh = false) {
             }
         });
     }
-    // ------------------------------------------------------
 
-    // Keep controls intact, clear out the games & leaderboard underneath
     container.innerHTML = '';
 
     const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
@@ -887,47 +848,41 @@ function renderGames(isSilentRefresh = false) {
         return;
     }
 
-    // Insert Leaderboard if no search
     if (!searchText) {
         const topPlaysHtml = buildTopPlaysCard(filteredGames, platform, selectedSlate);
         if (topPlaysHtml) {
             container.insertAdjacentHTML('beforeend', topPlaysHtml);
-            window.updateTopPlaysView(); // Fire the dynamic renderer!
+            window.updateTopPlaysView(); 
         }
     }
 
     let sortedGames = [...filteredGames].sort((a, b) => {
-        // 1. Define Helper to get status weight
         const getStatusWeight = (item) => {
             const status = item.gameRaw.status?.abstractGameState;
             const detailed = item.gameRaw.status?.detailedState || "";
             
-            // Extract the current inning and half
             const inning = item.gameRaw.linescore?.currentInning || 0;
             const half = item.gameRaw.linescore?.inningHalf || "";
 
-            if (status === "Final") return 2; // Bottom
+            if (status === "Final") return 2; 
             
             if (status === "Live" || detailed.includes("In Progress")) {
-                // If the game is in warmups (0) or Top of the 1st, keep it grouped with Pre-Game
                 if (inning === 0 || (inning === 1 && half === 'Top')) {
                     return 0; 
                 }
-                return 1; // Middle (Truly Live from Bottom 1st onward)
+                return 1; 
             }
             
-            return 0; // Top (Upcoming / Scheduled / Preview)
+            return 0; 
         };
 
         const weightA = getStatusWeight(a);
         const weightB = getStatusWeight(b);
 
-        // 2. Primary Sort: By Status Weight (Upcoming -> Live -> Final)
         if (weightA !== weightB) {
             return weightA - weightB;
         }
 
-        // 3. Secondary Sort: Sort by Game Start Time within those groups
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
@@ -935,9 +890,7 @@ function renderGames(isSilentRefresh = false) {
 
     adjustOverflowingNames();
 
-    // --- 2. RESTORE STATE (Only if silently refreshing) ---
     if (isSilentRefresh) {
-        // Restore Top Plays Tab
         const newActiveTab = document.querySelector(`.leaderboard-tab[data-tab="${activeTopPlaysTab}"]`);
         if (newActiveTab) {
             window.setTopPlaysTab(newActiveTab); 
@@ -945,19 +898,16 @@ function renderGames(isSilentRefresh = false) {
             window.updateTopPlaysView(); 
         }
 
-        // Restore inner scroll positions for Top Plays lists
         Object.keys(listViewScrollPositions).forEach(id => {
             const listEl = document.getElementById(id);
             if (listEl) listEl.scrollTop = listViewScrollPositions[id];
         });
 
-        // Restore Expanded Players
         openStatsIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('d-none');
         });
 
-        // Restore "Collapse Matchups" Button Text
         expandedCardIds.forEach(id => {
             const card = document.getElementById(id);
             if (card) {
@@ -966,12 +916,9 @@ function renderGames(isSilentRefresh = false) {
             }
         });
 
-        
-
-        // Restore main window Scroll Position seamlessly
         window.scrollTo(0, scrollY);
     }
-} // <-- Final closing bracket of renderGames
+} 
 
 function createGameCard(data, platform, selectedSlate) {
     const game = data.gameRaw;
@@ -1042,7 +989,6 @@ function createGameCard(data, platform, selectedSlate) {
         rightSideHtml = `<div class="text-muted fw-bold text-uppercase text-end ms-auto" style="font-size: 0.70rem; letter-spacing: 0.5px; line-height: 1.1;">${displayVenueName}</div>`;
     }
 
-    // --- ODDS ENGINE ---
     const oddsData = data.odds; 
     let mlAway = '', mlHome = '';
     let rawTotal = "TBD";
@@ -1067,7 +1013,6 @@ function createGameCard(data, platform, selectedSlate) {
         if (totalsMarket && totalsMarket.outcomes.length > 0) rawTotal = totalsMarket.outcomes[0].point; 
     }
 
-    // --- PITCHER DETERMINATION ---
     let awayPitcherHand = 'R', homePitcherHand = 'R'; 
     let awayPitcherObj = data.projectedLineups?.away?.startingPitcher;
     if (awayPitcherObj) awayPitcherObj = { ...awayPitcherObj }; 
@@ -1117,7 +1062,6 @@ function createGameCard(data, platform, selectedSlate) {
         }
     }
 
-    // --- GAME STATUS LOGIC ---
     const gameState = game.status.abstractGameState; 
     const detailedState = game.status.detailedState; 
     let timeBadgeHtml = `<span class="badge bg-white text-dark shadow-sm border px-2 py-1" style="font-size: 0.70rem;">${gameTime}</span>`;
@@ -1139,18 +1083,15 @@ function createGameCard(data, platform, selectedSlate) {
 
     let ouHtml = rawTotal !== "TBD" ? `<span class="badge bg-secondary text-white shadow-sm border px-2 py-1 ms-2" style="font-size: 0.70rem;">O/U ${rawTotal}</span>` : '';
 
-    
-        // --- TEAM RECORDS ---
     const awayWins = game.teams.away.leagueRecord?.wins || 0;
     const awayLosses = game.teams.away.leagueRecord?.losses || 0;
     const homeWins = game.teams.home.leagueRecord?.wins || 0;
     const homeLosses = game.teams.home.leagueRecord?.losses || 0;
     
-    // Both records now use ms-1 (margin-start) to give a small space after the team name
     const awayRecordHtml = `<span class="text-muted fw-normal ms-1" style="font-size: 0.70rem;">(${awayWins}-${awayLosses})</span>`;
     const homeRecordHtml = `<span class="text-muted fw-normal ms-1" style="font-size: 0.70rem;">(${homeWins}-${homeLosses})</span>`;
 
-    // --- PITCHER HEADER BUILDER ---
+    // --- WRAPPED IN PITCHER HEAD CARDS ---
     const buildPitcherHeader = (pitcherObj, mlOdds, pHand) => {
         if (!pitcherObj || !pitcherObj.id) {
             return `<div class="d-flex align-items-center justify-content-center bg-light rounded border text-muted fst-italic w-100" style="height: 42px; font-size: 0.70rem;">TBD</div>`;
@@ -1175,7 +1116,7 @@ function createGameCard(data, platform, selectedSlate) {
             <div class="d-flex flex-column justify-content-center text-truncate w-100">
                 <div class="d-flex align-items-center text-truncate w-100">
                     ${handText}
-                    <span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</span>
+                    <a href="/players/${slugify(playerName)}/" class="fw-bold text-dark text-truncate text-decoration-none" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</a>
                 </div>
                 <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
             </div>
@@ -1204,10 +1145,6 @@ function createGameCard(data, platform, selectedSlate) {
         </div>
     `;
 
-    // ==========================================
-    // --- STATE-AWARE TAB RIBBON ---
-    // ==========================================
-    // Check if there is a saved state for this specific game, otherwise default
     window.ACTIVE_GAME_TABS = window.ACTIVE_GAME_TABS || {};
     const activeTab = window.ACTIVE_GAME_TABS[game.gamePk] || 'default';
 
@@ -1224,11 +1161,7 @@ function createGameCard(data, platform, selectedSlate) {
         </div>
     `;
 
-
-    
-    // ==========================================
-    // --- TWO-LINE LINEUP BUILDER ---
-    // ==========================================
+    // --- WRAPPED IN LINEUP GRID TILES ---
     const buildLineupList = (playersArray, opposingPitcherHand) => {
         let displayArray = playersArray ? [...playersArray] : [];
         if (displayArray.length === 0) return `<div class="p-4 text-center text-muted small fw-bold">Lineup not yet posted</div>`;
@@ -1251,31 +1184,27 @@ function createGameCard(data, platform, selectedSlate) {
                 <div class="d-flex align-items-center text-truncate w-100" style="padding-bottom: 2px;">
                     <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${handText}
-                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</span>
+                    <a href="/players/${slugify(playerName)}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</a>
                 </div>`;
 
-            // --- 1. DEFAULT VIEW ---
             const viewDefault = `
                 <div class="d-flex align-items-center w-100">
                     <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${photoHtml}
                     ${handText}
-                    <span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</span>
+                    <a href="/players/${slugify(playerName)}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</a>
                 </div>`;
 
-            // --- 2. SEASON VIEW ---
             const sStats = deepStats[pidStr]?.season || { avg: '-', ops: '-', hr: 0 };
             const viewSeason = `
                 ${topLineHtml}
                 <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${sStats.avg} • ${sStats.ops} OPS • ${sStats.hr} HR</div>`;
 
-            // --- 3. VS P VIEW ---
             const bvp = deepStats[pidStr]?.bvp || { hits: 0, ab: 0, avg: '-', ops: '-', hr: 0 };
             const viewVsP = `
                 ${topLineHtml}
                 <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">${bvp.hits}-${bvp.ab} • ${bvp.avg} • ${bvp.ops} OPS • ${bvp.hr} HR</div>`;
 
-            // --- 4. SPLITS VIEW ---
             const split = opposingPitcherHand === 'L' ? deepStats[pidStr]?.split_vL : deepStats[pidStr]?.split_vR;
             const pSplit = split || { ab: 0, avg: '-', ops: '-', hr: 0 };
             const splitHits = (pSplit.ab > 0 && pSplit.avg !== '-') ? Math.round(parseFloat(pSplit.avg) * pSplit.ab) : 0;
@@ -1283,7 +1212,6 @@ function createGameCard(data, platform, selectedSlate) {
                 ${topLineHtml}
                 <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}: ${splitHits}-${pSplit.ab}•${pSplit.avg}•${pSplit.ops}•${pSplit.hr} HR</div>`;
 
-            // --- 5. FD VIEW ---
             const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
             const fdProj = selectedSlate === 'all' ? (p.proj || 0) : (p.fd_slates?.[selectedSlate]?.proj || 0);
             const fdVal = selectedSlate === 'all' ? (p.value || 0) : (p.fd_slates?.[selectedSlate]?.value || 0);
@@ -1296,7 +1224,6 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="text-success fw-bold">Value: ${fdVal > 0 ? parseFloat(fdVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
-            // --- 6. DK VIEW ---
             const dkSal = selectedSlate === 'all' ? (p.dk_salary || 0) : (p.dk_slates?.[selectedSlate]?.salary || 0);
             const dkProj = selectedSlate === 'all' ? (p.dk_proj || 0) : (p.dk_slates?.[selectedSlate]?.proj || 0);
             const dkVal = selectedSlate === 'all' ? (p.dk_value || 0) : (p.dk_slates?.[selectedSlate]?.value || 0);
@@ -1309,7 +1236,6 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="text-success fw-bold">Value: ${dkVal > 0 ? parseFloat(dkVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
-            // FIX: Note the lh-sm class instead of lh-1!
             return `
                 <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="min-height: 36px;">
                     <div class="d-flex align-items-center flex-grow-1 text-truncate w-100 lh-sm">
@@ -1326,7 +1252,6 @@ function createGameCard(data, platform, selectedSlate) {
         return `<div class="w-100 m-0 p-0"><ul class="batting-order w-100 m-0 p-0" style="list-style-type: none;">${listItems}</ul></div>`;
     };
 
-    // --- OFFICIAL VS PROJECTED LINEUPS ---
     let awayProjected = data.projectedLineups?.away?.battingOrder || [];
     let homeProjected = data.projectedLineups?.home?.battingOrder || [];
 
@@ -1336,7 +1261,6 @@ function createGameCard(data, platform, selectedSlate) {
     let isAwayOfficial = game.lineups?.awayPlayers?.length > 0;
     let isHomeOfficial = game.lineups?.homePlayers?.length > 0;
 
-    // Smart Match logic retained
     if (isAwayOfficial && awayProjected.length > 0) {
         const projMap = {};
         awayProjected.forEach(p => { 
@@ -1396,7 +1320,6 @@ function createGameCard(data, platform, selectedSlate) {
         umpString += `<span class="text-muted fw-normal" style="margin-left: 4px; letter-spacing: -0.2px;">(G: <span class="text-dark fw-bold">${umpStats.games}</span><span class="text-muted" style="margin: 0 3px;">•</span>K: <span class="${kColor} fw-bold">${umpStats.k_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>BB: <span class="${bbColor} fw-bold">${umpStats.bb_rate}</span><span class="text-muted" style="margin: 0 3px;">•</span>Runs: <span class="${rpgColor} fw-bold">${umpStats.rpg}</span>)</span>`;
     }
 
-    
     gameCard.innerHTML = `
         <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-${game.gamePk}">
             <div class="p-2 pb-1" style="background-color: #edf4f8;">
@@ -1452,14 +1375,11 @@ function openTweetModal(text) {
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
 
-    // --- 30 SECOND LIVE AUTO-REFRESH ---
     setInterval(() => {
         const datePicker = document.getElementById('date-picker');
         const currentDate = datePicker ? datePicker.value : DEFAULT_DATE;
-        // Pass "true" so it updates data silently in the background without flashing the loading spinner
         init(currentDate, true); 
     }, 30000); 
-    // -----------------------------------
 
     const searchInput = document.getElementById('team-search');
     if (searchInput) searchInput.addEventListener('input', renderGames);
@@ -1468,7 +1388,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (datePicker) {
         datePicker.value = DEFAULT_DATE;
         datePicker.addEventListener('change', (e) => {
-            if (e.target.value) { e.target.blur(); init(e.target.value); } // Normal load with spinner
+            if (e.target.value) { e.target.blur(); init(e.target.value); } 
         });
     }
 
