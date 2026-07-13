@@ -94,6 +94,8 @@ def generate_player_html(profile, slug):
     
     # Extract Core Profile Data
     player_id = profile.get("player_id", "")
+    team_id = profile.get("team_id", "")
+    team_logo_url = f"https://www.mlbstatic.com/team-logos/{team_id}.svg" if team_id else "https://www.mlbstatic.com/team-logos/team-cap-on-light/blank.svg"
     p_name = profile.get("name", "Unknown Player")
     is_pitcher = profile.get("is_pitcher", False)
     team_name = profile.get("team_name", "Free Agent")
@@ -222,7 +224,7 @@ def generate_player_html(profile, slug):
                 <div class="profile-hero-bg d-flex align-items-center flex-column flex-sm-row text-center text-sm-start gap-4">
                     <div class="player-headshot-frame flex-shrink-0">
                         <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current" class="player-headshot" id="player-headshot-img" alt="{p_name}">
-                        <img src="https://www.mlbstatic.com/team-logos/team-cap-on-light/blank.svg" class="player-team-badge" id="player-team-logo" alt="Team Badge">
+                        <img src="{team_logo_url}" class="player-team-badge" id="player-team-logo" alt="{team_name} Badge">
                     </div>
                     <div class="w-100 text-white">
                         <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-center align-items-sm-start gap-3">
