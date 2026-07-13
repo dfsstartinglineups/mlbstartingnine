@@ -16,6 +16,7 @@ import gc
 import subprocess
 import sys
 import ctypes
+import re
 
 # ==========================================
 # 0. ENVIRONMENT & DRY RUN SETTINGS
@@ -238,6 +239,12 @@ def get_lineup_hash(players_array):
 def get_team_slug(full_name):
     if full_name == "Athletics": return "athletics"
     return full_name.lower().replace(".", "").replace(" ", "-")
+
+def get_futbol_team_slug(full_name):
+    """Generates the exact same URL slug used in the Python site generator"""
+    slug = full_name.lower().replace(".", "").replace("'", "")
+    slug = re.sub(r'[^a-z0-9]+', '-', slug).strip('-')
+    return slug
 
 def parse_futbol_lineup(startXI):
     pos_dict = {'G': [], 'D': [], 'M': [], 'F': []}
@@ -881,15 +888,15 @@ async def run_engines(memory):
         for match in futbol_data:
             league_id = match.get('league', {}).get('id')
             if league_id not in FUTBOL_LEAGUES: continue
-
-            # 🛡️ COPYRIGHT SAFETY SHIELD: Skip lineup card generation for high-risk AI copyright leagues
-            if league_id in [140, 143, 61, 135]: 
-                continue
+            
             league_info = FUTBOL_LEAGUES[league_id]
             fixture_id = match.get('fixture', {}).get('id')
-            team_key = f"FUTBOL_{fixture_id}"
             
-            if team_key in tweeted_recently: continue
+            # Use a slightly different key since we are shifting from images to links
+            team_key = f"FUTBOL_LINKS_{fixture_id}"
+            
+            # Catch legacy keys to prevent re-tweeting if we just updated the bot
+            if team_key in tweeted_recently or f"FUTBOL_{fixture_id}" in tweeted_recently: continue
                 
             home_lineup = match.get('homeLineup')
             away_lineup = match.get('awayLineup')
@@ -903,99 +910,69 @@ async def run_engines(memory):
             h_name = f"{INTL_FLAGS.get(raw_h_name, '')} {raw_h_name}".strip() if league_id == 1 else raw_h_name
             a_name = f"{INTL_FLAGS.get(raw_a_name, '')} {raw_a_name}".strip() if league_id == 1 else raw_a_name
 
-            h_pos, a_pos = parse_futbol_lineup(home_startXI), parse_futbol_lineup(away_startXI)
-            h_form = home_lineup.get('formation', 'TBD')
-            a_form = away_lineup.get('formation', 'TBD')
             odds = match.get('odds', {})
             odds_str = f"📊 Live Match Odds\n{h_name}: {odds.get('home', 'TBD')} | Draw: {odds.get('draw', 'TBD')} | {a_name}: {odds.get('away', 'TBD')}\nOver {odds.get('total', '2.5')}: {odds.get('over', 'TBD')} | Under {odds.get('total', '2.5')}: {odds.get('under', 'TBD')}"
             
-            h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
+            h_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', '')
+            a_hash = raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
             
-            d_query = "" if target_date_str == date_str else f"?date={target_date_str}"
-            full_link = f"https://futbolstartingeleven.com/leagues/{league_info['url_slug']}/{d_query}#lineup-{fixture_id}"
+            home_slug = get_futbol_team_slug(raw_h_name)
+            away_slug = get_futbol_team_slug(raw_a_name)
+            
+            home_link = f"https://futbolstartingeleven.com/lineups/{home_slug}/"
+            away_link = f"https://futbolstartingeleven.com/lineups/{away_slug}/"
             
             EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
             e = random.choice(EMOJIS)
             
-            TITLES = [
-                f"{e} OFFICIAL STARTING XI: {league_info['name']}",
-                f"{e} {h_name} vs {a_name} starting lineups are out!",
-                f"{e} {h_name} and {a_name} have released their starting XI!",
-                f"{e} Lineups confirmed! {h_name} takes on {a_name} in {league_info['name']}.",
-                f"{e} The starting XI for {h_name} vs {a_name} is locked in.",
-                f"{e} {league_info['name']} action incoming! Here are the lineups for {h_name} vs {a_name}.",
-                f"{e} Team news is in for {h_name} vs {a_name}!",
-                f"{e} Managers have named their starting XI for {h_name} vs {a_name}.",
-                f"{e} Official lineups for today's {league_info['name']} clash between {h_name} and {a_name}.",
-                f"{e} {h_name} vs {a_name} lineups are confirmed. {league_info['name']}"
-            ]
-            chosen_title = random.choice(TITLES)
+            target_client = league_info.get("x_client") or futbol_client
+            target_bsky_client = league_info.get("bsky_client")
             
-            h_rank = f"[{match['teams']['home']['rank']}] " if match['teams']['home'].get('rank') else ""
-            h_rec = f"({match['teams']['home']['record']})" if match['teams']['home'].get('record') else ""
-            a_rank = f"[{match['teams']['away']['rank']}] " if match['teams']['away'].get('rank') else ""
-            a_rec = f"({match['teams']['away']['record']})" if match['teams']['away'].get('record') else ""
-            
-            header = f"{chosen_title}\n{h_rank}{h_name} {h_rec} vs {a_rank}{a_name} {a_rec}".replace("  ", " ").strip()
-            link_text = f"📱 Live stats & scores: {full_link}"
-            tags_text = f"{league_info['tag']} #{h_hash} #{a_hash}"
-            tweet_text = "\n\n".join([header, link_text, odds_str, tags_text])
-
-            bsky_tb = client_utils.TextBuilder()
-            bsky_tb.text(header + "\n\n")
-            bsky_tb.link(link_text, full_link)
-            bsky_tb.text("\n\n" + odds_str + "\n\n" + tags_text)
-
-            futbol_alt_text = f"Graphical tactical lineup card for {h_name} vs {a_name}."
-
-            if team_key in memory.get(date_str, []): continue
-
-            screenshot_success = False
-            for attempt in range(2):
-                try:
-                    b = await get_browser()
-                    if await take_screenshot(b, fixture_id, target_date_str):
-                        screenshot_success = True
-                        break 
-                    await asyncio.sleep(5)
-                except: await asyncio.sleep(5)
-                
-            if not screenshot_success: continue
-
-            target_client, target_v1_client = league_info.get("x_client") or futbol_client, league_info.get("v1_client") or futbol_api_v1
+            upload_success = False
 
             if DRY_RUN:
                 upload_success = True 
+                print(f"\n[SHADOW] 🛑 Mocking Dual Futbol Lineup Tweets for {raw_h_name} vs {raw_a_name}")
             else:
-                upload_success = False
                 try:
-                    media = target_v1_client.media_upload("temp_matchup.png")
-                    target_v1_client.create_media_metadata(media.media_id, futbol_alt_text)
-                    if target_client: target_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    # --- 1. HOME TEAM TWEET ---
+                    h_title = f"{e} OFFICIAL STARTING XI: {h_name}\n\n{h_name} has released their starting lineup against {a_name} in {league_info['name']} action!"
+                    h_tweet = f"{h_title}\n\nView the official tactical board and live stats here:\n{home_link}\n\n{odds_str}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
                     
-                    target_bsky_client = league_info.get("bsky_client")
+                    if target_client: target_client.create_tweet(text=h_tweet)
                     if target_bsky_client:
-                        with open("temp_matchup.jpg", "rb") as f:
-                            img_data = f.read()
-                        target_bsky_client.send_image(text=bsky_tb, image=img_data, image_alt=futbol_alt_text)
+                        h_bsky = client_utils.TextBuilder()
+                        h_bsky.text(f"{h_title}\n\nView the official tactical board and live stats here:\n")
+                        h_bsky.link(home_link, home_link)
+                        h_bsky.text(f"\n\n{odds_str}\n\n{league_info['tag']} #{h_hash} #{a_hash}")
+                        target_bsky_client.send_post(h_bsky)
+                        
+                    # Slight delay to prevent rate limit triggers on rapid consecutive posts
+                    await asyncio.sleep(2)
                     
-                    upload_success = True
-                except Exception as e: pass
+                    # --- 2. AWAY TEAM TWEET ---
+                    a_title = f"{e} OFFICIAL STARTING XI: {a_name}\n\n{a_name} has released their starting lineup against {h_name} in {league_info['name']} action!"
+                    a_tweet = f"{a_title}\n\nView the official tactical board and live stats here:\n{away_link}\n\n{odds_str}\n\n{league_info['tag']} #{a_hash} #{h_hash}"
+                    
+                    if target_client: target_client.create_tweet(text=a_tweet)
+                    if target_bsky_client:
+                        a_bsky = client_utils.TextBuilder()
+                        a_bsky.text(f"{a_title}\n\nView the official tactical board and live stats here:\n")
+                        a_bsky.link(away_link, away_link)
+                        a_bsky.text(f"\n\n{odds_str}\n\n{league_info['tag']} #{a_hash} #{h_hash}")
+                        target_bsky_client.send_post(a_bsky)
 
-            if os.path.exists("temp_matchup.png"): os.remove("temp_matchup.png")
-            if os.path.exists("temp_matchup.jpg"): os.remove("temp_matchup.jpg")
-            
+                    upload_success = True
+                except Exception as err:
+                    print(f"⚠️ Failed to post Futbol lineup links: {err}")
+
             if upload_success:
                 log_target_date.append(team_key)
                 tweeted_recently.append(team_key)
                 new_tweets_sent = True
                 
                 if firebase_admin._apps:
-                    db.reference('tweet_log').update({target_date_str: log_target_date})
-                
-            gc.collect()
-            try: ctypes.CDLL('libc.so.6').malloc_trim(0)
-            except Exception: pass            
+                    db.reference('tweet_log').update({target_date_str: log_target_date})            
 
         # --- B. FUTBOL LIVE ALERTS ---
         live_futbol_data = {}
