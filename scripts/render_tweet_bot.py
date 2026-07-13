@@ -834,34 +834,33 @@ async def run_engines(memory):
     # FUTBOL ENGINE (Lineups & Live Alerts)
     # ==========================================
     FUTBOL_LEAGUES = {
-    143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copadelrey", "x_client": seriea_client, "v1_client": seriea_api_v1},
-    140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "laliga", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/laliga.html"},    
-    61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue1", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/ligue1.html"},     
-    135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "seriea", "x_client": seriea_client, "v1_client": seriea_api_v1, "base_url": "https://futbolstartingeleven.com/seriea.html"},    
-    11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
-    239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombia", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
-    13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-    71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brazil", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-    128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentina", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-    531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacafnations", "x_client": mls_client, "v1_client": mls_api_v1},    
-    262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "x_client": mls_client, "v1_client": mls_api_v1},    
-    16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf", "x_client": mls_client, "v1_client": mls_api_v1},    
-    254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/nwsl.html"},
-    253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "base_url": "https://futbolstartingeleven.com/mls.html"},    
-    179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scotland", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
-    45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "facup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
-    39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "epl", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/epl.html"},    
-    40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "base_url": "https://futbolstartingeleven.com/championship.html"},
-    10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "intl", "base_url": "https://futbolstartingeleven.com/friendlies.html"},
-    1:  {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "worldcup"},
-    2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "ucl"},
-    3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "europa"},
-    188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "australia"},
-    5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefanations"},
-    848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "conference" },    
-    307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi"}
-}
-
+        143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copa-del-rey", "x_client": seriea_client, "v1_client": seriea_api_v1},
+        140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "la-liga", "x_client": seriea_client, "v1_client": seriea_api_v1},    
+        61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue-1", "x_client": seriea_client, "v1_client": seriea_api_v1},     
+        135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "serie-a", "x_client": seriea_client, "v1_client": seriea_api_v1},    
+        11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "copa-sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+        239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombian-primera-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
+        13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "copa-libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+        71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brasileirao-serie-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+        128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentine-liga-profesional", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+        531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacaf-nations-league", "x_client": mls_client, "v1_client": mls_api_v1},    
+        262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "liga-mx", "x_client": mls_client, "v1_client": mls_api_v1},    
+        16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf-champions-cup", "x_client": mls_client, "v1_client": mls_api_v1},    
+        254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1},
+        253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1},    
+        179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scottish-premiership", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+        45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "fa-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+        39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "english-premier-league", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
+        40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "efl-championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1},
+        10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "international-friendlies"},
+        1:   {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "fifa-world-cup"},
+        2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "uefa-champions-league"},
+        3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "uefa-europa-league"},
+        188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "a-league"},
+        5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefa-nations-league"},
+        848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "uefa-conference-league" },    
+        307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi-pro-league"}
+    }
     INTL_FLAGS = {
         "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
         "Northern Ireland": "🇬🇧", "Argentina": "🇦🇷", "Brazil": "🇧🇷", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹", "Mexico": "🇲🇽", "Netherlands": "🇳🇱", "Portugal": "🇵🇹", "Spain": "🇪🇸", "USA": "🇺🇸"
@@ -912,11 +911,8 @@ async def run_engines(memory):
             
             h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
             
-            if "base_url" in league_info:
-                full_link = f"{league_info['base_url']}?date={target_date_str}#lineup-{fixture_id}"
-            else:
-                slug = league_info.get("url_slug", "top")
-                full_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#lineup-{fixture_id}"
+            d_query = "" if target_date_str == date_str else f"?date={target_date_str}"
+            full_link = f"https://futbolstartingeleven.com/leagues/{league_info['url_slug']}/{d_query}#lineup-{fixture_id}"
             
             EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
             e = random.choice(EMOJIS)
@@ -1131,11 +1127,8 @@ async def run_engines(memory):
                                 goal_text = "\n".join(goal_text_lines)
 
                         # Build the URL
-                        if "base_url" in league_info:
-                            ft_link = f"{league_info['base_url']}?date={target_date_str}#match-{fixture_id}"
-                        else:
-                            slug = league_info.get("url_slug", "top")
-                            ft_link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#match-{fixture_id}"
+                        d_query = "" if target_date_str == date_str else f"?date={target_date_str}"
+                        ft_link = f"https://futbolstartingeleven.com/leagues/{league_info['url_slug']}/{d_query}#match-{fixture_id}"
 
                         ft_tweet_text = f"{result_text}\n\n{goal_text}\n\n📊 Full match stats & player ratings:\n{ft_link}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
                         
@@ -1251,11 +1244,8 @@ async def run_engines(memory):
                 american_odds = f"+{int((scorer_odds - 1) * 100)}"
                 h_hash, a_hash = raw_h_name.replace(' ', '').replace('-', '').replace('.', ''), raw_a_name.replace(' ', '').replace('-', '').replace('.', '')
                 
-                if "base_url" in league_info:
-                    link = f"{league_info['base_url']}?date={target_date_str}#goal-{fixture_id}"
-                else:
-                    slug = league_info.get("url_slug", "top")
-                    link = f"https://futbolstartingeleven.com/?league={slug}&date={target_date_str}#goal-{fixture_id}"
+                d_query = "" if target_date_str == date_str else f"?date={target_date_str}"
+                link = f"https://futbolstartingeleven.com/leagues/{league_info['url_slug']}/{d_query}#goal-{fixture_id}"
 
                 PHRASES = {
                     "hat_trick": {
