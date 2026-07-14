@@ -12,7 +12,7 @@ SITEMAP_OUTPUT_PATH = "sitemap.xml"
 DOMAIN = "https://mlbstartingnine.com"
 
 def slugify(text):
-    """Converts a player name into a clean, URL-safe SEO slug."""
+    """Converts a player name into a clean, URL-safe SEO slug as a fallback."""
     text = text.lower()
     # Normalize accents (e.g., James Domínguez -> james dominguez)
     text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
@@ -151,8 +151,8 @@ def generate_player_html(profile, slug):
                             <tr>
                                 <td class="text-start ps-3 fw-bold">{log.get('date', '')}</td>
                                 <td>{log.get('summary', '')}</td>
-                                <td class="dk-accent">{dk_pts:.2f}</td>
-                                <td class="fd-accent">{fd_pts:.1f}</td>
+                                <td class="dk-accent">{{dk_pts:.2f}}</td>
+                                <td class="fd-accent">{{fd_pts:.1f}}</td>
                             </tr>"""
                             
     if not historical_table_rows:
@@ -311,7 +311,13 @@ def main():
 
     for key, profile in master_data.items():
         player_name = profile.get("name", "Unknown Player")
-        player_slug = slugify(player_name)
+        
+        # 🎯 THE FIX: Read the exact stable slug directly from your master data record.
+        # Falls back to standard slugify logic if an entry doesn't have it yet.
+        player_slug = profile.get("slug")
+        if not player_slug:
+            player_slug = slugify(player_name)
+            
         player_dir = os.path.join(OUTPUT_PLAYERS_DIR, player_slug)
         index_file_path = os.path.join(player_dir, "index.html")
         
