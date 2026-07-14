@@ -1,433 +1,335 @@
-<!DOCTYPE html>
+import os
+import json
+import re
+import unicodedata
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
+
+# Path Configurations
+MASTER_DATA_PATH = "data/player_master_data.json"
+OUTPUT_PLAYERS_DIR = "players"
+SITEMAP_OUTPUT_PATH = "sitemap.xml"
+DOMAIN = "https://mlbstartingnine.com"
+
+def slugify(text):
+    """Converts a player name into a clean, URL-safe SEO slug."""
+    text = text.lower()
+    # Normalize accents (e.g., James Domínguez -> james dominguez)
+    text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
+    # Strip out punctuation like apostrophes or periods
+    text = re.sub(r"[^\w\s-]", "", text)
+    # Replace spaces with standard clean dashes
+    text = re.sub(r"[\s-]+", "-", text).strip("-")
+    return text
+
+def update_sitemap(new_player_urls):
+    """Safely merges and appends new player URLs into the existing sitemap.xml without erasing data."""
+    existing_urls = set()
+    
+    # 1. Read and extract current URLs if the sitemap already exists
+    if os.path.exists(SITEMAP_OUTPUT_PATH):
+        try:
+            # Register the sitemap namespace to avoid ugly 'ns0:' prefixing
+            ET.register_namespace('', "http://www.sitemaps.org/schemas/sitemap/0.9")
+            
+            tree = ET.parse(SITEMAP_OUTPUT_PATH)
+            root = tree.getroot()
+            
+            # Extract all current locations out of the existing XML tags
+            for loc in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc"):
+                if loc.text:
+                    existing_urls.add(loc.text.strip())
+            print(f"📖 Found existing sitemap. Loaded {len(existing_urls)} current URLs.")
+        except Exception as e:
+            print(f"⚠️ Error parsing existing sitemap ({e}). Starting fresh to prevent script crash.")
+
+    # 2. Add baseline homepage if it's completely missing from your registry
+    home_url = f"{DOMAIN}/"
+    existing_urls.add(home_url)
+
+    # 3. Merge new player urls into the master tracking set
+    new_additions_count = 0
+    for url in new_player_urls:
+        if url not in existing_urls:
+            existing_urls.add(url)
+            new_additions_count += 1
+
+    print(f"➕ Appending {new_additions_count} brand-new player profiles to the master map.")
+
+    # 4. Rebuild the master structured XML document tree cleanly
+    xml_root = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    
+    for url in sorted(list(existing_urls)):
+        url_node = ET.SubElement(xml_root, 'url')
+        ET.SubElement(url_node, 'loc').text = url
+        
+        # Set dynamic priority crawl weights based on URL context
+        if url == home_url:
+            ET.SubElement(url_node, 'changefreq').text = "always"
+            ET.SubElement(url_node, 'priority').text = "1.0"
+        elif "/lineups/" in url:
+            ET.SubElement(url_node, 'changefreq').text = "daily"
+            ET.SubElement(url_node, 'priority').text = "0.9"
+        elif "/players/" in url:
+            ET.SubElement(url_node, 'changefreq').text = "daily"
+            ET.SubElement(url_node, 'priority').text = "0.8"
+        else:
+            ET.SubElement(url_node, 'changefreq').text = "weekly"
+            ET.SubElement(url_node, 'priority').text = "0.6"
+
+    # 5. Output beautiful, human-readable indented code for Google bots
+    raw_xml = ET.tostring(xml_root, 'utf-8')
+    parsed_xml = minidom.parseString(raw_xml)
+    pretty_xml = parsed_xml.toprettyxml(indent="  ")
+
+    # Save cleanly back to the root directory
+    with open(SITEMAP_OUTPUT_PATH, "w", encoding="utf-8") as f:
+        f.write("\n".join([line for line in pretty_xml.splitlines() if line.strip()]))
+        
+    print(f"✅ Sitemap successfully compiled. Total active URLs: {len(existing_urls)}")
+
+def generate_player_html(profile, slug):
+    """Generates a static HTML skeleton with baked-in data optimized specifically for player type."""
+    player_url = f"{DOMAIN}/players/{slug}/"
+    
+    # Extract Core Profile Data
+    player_id = profile.get("player_id", "")
+    team_id = profile.get("team_id", "")
+    team_logo_url = f"https://www.mlbstatic.com/team-logos/{team_id}.svg" if team_id else "https://www.mlbstatic.com/team-logos/team-cap-on-light/blank.svg"
+    p_name = profile.get("name", "Unknown Player")
+    is_pitcher = profile.get("is_pitcher", False)
+    team_name = profile.get("team_name", "Free Agent")
+    position = profile.get("position", "Unknown Position")
+    
+    # Pre-Bake Season Strings & Headers based on Player Role
+    if is_pitcher:
+        title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
+        desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
+        
+        wins = profile.get("season", {}).get("w", 0)
+        losses = profile.get("season", {}).get("l", 0)
+        era = profile.get("season", {}).get("era", "-")
+        season_string = f"{position} • {team_name} • {wins}-{losses} • {era} ERA"
+        
+        split_vl_header = '<span class="badge bg-secondary me-1">LHB</span> vs. Left-Handed Batters'
+        split_vr_header = '<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters'
+        split_vol_label = "Batters Faced:"
+        split_hr_label = "HR Allowed:"
+    else:
+        title = f"Is {p_name} Playing Today? Lineup Status, BvP & Matchup Stats"
+        desc = f"Find out if {p_name} is in today's starting lineup. View real-time lineup status, lifetime matchup analytics, daily HR probability scores, and live box scores."
+        
+        avg = profile.get("season", {}).get("avg", "-")
+        hr = profile.get("season", {}).get("hr", 0)
+        season_string = f"{position} • {team_name} • {avg} AVG • {hr} HR"
+        
+        split_vl_header = 'Splits VS Left-Handed'
+        split_vr_header = 'Splits VS Right-Handed'
+        split_vol_label = "Volume:"
+        split_hr_label = "Power Stat:"
+
+    # Pre-Bake Platoon Splits
+    vl = profile.get("split_vL", {})
+    vr = profile.get("split_vR", {})
+    
+    vl_vol = vl.get("ab", 0)
+    vl_avg = vl.get("avg", "-")
+    vl_ops = vl.get("ops", "-")
+    vl_hr = vl.get("hr", 0)
+    
+    vr_vol = vr.get("ab", 0)
+    vr_avg = vr.get("avg", "-")
+    vr_ops = vr.get("ops", "-")
+    vr_hr = vr.get("hr", 0)
+
+    # Pre-Bake Historical Table Log Rows
+    historical_table_rows = ""
+    for log in profile.get("game_log", []):
+        dk_pts = log.get('dk_pts', 0.0)
+        fd_pts = log.get('fd_pts', 0.0)
+        historical_table_rows += f"""
+                            <tr>
+                                <td class="text-start ps-3 fw-bold">{log.get('date', '')}</td>
+                                <td>{log.get('summary', '')}</td>
+                                <td class="dk-accent">{dk_pts:.2f}</td>
+                                <td class="fd-accent">{fd_pts:.1f}</td>
+                            </tr>"""
+                            
+    if not historical_table_rows:
+        historical_table_rows = '<tr><td colspan="4" class="text-center p-3 text-muted">No recent history logged.</td></tr>'
+
+    html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){{dataLayer.push(arguments);}}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
-    <!-- 1. CONVERSATIONAL SEO META TAGS -->
-    <title>Is {{ player_name }} Starting Today? Lineup & Stats | Futbol Starting Eleven</title>
-    <meta name="description" content="Is {{ player_name }} starting today? Get live matchday lineup status, real-time performance stats, and season overview metrics for {{ player_name }} ({{ team_name }}).">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://futbolstartingeleven.com/players/{{ player_slug }}/">
-
-    <!-- 2. OPEN GRAPH META TAGS -->
-    <meta property="og:site_name" content="Futbol Starting Eleven">
-    <meta property="og:type" content="profile">
-    <meta property="og:title" content="Is {{ player_name }} Starting Today? Lineup & Stats | Futbol Starting Eleven">
-    <meta property="og:description" content="Live starting lineups, form ratings, and seasonal breakdown for {{ player_name }} at {{ team_name }}.">
-    <meta property="og:url" content="https://futbolstartingeleven.com/players/{{ player_slug }}/">
-    <meta property="og:image" content="https://futbolstartingeleven.com/social-share1.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-
-    <!-- 3. X / TWITTER CARD META TAGS -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:domain" content="futbolstartingeleven.com">
-    <meta name="twitter:title" content="{{ player_name }} - {{ team_name }} Matchday Profile">
-    <meta name="twitter:description" content="Track live performance matrix, formation maps, and stats for {{ player_name }} on Futbol Starting Eleven.">
-    <meta name="twitter:image" content="https://futbolstartingeleven.com/social-share1.png">
+    <title>{title}</title>
+    <meta name="description" content="{desc}">
+    <link rel="canonical" href="{player_url}" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
-        body { 
-            background-color: #f1f3f5; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            overflow-x: hidden; 
-        }
-        
-        /* THEME HEADER */
-        .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .header-brand a { color: inherit; }
-        .header-brand span { 
-            text-shadow: none !important; 
-            background: linear-gradient(to bottom, #20c997 0%, #198754 100%); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            background-clip: text; 
-            filter: drop-shadow(0 0 12px rgba(32, 201, 151, 0.6)); 
-        }
-
-        /* SIDEBAR PROFILE CARD */
-        .profile-sidebar-card {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            padding: 24px;
-            text-align: center;
-        }
-        .player-avatar-wrapper {
-            position: relative;
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 15px auto;
-        }
-        .player-avatar {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 4px solid #20c997;
-            background-color: #f8f9fa;
-        }
-        .team-badge-sub {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 35px;
-            height: 35px;
-            background: #fff;
-            border-radius: 50%;
-            padding: 3px;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .sidebar-player-name {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #212529;
-            margin-bottom: 2px;
-        }
-        .sidebar-player-meta {
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
-        }
-
-        /* SEAMLESS SEO LINK STYLES (Keeps native formatting) */
-        .seo-link {
-            color: inherit; 
-            text-decoration: none; 
-            transition: color 0.15s ease-in-out;
-        }
-        .sidebar-player-meta .seo-link:hover { color: #20c997; }
-        .table tbody td .seo-link:hover { color: #198754; }
-        .info-card .seo-link { font-weight: inherit; }
-        .info-card .seo-link:hover { color: #198754; }
-
-        /* INFO CARDS & DATA TABLES */
-        .info-card {
-            background: #fff;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            padding: 20px;
-            margin-bottom: 24px;
-        }
-        .info-card h3 {
-            font-size: 1rem;
-            font-weight: 800;
-            color: #212529;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f1f3f5;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #f8f9fa;
-        }
-        .stat-row:last-child { border-bottom: none; }
-        .stat-label { color: #6c757d; font-size: 0.85rem; font-weight: 600; }
-        .stat-value { color: #212529; font-size: 0.9rem; font-weight: 700; text-align: right; }
-
-        /* H2H METRIC STYLING */
-        .h2h-summary-box {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-        .h2h-record-title { font-size: 0.75rem; font-weight: 700; color: #6c757d; text-transform: uppercase; margin-bottom: 3px; }
-        .h2h-record-value { font-size: 1.25rem; font-weight: 800; color: #212529; }
-
-        /* PERFORMANCE TABLE WRAPPER WITH CONTAINED OVERFLOW */
-        .table-responsive {
-            border-radius: 8px;
-            overflow-x: auto;
-            border: 1px solid #dee2e6;
-            width: 100%;
-        }
-        .table thead th {
-            background-color: #212529;
-            color: #fff;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 700;
-            border: none;
-            padding: 12px;
-            white-space: nowrap;
-        }
-        .table tbody td {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #495057;
-            padding: 12px;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f3f5;
-            white-space: nowrap;
-        }
-        .table tbody tr:last-child td { border-bottom: none; }
-        .table tbody tr:hover { background-color: #f8f9fa; }
-        .comp-logo { width: 20px; height: 20px; margin-right: 8px; vertical-align: text-bottom; }
-
-        /* SUMMARY BLOCKS */
-        .big-stat-box {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #e9ecef;
-        }
-        .big-stat-value {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: #198754;
-            line-height: 1;
-        }
-        .big-stat-label {
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #6c757d;
-            text-transform: uppercase;
-            margin-top: 5px;
-            letter-spacing: 0.5px;
-        }
-
-        /* GREEN PULSING BALL ANIMATION */
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(32, 201, 151, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(32, 201, 151, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(32, 201, 151, 0); }
-        }
-        .live-dot {
+        body {{ background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
+        .header-brand {{ font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }}
+        .header-brand a {{ color: inherit; }}
+        .header-brand span {{ 
+            text-shadow: none !important;
+            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
+            padding-right: 2px;
             display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #20c997;
-            border-radius: 50%;
-            margin-right: 6px;
-            margin-bottom: 1px;
-            animation: pulse-green 2s infinite;
-        }
-
-        @media (max-width: 576px) { 
-            .header-brand { font-size: 1.5rem; } 
-        }
+        }}
+        .profile-hero-card {{ background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 24px; }}
+        .profile-hero-bg {{ background: linear-gradient(135deg, #212529 0%, #343a40 100%); position: relative; padding: 24px; }}
+        .player-headshot-frame {{ position: relative; width: 120px; height: 120px; }}
+        .player-headshot {{ width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: #fff; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }}
+        .player-team-badge {{ width: 38px; height: 38px; position: absolute; bottom: -2px; right: -2px; border-radius: 50%; background: #fff; border: 2px solid #dee2e6; object-fit: contain; padding: 2px; }}
+        .status-badge-confirmed {{ background-color: #198754; color: #fff; font-size: 0.75rem; font-weight: 700; }}
+        .status-badge-projected {{ background-color: #ffecb5; color: #1a1a1a; font-size: 0.75rem; font-weight: 700; }}
+        .status-badge-scratched {{ background-color: #dc3545; color: #fff; font-size: 0.75rem; font-weight: 700; }}
+        .dk-accent {{ color: #6c9d2f; font-weight: 800; }}
+        .fd-accent {{ color: #0d6efd; font-weight: 800; }}
+        .log-table-responsive {{ -webkit-scrollbar {{ height: 4px; }} }}
     </style>
 </head>
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar sticky-top shadow-sm pt-2 pb-2 mb-4" style="background-color: #212529; z-index: 1050;">
-        <div class="container d-flex justify-content-between align-items-center flex-wrap">
-            <div class="header-brand">
-                <a href="/" class="text-decoration-none">Futbol Starting <span>Eleven</span></a>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <a href="/lineups/{{ team_slug }}/" class="btn btn-sm btn-outline-light fw-bold" style="font-size:0.75rem;">← Back to {{ team_name }}</a>
-            </div>
-        </div>
-    </nav>
+<nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="header-brand mb-0"><a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a></div>
+        <div class="d-flex align-items-center gap-3"><a href="/" class="btn btn-sm btn-outline-light font-weight-bold" style="font-size:0.8rem;">← Back To Slate</a></div>
+    </div>
+</nav>
 
-    <!-- MAIN GRID CONTAINER -->
-    <div class="container mb-5">
-        <div class="row g-4">
+<div class="container px-2 px-md-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
             
-            <!-- LEFT COLUMN: PHOTO + PERSONAL DETAILS -->
-            <div class="col-lg-4">
-                <div class="profile-sidebar-card">
-                    
-                    <div class="player-avatar-wrapper">
-                        <img src="{{ player_photo_url }}" alt="{{ player_name }}" class="player-avatar">
-                        <img src="{{ team_badge_url }}" alt="{{ team_name }}" class="team-badge-sub">
+            <div class="profile-hero-card">
+                <div class="profile-hero-bg d-flex align-items-center flex-column flex-sm-row text-center text-sm-start gap-4">
+                    <div class="player-headshot-frame flex-shrink-0">
+                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current" class="player-headshot" id="player-headshot-img" alt="{p_name}">
+                        <img src="{team_logo_url}" class="player-team-badge" id="player-team-logo" alt="{team_name} Badge">
                     </div>
-                    
-                    <div class="sidebar-player-name">{{ player_name }}</div>
-                    <div class="sidebar-player-meta"><a href="/lineups/{{ team_slug }}/" class="seo-link fw-bold">{{ team_name }}</a> • {{ player_position }}</div>
-                    
-                    <hr style="border-color: #dee2e6; opacity: 1; margin: 15px 0;">
-                    
-                    <div class="text-start">
-                        <div class="stat-row">
-                            <span class="stat-label">Nationality</span>
-                            <span class="stat-value">{{ player_nationality_flag_entity }}</span>
+                    <div class="w-100 text-white">
+                        <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-center align-items-sm-start gap-3">
+                            <div>
+                                <h1 class="h3 fw-black mb-1 italic text-white" id="player-name-header">{p_name}</h1>
+                                <p class="text-muted mb-0" style="color: #adb5bd !important; font-size: 0.9rem; font-weight: 600;" id="player-meta-sub">{season_string}</p>
+                            </div>
+                            <div class="d-flex flex-column gap-2 flex-shrink-0" style="min-width: 180px;" id="badge-matrix-zone"></div>
                         </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Age</span>
-                            <span class="stat-value">{{ player_age }} ({{ player_birth_date }})</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Height / Weight</span>
-                            <span class="stat-value">{{ player_height }} / {{ player_weight }}</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Squad Number</span>
-                            <span class="stat-value">#{{ player_number }}</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Preferred Foot</span>
-                            <span class="stat-value">{{ player_foot }}</span>
-                        </div>
-                        <div class="stat-row">
-                            <span class="stat-label">Form Rating</span>
-                            <span class="stat-value text-success">{{ player_rating }}</span>
+                        <div class="border-top border-secondary mt-3 pt-2 text-muted" style="color: #dee2e6 !important; font-size: 0.8rem;">
+                            <span id="live-game-state-label"><strong>Game Status:</strong> Checking Today's Lineups...</span>
                         </div>
                     </div>
+                </div>
+
+                <div id="live-consoles-container"></div>
+
+                <div class="card-body p-3">
+                    <h5 class="fw-bold mb-3 text-dark border-bottom pb-2" style="font-size: 1rem; letter-spacing: -0.2px;">📈 Split Analytics & Matchup Matrix</h5>
                     
+                    <div id="hr-predictor-container" class="mb-3"></div>
+                    <div id="bvp-cards-container" class="mb-3"></div>
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vl-header">{split_vl_header}</div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-volume">{split_vol_label}</span><strong class="text-dark" id="split-vl-vol">{vl_vol}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vl-avg">{vl_avg}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vl-ops">{vl_ops}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vl-label-hr">{split_hr_label}</span><strong class="text-dark" id="split-vl-hr">{vl_hr}</strong></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="fw-bold text-dark border-bottom pb-1 mb-2" id="split-vr-header">{split_vr_header}</div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-volume">{split_vol_label}</span><strong class="text-dark" id="split-vr-vol">{vr_vol}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>Batting Avg:</span><strong class="text-dark" id="split-vr-avg">{vr_avg}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span>OPS:</span><strong class="text-dark" id="split-vr-ops">{vr_ops}</strong></div>
+                                <div class="d-flex justify-content-between small text-muted px-1 py-1"><span id="split-vr-label-hr">{split_hr_label}</span><strong class="text-dark" id="split-vr-hr">{vr_hr}</strong></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: LIVE CARD + SPECIFIC STATISTICS -->
-            <div class="col-lg-8">
-                
-                <!-- LIVE STATUS BAR -->
-                <div class="info-card border-success" style="border-left: 5px solid #20c997; margin-bottom: 20px;">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <div class="d-flex align-items-center">
-                            <span class="live-dot"></span>
-                            <span class="fw-bold text-dark" style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Live Matchday Center</span>
-                        </div>
-                        <div class="stat-value text-end" style="font-size: 0.9rem;">
-                            <a href="/lineups/{{ team_slug }}/" class="seo-link fw-bold text-dark">{{ team_name }}</a> vs <a href="/lineups/{{ opponent_slug }}/" class="seo-link fw-bold text-dark">{{ opponent_name }}</a> ({{ live_match_minute }}') <span class="text-muted font-monospace mx-1">|</span> <span class="badge bg-success text-white fw-bold px-2 py-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ live_lineup_status }}</span>
-                        </div>
-                    </div>
+            <div class="card shadow-sm border rounded bg-white overflow-hidden mb-4" style="border-color: #dee2e6 !important;">
+                <div class="card-header bg-dark text-white py-2"><h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">📋 Rolling Performance Log (Last 10 Games)</h6></div>
+                <div class="table-responsive log-table-responsive">
+                    <table class="table table-striped text-center align-middle mb-0" style="font-size:0.8rem; min-width: 500px;">
+                        <thead class="table-light fw-bold text-secondary">
+                            <tr><th class="text-start ps-3">Date</th><th>Game Line Performance</th><th>DraftKings Pts</th><th>FanDuel Pts</th></tr>
+                        </thead>
+                        <tbody id="game-historical-tbody">
+{historical_table_rows}
+                        </tbody>
+                    </table>
                 </div>
-
-                <!-- UPCOMING MATCHUP HEAD-TO-HEAD -->
-                <div class="info-card" style="margin-bottom: 20px;">
-                    <h3>Matchup History: {{ team_name }} vs {{ opponent_name }}</h3>
-                    <div class="row g-2 mb-3">
-                        <div class="col-4">
-                            <div class="h2h-summary-box">
-                                <div class="h2h-record-title">{{ team_name }} Wins</div>
-                                <div class="h2h-record-value text-success">{{ h2h_home_wins }}</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="h2h-summary-box">
-                                <div class="h2h-record-title">Draws</div>
-                                <div class="h2h-record-value text-muted">{{ h2h_draws }}</div>
-                            </div>
-                        </div>
-                        <div class="col-4">
-                            <div class="h2h-summary-box">
-                                <div class="h2h-record-title">{{ opponent_name }} Wins</div>
-                                <div class="h2h-record-value text-danger">{{ h2h_away_wins }}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="table-responsive">
-                        <table class="table table-sm table-borderless mb-0 text-center" style="font-size: 0.8rem;">
-                            <thead>
-                                <tr style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
-                                    <th class="text-start" style="padding: 8px 12px; color: #6c757d;">Date</th>
-                                    <th style="padding: 8px; color: #6c757d;">Competition</th>
-                                    <th class="text-end" style="padding: 8px 12px; color: #6c757d;">Result</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{ h2h_match_rows }}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- POSITION STATISTICS OVERVIEW -->
-                <div class="info-card">
-                    <h3>{{ current_season }} Season Overview (All Comps)</h3>
-                    <div class="row g-3">
-                        <div class="col-6 col-sm-3">
-                            <div class="big-stat-box">
-                                <div class="big-stat-value">{{ total_matches }}</div>
-                                <div class="big-stat-label">Matches</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3">
-                            <div class="big-stat-box">
-                                <div class="big-stat-value">{{ highlight_metric_1_val }}</div>
-                                <div class="big-stat-label">{{ highlight_metric_1_label }}</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3">
-                            <div class="big-stat-box">
-                                <div class="big-stat-value">{{ highlight_metric_2_val }}</div>
-                                <div class="big-stat-label">{{ highlight_metric_2_label }}</div>
-                            </div>
-                        </div>
-                        <div class="col-6 col-sm-3">
-                            <div class="big-stat-box">
-                                <div class="big-stat-value">{{ highlight_metric_3_val }}</div>
-                                <div class="big-stat-label">{{ highlight_metric_3_label }}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PERFORMANCE BREAKDOWN MATRIX -->
-                <div class="info-card">
-                    <h3>Performance by Competition</h3>
-                    <div class="table-responsive">
-                        <table class="table table-borderless mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Competition</th>
-                                    <th class="text-center">MP</th>
-                                    <th class="text-center">Min</th>
-                                    <th class="text-center">Gls</th>
-                                    <th class="text-center">Ast</th>
-                                    <th class="text-center">{{ custom_header_1 }}</th>
-                                    <th class="text-center">{{ custom_header_2 }}</th>
-                                    <th class="text-center">{{ custom_header_3 }}</th>
-                                    <th class="text-center">{{ custom_header_4 }}</th>
-                                    <th class="text-center">Yel/Red</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{ competition_rows }}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- ROLLING 10-GAME MATCH LOG -->
-                <div class="info-card">
-                    <h3>Recent Matches (Last 10 Games)</h3>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-borderless mb-0 text-center" style="font-size: 0.8rem;">
-                            <thead>
-                                <tr style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
-                                    <th class="text-start" style="padding: 8px 12px; color: #6c757d;">Date</th>
-                                    <th class="text-start" style="padding: 8px; color: #6c757d;">Opponent</th>
-                                    <th style="padding: 8px; color: #6c757d;">Result</th>
-                                    <th style="padding: 8px; color: #6c757d;">Min</th>
-                                    <th style="padding: 8px; color: #6c757d;">Gls</th>
-                                    <th style="padding: 8px; color: #6c757d;">Ast</th>
-                                    <th style="padding: 8px; color: #6c757d;">{{ custom_log_header }}</th>
-                                    <th style="padding: 8px; color: #6c757d;">Rating</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{ gamelog_rows }}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
             </div>
+
         </div>
     </div>
+</div>
 
+<script>var PLAYER_ID = "{player_id}";</script>
+<script src="/scripts/player_core.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+</html>"""
+    return html_content
+
+def main():
+    if not os.path.exists(MASTER_DATA_PATH):
+        print(f"❌ Error: Could not locate master log registry file at {MASTER_DATA_PATH}")
+        return
+
+    with open(MASTER_DATA_PATH, "r", encoding="utf-8") as f:
+        master_data = json.load(f)
+
+    all_player_urls = []
+    created_count = 0
+
+    print(f"📦 Commencing deployment processing loop for {len(master_data)} baseline player records...")
+
+    for key, profile in master_data.items():
+        player_name = profile.get("name", "Unknown Player")
+        player_slug = slugify(player_name)
+        player_dir = os.path.join(OUTPUT_PLAYERS_DIR, player_slug)
+        index_file_path = os.path.join(player_dir, "index.html")
+        
+        all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
+
+        # Overwrites the static files cleanly each night to update cumulative stats
+        os.makedirs(player_dir, exist_ok=True)
+
+        html_code = generate_player_html(profile, player_slug)
+        with open(index_file_path, "w", encoding="utf-8") as html_out:
+            html_out.write(html_code)
+        
+        created_count += 1
+        if created_count % 200 == 0:
+            print(f"   ... baked {created_count} static HTML index layouts ...")
+
+    print(f"⚡ Loop Complete. Pre-baked stats for {created_count} player profile files.")
+    update_sitemap(all_player_urls)
+
+if __name__ == "__main__":
+    main()
