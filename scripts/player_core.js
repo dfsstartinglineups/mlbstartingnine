@@ -126,10 +126,10 @@ async function loadPlayerProfileData() {
 
                 let badgeHtml = '';
                 if (isStartingPitcher) {
-                    badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">Starting Pitcher</div>`;
+                    badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP:Starting Pitcher</div>`;
                 } else {
                     if (isConfirmed && slotIndex !== -1) {
-                        badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">Batting #${slotIndex + 1}</div>`;
+                        badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP:Batting #${slotIndex + 1}</div>`;
                     } else if (isConfirmed && slotIndex === -1) {
                         // NEW LOGIC: Team is official, player is completely scratched
                         badgeHtml = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT STARTING</div>`;
