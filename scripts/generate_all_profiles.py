@@ -151,8 +151,8 @@ def generate_player_html(profile, slug):
                             <tr>
                                 <td class="text-start ps-3 fw-bold">{log.get('date', '')}</td>
                                 <td>{log.get('summary', '')}</td>
-                                <td class="dk-accent">{{dk_pts:.2f}}</td>
-                                <td class="fd-accent">{{fd_pts:.1f}}</td>
+                                <td class="dk-accent">{dk_pts:.2f}</td>
+                                <td class="fd-accent">{fd_pts:.1f}</td>
                             </tr>"""
                             
     if not historical_table_rows:
