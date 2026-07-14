@@ -505,8 +505,8 @@ async def run_engines(memory):
     # ==========================================
     weather_key = f"WEATHER_REPORT_{date_str}"
     
-    #if weather_key not in memory.get(date_str, []) and today_est.hour >= 10:
-    if weather_key not in memory.get(date_str, []) and today_est.hour >= 10 and False:   
+    if weather_key not in memory.get(date_str, []) and today_est.hour >= 10:
+    #if weather_key not in memory.get(date_str, []) and today_est.hour >= 10 and False:   
         weather_success = False
         for attempt in range(2):
             try:
