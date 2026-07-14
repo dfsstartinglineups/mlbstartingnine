@@ -842,7 +842,8 @@ async def run_engines(memory):
     # ==========================================
     FUTBOL_LEAGUES = {
         143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copa-del-rey", "x_client": seriea_client, "v1_client": seriea_api_v1},
-        140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "la-liga", "x_client": seriea_client, "v1_client": seriea_api_v1},    
+        140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "la-liga", "x_client": seriea_client, "v1_client": seriea_api_v1},
+        137: {"name": "🇮🇹 COPPA ITALIA", "tag": "#CoppaItalia", "url_slug": "coppa-italia", "x_client": seriea_client, "v1_client": seriea_api_v1},
         61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue-1", "x_client": seriea_client, "v1_client": seriea_api_v1},     
         135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "serie-a", "x_client": seriea_client, "v1_client": seriea_api_v1},    
         11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "copa-sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
@@ -850,15 +851,18 @@ async def run_engines(memory):
         13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "copa-libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
         71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brasileirao-serie-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
         128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentine-liga-profesional", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
+        9:   {"name": "🌎 COPA AMERICA", "tag": "#CopaAmerica", "url_slug": "copa-america", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
         531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacaf-nations-league", "x_client": mls_client, "v1_client": mls_api_v1},    
         262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "liga-mx", "x_client": mls_client, "v1_client": mls_api_v1},    
         16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf-champions-cup", "x_client": mls_client, "v1_client": mls_api_v1},    
         254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1},
-        253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1},    
+        253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1},
+        528: {"name": "🌎 LEAGUES CUP", "tag": "#LeaguesCup", "url_slug": "leagues-cup", "x_client": mls_client, "v1_client": mls_api_v1},
         179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scottish-premiership", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
         45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "fa-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
         39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "english-premier-league", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
         40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "efl-championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1},
+        48:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f EFL CUP", "tag": "#CarabaoCup", "url_slug": "efl-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},
         10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "international-friendlies"},
         1:   {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "fifa-world-cup"},
         2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "uefa-champions-league"},
@@ -866,7 +870,15 @@ async def run_engines(memory):
         188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "a-league"},
         5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefa-nations-league"},
         848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "uefa-conference-league" },    
-        307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi-pro-league"}
+        307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi-pro-league"},
+        78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga"},
+        88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie"},
+        94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "primeira-liga"},
+        203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "super-lig"},
+        144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#JupilerProLeague", "url_slug": "belgian-pro-league"},
+        119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "danish-superliga"},
+        81:  {"name": "🇩🇪 DFB-POKAL", "tag": "#DFBPokal", "url_slug": "dfb-pokal"},
+        4:   {"name": "🇪🇺 UEFA EURO", "tag": "#Euro", "url_slug": "uefa-euro"}
     }
     INTL_FLAGS = {
         "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
