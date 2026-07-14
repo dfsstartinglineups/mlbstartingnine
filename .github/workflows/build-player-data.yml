@@ -1,49 +1,43 @@
 name: Build Player Master Data
 
 on:
-  # Runs automatically at a set time (e.g., every night at 2:00 AM UTC)
-  schedule:
-    - cron: '0 2 * * *'
-  # Allows you to trigger it manually via the GitHub Actions tab anytime
+  # 🎯 ALLOWS YOU TO TRIGGER IT MANUALLY ANYTIME VIA THE ACTIONS TAB
   workflow_dispatch:
 
 jobs:
   build-data:
     runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write 
 
     steps:
-    # 1. Check out the repository source files
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    # 2. Setup standard Python environment
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        cache: 'pip' # Optional: Caches dependencies to speed up future runs
+        cache: 'pip'
 
-    # 3. Install required network libraries
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install requests
 
-    # 4. Execute your data pipeline engine script
     - name: Run Master Data Builder
       run: python scripts/build_player_master_data.py
 
-    # 5. Commit and push the modified JSON database back to the repo safely
     - name: Commit and Push Database Updates
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add data/player_master_data.json
         
-        # Only commit if changes exist, avoiding clean working tree errors
         if git diff-index --quiet HEAD --; then
-          echo "No database changes detected tonight."
+          echo "No database changes detected."
         else
-          git commit -m "🤖 Auto-Update: player_master_data.json stable slugs & statistics"
+          git commit -m "🤖 Manual Run: player_master_data.json stable slugs & statistics"
           git push
         fi
