@@ -10,6 +10,19 @@ let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'tr
 
 const X_SVG_PATH = "M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z";
 
+let PLAYER_DATABASE = null;
+
+// Looks up the true, collision-proof database slug by raw numerical ID
+function getPlayerSlug(id, defaultName) {
+    if (id && PLAYER_DATABASE) {
+        const dbKey = 'ID' + id;
+        if (PLAYER_DATABASE[dbKey] && PLAYER_DATABASE[dbKey].slug) {
+            return PLAYER_DATABASE[dbKey].slug;
+        }
+    }
+    return slugify(defaultName);
+}
+
 // --- URL SLUG GENERATOR ---
 // Accurately mirrors Python's string serialization loops for clean isolated directory matches
 function slugify(text) {
@@ -225,6 +238,18 @@ async function init(dateToFetch, isSilentRefresh = false) {
                 <p class="mt-3 text-muted fw-bold">Loading Pitch Data...</p>
             </div>`;
     }
+
+    // --- FETCH PLAYER DATABASE ONCE ON INITIALIZATION ---
+    if (!PLAYER_DATABASE) {
+        try {
+            const dbRes = await fetch('data/player_master_data.json');
+            if (dbRes.ok) {
+                PLAYER_DATABASE = await dbRes.json();
+            }
+        } catch (e) {
+            console.error("Player DB could not be loaded into index view runtime memory:", e);
+        }
+    }
     
     try {
         const response = await fetch(`data/daily_files/games_${dateToFetch}.json?v=` + new Date().getTime());
@@ -426,11 +451,11 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
 
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-truncate pe-2" style="font-size: 0.95rem;"><a href="/players/${slugify(p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
+                    <div class="text-truncate pe-2" style="font-size: 0.95rem;"><a href="/players/${getPlayerSlug(p.id, p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
                     <div class="text-end fw-bold text-dark" style="font-size: 1.0rem;">${opsDisplay} <span class="text-muted" style="font-size:0.6rem;">OPS</span></div>
                 </div>
                 <div class="text-muted text-truncate w-100" style="font-size: 0.72rem; margin-top: -2px;">
-                    v. <a href="/players/${slugify(p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR
+                    v. <a href="/players/${getPlayerSlug(null, p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR
                 </div>
             `;
             
@@ -451,15 +476,15 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             
             let pitcherSplitHtml = '';
             if (p.oppPitcherSplit && p.oppPitcherSplit.ab > 0) {
-                pitcherSplitHtml = `<span><a href="/players/${slugify(p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
+                pitcherSplitHtml = `<span><a href="/players/${getPlayerSlug(null, p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
             } else {
-                pitcherSplitHtml = `<span><a href="/players/${slugify(p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: No History</span>`;
+                pitcherSplitHtml = `<span><a href="/players/${getPlayerSlug(null, p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: No History</span>`;
             }
             
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center pe-2" style="min-width: 0;">
-                        <div class="text-truncate" style="font-size: 0.95rem;"><a href="/players/${slugify(p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
+                        <div class="text-truncate" style="font-size: 0.95rem;"><a href="/players/${getPlayerSlug(p.id, p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
                         ${gameStatusBadge}
                     </div>
                     <div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 20px;">${hrIcon}</div>
@@ -531,7 +556,7 @@ window.buildTopPlaysListHtml = function(players, mode, platform) {
             tabSpecificHtml = `
                 <div class="d-flex justify-content-between align-items-center w-100">
                     <div class="d-flex align-items-baseline text-truncate pe-2" style="min-width: 0;">
-                        <div class="text-truncate me-1" style="font-size: 0.95rem;"><a href="/players/${slugify(p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
+                        <div class="text-truncate me-1" style="font-size: 0.95rem;"><a href="/players/${getPlayerSlug(p.id, p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
                         <div class="text-muted ms-1" style="font-size: 0.70rem; white-space: nowrap;">${displayPos} • ${salFmt}</div>
                     </div>
                     <div class="text-end flex-shrink-0 ms-2">${topMetric}</div>
@@ -1116,7 +1141,7 @@ function createGameCard(data, platform, selectedSlate) {
             <div class="d-flex flex-column justify-content-center text-truncate w-100">
                 <div class="d-flex align-items-center text-truncate w-100">
                     ${handText}
-                    <a href="/players/${slugify(playerName)}/" class="fw-bold text-dark text-truncate text-decoration-none" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</a>
+                    <a href="/players/${getPlayerSlug(pitcherObj.id, playerName)}/" class="fw-bold text-dark text-truncate text-decoration-none" style="font-size: 0.75rem;" title="${playerName}">${abbrName}</a>
                 </div>
                 <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">${pStats.w}-${pStats.l} • ${pStats.era} • ${pStats.k || 0}K</span>
             </div>
@@ -1184,7 +1209,7 @@ function createGameCard(data, platform, selectedSlate) {
                 <div class="d-flex align-items-center text-truncate w-100" style="padding-bottom: 2px;">
                     <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${handText}
-                    <a href="/players/${slugify(playerName)}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</a>
+                    <a href="/players/${getPlayerSlug(p.id, playerName)}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.65rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</a>
                 </div>`;
 
             const viewDefault = `
@@ -1192,7 +1217,7 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">${prefixText}</span>
                     ${photoHtml}
                     ${handText}
-                    <a href="/players/${slugify(playerName)}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</a>
+                    <a href="/players/${getPlayerSlug(p.id, playerName)}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.70rem;" title="${playerName}" data-shortname="${abbrName}">${playerName}</a>
                 </div>`;
 
             const sStats = deepStats[pidStr]?.season || { avg: '-', ops: '-', hr: 0 };
