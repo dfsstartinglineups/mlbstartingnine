@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+import unicodedata
 import tweepy
 import zoneinfo
 from datetime import datetime, timezone, timedelta
@@ -242,8 +243,17 @@ def get_team_slug(full_name):
 
 def get_futbol_team_slug(full_name):
     """Generates the exact same URL slug used in the Python site generator"""
-    slug = full_name.lower().replace(".", "").replace("'", "")
+    slug = full_name.lower()
+    
+    # Normalize accents/special characters (e.g., Shkodër -> shkoder)
+    slug = unicodedata.normalize('NFKD', slug).encode('ascii', 'ignore').decode('utf-8')
+    
+    # Strip basic punctuation
+    slug = slug.replace(".", "").replace("'", "")
+    
+    # Replace any remaining spaces or non-alphanumerics (including '/') with a clean hyphen
     slug = re.sub(r'[^a-z0-9]+', '-', slug).strip('-')
+    
     return slug
 
 def parse_futbol_lineup(startXI):
