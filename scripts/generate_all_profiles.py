@@ -142,9 +142,9 @@ def generate_player_html(profile, slug):
     vr_ops = vr.get("ops", "-")
     vr_hr = vr.get("hr", 0)
 
-    # Pre-Bake Historical Table Log Rows
+    # Pre-Bake Historical Table Log Rows (Reversed for Newest Games on Top)
     historical_table_rows = ""
-    for log in profile.get("game_log", []):
+    for log in reversed(profile.get("game_log", [])):
         dk_pts = log.get('dk_pts', 0.0)
         fd_pts = log.get('fd_pts', 0.0)
         historical_table_rows += f"""
