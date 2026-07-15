@@ -2,6 +2,7 @@
  * ============================================================================
  * MLB STARTING 9 - MASTER TEAM LINEUP ENGINE (mlb_starting_lineup.js)
  * Compact Dugout Scorecard: Short Names, Visible Watermark, & Dynamic Date.
+ * Includes Look-Ahead Fetching for Off-Days.
  * ============================================================================
  */
 
@@ -26,6 +27,17 @@ function slugify(text) {
         .replace(/[^\w\s-]/g, '')                          
         .replace(/[\s-]+/g, '-')                           
         .trim();
+}
+
+// --- DATE HELPER ---
+function getEstDateString(offsetDays = 0) {
+    const date = new Date();
+    date.setDate(date.getDate() + offsetDays);
+    const estDateString = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit'
+    }).format(date);
+    const [mm, dd, yyyy] = estDateString.split('/');
+    return `${yyyy}-${mm}-${dd}`;
 }
 
 // ==========================================
@@ -73,14 +85,12 @@ function getHeadshotUrl(personId) {
     return `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${personId}/headshot/67/current`;
 }
 
-// 🛡️ THE PITCHER FIX: Dynamically grabs handedness and ignores projected pitchers if MLB announces an official one
 function getSafePitcher(gameData, sideKey, gameNum) {
     const raw = gameData.gameRaw || {};
     const proj = gameData.projectedLineups?.[sideKey]?.startingPitcher || {};
     const official = raw.teams?.[sideKey]?.probablePitcher;
     const handMap = gameData.lineupHandedness || {};
 
-    // 1. If MLB officially announced the pitcher, ALWAYS trust MLB over the projection site.
     if (official && official.fullName) {
         return {
             id: official.id,
@@ -89,7 +99,6 @@ function getSafePitcher(gameData, sideKey, gameNum) {
         };
     }
     
-    // 2. If no official MLB pitcher, but it's Game 1, trust the backend projection.
     if (gameNum === 1 && proj && proj.name) {
         return {
             id: proj.id,
@@ -98,7 +107,6 @@ function getSafePitcher(gameData, sideKey, gameNum) {
         };
     }
     
-    // 3. 🛡️ DOUBLEHEADER SHIELD: If Game 2 and no official MLB pitcher, DO NOT trust projections!
     return { id: null, name: "TBD / Bullpen Game", hand: "" };
 }
 
@@ -116,15 +124,8 @@ function getShortTeamName(fullName, mlbTeamNameNode) {
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
     buildHeaderAndFooter();
-    
-    // Sync browser time to EST so files always load correctly across timezones
-    const estDateString = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit'
-    }).format(new Date());
-    const [mm, dd, yyyy] = estDateString.split('/');
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+    const todayStr = getEstDateString(0);
 
-    // --- NEW: FETCH PLAYER DATABASE ONCE ON INITIALIZATION ---
     if (!PLAYER_DATABASE) {
         try {
             const dbRes = await fetch('/data/player_master_data.json');
@@ -135,7 +136,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             console.error("Player Master DB could not be loaded:", e);
         }
     }
-    // --------------------------------------------------------
 
     try {
         const res = await fetch(`/data/daily_files/games_${todayStr}.json?v=${new Date().getTime()}`);
@@ -146,7 +146,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     populateTeamDropdown();
-    renderTeamPage();
+    // Needs to await the render function now that it fetches data internally
+    await renderTeamPage(); 
 });
 
 // ==========================================
@@ -246,7 +247,53 @@ function populateTeamDropdown() {
 // ==========================================
 // 4. CORE ENGINE: RENDER SCORECARD
 // ==========================================
-function renderTeamPage() {
+
+// Extracted search logic to handle today, tomorrow, and +2 days 
+function findGameInSlate(slateData, teamId) {
+    let result = { targetGame: null, targetSide: null, isDoubleHeader: false, gameNum: 1 };
+    if (!slateData || !slateData.games) return result;
+    
+    let game1 = null;
+    let game2 = null;
+
+    for (const g of slateData.games) {
+        const raw = g.gameRaw || {};
+        if (raw.teams?.away?.team?.id === teamId || raw.teams?.home?.team?.id === teamId) {
+            const gNum = raw.gameNumber || 1;
+            
+            if (gNum === 1 && !game1) {
+                game1 = g;
+            } else if (gNum === 2 && !game2) {
+                game2 = g;
+            }
+        }
+    }
+
+    if (game1) {
+        result.targetGame = game1;
+        result.targetSide = result.targetGame.gameRaw.teams?.away?.team?.id === teamId ? 'away' : 'home';
+        result.gameNum = 1;
+
+        if (game2) {
+            result.isDoubleHeader = true;
+            const status1 = game1.gameRaw?.status?.abstractGameState || "";
+            
+            if (status1 === "Final" || status1 === "Game Over") {
+                result.targetGame = game2;
+                result.targetSide = result.targetGame.gameRaw.teams?.away?.team?.id === teamId ? 'away' : 'home';
+                result.gameNum = 2;
+            }
+        }
+    } else if (game2) {
+        result.targetGame = game2;
+        result.targetSide = result.targetGame.gameRaw.teams?.away?.team?.id === teamId ? 'away' : 'home';
+        result.gameNum = 2;
+    }
+
+    return result;
+}
+
+async function renderTeamPage() {
     const captureArea = document.getElementById("capture-area");
     if (!captureArea) return;
 
@@ -255,59 +302,52 @@ function renderTeamPage() {
     document.documentElement.style.setProperty('--paper-line', theme.paperLine);
     document.documentElement.style.setProperty('--marker-ink', theme.markerInk);
 
-    let targetGame = null;
-    let targetSide = null;
-    let isDoubleHeader = false;
-    let gameNum = 1;
+    // Try finding the game in today's data first
+    let result = findGameInSlate(dailySlateData, currentTargetId);
+    let isFutureGame = false;
+    let futureDateStr = "";
 
-    if (dailySlateData && dailySlateData.games) {
-        let game1 = null;
-        let game2 = null;
-
-        // 1. Explicitly isolate Today's Game 1 and Game 2 by their true MLB game numbers
-        for (const g of dailySlateData.games) {
-            const raw = g.gameRaw || {};
-            if (raw.teams?.away?.team?.id === currentTargetId || raw.teams?.home?.team?.id === currentTargetId) {
-                const gNum = raw.gameNumber || 1;
-                
-                if (gNum === 1 && !game1) {
-                    game1 = g;
-                } else if (gNum === 2 && !game2) {
-                    game2 = g;
+    // If missing today, try tomorrow
+    if (!result.targetGame) {
+        const tmrwStr = getEstDateString(1);
+        try {
+            const res = await fetch(`/data/daily_files/games_${tmrwStr}.json?v=${new Date().getTime()}`);
+            if (res.ok) {
+                const tmrwData = await res.json();
+                result = findGameInSlate(tmrwData, currentTargetId);
+                if (result.targetGame) {
+                    isFutureGame = true;
+                    futureDateStr = tmrwStr;
                 }
             }
-        }
-
-        // 2. Doubleheader Auto-Flip Routing Logic
-        if (game1) {
-            targetGame = game1;
-            targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
-            gameNum = 1;
-
-            if (game2) {
-                isDoubleHeader = true;
-                const status1 = game1.gameRaw?.status?.abstractGameState || "";
-                
-                if (status1 === "Final" || status1 === "Game Over") {
-                    targetGame = game2;
-                    targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
-                    gameNum = 2;
-                }
-            }
-        } else if (game2) {
-            targetGame = game2;
-            targetSide = targetGame.gameRaw.teams?.away?.team?.id === currentTargetId ? 'away' : 'home';
-            gameNum = 2;
-        }
+        } catch(err) { console.warn("Failed +1 day fetch", err); }
     }
 
-    // OFF-DAY FALLBACK
+    // If still missing, try the day after tomorrow
+    if (!result.targetGame) {
+        const nextDayStr = getEstDateString(2);
+        try {
+            const res = await fetch(`/data/daily_files/games_${nextDayStr}.json?v=${new Date().getTime()}`);
+            if (res.ok) {
+                const nextData = await res.json();
+                result = findGameInSlate(nextData, currentTargetId);
+                if (result.targetGame) {
+                    isFutureGame = true;
+                    futureDateStr = nextDayStr;
+                }
+            }
+        } catch(err) { console.warn("Failed +2 day fetch", err); }
+    }
+
+    const { targetGame, targetSide, isDoubleHeader, gameNum } = result;
+
+    // OFF-DAY HARD FALLBACK: No games found in a 3-day window
     if (!targetGame || !targetSide) {
         captureArea.innerHTML = `
             <div style="max-width: 550px; margin: 30px auto; background: var(--paper-bg); border: 2px dashed var(--marker-ink); border-radius: 10px; padding: 35px 20px; text-align: center; font-family: 'Montserrat', sans-serif; color: #222; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
                 <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="height: 70px; margin-bottom: 12px; opacity: 0.8;">
-                <h1 style="font-family: 'Bebas Neue', cursive; font-size: 32px; color: var(--marker-ink); margin: 0;">NO GAME SCHEDULED TODAY</h1>
-                <p style="font-size: 14px; color: #555; margin-top: 8px;">The ${currentTargetName} have an off-day or their game has been postponed.</p>
+                <h1 style="font-family: 'Bebas Neue', cursive; font-size: 32px; color: var(--marker-ink); margin: 0;">NO GAME SCHEDULED</h1>
+                <p style="font-size: 14px; color: #555; margin-top: 8px;">The ${currentTargetName} do not have a game scheduled in the next 48 hours.</p>
                 <a href="/" style="display: inline-block; margin-top: 18px; background: var(--marker-ink); color: #fff; padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 12px;">View Full Slate &rarr;</a>
             </div>
         `;
@@ -326,7 +366,7 @@ function renderTeamPage() {
     const shortName = getShortTeamName(currentTargetName, raw.teams?.[targetSide]?.team?.teamName);
     const oppShortName = getShortTeamName(oppTeamObj.name, oppTeamObj.teamName);
 
-    const gameDateRaw = raw.officialDate || new Date().toISOString().split('T')[0];
+    const gameDateRaw = raw.officialDate || futureDateStr || new Date().toISOString().split('T')[0];
     const [yy, mm, dd] = gameDateRaw.split('-');
     const dObj = new Date(yy, mm - 1, dd);
     let displayDate = dObj.toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' }).toUpperCase();
@@ -356,8 +396,21 @@ function renderTeamPage() {
         if (ml) oddsStr = `<div style="font-family: 'Roboto Mono', monospace; font-size: 11px; color: #555; margin-top: 3px;">Vegas Line: ${mlFormat}${ou}</div>`;
     }
 
+    // CREATE LOOK-AHEAD BANNER IF IT'S A FUTURE GAME
+    let futureBannerHtml = "";
+    if (isFutureGame) {
+        const niceDate = dObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        const vsSymbolBanner = targetSide === 'away' ? `@ ${oppShortName}` : `vs ${oppShortName}`;
+
+        futureBannerHtml = `
+            <div style="max-width: 580px; width: 94%; margin: 15px auto 0; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 13px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <strong>The ${currentTargetName} are off today.</strong> Their next matchup is on <strong>${niceDate}</strong> ${vsSymbolBanner}. Below is the early projected lineup.
+            </div>
+        `;
+    }
+
     // 4. BUILD COMPACT VISUAL CARD 
-    let cardHtml = `
+    let cardHtml = futureBannerHtml + `
         <div style="max-width: 580px; width: 94%; margin: 15px auto; background: var(--paper-bg); border-radius: 10px; padding: 18px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; border: 1px solid #bbb; color: var(--marker-ink); box-sizing: border-box;">
             
             <img src="https://www.mlbstatic.com/team-logos/${currentTargetId}.svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; height: 420px; object-fit: contain; opacity: 0.09; pointer-events: none; z-index: 0;">
@@ -382,7 +435,6 @@ function renderTeamPage() {
                 <div style="font-family: 'Montserrat', sans-serif; font-size: 10px; text-transform: uppercase; color: #666; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; border-bottom: 1px dashed var(--paper-line); padding-bottom: 3px;">Batting Order</div>
     `;
 
-    // 🛡️ THE LINEUP SOURCE FIX: If official, grab the official lineup. Otherwise, grab projections.
     const isOfficial = (status === "OFFICIAL" || status === "MODIFIED");
     const batters = (isOfficial && raw.lineups && raw.lineups[`${targetSide}Players`]) 
         ? raw.lineups[`${targetSide}Players`] 
