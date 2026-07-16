@@ -1176,11 +1176,19 @@ async def run_engines(memory):
                 p_id = str(event.get('player_id', event.get('player', 'UNK')))
                 event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{event_time}_{p_id}"
                 
+                # Generate adjacent minute keys (+1 and -1) to catch API shifts
+                adjacent_keys = [
+                    f"ALERT_{fixture_id}_{team_id}_Goal_{t}_{p_id}"
+                    for t in [event_time - 1, event_time, event_time + 1]
+                ]
+                
                 player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
                 p_goals = player_goal_counts[p_id]
                 
-                # 2. THE BRIDGE CHECK: Skip if either the old or new key was already tweeted!
-                if event_key in tweeted_recently or old_key in tweeted_recently: 
+                # 2. THE BRIDGE CHECK + TIME SHIFT CHECK:
+                # Skip if the old key is detected OR if any of the adjacent minute keys are in memory
+                has_been_tweeted = old_key in tweeted_recently or any(k in tweeted_recently for k in adjacent_keys)
+                if has_been_tweeted: 
                     continue
 
                 is_late = 75 <= event_time < 90
