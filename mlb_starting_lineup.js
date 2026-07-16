@@ -366,6 +366,10 @@ async function renderTeamPage() {
     const shortName = getShortTeamName(currentTargetName, raw.teams?.[targetSide]?.team?.teamName);
     const oppShortName = getShortTeamName(oppTeamObj.name, oppTeamObj.teamName);
 
+    // --- NEW: Generate Opponent Link ---
+    const oppSlug = getSlugFromId(oppTeamObj.id);
+    const oppAnchor = `<a href="/lineups/${oppSlug}/" style="color: inherit; text-decoration: none; border-bottom: 1px dashed #888;">${oppShortName}</a>`;
+
     const gameDateRaw = raw.officialDate || futureDateStr || new Date().toISOString().split('T')[0];
     const [yy, mm, dd] = gameDateRaw.split('-');
     const dObj = new Date(yy, mm - 1, dd);
@@ -386,7 +390,7 @@ async function renderTeamPage() {
         badgeHtml = `<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block;">⏳ PROJECTED BATTING ORDER</span>`;
     }
 
-    const vsSymbol = targetSide === 'away' ? `@ ${oppShortName}` : `vs ${oppShortName}`;
+    const vsSymbol = targetSide === 'away' ? `@ ${oppAnchor}` : `vs ${oppAnchor}`;
     const venueName = raw.venue?.name || "Stadium";
     let oddsStr = "";
     if (targetGame.odds && targetGame.odds.moneyline) {
@@ -400,7 +404,9 @@ async function renderTeamPage() {
     let futureBannerHtml = "";
     if (isFutureGame) {
         const niceDate = dObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-        const vsSymbolBanner = targetSide === 'away' ? `@ ${oppShortName}` : `vs ${oppShortName}`;
+        
+        // --- UPDATED: Use the linked oppAnchor here too ---
+        const vsSymbolBanner = targetSide === 'away' ? `@ ${oppAnchor}` : `vs ${oppAnchor}`;
 
         futureBannerHtml = `
             <div style="max-width: 580px; width: 94%; margin: 15px auto 0; background: #fff3cd; border: 1px solid #ffeeba; color: #856404; padding: 12px; border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 13px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
