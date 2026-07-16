@@ -1169,13 +1169,19 @@ async def run_engines(memory):
                 else: current_away_score += 1
                 
                 event_time = get_actual_minute(event)
-                event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{current_home_score if team_id == h_id else current_away_score}"
+                
+                # 1. Generate BOTH the old and new keys
+                old_key = f"ALERT_{fixture_id}_{team_id}_Goal_{current_home_score if team_id == h_id else current_away_score}"
                 
                 p_id = str(event.get('player_id', event.get('player', 'UNK')))
+                event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{event_time}_{p_id}"
+                
                 player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
                 p_goals = player_goal_counts[p_id]
                 
-                if event_key in tweeted_recently: continue
+                # 2. THE BRIDGE CHECK: Skip if either the old or new key was already tweeted!
+                if event_key in tweeted_recently or old_key in tweeted_recently: 
+                    continue
 
                 is_late = 75 <= event_time < 90
                 is_stoppage = event_time >= 90
