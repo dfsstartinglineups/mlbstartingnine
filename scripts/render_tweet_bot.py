@@ -1176,10 +1176,10 @@ async def run_engines(memory):
                 p_id = str(event.get('player_id', event.get('player', 'UNK')))
                 event_key = f"ALERT_{fixture_id}_{team_id}_Goal_{event_time}_{p_id}"
                 
-                # Generate adjacent minute keys (+1 and -1) to catch API shifts
+                # Generate adjacent minute keys (+- 2 mins) to catch API shifts
                 adjacent_keys = [
                     f"ALERT_{fixture_id}_{team_id}_Goal_{t}_{p_id}"
-                    for t in [event_time - 1, event_time, event_time + 1]
+                    for t in [event_time - 2, event_time - 1, event_time, event_time + 1, event_time + 2]
                 ]
                 
                 player_goal_counts[p_id] = player_goal_counts.get(p_id, 0) + 1
