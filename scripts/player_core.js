@@ -154,8 +154,15 @@ async function loadPlayerProfileData() {
                 const isStartingPitcher = String(gameRaw.teams?.[teamSide]?.probablePitcher?.id) === PLAYER_ID || 
                                           String(myGame.projectedLineups?.[teamSide]?.startingPitcher?.id) === PLAYER_ID;
 
+                // Check for game postponement status
+                const abstractState = gameRaw.status?.abstractGameState || "";
+                const detailedState = gameRaw.status?.detailedState || "";
+                const isPostponed = abstractState.includes("Postponed") || detailedState.includes("Postponed") || gameRaw.status?.statusCode === "C";
+
                 let badgeHtml = '';
-                if (isStartingPitcher) {
+                if (isPostponed) {
+                    badgeHtml = `<div class="badge bg-danger p-2 w-100 shadow-sm text-uppercase fw-bold text-white">✕ GAME POSTPONED</div>`;
+                } else if (isStartingPitcher) {
                     badgeHtml = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP:  Starting Pitcher</div>`;
                 } else {
                     if (isConfirmed && slotIndex !== -1) {
@@ -173,9 +180,21 @@ async function loadPlayerProfileData() {
 
                 const teamSlug = getSlugFromId(myTeamId);
                 const lineupLinkText = isConfirmed ? "View Official Lineup" : "View Projected Lineup";
-                const lineupLinkHtml = `<a href="https://mlbstartingnine.com/lineups/${teamSlug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 ${lineupLinkText}</a>`;
+                const lineupLinkHtml = isPostponed ? "" : `<a href="https://mlbstartingnine.com/lineups/${teamSlug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 ${lineupLinkText}</a>`;
 
                 badgeZone.innerHTML = `<div class="mb-3">${badgeHtml}${lineupLinkHtml}</div>`;
+
+                // If game is postponed, update text status and halt active rendering 
+                if (isPostponed) {
+                    safeHtml('live-game-state-label', `<strong>Game Status:</strong> <span class="text-danger fw-bold">Postponed</span>`);
+                    liveConsoleZone.innerHTML = `
+                    <div class="p-3 border-bottom text-center" style="background-color: #fdf2f2;">
+                        <span class="badge bg-danger text-uppercase mb-1" style="font-size:0.6rem;">PPD</span>
+                        <span class="text-dark d-block fw-semibold" style="font-size: 0.85rem;">This matchup has been called off.</span>
+                    </div>`;
+                    if (hrZone) hrZone.innerHTML = '';
+                    return;
+                }
 
                 // Game State Text
                 const activeLiveGame = liveData[gamePk];
@@ -312,7 +331,7 @@ async function loadPlayerProfileData() {
                                 <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">AT BATS</span><strong class="text-dark">${bvp.ab}</strong></div>
                                 <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HITS</span><strong class="text-dark">${bvp.hits}</strong></div>
                                 <div class="col-3 border-end"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">HOME RUNS</span><strong class="text-dark">${bvp.hr}</strong></div>
-                                <div class="col-3"><span class="text-muted d-block" style="font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
+                                <div class="col-3"><span class="text-muted d-block; font-size: 0.6rem; font-weight:700;">OPS</span><strong class="text-success">${bvp.ops}</strong></div>
                             </div>
                         </div>`;
                     } else {
