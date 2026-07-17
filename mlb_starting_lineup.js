@@ -2,7 +2,7 @@
  * ============================================================================
  * MLB STARTING 9 - MASTER TEAM LINEUP ENGINE (mlb_starting_lineup.js)
  * Compact Dugout Scorecard: Short Names, Visible Watermark, & Dynamic Date.
- * Includes Look-Ahead Fetching for Off-Days.
+ * Includes Look-Ahead Fetching for Off-Days & Postponement Handling.
  * ============================================================================
  */
 
@@ -248,46 +248,50 @@ function populateTeamDropdown() {
 // 4. CORE ENGINE: RENDER SCORECARD
 // ==========================================
 
-// Extracted search logic to handle today, tomorrow, and +2 days 
+// Doubleheader and Postponement aware search logic
 function findGameInSlate(slateData, teamId) {
     let result = { targetGame: null, targetSide: null, isDoubleHeader: false, gameNum: 1 };
     if (!slateData || !slateData.games) return result;
     
-    let game1 = null;
-    let game2 = null;
+    let matchingGames = [];
 
     for (const g of slateData.games) {
         const raw = g.gameRaw || {};
         if (raw.teams?.away?.team?.id === teamId || raw.teams?.home?.team?.id === teamId) {
-            const gNum = raw.gameNumber || 1;
-            
-            if (gNum === 1 && !game1) {
-                game1 = g;
-            } else if (gNum === 2 && !game2) {
-                game2 = g;
-            }
+            matchingGames.push(g);
         }
     }
 
-    if (game1) {
-        result.targetGame = game1;
-        result.targetSide = result.targetGame.gameRaw.teams?.away?.team?.id === teamId ? 'away' : 'home';
-        result.gameNum = 1;
+    if (matchingGames.length === 0) return result;
 
-        if (game2) {
-            result.isDoubleHeader = true;
-            const status1 = game1.gameRaw?.status?.abstractGameState || "";
-            
-            if (status1 === "Final" || status1 === "Game Over") {
-                result.targetGame = game2;
-                result.targetSide = result.targetGame.gameRaw.teams?.away?.team?.id === teamId ? 'away' : 'home';
-                result.gameNum = 2;
-            }
+    matchingGames.sort((a, b) => (a.gameRaw?.gameNumber || 1) - (b.gameRaw?.gameNumber || 1));
+
+    if (matchingGames.length > 1) {
+        result.isDoubleHeader = true;
+        
+        // Filter out games that are explicitly postponed if there are alternatives
+        const activeGames = matchingGames.filter(m => {
+            const state = m.gameRaw?.status?.abstractGameState || "";
+            const detailed = m.gameRaw?.status?.detailedState || "";
+            return !state.includes("Postponed") && !detailed.includes("Postponed") && m.gameRaw?.status?.statusCode !== "C";
+        });
+
+        let selected = null;
+        if (activeGames.length > 0) {
+            const liveMatch = activeGames.find(m => ["Live", "In Progress"].includes(m.gameRaw?.status?.abstractGameState));
+            const upcomingMatch = activeGames.find(m => ["Preview", "Scheduled"].includes(m.gameRaw?.status?.abstractGameState));
+            selected = liveMatch || upcomingMatch || activeGames[activeGames.length - 1];
+        } else {
+            selected = matchingGames[0];
         }
-    } else if (game2) {
-        result.targetGame = game2;
-        result.targetSide = result.targetGame.gameRaw.teams?.away?.team?.id === teamId ? 'away' : 'home';
-        result.gameNum = 2;
+
+        result.targetGame = selected;
+        result.targetSide = selected.gameRaw?.teams?.away?.team?.id === teamId ? 'away' : 'home';
+        result.gameNum = selected.gameRaw?.gameNumber || 1;
+    } else {
+        result.targetGame = matchingGames[0];
+        result.targetSide = result.targetGame.gameRaw?.teams?.away?.team?.id === teamId ? 'away' : 'home';
+        result.gameNum = result.targetGame.gameRaw?.gameNumber || 1;
     }
 
     return result;
@@ -366,7 +370,11 @@ async function renderTeamPage() {
     const shortName = getShortTeamName(currentTargetName, raw.teams?.[targetSide]?.team?.teamName);
     const oppShortName = getShortTeamName(oppTeamObj.name, oppTeamObj.teamName);
 
-    // --- NEW: Generate Opponent Link ---
+    // --- CHECK PPD STATUS ---
+    const abstractState = raw.status?.abstractGameState || "";
+    const detailedState = raw.status?.detailedState || "";
+    const isPostponed = abstractState.includes("Postponed") || detailedState.includes("Postponed") || raw.status?.statusCode === "C";
+
     const oppSlug = getSlugFromId(oppTeamObj.id);
     const oppAnchor = `<a href="/lineups/${oppSlug}/" style="color: inherit; text-decoration: none; border-bottom: 1px dashed #888;">${oppShortName}</a>`;
 
@@ -381,7 +389,9 @@ async function renderTeamPage() {
     
     const status = tracking.status || "NONE";
     let badgeHtml = "";
-    if (status === "OFFICIAL") {
+    if (isPostponed) {
+        badgeHtml = `<span style="background: #ff1744; color: #fff; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);">✕ GAME POSTPONED (PPD)</span>`;
+    } else if (status === "OFFICIAL") {
         const timeStr = tracking.officialAt ? ` (${tracking.officialAt})` : "";
         badgeHtml = `<span style="background: #00e676; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 0 8px rgba(0, 230, 118, 0.4);">✓ OFFICIAL STARTING 9${timeStr}</span>`;
     } else if (status === "MODIFIED") {
@@ -393,7 +403,7 @@ async function renderTeamPage() {
     const vsSymbol = targetSide === 'away' ? `@ ${oppAnchor}` : `vs ${oppAnchor}`;
     const venueName = raw.venue?.name || "Stadium";
     let oddsStr = "";
-    if (targetGame.odds && targetGame.odds.moneyline) {
+    if (targetGame.odds && targetGame.odds.moneyline && !isPostponed) {
         const ml = targetGame.odds.moneyline[targetSide];
         const mlFormat = ml > 0 ? `+${ml}` : ml;
         const ou = targetGame.odds.overUnder ? ` • O/U ${targetGame.odds.overUnder}` : "";
@@ -402,10 +412,8 @@ async function renderTeamPage() {
 
     // CREATE LOOK-AHEAD BANNER IF IT'S A FUTURE GAME
     let futureBannerHtml = "";
-    if (isFutureGame) {
+    if (isFutureGame && !isPostponed) {
         const niceDate = dObj.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-        
-        // --- UPDATED: Use the linked oppAnchor here too ---
         const vsSymbolBanner = targetSide === 'away' ? `@ ${oppAnchor}` : `vs ${oppAnchor}`;
 
         futureBannerHtml = `
@@ -446,83 +454,98 @@ async function renderTeamPage() {
         ? raw.lineups[`${targetSide}Players`] 
         : (projData.battingOrder || []);
 
-    if (batters.length === 0) {
-        cardHtml += `<div style="padding: 15px; text-align: center; font-family: 'Montserrat', sans-serif; color: #666; font-style: italic;">Batting order not populated yet.</div>`;
+    if (isPostponed) {
+        cardHtml += `
+            <div style="padding: 40px 15px; text-align: center; font-family: 'Montserrat', sans-serif; background: rgba(255, 23, 68, 0.05); border: 1px dashed rgba(255, 23, 68, 0.4); border-radius: 8px; margin-top: 15px; position: relative; z-index: 2;">
+                <div style="color: #d32f2f; font-weight: 800; font-size: 17px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Matchup Called Off</div>
+                <div style="color: #666; font-size: 12.5px; font-weight: 500;">This game has been postponed due to weather or scheduling changes.</div>
+            </div>
+        </div>`; // Close card early
     } else {
-        batters.forEach((b, idx) => {
-            const playerName = b.name || b.fullName || "Unknown";
-            const pos = posMap[b.id] || posMap[String(b.id)] || b.fd_positions || b.dk_positions || "DH";
-            const hand = handMap[b.id] || handMap[String(b.id)] || b.hand || "";
-            const handDisplay = hand ? `(${hand}) ` : "";
-            const headshot = getHeadshotUrl(b.id);
-            
-            cardHtml += `
-                <div style="display: flex; align-items: center; border-bottom: 1px solid var(--paper-line); height: 42px; position: relative; z-index: 2; transition: background 0.15s; padding: 0 4px;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
-                    
-                    <div style="width: 32px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 17px; color: var(--marker-ink); flex-shrink: 0;">
-                        ${idx + 1}
-                    </div>
-                    
-                    <div style="width: 44px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
-                        <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
-                            <img src="${headshot}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" crossorigin="anonymous" onerror="this.src='https://www.mlbstatic.com/team-logos/100.svg'">
-                        </div>
-                    </div>
-                    
-                    <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(15px, 3.8vw, 17px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span><a href="/players/${getPlayerSlug(b.id, playerName)}/" style="color: inherit; text-decoration: none;">${playerName}</a>
-                    </div>
-                    
-                    <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
-                        ${pos}
-                    </div>
-
-                </div>
-            `;
-        });
-    }
-
-    const safePitcher = getSafePitcher(targetGame, targetSide, gameNum);
-    const pName = safePitcher.name;
-    const pHand = safePitcher.hand ? `(${safePitcher.hand}) ` : "";
-    const pHeadshot = getHeadshotUrl(safePitcher.id);
-
-    cardHtml += `
-            </div>
-            
-            <div style="margin-top: 12px; position: relative; z-index: 1;">
-                <div style="font-family: 'Caveat', cursive; font-size: 17px; color: #4a4f58; font-weight: 700; margin-bottom: 2px; padding-left: 4px;">Starting Pitcher</div>
+        if (batters.length === 0) {
+            cardHtml += `<div style="padding: 15px; text-align: center; font-family: 'Montserrat', sans-serif; color: #666; font-style: italic;">Batting order not populated yet.</div>`;
+        } else {
+            batters.forEach((b, idx) => {
+                const playerName = b.name || b.fullName || "Unknown";
+                const pos = posMap[b.id] || posMap[String(b.id)] || b.fd_positions || b.dk_positions || "DH";
+                const hand = handMap[b.id] || handMap[String(b.id)] || b.hand || "";
+                const handDisplay = hand ? `(${hand}) ` : "";
+                const headshot = getHeadshotUrl(b.id);
                 
-                <div style="display: flex; align-items: center; border: 1.5px solid var(--marker-ink); background-color: rgba(0,0,0,0.03); border-radius: 6px; height: 50px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); padding: 0 4px;">
-                    
-                    <div style="width: 36px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 16px; color: var(--marker-ink); background: rgba(0,0,0,0.04); flex-shrink: 0;">
-                        SP
-                    </div>
-                    
-                    <div style="width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
-                        <div style="width: 36px; height: 36px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
-                            <img src="${pHeadshot}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" crossorigin="anonymous" onerror="this.src='https://www.mlbstatic.com/team-logos/100.svg'">
+                cardHtml += `
+                    <div style="display: flex; align-items: center; border-bottom: 1px solid var(--paper-line); height: 42px; position: relative; z-index: 2; transition: background 0.15s; padding: 0 4px;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                        
+                        <div style="width: 32px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 17px; color: var(--marker-ink); flex-shrink: 0;">
+                            ${idx + 1}
                         </div>
-                    </div>
-                    
-                    <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(16px, 4vw, 18px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${pHand}</span><a href="/players/${getPlayerSlug(safePitcher.id, pName)}/" style="color: inherit; text-decoration: none;">${pName}</a>
-                    </div>
-                    
-                    <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
-                        SP
-                    </div>
+                        
+                        <div style="width: 44px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
+                                <img src="${headshot}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" crossorigin="anonymous" onerror="this.src='https://www.mlbstatic.com/team-logos/100.svg'">
+                            </div>
+                        </div>
+                        
+                        <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(15px, 3.8vw, 17px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span style="font-family: 'Caveat', cursive; font-size: clamp(15px, 3.8vw, 17px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${handDisplay}</span><a href="/players/${getPlayerSlug(b.id, playerName)}/" style="color: inherit; text-decoration: none;">${playerName}</a>
+                        </div>
+                        
+                        <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
+                            ${pos}
+                        </div>
 
+                    </div>
+                `;
+            });
+        }
+
+        const safePitcher = getSafePitcher(targetGame, targetSide, gameNum);
+        const pName = safePitcher.name;
+        const pHand = safePitcher.hand ? `(${safePitcher.hand}) ` : "";
+        const pHeadshot = getHeadshotUrl(safePitcher.id);
+
+        cardHtml += `
                 </div>
-            </div>
+                
+                <div style="margin-top: 12px; position: relative; z-index: 1;">
+                    <div style="font-family: 'Caveat', cursive; font-size: 17px; color: #4a4f58; font-weight: 700; margin-bottom: 2px; padding-left: 4px;">Starting Pitcher</div>
+                    
+                    <div style="display: flex; align-items: center; border: 1.5px solid var(--marker-ink); background-color: rgba(0,0,0,0.03); border-radius: 6px; height: 50px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.04); padding: 0 4px;">
+                        
+                        <div style="width: 36px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 16px; color: var(--marker-ink); background: rgba(0,0,0,0.04); flex-shrink: 0;">
+                            SP
+                        </div>
+                        
+                        <div style="width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
+                                <img src="${pHeadshot}" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" crossorigin="anonymous" onerror="this.src='https://www.mlbstatic.com/team-logos/100.svg'">
+                            </div>
+                        </div>
+                        
+                        <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(16px, 4vw, 18px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">${pHand}</span><a href="/players/${getPlayerSlug(safePitcher.id, pName)}/" style="color: inherit; text-decoration: none;">${pName}</a>
+                        </div>
+                        
+                        <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">
+                            SP
+                        </div>
 
-        </div>
-    `;
+                    </div>
+                </div>
+
+            </div>
+        `;
+    }
 
     captureArea.innerHTML = cardHtml;
 
     // Pass the active batters array to keep the Analytics synced with the display
-    renderAnalyticsSection(targetGame, targetSide, batters, gameNum);
+    // Only render analytics if the game is actually being played
+    if (isPostponed) {
+        const container = document.getElementById("public-analytics-section");
+        if (container) container.innerHTML = "";
+    } else {
+        renderAnalyticsSection(targetGame, targetSide, batters, gameNum);
+    }
 }
 
 // ==========================================
