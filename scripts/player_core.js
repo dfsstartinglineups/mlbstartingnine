@@ -43,11 +43,12 @@ async function loadPlayerProfileData() {
             
             let myGame = null;
             let teamSide = null;
+            let matchingGames = []; // Track all matches for doubleheaders
             
             // Read the team name that Python baked into the header (e.g., "San Francisco Giants")
             const metaSub = document.getElementById('player-meta-sub')?.textContent || "";
             
-            // Smarter discovery loop: Find the player's team regardless of bench status
+            // 1. Gather all potential game matches for this team/player
             for (const game of (dailyData.games || [])) {
                 const homeTeamName = game.gameRaw?.teams?.home?.team?.name || "";
                 const awayTeamName = game.gameRaw?.teams?.away?.team?.name || "";
@@ -55,7 +56,6 @@ async function loadPlayerProfileData() {
                 const homeP = String(game.gameRaw?.teams?.home?.probablePitcher?.id || game.projectedLineups?.home?.startingPitcher?.id);
                 const awayP = String(game.gameRaw?.teams?.away?.probablePitcher?.id || game.projectedLineups?.away?.startingPitcher?.id);
                 
-                // Matches ID explicitly OR falls back to text-matching the team name on the page
                 const inHome = (game.gameRaw?.lineups?.homePlayers || []).some(p => String(p.id) === PLAYER_ID) || 
                                (game.projectedLineups?.home?.battingOrder || []).some(p => String(p.id) === PLAYER_ID) || 
                                homeP === PLAYER_ID ||
@@ -66,8 +66,38 @@ async function loadPlayerProfileData() {
                                awayP === PLAYER_ID ||
                                (awayTeamName && metaSub.includes(awayTeamName));
                 
-                if (inHome) { myGame = game; teamSide = 'home'; break; }
-                if (inAway) { myGame = game; teamSide = 'away'; break; }
+                if (inHome) { matchingGames.push({ game, teamSide: 'home' }); }
+                if (inAway) { matchingGames.push({ game, teamSide: 'away' }); }
+            }
+
+            // 2. DOUBLEHEADER RESOLUTION LOGIC
+            if (matchingGames.length > 0) {
+                let selectedMatch = matchingGames[0]; // Default fallback
+
+                if (matchingGames.length > 1) {
+                    // Check if one of the games is currently live or active
+                    const liveMatch = matchingGames.find(m => {
+                        const state = m.game.gameRaw?.status?.abstractGameState || "";
+                        return state === "Live" || state === "In Progress";
+                    });
+
+                    // Check if one of the games is upcoming
+                    const upcomingMatch = matchingGames.find(m => {
+                        const state = m.game.gameRaw?.status?.abstractGameState || "";
+                        return state === "Preview" || state === "Scheduled";
+                    });
+
+                    if (liveMatch) {
+                        selectedMatch = liveMatch; // Prioritize the game currently being played
+                    } else if (upcomingMatch) {
+                        selectedMatch = upcomingMatch; // Otherwise, prioritize the next game on deck
+                    } else {
+                        selectedMatch = matchingGames[matchingGames.length - 1]; // If both are Final, show the nightcap
+                    }
+                }
+
+                myGame = selectedMatch.game;
+                teamSide = selectedMatch.teamSide;
             }
 
             if (myGame) {
