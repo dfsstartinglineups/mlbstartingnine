@@ -142,11 +142,23 @@ async function loadPlayerProfileData() {
                 const dkProjectionValue = (dkRaw) ? Number(dkRaw).toFixed(1) : 'NA';
                 const fdProjectionValue = (fdRaw) ? Number(fdRaw).toFixed(1) : 'NA';
 
-                let isConfirmed = trackingNode.status === "OFFICIAL";
+                // FIX: Support alternative confirmation statuses and live feed lineups
+                const actualLineup = gameRaw.lineups?.[`${teamSide}Players`] || [];
+                const hasLiveLineup = actualLineup.length > 0;
+                const isConfirmedStatus = ["OFFICIAL", "UPDATED", "MODIFIED", "CONFIRMED"].includes(trackingNode.status);
+
+                let isConfirmed = isConfirmedStatus || hasLiveLineup;
                 let slotIndex = -1;
-                if (isConfirmed && trackingNode.hash) {
+
+                // Prioritize the live MLB feed lineup position if available
+                if (hasLiveLineup) {
+                    slotIndex = actualLineup.findIndex(p => String(p.id) === PLAYER_ID);
+                }
+                // Fallback to tracking hash if feed isn't active yet
+                if (slotIndex === -1 && trackingNode.hash) {
                     slotIndex = trackingNode.hash.split('-').indexOf(PLAYER_ID);
                 }
+                // Fallback to projected lineups
                 if (slotIndex === -1) {
                     slotIndex = (myGame.projectedLineups?.[teamSide]?.battingOrder || []).findIndex(p => String(p.id) === PLAYER_ID);
                 }
