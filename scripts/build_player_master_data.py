@@ -77,8 +77,8 @@ def fetch_all_active_rosters(session):
 
 def fetch_mlb_season_and_splits(session, player_id, group_type="hitting"):
     """
-    Queries MLB API to compile season totals alongside left/right splits 
-    for the current calendar year.
+    Queries MLB API to compile season totals for the current calendar year,
+    and a combined 2-year rolling average for left/right platoon splits.
     """
     current_year = datetime.utcnow().year
     stats_profile = {
@@ -87,7 +87,7 @@ def fetch_mlb_season_and_splits(session, player_id, group_type="hitting"):
         "split_vR": {"ab": 0, "hr": 0, "avg": "-", "ops": "-"}
     }
     
-    # 1. Fetch Year Totals
+    # 1. Fetch Year Totals (Current Year Only)
     season_url = f"https://statsapi.mlb.com/api/v1/people/{player_id}/stats?stats=season&group={group_type}&gameType=R&season={current_year}"
     try:
         res = session.get(season_url, timeout=8).json()
@@ -117,23 +117,59 @@ def fetch_mlb_season_and_splits(session, player_id, group_type="hitting"):
     except Exception:
         pass
 
-    # 2. Fetch Handedness Platoon Splits
+    # 2. Fetch Handedness Platoon Splits (2-Year Rolling Sample)
+    years_to_fetch = [current_year - 1, current_year]
+    
     for sit_code, target_key in [('vl', 'split_vL'), ('vr', 'split_vR')]:
-        split_url = f"https://statsapi.mlb.com/api/v1/people/{player_id}/stats?stats=statSplits&sitCodes={sit_code}&group={group_type}&gameType=R&season={current_year}"
-        try:
-            res = session.get(split_url, timeout=8).json()
-            splits = res.get('stats', [{}])[0].get('splits', [])
-            if splits:
-                stat = splits[0].get('stat', {})
-                stats_profile[target_key] = {
-                    "ab": stat.get('atBats' if group_type == "hitting" else 'battersFaced', 0),
-                    "hr": stat.get('homeRuns', 0),
-                    "avg": stat.get('avg', '-'),
-                    "ops": stat.get('ops', '-')
-                }
-        except Exception:
-            pass
-        time.sleep(0.05) 
+        totals = {"ab": 0, "h": 0, "2b": 0, "3b": 0, "hr": 0, "bb": 0, "hbp": 0, "sf": 0}
+        
+        for year in years_to_fetch:
+            split_url = f"https://statsapi.mlb.com/api/v1/people/{player_id}/stats?stats=statSplits&sitCodes={sit_code}&group={group_type}&gameType=R&season={year}"
+            try:
+                res = session.get(split_url, timeout=8).json()
+                splits = res.get('stats', [{}])[0].get('splits', [])
+                if splits:
+                    stat = splits[0].get('stat', {})
+                    
+                    # Accumulate raw counting stats across both years
+                    totals["ab"] += stat.get('atBats' if group_type == "hitting" else 'battersFaced', 0)
+                    totals["h"] += stat.get('hits', 0)
+                    totals["2b"] += stat.get('doubles', 0)
+                    totals["3b"] += stat.get('triples', 0)
+                    totals["hr"] += stat.get('homeRuns', 0)
+                    totals["bb"] += stat.get('baseOnBalls', 0)
+                    totals["hbp"] += stat.get('hitByPitch', 0)
+                    totals["sf"] += stat.get('sacFlies', 0)
+            except Exception:
+                pass
+            time.sleep(0.05)
+            
+        # Calculate final accurate 2-year percentages
+        ab = totals["ab"]
+        h = totals["h"]
+        hr = totals["hr"]
+        bb = totals["bb"]
+        hbp = totals["hbp"]
+        sf = totals["sf"]
+        
+        avg = h / ab if ab > 0 else 0.0
+        tb = (h - (totals["2b"] + totals["3b"] + hr)) + (2 * totals["2b"]) + (3 * totals["3b"]) + (4 * hr)
+        slg = tb / ab if ab > 0 else 0.0
+        obp = (h + bb + hbp) / (ab + bb + hbp + sf) if (ab + bb + hbp + sf) > 0 else 0.0
+        ops = obp + slg
+        
+        # Format identically to the MLB API string returns
+        avg_str = f"{avg:.3f}".replace("0.", ".")
+        ops_str = f"{ops:.3f}".replace("0.", ".")
+        if avg_str == ".000" and ab == 0: avg_str = "-"
+        if ops_str == ".000" and ab == 0: ops_str = "-"
+        
+        stats_profile[target_key] = {
+            "ab": ab,
+            "hr": hr,
+            "avg": avg_str,
+            "ops": ops_str
+        }
 
     return stats_profile
 
