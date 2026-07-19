@@ -57,14 +57,25 @@
         }
 
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
-        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; }
+        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; white-space: nowrap; }
         .table th:hover { background-color: #343a40; }
         .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
-        
         .team-icon { width: 22px; height: 22px; margin-right: 6px; vertical-align: middle; }
+
+        /* Mobile Compacting Styles */
+        @media (max-width: 768px) {
+            .table th, .table td { 
+                padding: 8px 6px; 
+                font-size: 0.75rem; 
+                white-space: nowrap; 
+            }
+            .player-link { font-size: 0.80rem; }
+            .team-icon { width: 16px; height: 16px; margin-right: 4px; }
+            .col-rank { width: auto !important; padding-right: 2px !important; }
+        }
     </style>
 </head>
 <body>
@@ -132,18 +143,24 @@
         </div>
     </div>
 
-    <div class="table-card shadow-sm mb-4">
-        <div class="table-responsive">
+    <div class="table-card shadow-sm mb-4 position-relative">
+        
+        <!-- Animated Horizontal Scroll Indicator for Mobile -->
+        <div id="scroll-indicator" class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
+            &larr; Swipe
+        </div>
+
+        <div class="table-responsive" id="table-scroll-container">
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
                     <tr>
                         <th style="width: 5%;" onclick="sortTable(this, 0)">Rank &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
-                        <th onclick="sortTable(this, 2)">Team &#x21D5;</th>
-                        <th onclick="sortTable(this, 3)">Matchup &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 4)">Salary &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 5)">Proj &#x21D5;</th>
-                        <th class="text-end text-primary" onclick="sortTable(this, 6)">Value &#x21D5;</th>
+                        <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
+                        <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
+                        <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 6)">Proj &#x21D5;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,27 +176,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/pittsburgh-pirates/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/694973/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/694973/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/paul-skenes/" class="player-link">Paul Skenes</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.84x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon"> Pirates
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon ms-2" style="margin-right: 4px;"> Guardians
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,700</td>
                         <td class="text-end fw-bold col-proj">37.27</td>
-                        <td class="text-end fw-bold text-success col-value">3.84x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -193,27 +210,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/seattle-mariners/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669302/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669302/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/logan-gilbert/" class="player-link">Logan Gilbert</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.59x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon ms-2" style="margin-right: 4px;"> Giants
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,800</td>
                         <td class="text-end fw-bold col-proj">35.15</td>
-                        <td class="text-end fw-bold text-success col-value">3.59x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -227,27 +244,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cincinnati-reds/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668881/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668881/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/hunter-greene/" class="player-link">Hunter Greene</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.55x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon"> Reds
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rockies
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$10,000</td>
                         <td class="text-end fw-bold col-proj">35.48</td>
-                        <td class="text-end fw-bold text-success col-value">3.55x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -261,27 +278,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/houston-astros/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/686613/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/686613/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/hunter-brown/" class="player-link">Hunter Brown</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.44x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon"> Astros
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon ms-2" style="margin-right: 4px;"> Orioles
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,600</td>
                         <td class="text-end fw-bold col-proj">33.0</td>
-                        <td class="text-end fw-bold text-success col-value">3.44x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -295,27 +312,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/chicago-cubs/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/684007/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/684007/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/shota-imanaga/" class="player-link">Shota Imanaga</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.37x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon"> Cubs
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon ms-2" style="margin-right: 4px;"> Twins
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,700</td>
                         <td class="text-end fw-bold col-proj">29.3</td>
-                        <td class="text-end fw-bold text-success col-value">3.37x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -329,27 +346,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-angels/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/696270/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/696270/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/ryan-johnson/" class="player-link">Ryan Johnson</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.19x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon"> Angels
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Tigers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$6,700</td>
                         <td class="text-end fw-bold col-proj">21.35</td>
-                        <td class="text-end fw-bold text-success col-value">3.19x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -363,27 +380,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/atlanta-braves/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/656550/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/656550/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/grant-holmes/" class="player-link">Grant Holmes</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.11x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon"> Braves
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rangers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$7,300</td>
                         <td class="text-end fw-bold col-proj">22.7</td>
-                        <td class="text-end fw-bold text-success col-value">3.11x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -397,27 +414,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/athletics/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682052/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682052/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/jacob-lopez/" class="player-link">Jacob Lopez</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.11x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon"> Athletics
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon ms-2" style="margin-right: 4px;"> Nationals
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$6,600</td>
                         <td class="text-end fw-bold col-proj">20.5</td>
-                        <td class="text-end fw-bold text-success col-value">3.11x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -431,27 +448,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-mets/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/690997/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/690997/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/nolan-mclean/" class="player-link">Nolan McLean</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.09x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon"> Mets
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon ms-2" style="margin-right: 4px;"> Phillies
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,900</td>
                         <td class="text-end fw-bold col-proj">30.6</td>
-                        <td class="text-end fw-bold text-success col-value">3.09x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -465,27 +482,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/688107/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/688107/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/robert-gasser/" class="player-link">Robert Gasser</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">3.01x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon ms-2" style="margin-right: 4px;"> Marlins
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,100</td>
                         <td class="text-end fw-bold col-proj">24.4</td>
-                        <td class="text-end fw-bold text-success col-value">3.01x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -499,27 +516,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676282/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676282/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/joey-cantillo/" class="player-link">Joey Cantillo</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.99x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon"> Guardians
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon ms-2" style="margin-right: 4px;"> Pirates
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,100</td>
                         <td class="text-end fw-bold col-proj">27.2</td>
-                        <td class="text-end fw-bold text-success col-value">2.99x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -533,27 +550,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/detroit-tigers/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663554/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663554/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/casey-mize/" class="player-link">Casey Mize</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.98x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon ms-2" style="margin-right: 4px;"> Angels
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,200</td>
                         <td class="text-end fw-bold col-proj">27.4</td>
-                        <td class="text-end fw-bold text-success col-value">2.98x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -567,27 +584,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/miami-marlins/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691587/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691587/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/eury-perez/" class="player-link">Eury Perez</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.97x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon"> Marlins
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Brewers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,400</td>
                         <td class="text-end fw-bold col-proj">27.9</td>
-                        <td class="text-end fw-bold text-success col-value">2.97x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -601,27 +618,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663556/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663556/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/shane-mcclanahan/" class="player-link">Shane McClanahan</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.96x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon"> Rays
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon ms-2" style="margin-right: 4px;"> Red Sox
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,200</td>
                         <td class="text-end fw-bold col-proj">27.19</td>
-                        <td class="text-end fw-bold text-success col-value">2.96x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -635,27 +652,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/texas-rangers/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/543135/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/543135/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/nathan-eovaldi/" class="player-link">Nathan Eovaldi</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.84x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon"> Rangers
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon ms-2" style="margin-right: 4px;"> Braves
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$10,100</td>
                         <td class="text-end fw-bold col-proj">28.7</td>
-                        <td class="text-end fw-bold text-success col-value">2.84x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -669,27 +686,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/san-francisco-giants/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/592662/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/592662/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/robbie-ray/" class="player-link">Robbie Ray</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.81x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon"> Giants
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon ms-2" style="margin-right: 4px;"> Mariners
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,000</td>
                         <td class="text-end fw-bold col-proj">25.25</td>
-                        <td class="text-end fw-bold text-success col-value">2.81x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -703,27 +720,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/philadelphia-phillies/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/660604/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/660604/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/alan-rangel/" class="player-link">Alan Rangel</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.73x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon"> Phillies
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon ms-2" style="margin-right: 4px;"> Mets
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$7,100</td>
                         <td class="text-end fw-bold col-proj">19.4</td>
-                        <td class="text-end fw-bold text-success col-value">2.73x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -737,27 +754,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/baltimore-orioles/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687064/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687064/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/brandon-young/" class="player-link">Brandon Young</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.69x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon"> Orioles
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon ms-2" style="margin-right: 4px;"> Astros
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,400</td>
                         <td class="text-end fw-bold col-proj">22.6</td>
-                        <td class="text-end fw-bold text-success col-value">2.69x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -771,27 +788,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/boston-red-sox/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/543243/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/543243/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/sonny-gray/" class="player-link">Sonny Gray</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.68x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon"> Red Sox
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rays
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$10,200</td>
                         <td class="text-end fw-bold col-proj">27.3</td>
-                        <td class="text-end fw-bold text-success col-value">2.68x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -805,27 +822,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/washington-nationals/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Projected Lineup Position">P</span>
+                                        <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/656492/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/656492/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/foster-griffin/" class="player-link">Foster Griffin</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.56x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon"> Nationals
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon ms-2" style="margin-right: 4px;"> Athletics
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$9,500</td>
                         <td class="text-end fw-bold col-proj">24.28</td>
-                        <td class="text-end fw-bold text-success col-value">2.56x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -839,27 +856,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/kansas-city-royals/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/702070/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/702070/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/noah-cameron/" class="player-link">Noah Cameron</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.53x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon"> Royals
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon ms-2" style="margin-right: 4px;"> Padres
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,500</td>
                         <td class="text-end fw-bold col-proj">21.51</td>
-                        <td class="text-end fw-bold text-success col-value">2.53x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -873,27 +890,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/minnesota-twins/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805673/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805673/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/zebby-matthews/" class="player-link">Zebby Matthews</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.47x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon"> Twins
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon ms-2" style="margin-right: 4px;"> Cubs
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,800</td>
                         <td class="text-end fw-bold col-proj">21.7</td>
-                        <td class="text-end fw-bold text-success col-value">2.47x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -907,27 +924,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/arizona-diamondbacks/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/593958/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/593958/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/eduardo-rodriguez/" class="player-link">Eduardo Rodriguez</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.45x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon"> Dbacks
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon ms-2" style="margin-right: 4px;"> Cardinals
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,900</td>
                         <td class="text-end fw-bold col-proj">21.84</td>
-                        <td class="text-end fw-bold text-success col-value">2.45x</td>
                     </tr>
                     
                     <tr data-slates="20603" 
@@ -941,27 +958,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/colorado-rockies/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663372/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663372/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/ryan-feltner/" class="player-link">Ryan Feltner</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.44x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon"> Rockies
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 vs. <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon ms-2" style="margin-right: 4px;"> Reds
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$7,000</td>
                         <td class="text-end fw-bold col-proj">17.05</td>
-                        <td class="text-end fw-bold text-success col-value">2.44x</td>
                     </tr>
                     
                     <tr data-slates="20604,20603" 
@@ -975,27 +992,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/san-diego-padres/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/608566/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/608566/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/german-marquez/" class="player-link">German Marquez</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">2.29x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon"> Padres
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon ms-2" style="margin-right: 4px;"> Royals
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$6,800</td>
                         <td class="text-end fw-bold col-proj">15.58</td>
-                        <td class="text-end fw-bold text-success col-value">2.29x</td>
                     </tr>
                     
                     <tr data-slates="20605" 
@@ -1009,27 +1026,27 @@
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/st-louis-cardinals/" class="text-decoration-none">
                                     
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">P</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669467/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669467/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="/players/andre-pallante/" class="player-link">Andre Pallante</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">1.97x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon"> Cardinals
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 @ <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon ms-2" style="margin-right: 4px;"> Dbacks
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$8,300</td>
                         <td class="text-end fw-bold col-proj">16.38</td>
-                        <td class="text-end fw-bold text-success col-value">1.97x</td>
                     </tr>
                     
                 </tbody>
@@ -1043,6 +1060,22 @@
 </div>
 
 <script>
+// Fade out swipe indicator on scroll
+document.addEventListener("DOMContentLoaded", () => {
+    const scrollContainer = document.getElementById('table-scroll-container');
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    
+    if (scrollContainer && scrollIndicator) {
+        scrollContainer.addEventListener('scroll', () => {
+            if (scrollContainer.scrollLeft > 10) {
+                scrollIndicator.style.opacity = '0';
+            } else {
+                scrollIndicator.style.opacity = '0.85';
+            }
+        }, { passive: true });
+    }
+});
+
 function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
@@ -1071,9 +1104,9 @@ function filterSlate(slateId) {
         }
     });
 
-    // Automatically trigger a Sort by Value (Col Index 6) descending when a slate is changed
-    const valueHeader = document.querySelectorAll('#leaderboard-table th')[6];
-    sortTable(valueHeader, 6, true);
+    // Automatically trigger a Sort by Value (Col Index 2) descending when a slate is changed
+    const valueHeader = document.querySelectorAll('#leaderboard-table th')[2];
+    sortTable(valueHeader, 2, true);
 }
 
 function sortTable(thElement, colIndex, forceDesc = false) {
