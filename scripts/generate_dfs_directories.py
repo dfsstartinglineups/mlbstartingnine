@@ -30,12 +30,12 @@ TEAM_BAD_PENALTY = -0.050
 POS_LABELS_DK = {
     "pitchers": "Pitchers", "catchers": "Catchers", "first-base": "First Base",
     "second-base": "Second Base", "third-base": "Third Base", 
-    "shortstops": "Shortstops", "outfielders": "Outfielders"
+    "shortstops": "Shortstops", "outfielders": "Outfielders", "util": "Util (All Hitters)"
 }
 POS_LABELS_FD = {
     "pitchers": "Pitchers", "catchers-first-base": "C / 1B",
     "second-base": "Second Base", "third-base": "Third Base", 
-    "shortstops": "Shortstops", "outfielders": "Outfielders"
+    "shortstops": "Shortstops", "outfielders": "Outfielders", "util": "Utility"
 }
 
 # =========================================================================
@@ -49,7 +49,8 @@ SEO_METADATA = {
         "second-base": {"title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings", "desc": "Unlock top-rated DraftKings second base projections. Real-time situational performance matrices for today's fantasy baseball slates."},
         "third-base": {"title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base", "desc": "Premium DraftKings third base projections featuring advanced park factor adjustments, batting order weights, and optimizer data."},
         "shortstops": {"title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections", "desc": "Compare daily fantasy shortstop values on DraftKings. Updated projections utilizing proprietary BvP and Vegas linescoring data."},
-        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly."}
+        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly."},
+        "util": {"title": "Top DraftKings Hitters Today - DFS Overall Value Rankings", "desc": "View the highest projected DraftKings hitters across all positions. The ultimate leaderboard for finding pure salary value and lineup upside."}
     },
     "fanduel": {
         "pitchers": {"title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball", "desc": "Maximize your FanDuel pitching slot with real-time projections, advanced umpire data, and proprietary situational matchup scoring."},
@@ -57,7 +58,8 @@ SEO_METADATA = {
         "second-base": {"title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks", "desc": "Find the highest-value second basemen on FanDuel today. Projections calculated via proprietary live vegas total adjustments."},
         "third-base": {"title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value", "desc": "Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games."},
         "shortstops": {"title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings", "desc": "Daily updated FanDuel shortstop projections. Real-time value tiers using current matchup analytics and confirmed official starting lineups."},
-        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Deep-dive FanDuel outfielder value tables. The ultimate tool for finding elite, mid-tier, and value salary plays for tonight's slates."}
+        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Deep-dive FanDuel outfielder value tables. The ultimate tool for finding elite, mid-tier, and value salary plays for tonight's slates."},
+        "util": {"title": "Best FanDuel Utility Projections Today - DFS UTIL Picks", "desc": "Fill your FanDuel Utility slot with the highest value hitters. Optimized projections comparing all non-pitchers on today's main and late MLB slates."}
     }
 }
 
@@ -499,8 +501,9 @@ def main():
 
     print(f"🏁 Constraint Status Check -> DraftKings Data Found: {has_dk_data} | FanDuel Data Found: {has_fd_data}")
 
-    dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": []}
-    fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": []}
+    # Add util to initialization pools
+    dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
+    fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
 
     for game in games_list:
         p_data = game.get("projectedLineups", {})
@@ -559,6 +562,9 @@ def main():
                 if has_dk_data:
                     p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res:
+                        # Add every non-pitcher to the util array
+                        dk_pools["util"].append(p_res)
+                        
                         dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
                         for raw_pos in dk_positions:
                             if "P" in raw_pos: dk_pools["pitchers"].append(p_res)
@@ -572,6 +578,9 @@ def main():
                 if has_fd_data:
                     p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res:
+                        # Add every non-pitcher to the util array
+                        fd_pools["util"].append(p_res)
+                        
                         fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
                         for raw_pos in fd_positions:
                             if "P" in raw_pos: fd_pools["pitchers"].append(p_res)
@@ -616,7 +625,12 @@ def main():
             os.makedirs(folder_path, exist_ok=True)
             
             meta = SEO_METADATA["draftkings"].get(pos_slug, {"title": f"DraftKings {pos_slug.title()}", "desc": "MLB Projections"})
-            clean_title = pos_slug.replace("-", " ").title()
+            
+            if pos_slug == "util":
+                clean_title = "Utility (All Hitters)"
+            else:
+                clean_title = pos_slug.replace("-", " ").title()
+                
             page_url = f"{base_domain}/dfs/draftkings/top-{pos_slug}/"
 
             html_output = render_static_html(
@@ -645,8 +659,13 @@ def main():
             os.makedirs(folder_path, exist_ok=True)
             
             meta = SEO_METADATA["fanduel"].get(pos_slug, {"title": f"FanDuel {pos_slug.title()}", "desc": "MLB Projections"})
-            clean_title = pos_slug.replace("-", " ").title()
-            if "Catchers" in clean_title: clean_title = "C / 1B Split"
+            
+            if pos_slug == "util":
+                clean_title = "Utility"
+            else:
+                clean_title = pos_slug.replace("-", " ").title()
+                if "Catchers" in clean_title: clean_title = "C / 1B Split"
+                
             page_url = f"{base_domain}/dfs/fanduel/top-{pos_slug}/"
 
             html_output = render_static_html(
