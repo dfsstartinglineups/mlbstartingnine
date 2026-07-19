@@ -342,16 +342,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                         <td class="fw-bold text-muted col-rank">{{ loop.index }}</td>
                         <td>
                             <div class="d-flex align-items-center">
+                                {% if p.order_status == 'official' %}
+                                    <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
+                                {% elif p.order_status == 'projected' %}
+                                    <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
+                                {% elif p.order_status == 'ns' %}
+                                    <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Not Starting">NS</span>
+                                {% endif %}
+                                
                                 <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
-                                
-                                {% if p.order_status == 'official' %}
-                                    <span class="badge bg-success ms-2 shadow-sm" style="font-size: 0.65rem;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
-                                {% elif p.order_status == 'projected' %}
-                                    <span class="badge bg-warning text-dark ms-2 shadow-sm" style="font-size: 0.65rem;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
-                                {% elif p.order_status == 'ns' %}
-                                    <span class="badge bg-danger ms-2 shadow-sm" style="font-size: 0.65rem;" title="Not Starting">NS</span>
-                                {% endif %}
                             </div>
                         </td>
                         <td>
