@@ -25,22 +25,25 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests
+          pip install requests jinja2
 
       - name: Run MLB Live Scraper
         run: python scripts/scrape_mlb_live.py
+        
+      - name: Generate DFS Directories
+        run: python scripts/generate_dfs_directories.py
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Stage the new LIVE directory where the script saves its data
-          git add data/LIVE/
+          # Stage the new LIVE directory, the DFS html pages, and the DFS sitemap
+          git add data/LIVE/ dfs/ sitemap-dfs.xml
           
           # Check if there are staged changes ready to be committed
           if ! git diff --quiet --staged; then
-            git commit -m "⚡ Automated update: MLB Live Stats [skip ci]"
+            git commit -m "⚡ Automated update: MLB Live Stats & DFS Pages [skip ci]"
             
             # Pull latest changes and rebase BEFORE pushing to avoid conflicts with the main scraper
             git pull --rebase origin main || echo "Nothing to pull"
@@ -48,5 +51,5 @@ jobs:
             # Try pushing. If rejected, pull again and immediately push.
             git push origin main || (git pull --rebase origin main && git push origin main)
           else
-            echo "No new MLB live stats. Skipping commit."
+            echo "No new updates. Skipping commit."
           fi
