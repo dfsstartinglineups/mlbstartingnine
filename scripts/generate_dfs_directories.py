@@ -301,7 +301,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             }
             .player-link { font-size: 0.80rem; }
             .team-icon { width: 16px; height: 16px; margin-right: 4px; }
-            .col-rank { width: auto !important; padding-right: 2px !important; }
+            .col-rank { padding-right: 4px !important; padding-left: 4px !important; }
         }
     </style>
 </head>
@@ -359,7 +359,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
                     <tr>
-                        <th style="width: 5%;" onclick="sortTable(this, 0)">Rank &#x21D5;</th>
+                        <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
                         <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
                         <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
@@ -376,7 +376,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                         data-default-proj="{{ p.proj }}" 
                         data-default-value="{{ p.value }}x">
                         
-                        <td class="fw-bold text-muted col-rank">{{ loop.index }}</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">{{ loop.index }}</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/{{ p.team_slug }}/" class="text-decoration-none">
