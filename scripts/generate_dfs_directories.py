@@ -228,6 +228,13 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -330,11 +337,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
     </div>
 
-    <div class="disclaimer-box p-3 mb-4 shadow-sm">
-        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
-    </div>
-
-    <div class="table-card shadow-sm">
+    <div class="table-card shadow-sm mb-4">
         <div class="table-responsive">
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
@@ -391,6 +394,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 </tbody>
             </table>
         </div>
+    </div>
+    
+    <div class="disclaimer-box p-3 mb-4 shadow-sm">
+        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 </div>
 
