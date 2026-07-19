@@ -7,7 +7,6 @@ import unicodedata
 # =========================================================================
 # --- 1. DYNAMIC PATH ROUTING (Adjusted for /scripts/ folder) ---
 # =========================================================================
-# Finds the absolute path of /scripts/ and gets its parent (the project root)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
@@ -199,8 +198,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Favicons -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
     <title>{{ seo_title }}</title>
     <meta name="description" content="{{ seo_desc }}">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:site_name" content="MLB Starting Nine">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ page_url }}">
+    <meta property="og:title" content="{{ seo_title }}">
+    <meta property="og:description" content="{{ seo_desc }}">
+    <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta property="twitter:domain" content="mlbstartingnine.com">
+    <meta property="twitter:url" content="{{ page_url }}">
+    <meta name="twitter:title" content="{{ seo_title }}">
+    <meta name="twitter:description" content="{{ seo_desc }}">
+    <meta name="twitter:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -401,15 +423,24 @@ def main():
     for key in fd_pools:
         fd_pools[key] = sorted(fd_pools[key], key=lambda x: x["value"], reverse=True)
 
-    def render_static_html(seo_title, seo_desc, page_heading, platform_name, date_str, players_list, distinct_slates):
+    def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, date_str, players_list, distinct_slates):
         try:
             from jinja2 import Template
             t = Template(HTML_TEMPLATE)
-            return t.render(seo_title=seo_title, seo_desc=seo_desc, page_heading=page_heading, platform_name=platform_name, date_str=date_str, players=players_list, distinct_slates=distinct_slates)
+            return t.render(
+                seo_title=seo_title, 
+                seo_desc=seo_desc, 
+                page_url=page_url,
+                page_heading=page_heading, 
+                platform_name=platform_name, 
+                date_str=date_str, 
+                players=players_list, 
+                distinct_slates=distinct_slates
+            )
         except ImportError:
             return "Jinja2 parsing engine dependency required to compile static structure outputs."
 
-    # URLs for the Sitemap
+    # URLs for the Sitemap & OG Tags
     generated_urls = []
     base_domain = "https://mlbstartingnine.com"
 
@@ -420,10 +451,12 @@ def main():
             
             meta = SEO_METADATA["draftkings"].get(pos_slug, {"title": f"DraftKings {pos_slug.title()}", "desc": "MLB Projections"})
             clean_title = pos_slug.replace("-", " ").title()
+            page_url = f"{base_domain}/dfs/draftkings/top-{pos_slug}/"
 
             html_output = render_static_html(
                 seo_title=meta["title"],
                 seo_desc=meta["desc"],
+                page_url=page_url,
                 page_heading=f"DraftKings {clean_title} Leaderboard",
                 platform_name="DraftKings",
                 date_str=today_str,
@@ -433,7 +466,7 @@ def main():
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file:
                 file.write(html_output)
             
-            generated_urls.append(f"{base_domain}/{OUTPUT_BASE_DIR}/draftkings/top-{pos_slug}/")
+            generated_urls.append(page_url)
             
         print("✅ DraftKings Directory Pages Generated.")
 
@@ -445,10 +478,12 @@ def main():
             meta = SEO_METADATA["fanduel"].get(pos_slug, {"title": f"FanDuel {pos_slug.title()}", "desc": "MLB Projections"})
             clean_title = pos_slug.replace("-", " ").title()
             if "Catchers" in clean_title: clean_title = "C / 1B Split"
-                
+            page_url = f"{base_domain}/dfs/fanduel/top-{pos_slug}/"
+
             html_output = render_static_html(
                 seo_title=meta["title"],
                 seo_desc=meta["desc"],
+                page_url=page_url,
                 page_heading=f"FanDuel {clean_title} Leaderboard",
                 platform_name="FanDuel",
                 date_str=today_str,
@@ -458,7 +493,7 @@ def main():
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file:
                 file.write(html_output)
             
-            generated_urls.append(f"{base_domain}/{OUTPUT_BASE_DIR}/fanduel/top-{pos_slug}/")
+            generated_urls.append(page_url)
             
         print("✅ FanDuel Directory Pages Generated.")
 
