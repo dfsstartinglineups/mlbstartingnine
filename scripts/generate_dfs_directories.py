@@ -284,14 +284,25 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
-        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; }
+        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; white-space: nowrap; }
         .table th:hover { background-color: #343a40; }
         .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
-        
         .team-icon { width: 22px; height: 22px; margin-right: 6px; vertical-align: middle; }
+
+        /* Mobile Compacting Styles */
+        @media (max-width: 768px) {
+            .table th, .table td { 
+                padding: 8px 6px; 
+                font-size: 0.75rem; 
+                white-space: nowrap; 
+            }
+            .player-link { font-size: 0.80rem; }
+            .team-icon { width: 16px; height: 16px; margin-right: 4px; }
+            .col-rank { width: auto !important; padding-right: 2px !important; }
+        }
     </style>
 </head>
 <body>
@@ -337,18 +348,24 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
     </div>
 
-    <div class="table-card shadow-sm mb-4">
-        <div class="table-responsive">
+    <div class="table-card shadow-sm mb-4 position-relative">
+        
+        <!-- Animated Horizontal Scroll Indicator for Mobile -->
+        <div id="scroll-indicator" class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
+            &larr; Swipe
+        </div>
+
+        <div class="table-responsive" id="table-scroll-container">
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
                     <tr>
                         <th style="width: 5%;" onclick="sortTable(this, 0)">Rank &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
-                        <th onclick="sortTable(this, 2)">Team &#x21D5;</th>
-                        <th onclick="sortTable(this, 3)">Matchup &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 4)">Salary &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 5)">Proj &#x21D5;</th>
-                        <th class="text-end text-primary" onclick="sortTable(this, 6)">Value &#x21D5;</th>
+                        <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
+                        <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
+                        <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 6)">Proj &#x21D5;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -364,31 +381,31 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/{{ p.team_slug }}/" class="text-decoration-none">
                                     {% if p.order_status == 'official' %}
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
                                     {% elif p.order_status == 'projected' %}
-                                        <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
+                                        <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
                                     {% elif p.order_status == 'ns' %}
-                                        <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Not Starting">NS</span>
+                                        <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Not Starting">NS</span>
                                     {% endif %}
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
                             </div>
                         </td>
+                        <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="{{ p.team }} Icon" class="team-icon"> {{ p.team }}
                             </span>
                         </td>
-                        <td class="text-muted font-monospace fw-semibold">
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                             <div class="d-flex align-items-center">
                                 {{ p.opp_indicator }} <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opp_name }} Icon" class="team-icon ms-2" style="margin-right: 4px;"> {{ p.opp_name }}
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">${{ "{:,}".format(p.salary) }}</td>
                         <td class="text-end fw-bold col-proj">{{ p.proj }}</td>
-                        <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -402,6 +419,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>
+// Fade out swipe indicator on scroll
+document.addEventListener("DOMContentLoaded", () => {
+    const scrollContainer = document.getElementById('table-scroll-container');
+    const scrollIndicator = document.getElementById('scroll-indicator');
+    
+    if (scrollContainer && scrollIndicator) {
+        scrollContainer.addEventListener('scroll', () => {
+            if (scrollContainer.scrollLeft > 10) {
+                scrollIndicator.style.opacity = '0';
+            } else {
+                scrollIndicator.style.opacity = '0.85';
+            }
+        }, { passive: true });
+    }
+});
+
 function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
@@ -430,9 +463,9 @@ function filterSlate(slateId) {
         }
     });
 
-    // Automatically trigger a Sort by Value (Col Index 6) descending when a slate is changed
-    const valueHeader = document.querySelectorAll('#leaderboard-table th')[6];
-    sortTable(valueHeader, 6, true);
+    // Automatically trigger a Sort by Value (Col Index 2) descending when a slate is changed
+    const valueHeader = document.querySelectorAll('#leaderboard-table th')[2];
+    sortTable(valueHeader, 2, true);
 }
 
 function sortTable(thElement, colIndex, forceDesc = false) {
