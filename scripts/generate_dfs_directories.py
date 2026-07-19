@@ -121,7 +121,7 @@ def calculate_vegas_nudge(itt):
     elif 0 < itt <= TEAM_BAD_SCORE: return TEAM_BAD_PENALTY
     return 0.0
 
-def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False):
+def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos="", order_status=""):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
     
@@ -200,6 +200,8 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
         "value": value,
         "slates": ",".join(slate_ids),
         "slate_stats_json": json.dumps(slate_stats),
+        "lineup_pos": lineup_pos,
+        "order_status": order_status,
         "url": get_player_url(player.get("id"), player.get("name") or player.get("fullName"))
     }
 
@@ -337,11 +339,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                         data-default-proj="{{ p.proj }}" 
                         data-default-value="{{ p.value }}x">
                         
-                        <td class="fw-bold text-muted">{{ loop.index }}</td>
+                        <td class="fw-bold text-muted col-rank">{{ loop.index }}</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
+                                
+                                {% if p.order_status == 'official' %}
+                                    <span class="badge bg-success ms-2 shadow-sm" style="font-size: 0.65rem;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
+                                {% elif p.order_status == 'projected' %}
+                                    <span class="badge bg-warning text-dark ms-2 shadow-sm" style="font-size: 0.65rem;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
+                                {% elif p.order_status == 'ns' %}
+                                    <span class="badge bg-danger ms-2 shadow-sm" style="font-size: 0.65rem;" title="Not Starting">NS</span>
+                                {% endif %}
                             </div>
                         </td>
                         <td>
@@ -393,13 +403,21 @@ function filterSlate(slateId) {
             }
         }
     });
+
+    // Automatically trigger a Sort by Value (Col Index 6) descending when a slate is changed
+    const valueHeader = document.querySelectorAll('#leaderboard-table th')[6];
+    sortTable(valueHeader, 6, true);
 }
 
-function sortTable(thElement, colIndex) {
+function sortTable(thElement, colIndex, forceDesc = false) {
     const table = thElement.closest("table");
     const tbody = table.querySelector("tbody");
     const rows = Array.from(tbody.querySelectorAll("tr"));
-    const isAscending = thElement.classList.contains("asc");
+    
+    let isAscending = thElement.classList.contains("asc");
+    
+    // If we are forcing a descending sort (e.g. from the filter function), override here
+    if (forceDesc) isAscending = true; 
     
     table.querySelectorAll("th").forEach(th => {
         th.classList.remove("asc", "desc");
@@ -420,7 +438,16 @@ function sortTable(thElement, colIndex) {
         return 0;
     });
 
+    // Re-append sorted rows to the DOM
     rows.forEach(row => tbody.appendChild(row));
+
+    // Recalculate rank numbers (1, 2, 3...) for whatever rows are currently visible
+    let currentRank = 1;
+    rows.forEach(row => {
+        if (row.style.display !== 'none') {
+            row.querySelector('.col-rank').textContent = currentRank++;
+        }
+    });
 }
 </script>
 </body>
@@ -487,18 +514,50 @@ def main():
         ]:
             side_node = p_data.get(side, {})
             
+            # Setup official lineup verification cross-checking
+            raw_lineups = game.get("gameRaw", {}).get("lineups", {})
+            official_players_raw = raw_lineups.get(f"{side}Players", [])
+            is_official = len(official_players_raw) > 0
+            official_ids = [str(p.get("id")) for p in official_players_raw]
+            
             pitcher = side_node.get("startingPitcher")
             if pitcher:
+                pitcher_id = str(pitcher.get("id"))
+                prob_pitcher = game.get("gameRaw", {}).get("teams", {}).get(side, {}).get("probablePitcher", {})
+                prob_id = str(prob_pitcher.get("id", ""))
+                
+                lineup_pos = "P"
+                if is_official:
+                    if prob_id == pitcher_id or pitcher_id in official_ids:
+                        order_status = "official"
+                    else:
+                        order_status = "ns"
+                        lineup_pos = "NS"
+                else:
+                    order_status = "projected"
+
                 if has_dk_data:
-                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True)
+                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res: dk_pools["pitchers"].append(p_res)
                 if has_fd_data:
-                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False)
+                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res: fd_pools["pitchers"].append(p_res)
 
             for batter in side_node.get("battingOrder", []):
+                batter_id = str(batter.get("id"))
+                lineup_pos = str(batter.get("order", ""))
+                
+                if is_official:
+                    if batter_id in official_ids:
+                        order_status = "official"
+                    else:
+                        order_status = "ns"
+                        lineup_pos = "NS"
+                else:
+                    order_status = "projected"
+
                 if has_dk_data:
-                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True)
+                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res:
                         dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
                         for raw_pos in dk_positions:
@@ -511,7 +570,7 @@ def main():
                             elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
 
                 if has_fd_data:
-                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False)
+                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res:
                         fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
                         for raw_pos in fd_positions:
