@@ -81,15 +81,13 @@ def get_player_url(player_id, default_name):
 # =========================================================================
 # --- 4. PROPRIETARY ALGORITHM NUDGES ---
 # =========================================================================
-def get_team_abbr(game_node, side):
-    """Safely extracts team abbreviations."""
-    # Try Lineup JSON schema fallback first
-    if f"{side}Team" in game_node and isinstance(game_node[f"{side}Team"], dict) and "abbreviation" in game_node[f"{side}Team"]:
-        return game_node[f"{side}Team"]["abbreviation"]
-    # Try Standard statsapi schema
+def get_team_name(game_node, side):
+    """Safely extracts full team names instead of abbreviations."""
+    if f"{side}Team" in game_node and isinstance(game_node[f"{side}Team"], dict) and "name" in game_node[f"{side}Team"]:
+        return game_node[f"{side}Team"]["name"]
     raw_teams = game_node.get("gameRaw", {}).get("teams", {})
-    if side in raw_teams and "team" in raw_teams[side] and "abbreviation" in raw_teams[side]["team"]:
-        return raw_teams[side]["team"]["abbreviation"]
+    if side in raw_teams and "team" in raw_teams[side] and "name" in raw_teams[side]["team"]:
+        return raw_teams[side]["team"]["name"]
     return "AWAY" if side == "away" else "HOME"
 
 def calculate_vegas_nudge(itt):
@@ -99,7 +97,7 @@ def calculate_vegas_nudge(itt):
     elif 0 < itt <= TEAM_BAD_SCORE: return TEAM_BAD_PENALTY
     return 0.0
 
-def process_proprietary_projection(player, is_pitcher, team_abbr, opp_abbr, is_home, game, is_dk=False):
+def process_proprietary_projection(player, is_pitcher, team_name, opp_name, is_home, game, is_dk=False):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
     
@@ -152,8 +150,8 @@ def process_proprietary_projection(player, is_pitcher, team_abbr, opp_abbr, is_h
     return {
         "id": player.get("id"),
         "name": player.get("name") or player.get("fullName"),
-        "team": team_abbr,
-        "opponent": f"v. {opp_abbr}" if is_home else f"@ {opp_abbr}",
+        "team": team_name,
+        "opponent": f"vs. {opp_name}" if is_home else f"@ {opp_name}",
         "salary": salary,
         "proj": final_proj,
         "value": value,
@@ -225,6 +223,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
+        .team-icon { width: 16px; height: 16px; margin-right: 6px; vertical-align: text-bottom; }
     </style>
 </head>
 <body>
@@ -289,8 +288,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                                 <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
                             </div>
                         </td>
-                        <td><span class="badge bg-light text-dark border">{{ p.team }}</span></td>
-                        <td class="text-muted font-monospace">{{ p.opponent }}</td>
+                        <td>
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
+                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> {{ p.team }}
+                            </span>
+                        </td>
+                        <td class="text-muted font-monospace">
+                            <div class="d-flex align-items-center">
+                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> {{ p.opponent }}
+                            </div>
+                        </td>
                         <td class="text-end fw-semibold">${{ "{:,}".format(p.salary) }}</td>
                         <td class="text-end fw-bold">{{ p.proj }}</td>
                         <td class="text-end fw-bold text-success">{{ p.value }}x</td>
@@ -374,9 +381,9 @@ def main():
     for game in games_list:
         p_data = game.get("projectedLineups", {})
         
-        # Safely fetch abbreviations
-        away_team = get_team_abbr(game, "away")
-        home_team = get_team_abbr(game, "home")
+        # Use full team names instead of abbreviations
+        away_team = get_team_name(game, "away")
+        home_team = get_team_name(game, "home")
 
         # Properly match side block with correct context flags
         for side, team, opp, is_home in [("away", away_team, home_team, False), ("home", home_team, away_team, True)]:
