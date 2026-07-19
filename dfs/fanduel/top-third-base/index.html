@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Favicons -->
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -12,7 +11,6 @@
     <title>Optimized FanDuel 3B Projections Today - Fantasy Third Base Value</title>
     <meta name="description" content="Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games.">
     
-    <!-- Open Graph Tags -->
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mlbstartingnine.com/dfs/fanduel/top-third-base/">
@@ -20,7 +18,6 @@
     <meta property="og:description" content="Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games.">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
-    <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary">
     <meta property="twitter:domain" content="mlbstartingnine.com">
     <meta property="twitter:url" content="https://mlbstartingnine.com/dfs/fanduel/top-third-base/">
@@ -32,7 +29,6 @@
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        /* Updated MLB Starting Nine Header Style */
         .header-brand { 
             font-weight: 900; 
             letter-spacing: -1px; 
@@ -54,12 +50,15 @@
         }
 
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
-        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; }
+        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; }
+        .table th:hover { background-color: #343a40; }
         .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
-        .team-icon { width: 16px; height: 16px; margin-right: 6px; vertical-align: text-bottom; }
+        
+        /* Updated Icon Styling */
+        .team-icon { width: 22px; height: 22px; margin-right: 8px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -81,7 +80,6 @@
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
 
-    <!-- Dropdown Slate Row Filtering -->
     
     <div class="d-flex align-items-center gap-2 mb-3">
         <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
@@ -104,24 +102,22 @@
     </div>
     
 
-    <!-- Proprietary Metric Disclaimer Box -->
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
         <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 
-    <!-- Core Dynamic Data Directory Table -->
     <div class="table-card shadow-sm">
         <div class="table-responsive">
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
                     <tr>
-                        <th style="width: 5%;">Rank</th>
-                        <th>Player</th>
-                        <th>Team</th>
-                        <th>Matchup</th>
-                        <th class="text-end">Salary</th>
-                        <th class="text-end">Proj</th>
-                        <th class="text-end text-primary">Value</th>
+                        <th style="width: 5%;" onclick="sortTable(this, 0)">Rank &#x21D5;</th>
+                        <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                        <th onclick="sortTable(this, 2)">Team &#x21D5;</th>
+                        <th onclick="sortTable(this, 3)">Matchup &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 4)">Salary &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 5)">Proj &#x21D5;</th>
+                        <th class="text-end text-primary" onclick="sortTable(this, 6)">Value &#x21D5;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -135,13 +131,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Cincinnati Reds
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="CIN Icon" class="team-icon"> CIN
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Colorado Rockies
+                                <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="@ COL Icon" class="team-icon"> @ COL
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -158,13 +154,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Kansas City Royals
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="KC Icon" class="team-icon"> KC
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. San Diego Padres
+                                <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="vs. SD Icon" class="team-icon"> vs. SD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,000</td>
@@ -181,13 +177,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> San Diego Padres
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="SD Icon" class="team-icon"> SD
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Kansas City Royals
+                                <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="@ KC Icon" class="team-icon"> @ KC
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -204,13 +200,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Detroit Tigers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="DET Icon" class="team-icon"> DET
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Los Angeles Angels
+                                <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="@ LAA Icon" class="team-icon"> @ LAA
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,400</td>
@@ -227,13 +223,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> San Diego Padres
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="SD Icon" class="team-icon"> SD
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Kansas City Royals
+                                <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="@ KC Icon" class="team-icon"> @ KC
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,300</td>
@@ -250,13 +246,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Chicago Cubs
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="CHC Icon" class="team-icon"> CHC
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Minnesota Twins
+                                <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="vs. MIN Icon" class="team-icon"> vs. MIN
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,100</td>
@@ -273,13 +269,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Washington Nationals
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="WSH Icon" class="team-icon"> WSH
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Athletics
+                                <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="@ OAK Icon" class="team-icon"> @ OAK
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -296,13 +292,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Detroit Tigers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="DET Icon" class="team-icon"> DET
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Los Angeles Angels
+                                <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="@ LAA Icon" class="team-icon"> @ LAA
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,500</td>
@@ -319,13 +315,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Houston Astros
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="HOU Icon" class="team-icon"> HOU
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Baltimore Orioles
+                                <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="vs. BAL Icon" class="team-icon"> vs. BAL
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -342,13 +338,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Kansas City Royals
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="KC Icon" class="team-icon"> KC
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. San Diego Padres
+                                <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="vs. SD Icon" class="team-icon"> vs. SD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,800</td>
@@ -365,13 +361,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> New York Mets
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="NYM Icon" class="team-icon"> NYM
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Philadelphia Phillies
+                                <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="@ PHI Icon" class="team-icon"> @ PHI
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -388,13 +384,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Texas Rangers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="TEX Icon" class="team-icon"> TEX
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Atlanta Braves
+                                <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="@ ATL Icon" class="team-icon"> @ ATL
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,100</td>
@@ -411,13 +407,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Cincinnati Reds
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="CIN Icon" class="team-icon"> CIN
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Colorado Rockies
+                                <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="@ COL Icon" class="team-icon"> @ COL
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$4,000</td>
@@ -434,13 +430,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Arizona Diamondbacks
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="ARI Icon" class="team-icon"> ARI
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. St. Louis Cardinals
+                                <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="vs. STL Icon" class="team-icon"> vs. STL
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,800</td>
@@ -457,13 +453,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Atlanta Braves
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="ATL Icon" class="team-icon"> ATL
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Texas Rangers
+                                <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="vs. TEX Icon" class="team-icon"> vs. TEX
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,700</td>
@@ -480,13 +476,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Boston Red Sox
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="BOS Icon" class="team-icon"> BOS
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Tampa Bay Rays
+                                <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="vs. TB Icon" class="team-icon"> vs. TB
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,500</td>
@@ -503,13 +499,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Atlanta Braves
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="ATL Icon" class="team-icon"> ATL
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Texas Rangers
+                                <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="vs. TEX Icon" class="team-icon"> vs. TEX
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,800</td>
@@ -526,13 +522,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Philadelphia Phillies
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="PHI Icon" class="team-icon"> PHI
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. New York Mets
+                                <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="vs. NYM Icon" class="team-icon"> vs. NYM
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,700</td>
@@ -549,13 +545,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Pittsburgh Pirates
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="PIT Icon" class="team-icon"> PIT
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Cleveland Guardians
+                                <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="@ CLE Icon" class="team-icon"> @ CLE
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,500</td>
@@ -572,13 +568,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Minnesota Twins
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="MIN Icon" class="team-icon"> MIN
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Chicago Cubs
+                                <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="@ CHC Icon" class="team-icon"> @ CHC
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,900</td>
@@ -595,13 +591,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Texas Rangers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="TEX Icon" class="team-icon"> TEX
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Atlanta Braves
+                                <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="@ ATL Icon" class="team-icon"> @ ATL
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,900</td>
@@ -618,13 +614,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Tampa Bay Rays
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="TB Icon" class="team-icon"> TB
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Boston Red Sox
+                                <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="@ BOS Icon" class="team-icon"> @ BOS
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$4,000</td>
@@ -641,13 +637,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Boston Red Sox
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="BOS Icon" class="team-icon"> BOS
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Tampa Bay Rays
+                                <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="vs. TB Icon" class="team-icon"> vs. TB
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,900</td>
@@ -664,13 +660,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Milwaukee Brewers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="MIL Icon" class="team-icon"> MIL
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Miami Marlins
+                                <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="vs. MIA Icon" class="team-icon"> vs. MIA
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,500</td>
@@ -687,13 +683,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> San Francisco Giants
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="SF Icon" class="team-icon"> SF
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Seattle Mariners
+                                <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="@ SEA Icon" class="team-icon"> @ SEA
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -710,13 +706,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Los Angeles Angels
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="LAA Icon" class="team-icon"> LAA
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Detroit Tigers
+                                <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="vs. DET Icon" class="team-icon"> vs. DET
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -733,13 +729,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Baltimore Orioles
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="BAL Icon" class="team-icon"> BAL
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Houston Astros
+                                <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="@ HOU Icon" class="team-icon"> @ HOU
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,600</td>
@@ -756,13 +752,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Minnesota Twins
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="MIN Icon" class="team-icon"> MIN
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Chicago Cubs
+                                <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="@ CHC Icon" class="team-icon"> @ CHC
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -779,13 +775,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Colorado Rockies
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="COL Icon" class="team-icon"> COL
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Cincinnati Reds
+                                <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="vs. CIN Icon" class="team-icon"> vs. CIN
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -802,13 +798,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Minnesota Twins
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="MIN Icon" class="team-icon"> MIN
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Chicago Cubs
+                                <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="@ CHC Icon" class="team-icon"> @ CHC
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,600</td>
@@ -825,13 +821,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> New York Yankees
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="NYY Icon" class="team-icon"> NYY
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Los Angeles Dodgers
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="vs. LAD Icon" class="team-icon"> vs. LAD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,600</td>
@@ -848,13 +844,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> New York Yankees
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="NYY Icon" class="team-icon"> NYY
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Los Angeles Dodgers
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="vs. LAD Icon" class="team-icon"> vs. LAD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,600</td>
@@ -871,13 +867,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> New York Yankees
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="NYY Icon" class="team-icon"> NYY
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Los Angeles Dodgers
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="vs. LAD Icon" class="team-icon"> vs. LAD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$3,800</td>
@@ -894,13 +890,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Toronto Blue Jays
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="TOR Icon" class="team-icon"> TOR
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Chicago White Sox
+                                <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="vs. CWS Icon" class="team-icon"> vs. CWS
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$10,000</td>
@@ -917,13 +913,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Los Angeles Dodgers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="LAD Icon" class="team-icon"> LAD
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ New York Yankees
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="@ NYY Icon" class="team-icon"> @ NYY
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$8,400</td>
@@ -940,13 +936,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Los Angeles Dodgers
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="LAD Icon" class="team-icon"> LAD
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ New York Yankees
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="@ NYY Icon" class="team-icon"> @ NYY
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$8,400</td>
@@ -963,13 +959,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> New York Yankees
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="NYY Icon" class="team-icon"> NYY
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Los Angeles Dodgers
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="vs. LAD Icon" class="team-icon"> vs. LAD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$9,200</td>
@@ -986,13 +982,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> New York Yankees
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="NYY Icon" class="team-icon"> NYY
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. Los Angeles Dodgers
+                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="vs. LAD Icon" class="team-icon"> vs. LAD
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$9,200</td>
@@ -1009,13 +1005,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Chicago White Sox
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="CWS Icon" class="team-icon"> CWS
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Toronto Blue Jays
+                                <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="@ TOR Icon" class="team-icon"> @ TOR
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$12,600</td>
@@ -1032,13 +1028,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> St. Louis Cardinals
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="STL Icon" class="team-icon"> STL
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> @ Arizona Diamondbacks
+                                <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="@ ARI Icon" class="team-icon"> @ ARI
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,500</td>
@@ -1055,13 +1051,13 @@
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> Seattle Mariners
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="SEA Icon" class="team-icon"> SEA
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> vs. San Francisco Giants
+                                <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="vs. SF Icon" class="team-icon"> vs. SF
                             </div>
                         </td>
                         <td class="text-end fw-semibold">$2,700</td>
@@ -1076,6 +1072,7 @@
 </div>
 
 <script>
+// Filter Slates Logic
 function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
@@ -1090,6 +1087,36 @@ function filterSlate(slateId) {
             row.style.display = 'none';
         }
     });
+}
+
+// Clickable Table Sorting Logic
+function sortTable(thElement, colIndex) {
+    const table = thElement.closest("table");
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const isAscending = thElement.classList.contains("asc");
+    
+    table.querySelectorAll("th").forEach(th => {
+        th.classList.remove("asc", "desc");
+    });
+
+    thElement.classList.add(isAscending ? "desc" : "asc");
+    const dirModifier = isAscending ? -1 : 1;
+
+    rows.sort((a, b) => {
+        // Strip out string characters ($ and x) for clean math sorting
+        const aText = a.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
+        const bText = b.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
+        
+        const aVal = isNaN(parseFloat(aText)) ? aText : parseFloat(aText);
+        const bVal = isNaN(parseFloat(bText)) ? bText : parseFloat(bText);
+
+        if (aVal > bVal) return 1 * dirModifier;
+        if (aVal < bVal) return -1 * dirModifier;
+        return 0;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
 }
 </script>
 </body>
