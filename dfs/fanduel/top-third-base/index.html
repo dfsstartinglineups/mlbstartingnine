@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Favicons -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <title>Optimized FanDuel 3B Projections Today - Fantasy Third Base Value</title>
+    <meta name="description" content="Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games.">
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:site_name" content="MLB Starting Nine">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mlbstartingnine.com/dfs/fanduel/top-third-base/">
+    <meta property="og:title" content="Optimized FanDuel 3B Projections Today - Fantasy Third Base Value">
+    <meta property="og:description" content="Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games.">
+    <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta property="twitter:domain" content="mlbstartingnine.com">
+    <meta property="twitter:url" content="https://mlbstartingnine.com/dfs/fanduel/top-third-base/">
+    <meta name="twitter:title" content="Optimized FanDuel 3B Projections Today - Fantasy Third Base Value">
+    <meta name="twitter:description" content="Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games.">
+    <meta name="twitter:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .navbar-brand { font-weight: 800; letter-spacing: -0.5px; }
+        .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
+        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; }
+        .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
+        .player-link { font-weight: 700; color: #212529; text-decoration: none; }
+        .player-link:hover { color: #0d6efd; text-decoration: underline; }
+        .slate-btn { font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; border: 1px solid #ced4da; background: #fff; color: #495057; transition: all 0.2s; }
+        .slate-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+        .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand text-primary" href="/">MLB<span class="text-white">STARTINGNINE</span></a>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">FanDuel Third Base Leaderboard</h1>
+            <p class="text-muted small mb-0">Updated: 2026-07-19 | Real-time Context Performance Matrix</p>
+        </div>
+        <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
+    </div>
+
+    <!-- Interactive Slate Row Filtering -->
+    
+    <div class="d-flex align-items-center gap-2 mb-3 overflow-auto pb-2" style="white-space: nowrap;">
+        <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+        <button class="slate-btn active" data-slate="all" onclick="filterSlate('all', this)">All Games</button>
+        
+        <button class="slate-btn" data-slate="20603" onclick="filterSlate('20603', this)">9 Games  · Main SUN 1:35PM ET</button>
+        
+        <button class="slate-btn" data-slate="20604" onclick="filterSlate('20604', this)">4 Games  · Express SUN 2:10PM ET</button>
+        
+        <button class="slate-btn" data-slate="20605" onclick="filterSlate('20605', this)">4 Games  · Late SUN 4:05PM ET</button>
+        
+        <button class="slate-btn" data-slate="20606" onclick="filterSlate('20606', this)">CWS @ TOR SUN 12:15PM ET</button>
+        
+        <button class="slate-btn" data-slate="20607" onclick="filterSlate('20607', this)">CIN @ COL SUN 3:10PM ET</button>
+        
+        <button class="slate-btn" data-slate="20608" onclick="filterSlate('20608', this)">LAD @ NYY SUN 7:20PM ET</button>
+        
+    </div>
+    
+
+    <!-- Proprietary Metric Disclaimer Box -->
+    <div class="disclaimer-box p-3 mb-4 shadow-sm">
+        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed above are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
+    </div>
+
+    <!-- Core Dynamic Data Directory Table -->
+    <div class="table-card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">Rank</th>
+                        <th>Player</th>
+                        <th>Team</th>
+                        <th>Matchup</th>
+                        <th class="text-end">Salary</th>
+                        <th class="text-end">Proj</th>
+                        <th class="text-end text-primary">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                    <tr data-slates="20603,20607">
+                        <td class="fw-bold text-muted">1</td>
+                        <td><a href="/players/eugenio-suarez/" class="player-link">Eugenio Suarez</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,200</td>
+                        <td class="text-end fw-bold">14.43</td>
+                        <td class="text-end fw-bold text-success">4.51x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20604">
+                        <td class="fw-bold text-muted">2</td>
+                        <td><a href="/players/manny-machado/" class="player-link">Manny Machado</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,000</td>
+                        <td class="text-end fw-bold">12.6</td>
+                        <td class="text-end fw-bold text-success">4.2x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">3</td>
+                        <td><a href="/players/kevin-mcgonigle/" class="player-link">Kevin McGonigle</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,400</td>
+                        <td class="text-end fw-bold">13.31</td>
+                        <td class="text-end fw-bold text-success">3.91x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">4</td>
+                        <td><a href="/players/curtis-mead/" class="player-link">Curtis Mead</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,200</td>
+                        <td class="text-end fw-bold">12.15</td>
+                        <td class="text-end fw-bold text-success">3.8x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20607">
+                        <td class="fw-bold text-muted">5</td>
+                        <td><a href="/players/sal-stewart/" class="player-link">Sal Stewart</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$4,000</td>
+                        <td class="text-end fw-bold">15.14</td>
+                        <td class="text-end fw-bold text-success">3.79x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">6</td>
+                        <td><a href="/players/matt-vierling/" class="player-link">Matt Vierling</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,500</td>
+                        <td class="text-end fw-bold">9.12</td>
+                        <td class="text-end fw-bold text-success">3.65x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">7</td>
+                        <td><a href="/players/bo-bichette/" class="player-link">Bo Bichette</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,000</td>
+                        <td class="text-end fw-bold">10.4</td>
+                        <td class="text-end fw-bold text-success">3.47x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">8</td>
+                        <td><a href="/players/josh-jung/" class="player-link">Josh Jung</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,100</td>
+                        <td class="text-end fw-bold">10.5</td>
+                        <td class="text-end fw-bold text-success">3.39x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">9</td>
+                        <td><a href="/players/jared-triolo/" class="player-link">Jared Triolo</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,500</td>
+                        <td class="text-end fw-bold">8.22</td>
+                        <td class="text-end fw-bold text-success">3.29x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20604">
+                        <td class="fw-bold text-muted">10</td>
+                        <td><a href="/players/royce-lewis/" class="player-link">Royce Lewis</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,900</td>
+                        <td class="text-end fw-bold">9.08</td>
+                        <td class="text-end fw-bold text-success">3.13x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">11</td>
+                        <td><a href="/players/junior-caminero/" class="player-link">Junior Caminero</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$4,000</td>
+                        <td class="text-end fw-bold">11.87</td>
+                        <td class="text-end fw-bold text-success">2.97x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">12</td>
+                        <td><a href="/players/ezequiel-duran/" class="player-link">Ezequiel Duran</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,900</td>
+                        <td class="text-end fw-bold">8.6</td>
+                        <td class="text-end fw-bold text-success">2.97x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20604">
+                        <td class="fw-bold text-muted">13</td>
+                        <td><a href="/players/brooks-lee/" class="player-link">Brooks Lee</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,000</td>
+                        <td class="text-end fw-bold">8.22</td>
+                        <td class="text-end fw-bold text-success">2.74x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">14</td>
+                        <td><a href="/players/casey-schmitt/" class="player-link">Casey Schmitt</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$3,200</td>
+                        <td class="text-end fw-bold">8.54</td>
+                        <td class="text-end fw-bold text-success">2.67x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20604">
+                        <td class="fw-bold text-muted">15</td>
+                        <td><a href="/players/coby-mayo/" class="player-link">Coby Mayo</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,600</td>
+                        <td class="text-end fw-bold">6.89</td>
+                        <td class="text-end fw-bold text-success">2.65x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20604">
+                        <td class="fw-bold text-muted">16</td>
+                        <td><a href="/players/ryan-kreidler/" class="player-link">Ryan Kreidler</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,600</td>
+                        <td class="text-end fw-bold">5.9</td>
+                        <td class="text-end fw-bold text-success">2.27x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">17</td>
+                        <td><a href="/players/max-muncy-571970/" class="player-link">Max Muncy</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$8,400</td>
+                        <td class="text-end fw-bold">9.18</td>
+                        <td class="text-end fw-bold text-success">1.09x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">18</td>
+                        <td><a href="/players/max-muncy-571970/" class="player-link">Max Muncy</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$8,400</td>
+                        <td class="text-end fw-bold">9.0</td>
+                        <td class="text-end fw-bold text-success">1.07x</td>
+                    </tr>
+                    
+                    <tr data-slates="20606">
+                        <td class="fw-bold text-muted">19</td>
+                        <td><a href="/players/miguel-vargas/" class="player-link">Miguel Vargas</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$12,600</td>
+                        <td class="text-end fw-bold">11.86</td>
+                        <td class="text-end fw-bold text-success">0.94x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">20</td>
+                        <td><a href="/players/jose-fermin-665877/" class="player-link">Jose Fermin</a></td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,500</td>
+                        <td class="text-end fw-bold">1.84</td>
+                        <td class="text-end fw-bold text-success">0.74x</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterSlate(slateId, btn) {
+    document.querySelectorAll('.slate-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    const rows = document.querySelectorAll('#leaderboard-table tbody tr');
+    rows.forEach(row => {
+        if (slateId === 'all') {
+            row.style.display = '';
+            return;
+        }
+        const rowSlates = row.getAttribute('data-slates').split(',');
+        if (rowSlates.includes(slateId)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+</body>
+</html>
