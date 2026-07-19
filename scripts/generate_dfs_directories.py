@@ -31,60 +31,21 @@ TEAM_BAD_PENALTY = -0.050
 # =========================================================================
 SEO_METADATA = {
     "draftkings": {
-        "pitchers": {
-            "title": "Top DraftKings Pitcher Projections Today - DFS Lineup Values",
-            "desc": "Optimized DraftKings pitcher projections for today's MLB slate. Discover proprietary value ratings, projected stats, and custom vegas splits."
-        },
-        "catchers": {
-            "title": "Best DraftKings Catchers Today - Daily Fantasy C Projections",
-            "desc": "Daily fantasy baseball rankings for DraftKings catchers. View calculated values, salaries, and platoon advantages for today's games."
-        },
-        "first-base": {
-            "title": "Top DraftKings 1B Projections Today - Elite First Base Value",
-            "desc": "Analyze today's DraftKings first base projections. Get proprietary performance multipliers, matchup stats, and salary rankings."
-        },
-        "second-base": {
-            "title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings",
-            "desc": "Unlock top-rated DraftKings second base projections. Real-time situational performance matrices for today's fantasy baseball slates."
-        },
-        "third-base": {
-            "title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base",
-            "desc": "Premium DraftKings third base projections featuring advanced park factor adjustments, batting order weights, and optimizer data."
-        },
-        "shortstops": {
-            "title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections",
-            "desc": "Compare daily fantasy shortstop values on DraftKings. Updated projections utilizing proprietary BvP and Vegas linescoring data."
-        },
-        "outfielders": {
-            "title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid",
-            "desc": "Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly."
-        }
+        "pitchers": {"title": "Top DraftKings Pitcher Projections Today - DFS Lineup Values", "desc": "Optimized DraftKings pitcher projections for today's MLB slate. Discover proprietary value ratings, projected stats, and custom vegas splits."},
+        "catchers": {"title": "Best DraftKings Catchers Today - Daily Fantasy C Projections", "desc": "Daily fantasy baseball rankings for DraftKings catchers. View calculated values, salaries, and platoon advantages for today's games."},
+        "first-base": {"title": "Top DraftKings 1B Projections Today - Elite First Base Value", "desc": "Analyze today's DraftKings first base projections. Get proprietary performance multipliers, matchup stats, and salary rankings."},
+        "second-base": {"title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings", "desc": "Unlock top-rated DraftKings second base projections. Real-time situational performance matrices for today's fantasy baseball slates."},
+        "third-base": {"title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base", "desc": "Premium DraftKings third base projections featuring advanced park factor adjustments, batting order weights, and optimizer data."},
+        "shortstops": {"title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections", "desc": "Compare daily fantasy shortstop values on DraftKings. Updated projections utilizing proprietary BvP and Vegas linescoring data."},
+        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly."}
     },
     "fanduel": {
-        "pitchers": {
-            "title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball",
-            "desc": "Maximize your FanDuel pitching slot with real-time projections, advanced umpire data, and proprietary situational matchup scoring."
-        },
-        "catchers-first-base": {
-            "title": "Best FanDuel C/1B Projections Today - Catchers & First Base Value",
-            "desc": "Optimized FanDuel combined Catcher and First Base projections. View real-time value scores adjusted for park metrics and platoon splits."
-        },
-        "second-base": {
-            "title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks",
-            "desc": "Find the highest-value second basemen on FanDuel today. Projections calculated via proprietary live vegas total adjustments."
-        },
-        "third-base": {
-            "title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value",
-            "desc": "Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games."
-        },
-        "shortstops": {
-            "title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings",
-            "desc": "Daily updated FanDuel shortstop projections. Real-time value tiers using current matchup analytics and confirmed official starting lineups."
-        },
-        "outfielders": {
-            "title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings",
-            "desc": "Deep-dive FanDuel outfielder value tables. The ultimate tool for finding elite, mid-tier, and value salary plays for tonight's slates."
-        }
+        "pitchers": {"title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball", "desc": "Maximize your FanDuel pitching slot with real-time projections, advanced umpire data, and proprietary situational matchup scoring."},
+        "catchers-first-base": {"title": "Best FanDuel C/1B Projections Today - Catchers & First Base Value", "desc": "Optimized FanDuel combined Catcher and First Base projections. View real-time value scores adjusted for park metrics and platoon splits."},
+        "second-base": {"title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks", "desc": "Find the highest-value second basemen on FanDuel today. Projections calculated via proprietary live vegas total adjustments."},
+        "third-base": {"title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value", "desc": "Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games."},
+        "shortstops": {"title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings", "desc": "Daily updated FanDuel shortstop projections. Real-time value tiers using current matchup analytics and confirmed official starting lineups."},
+        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Deep-dive FanDuel outfielder value tables. The ultimate tool for finding elite, mid-tier, and value salary plays for tonight's slates."}
     }
 }
 
@@ -120,6 +81,17 @@ def get_player_url(player_id, default_name):
 # =========================================================================
 # --- 4. PROPRIETARY ALGORITHM NUDGES ---
 # =========================================================================
+def get_team_abbr(game_node, side):
+    """Safely extracts team abbreviations."""
+    # Try Lineup JSON schema fallback first
+    if f"{side}Team" in game_node and isinstance(game_node[f"{side}Team"], dict) and "abbreviation" in game_node[f"{side}Team"]:
+        return game_node[f"{side}Team"]["abbreviation"]
+    # Try Standard statsapi schema
+    raw_teams = game_node.get("gameRaw", {}).get("teams", {})
+    if side in raw_teams and "team" in raw_teams[side] and "abbreviation" in raw_teams[side]["team"]:
+        return raw_teams[side]["team"]["abbreviation"]
+    return "AWAY" if side == "away" else "HOME"
+
 def calculate_vegas_nudge(itt):
     if itt >= TEAM_MEGA_SCORE: return TEAM_MEGA_BOOST
     elif itt >= TEAM_ELITE_SCORE: return TEAM_ELITE_BOOST
@@ -127,7 +99,7 @@ def calculate_vegas_nudge(itt):
     elif 0 < itt <= TEAM_BAD_SCORE: return TEAM_BAD_PENALTY
     return 0.0
 
-def process_proprietary_projection(player, is_pitcher, team_abbr, opp_abbr, game, is_dk=False):
+def process_proprietary_projection(player, is_pitcher, team_abbr, opp_abbr, is_home, game, is_dk=False):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
     
@@ -149,7 +121,6 @@ def process_proprietary_projection(player, is_pitcher, team_abbr, opp_abbr, game
     away_itt = round(total / 2.0, 2) if total > 0 else 4.2
     home_itt = round(total / 2.0, 2) if total > 0 else 4.2
     
-    is_home = (team_abbr == game.get("gameRaw", {}).get("teams", {}).get("home", {}).get("team", {}).get("name", ""))
     my_itt = home_itt if is_home else away_itt
     opp_itt = away_itt if is_home else home_itt
 
@@ -226,22 +197,43 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .navbar-brand { font-weight: 800; letter-spacing: -0.5px; }
+        
+        /* Updated MLB Starting Nine Header Style */
+        .header-brand { 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            font-size: 2rem; 
+            color: #fff; 
+            font-style: italic; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+        .header-brand a { color: inherit; text-decoration: none; }
+        .header-brand span { 
+            text-shadow: none !important;
+            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
+            padding-right: 2px; 
+            display: inline-block; 
+        }
+
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
         .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; }
         .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
-        .slate-btn { font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; border: 1px solid #ced4da; background: #fff; color: #495057; transition: all 0.2s; }
-        .slate-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-    <div class="container">
-        <a class="navbar-brand text-primary" href="/">MLB<span class="text-white">STARTINGNINE</span></a>
+<nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="header-brand mb-2 mb-md-0">
+            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
+        </div>
     </div>
 </nav>
 
@@ -254,20 +246,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
 
-    <!-- Interactive Slate Row Filtering -->
+    <!-- Dropdown Slate Row Filtering -->
     {% if distinct_slates %}
-    <div class="d-flex align-items-center gap-2 mb-3 overflow-auto pb-2" style="white-space: nowrap;">
+    <div class="d-flex align-items-center gap-2 mb-3">
         <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-        <button class="slate-btn active" data-slate="all" onclick="filterSlate('all', this)">All Games</button>
-        {% for s_id, s_name in distinct_slates.items() %}
-        <button class="slate-btn" data-slate="{{ s_id }}" onclick="filterSlate('{{ s_id }}', this)">{{ s_name }}</button>
-        {% endfor %}
+        <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
+            <option value="all">All Games</option>
+            {% for s_id, s_name in distinct_slates.items() %}
+            <option value="{{ s_id }}">{{ s_name }}</option>
+            {% endfor %}
+        </select>
     </div>
     {% endif %}
 
     <!-- Proprietary Metric Disclaimer Box -->
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
-        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed above are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
+        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 
     <!-- Core Dynamic Data Directory Table -->
@@ -289,7 +283,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     {% for p in players %}
                     <tr data-slates="{{ p.slates }}">
                         <td class="fw-bold text-muted">{{ loop.index }}</td>
-                        <td><a href="{{ p.url }}" class="player-link">{{ p.name }}</a></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">{{ p.team }}</span></td>
                         <td class="text-muted font-monospace">{{ p.opponent }}</td>
                         <td class="text-end fw-semibold">${{ "{:,}".format(p.salary) }}</td>
@@ -304,10 +303,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>
-function filterSlate(slateId, btn) {
-    document.querySelectorAll('.slate-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
+function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
         if (slateId === 'all') {
@@ -377,24 +373,27 @@ def main():
 
     for game in games_list:
         p_data = game.get("projectedLineups", {})
-        away_team = game.get("gameRaw", {}).get("teams", {}).get("away", {}).get("team", {}).get("abbreviation", "AWAY")
-        home_team = game.get("gameRaw", {}).get("teams", {}).get("home", {}).get("team", {}).get("abbreviation", "HOME")
+        
+        # Safely fetch abbreviations
+        away_team = get_team_abbr(game, "away")
+        home_team = get_team_abbr(game, "home")
 
-        for side, team, opp in [("away", away_team, home_team), ("top", home_team, away_team)]:
+        # Properly match side block with correct context flags
+        for side, team, opp, is_home in [("away", away_team, home_team, False), ("home", home_team, away_team, True)]:
             side_node = p_data.get(side, {})
             
             pitcher = side_node.get("startingPitcher")
             if pitcher:
                 if has_dk_data:
-                    p_res = process_proprietary_projection(pitcher, True, team, opp, game, is_dk=True)
+                    p_res = process_proprietary_projection(pitcher, True, team, opp, is_home, game, is_dk=True)
                     if p_res: dk_pools["pitchers"].append(p_res)
                 if has_fd_data:
-                    p_res = process_proprietary_projection(pitcher, True, team, opp, game, is_dk=False)
+                    p_res = process_proprietary_projection(pitcher, True, team, opp, is_home, game, is_dk=False)
                     if p_res: fd_pools["pitchers"].append(p_res)
 
             for batter in side_node.get("battingOrder", []):
                 if has_dk_data:
-                    p_res = process_proprietary_projection(batter, False, team, opp, game, is_dk=True)
+                    p_res = process_proprietary_projection(batter, False, team, opp, is_home, game, is_dk=True)
                     if p_res:
                         dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
                         for raw_pos in dk_positions:
@@ -407,7 +406,7 @@ def main():
                             elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
 
                 if has_fd_data:
-                    p_res = process_proprietary_projection(batter, False, team, opp, game, is_dk=False)
+                    p_res = process_proprietary_projection(batter, False, team, opp, is_home, game, is_dk=False)
                     if p_res:
                         fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
                         for raw_pos in fd_positions:
