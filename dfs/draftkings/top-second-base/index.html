@@ -74,7 +74,7 @@
             }
             .player-link { font-size: 0.80rem; }
             .team-icon { width: 16px; height: 16px; margin-right: 4px; }
-            .col-rank { width: auto !important; padding-right: 2px !important; }
+            .col-rank { padding-right: 4px !important; padding-left: 4px !important; }
         }
     </style>
 </head>
@@ -158,7 +158,7 @@
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
                     <tr>
-                        <th style="width: 5%;" onclick="sortTable(this, 0)">Rank &#x21D5;</th>
+                        <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
                         <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
                         <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
@@ -169,13 +169,13 @@
                 </thead>
                 <tbody>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$2,100", "proj": "6.92", "value": "3.30x"}, "24D06": {"salary": "$2,100", "proj": "6.92", "value": "3.30x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$2,100", "proj": "6.92", "value": "3.30x"}, "24D01": {"salary": "$2,100", "proj": "6.92", "value": "3.30x"}}' 
                         data-default-salary="$2,100" 
                         data-default-proj="6.92" 
                         data-default-value="3.3x">
                         
-                        <td class="fw-bold text-muted col-rank">1</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">1</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/kansas-city-royals/" class="text-decoration-none">
@@ -209,7 +209,7 @@
                         data-default-proj="6.97" 
                         data-default-value="2.9x">
                         
-                        <td class="fw-bold text-muted col-rank">2</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">2</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/detroit-tigers/" class="text-decoration-none">
@@ -243,7 +243,7 @@
                         data-default-proj="8.32" 
                         data-default-value="2.6x">
                         
-                        <td class="fw-bold text-muted col-rank">3</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">3</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/athletics/" class="text-decoration-none">
@@ -277,7 +277,7 @@
                         data-default-proj="8.63" 
                         data-default-value="2.47x">
                         
-                        <td class="fw-bold text-muted col-rank">4</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">4</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/toronto-blue-jays/" class="text-decoration-none">
@@ -311,7 +311,7 @@
                         data-default-proj="6.76" 
                         data-default-value="2.41x">
                         
-                        <td class="fw-bold text-muted col-rank">5</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">5</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
@@ -339,13 +339,13 @@
                         <td class="text-end fw-bold col-proj">6.76</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$2,100", "proj": "4.66", "value": "2.22x"}, "24D06": {"salary": "$2,100", "proj": "4.66", "value": "2.22x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$2,100", "proj": "4.66", "value": "2.22x"}, "24D01": {"salary": "$2,100", "proj": "4.66", "value": "2.22x"}}' 
                         data-default-salary="$2,100" 
                         data-default-proj="4.66" 
                         data-default-value="2.22x">
                         
-                        <td class="fw-bold text-muted col-rank">6</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">6</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -373,13 +373,13 @@
                         <td class="text-end fw-bold col-proj">4.66</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D05" 
-                        data-slate-stats='{"24D01": {"salary": "$2,700", "proj": "5.92", "value": "2.19x"}, "24D05": {"salary": "$5,000", "proj": "5.92", "value": "1.18x"}}' 
+                    <tr data-slates="24D05,24D01" 
+                        data-slate-stats='{"24D05": {"salary": "$5,000", "proj": "5.92", "value": "1.18x"}, "24D01": {"salary": "$2,700", "proj": "5.92", "value": "2.19x"}}' 
                         data-default-salary="$2,700" 
                         data-default-proj="5.92" 
                         data-default-value="2.19x">
                         
-                        <td class="fw-bold text-muted col-rank">7</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">7</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -413,7 +413,7 @@
                         data-default-proj="8.05" 
                         data-default-value="2.18x">
                         
-                        <td class="fw-bold text-muted col-rank">8</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">8</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/washington-nationals/" class="text-decoration-none">
@@ -447,7 +447,7 @@
                         data-default-proj="7.7" 
                         data-default-value="2.14x">
                         
-                        <td class="fw-bold text-muted col-rank">9</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">9</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/boston-red-sox/" class="text-decoration-none">
@@ -475,13 +475,13 @@
                         <td class="text-end fw-bold col-proj">7.7</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$2,400", "proj": "5.14", "value": "2.14x"}, "24D06": {"salary": "$2,400", "proj": "5.14", "value": "2.14x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$2,400", "proj": "5.14", "value": "2.14x"}, "24D01": {"salary": "$2,400", "proj": "5.14", "value": "2.14x"}}' 
                         data-default-salary="$2,400" 
                         data-default-proj="5.14" 
                         data-default-value="2.14x">
                         
-                        <td class="fw-bold text-muted col-rank">10</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">10</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
@@ -509,13 +509,13 @@
                         <td class="text-end fw-bold col-proj">5.14</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$3,900", "proj": "8.32", "value": "2.13x"}, "24D06": {"salary": "$3,900", "proj": "8.32", "value": "2.13x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$3,900", "proj": "8.32", "value": "2.13x"}, "24D01": {"salary": "$3,900", "proj": "8.32", "value": "2.13x"}}' 
                         data-default-salary="$3,900" 
                         data-default-proj="8.32" 
                         data-default-value="2.13x">
                         
-                        <td class="fw-bold text-muted col-rank">11</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">11</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -549,7 +549,7 @@
                         data-default-proj="6.27" 
                         data-default-value="2.09x">
                         
-                        <td class="fw-bold text-muted col-rank">12</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">12</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-angels/" class="text-decoration-none">
@@ -577,13 +577,13 @@
                         <td class="text-end fw-bold col-proj">6.27</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D05" 
-                        data-slate-stats='{"24D01": {"salary": "$3,200", "proj": "6.60", "value": "2.06x"}, "24D05": {"salary": "$6,000", "proj": "6.60", "value": "1.10x"}}' 
+                    <tr data-slates="24D05,24D01" 
+                        data-slate-stats='{"24D05": {"salary": "$6,000", "proj": "6.60", "value": "1.10x"}, "24D01": {"salary": "$3,200", "proj": "6.60", "value": "2.06x"}}' 
                         data-default-salary="$3,200" 
                         data-default-proj="6.6" 
                         data-default-value="2.06x">
                         
-                        <td class="fw-bold text-muted col-rank">13</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">13</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -611,13 +611,13 @@
                         <td class="text-end fw-bold col-proj">6.6</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$3,500", "proj": "7.10", "value": "2.03x"}, "24D06": {"salary": "$3,500", "proj": "7.10", "value": "2.03x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$3,500", "proj": "7.10", "value": "2.03x"}, "24D01": {"salary": "$3,500", "proj": "7.10", "value": "2.03x"}}' 
                         data-default-salary="$3,500" 
                         data-default-proj="7.1" 
                         data-default-value="2.03x">
                         
-                        <td class="fw-bold text-muted col-rank">14</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">14</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/chicago-cubs/" class="text-decoration-none">
@@ -651,7 +651,7 @@
                         data-default-proj="4.95" 
                         data-default-value="1.98x">
                         
-                        <td class="fw-bold text-muted col-rank">15</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">15</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/texas-rangers/" class="text-decoration-none">
@@ -685,7 +685,7 @@
                         data-default-proj="9.9" 
                         data-default-value="1.98x">
                         
-                        <td class="fw-bold text-muted col-rank">16</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">16</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/arizona-diamondbacks/" class="text-decoration-none">
@@ -719,7 +719,7 @@
                         data-default-proj="8.01" 
                         data-default-value="1.91x">
                         
-                        <td class="fw-bold text-muted col-rank">17</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">17</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/atlanta-braves/" class="text-decoration-none">
@@ -753,7 +753,7 @@
                         data-default-proj="5.27" 
                         data-default-value="1.88x">
                         
-                        <td class="fw-bold text-muted col-rank">18</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">18</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-angels/" class="text-decoration-none">
@@ -781,13 +781,13 @@
                         <td class="text-end fw-bold col-proj">5.27</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D05" 
-                        data-slate-stats='{"24D01": {"salary": "$4,000", "proj": "7.40", "value": "1.85x"}, "24D05": {"salary": "$7,400", "proj": "7.40", "value": "1.00x"}}' 
+                    <tr data-slates="24D05,24D01" 
+                        data-slate-stats='{"24D05": {"salary": "$7,400", "proj": "7.40", "value": "1.00x"}, "24D01": {"salary": "$4,000", "proj": "7.40", "value": "1.85x"}}' 
                         data-default-salary="$4,000" 
                         data-default-proj="7.4" 
                         data-default-value="1.85x">
                         
-                        <td class="fw-bold text-muted col-rank">19</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">19</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/philadelphia-phillies/" class="text-decoration-none">
@@ -815,13 +815,13 @@
                         <td class="text-end fw-bold col-proj">7.4</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$4,500", "proj": "8.22", "value": "1.83x"}, "24D06": {"salary": "$4,500", "proj": "8.22", "value": "1.83x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$4,500", "proj": "8.22", "value": "1.83x"}, "24D01": {"salary": "$4,500", "proj": "8.22", "value": "1.83x"}}' 
                         data-default-salary="$4,500" 
                         data-default-proj="8.22" 
                         data-default-value="1.83x">
                         
-                        <td class="fw-bold text-muted col-rank">20</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">20</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/miami-marlins/" class="text-decoration-none">
@@ -855,7 +855,7 @@
                         data-default-proj="5.86" 
                         data-default-value="1.83x">
                         
-                        <td class="fw-bold text-muted col-rank">21</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">21</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/seattle-mariners/" class="text-decoration-none">
@@ -883,13 +883,13 @@
                         <td class="text-end fw-bold col-proj">5.86</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$3,100", "proj": "5.60", "value": "1.81x"}, "24D06": {"salary": "$3,100", "proj": "5.60", "value": "1.81x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$3,100", "proj": "5.60", "value": "1.81x"}, "24D01": {"salary": "$3,100", "proj": "5.60", "value": "1.81x"}}' 
                         data-default-salary="$3,100" 
                         data-default-proj="5.6" 
                         data-default-value="1.81x">
                         
-                        <td class="fw-bold text-muted col-rank">22</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">22</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/chicago-cubs/" class="text-decoration-none">
@@ -917,13 +917,13 @@
                         <td class="text-end fw-bold col-proj">5.6</td>
                     </tr>
                     
-                    <tr data-slates="24D0C,24E22" 
-                        data-slate-stats='{"24D0C": {"salary": "$6,600", "proj": "7.79", "value": "1.18x"}, "24E22": {"salary": "$4,400", "proj": "7.79", "value": "1.77x"}}' 
+                    <tr data-slates="24E22,24D0C" 
+                        data-slate-stats='{"24E22": {"salary": "$4,400", "proj": "7.79", "value": "1.77x"}, "24D0C": {"salary": "$6,600", "proj": "7.79", "value": "1.18x"}}' 
                         data-default-salary="$4,400" 
                         data-default-proj="7.79" 
                         data-default-value="1.77x">
                         
-                        <td class="fw-bold text-muted col-rank">23</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">23</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-yankees/" class="text-decoration-none">
@@ -957,7 +957,7 @@
                         data-default-proj="8.09" 
                         data-default-value="1.76x">
                         
-                        <td class="fw-bold text-muted col-rank">24</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">24</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/st-louis-cardinals/" class="text-decoration-none">
@@ -985,13 +985,13 @@
                         <td class="text-end fw-bold col-proj">8.09</td>
                     </tr>
                     
-                    <tr data-slates="24D0C,24E22" 
-                        data-slate-stats='{"24D0C": {"salary": "$6,600", "proj": "7.60", "value": "1.15x"}, "24E22": {"salary": "$4,400", "proj": "7.60", "value": "1.73x"}}' 
+                    <tr data-slates="24E22,24D0C" 
+                        data-slate-stats='{"24E22": {"salary": "$4,400", "proj": "7.60", "value": "1.73x"}, "24D0C": {"salary": "$6,600", "proj": "7.60", "value": "1.15x"}}' 
                         data-default-salary="$4,400" 
                         data-default-proj="7.6" 
                         data-default-value="1.73x">
                         
-                        <td class="fw-bold text-muted col-rank">25</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">25</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-yankees/" class="text-decoration-none">
@@ -1019,13 +1019,13 @@
                         <td class="text-end fw-bold col-proj">7.6</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$5,200", "proj": "8.84", "value": "1.70x"}, "24D06": {"salary": "$5,200", "proj": "8.84", "value": "1.70x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$5,200", "proj": "8.84", "value": "1.70x"}, "24D01": {"salary": "$5,200", "proj": "8.84", "value": "1.70x"}}' 
                         data-default-salary="$5,200" 
                         data-default-proj="8.84" 
                         data-default-value="1.7x">
                         
-                        <td class="fw-bold text-muted col-rank">26</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">26</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
@@ -1053,13 +1053,13 @@
                         <td class="text-end fw-bold col-proj">8.84</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$3,700", "proj": "6.01", "value": "1.62x"}, "24D06": {"salary": "$3,700", "proj": "6.01", "value": "1.62x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$3,700", "proj": "6.01", "value": "1.62x"}, "24D01": {"salary": "$3,700", "proj": "6.01", "value": "1.62x"}}' 
                         data-default-salary="$3,700" 
                         data-default-proj="6.01" 
                         data-default-value="1.62x">
                         
-                        <td class="fw-bold text-muted col-rank">27</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">27</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/baltimore-orioles/" class="text-decoration-none">
@@ -1093,7 +1093,7 @@
                         data-default-proj="6.34" 
                         data-default-value="1.55x">
                         
-                        <td class="fw-bold text-muted col-rank">28</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">28</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
@@ -1127,7 +1127,7 @@
                         data-default-proj="4.91" 
                         data-default-value="1.49x">
                         
-                        <td class="fw-bold text-muted col-rank">29</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">29</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/athletics/" class="text-decoration-none">
@@ -1161,7 +1161,7 @@
                         data-default-proj="6.43" 
                         data-default-value="1.46x">
                         
-                        <td class="fw-bold text-muted col-rank">30</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">30</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/san-francisco-giants/" class="text-decoration-none">
@@ -1195,7 +1195,7 @@
                         data-default-proj="5.51" 
                         data-default-value="1.45x">
                         
-                        <td class="fw-bold text-muted col-rank">31</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">31</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/colorado-rockies/" class="text-decoration-none">
@@ -1223,13 +1223,13 @@
                         <td class="text-end fw-bold col-proj">5.51</td>
                     </tr>
                     
-                    <tr data-slates="24D0C,24E22" 
-                        data-slate-stats='{"24D0C": {"salary": "$6,800", "proj": "6.35", "value": "0.93x"}, "24E22": {"salary": "$4,600", "proj": "6.35", "value": "1.38x"}}' 
+                    <tr data-slates="24E22,24D0C" 
+                        data-slate-stats='{"24E22": {"salary": "$4,600", "proj": "6.35", "value": "1.38x"}, "24D0C": {"salary": "$6,800", "proj": "6.35", "value": "0.93x"}}' 
                         data-default-salary="$4,600" 
                         data-default-proj="6.35" 
                         data-default-value="1.38x">
                         
-                        <td class="fw-bold text-muted col-rank">32</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">32</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -1257,13 +1257,13 @@
                         <td class="text-end fw-bold col-proj">6.35</td>
                     </tr>
                     
-                    <tr data-slates="24D0C,24E22" 
-                        data-slate-stats='{"24D0C": {"salary": "$6,800", "proj": "6.01", "value": "0.88x"}, "24E22": {"salary": "$4,600", "proj": "6.01", "value": "1.31x"}}' 
+                    <tr data-slates="24E22,24D0C" 
+                        data-slate-stats='{"24E22": {"salary": "$4,600", "proj": "6.01", "value": "1.31x"}, "24D0C": {"salary": "$6,800", "proj": "6.01", "value": "0.88x"}}' 
                         data-default-salary="$4,600" 
                         data-default-proj="6.01" 
                         data-default-value="1.31x">
                         
-                        <td class="fw-bold text-muted col-rank">33</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">33</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -1291,13 +1291,13 @@
                         <td class="text-end fw-bold col-proj">6.01</td>
                     </tr>
                     
-                    <tr data-slates="24D01,24D06" 
-                        data-slate-stats='{"24D01": {"salary": "$4,700", "proj": "5.70", "value": "1.21x"}, "24D06": {"salary": "$4,700", "proj": "5.70", "value": "1.21x"}}' 
+                    <tr data-slates="24D06,24D01" 
+                        data-slate-stats='{"24D06": {"salary": "$4,700", "proj": "5.70", "value": "1.21x"}, "24D01": {"salary": "$4,700", "proj": "5.70", "value": "1.21x"}}' 
                         data-default-salary="$4,700" 
                         data-default-proj="5.7" 
                         data-default-value="1.21x">
                         
-                        <td class="fw-bold text-muted col-rank">34</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">34</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/minnesota-twins/" class="text-decoration-none">
@@ -1331,7 +1331,7 @@
                         data-default-proj="7.66" 
                         data-default-value="1.09x">
                         
-                        <td class="fw-bold text-muted col-rank">35</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">35</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/colorado-rockies/" class="text-decoration-none">
