@@ -4,7 +4,7 @@ import re
 import unicodedata
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from datetime import datetime
+from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 # Path Configurations
@@ -23,7 +23,6 @@ def slugify(text):
     return re.sub(r"[\s-]+", "-", text).strip("-")
 
 def get_target_slate_date():
-    """Matches the precise logic used by player_core.js for late-night slates."""
     now = datetime.now(ZoneInfo("America/New_York"))
     if now.hour < 4:
         now = now - timedelta(days=1)
@@ -51,11 +50,50 @@ def load_json_safe(path):
             pass
     return {}
 
+def update_sitemap(new_player_urls):
+    existing_urls = set()
+    if os.path.exists(SITEMAP_OUTPUT_PATH):
+        try:
+            ET.register_namespace('', "http://www.sitemaps.org/schemas/sitemap/0.9")
+            tree = ET.parse(SITEMAP_OUTPUT_PATH)
+            root = tree.getroot()
+            for loc in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc"):
+                if loc.text: existing_urls.add(loc.text.strip())
+        except Exception:
+            pass
+
+    home_url = f"{DOMAIN}/"
+    existing_urls.add(home_url)
+    for url in new_player_urls:
+        existing_urls.add(url)
+
+    xml_root = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
+    for url in sorted(list(existing_urls)):
+        url_node = ET.SubElement(xml_root, 'url')
+        ET.SubElement(url_node, 'loc').text = url
+        if url == home_url:
+            ET.SubElement(url_node, 'changefreq').text = "always"
+            ET.SubElement(url_node, 'priority').text = "1.0"
+        elif "/lineups/" in url:
+            ET.SubElement(url_node, 'changefreq').text = "daily"
+            ET.SubElement(url_node, 'priority').text = "0.9"
+        elif "/players/" in url:
+            ET.SubElement(url_node, 'changefreq').text = "daily"
+            ET.SubElement(url_node, 'priority').text = "0.8"
+        else:
+            ET.SubElement(url_node, 'changefreq').text = "weekly"
+            ET.SubElement(url_node, 'priority').text = "0.6"
+
+    raw_xml = ET.tostring(xml_root, 'utf-8')
+    parsed_xml = minidom.parseString(raw_xml)
+    pretty_xml = parsed_xml.toprettyxml(indent="  ")
+    with open(SITEMAP_OUTPUT_PATH, "w", encoding="utf-8") as f:
+        f.write("\n".join([line for line in pretty_xml.splitlines() if line.strip()]))
+
 # ==========================================
-# 2. MATCHUP ENGINE (PORTED FROM JS)
+# 2. MATCHUP ENGINE
 # ==========================================
 def resolve_active_matchup(player_id, team_name, daily_data):
-    """Finds the player's active game, handling doubleheaders precisely like player_core.js."""
     matching_games = []
     p_id_str = str(player_id)
     
@@ -76,32 +114,25 @@ def resolve_active_matchup(player_id, team_name, daily_data):
                    p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("away", {}).get("battingOrder", [])] or 
                    away_p == p_id_str or (away_team_name and away_team_name in team_name))
                    
-        if in_home:
-            matching_games.append({"game": game, "teamSide": "home"})
-        if in_away:
-            matching_games.append({"game": game, "teamSide": "away"})
+        if in_home: matching_games.append({"game": game, "teamSide": "home"})
+        if in_away: matching_games.append({"game": game, "teamSide": "away"})
             
-    if not matching_games:
-        return None, None
+    if not matching_games: return None, None
         
     if len(matching_games) > 1:
         live_match = next((m for m in matching_games if m["game"].get("gameRaw", {}).get("status", {}).get("abstractGameState") in ["Live", "In Progress"]), None)
         upcoming_match = next((m for m in matching_games if m["game"].get("gameRaw", {}).get("status", {}).get("abstractGameState") in ["Preview", "Scheduled"]), None)
-        if live_match:
-            return live_match["game"], live_match["teamSide"]
-        elif upcoming_match:
-            return upcoming_match["game"], upcoming_match["teamSide"]
-        else:
-            return matching_games[-1]["game"], matching_games[-1]["teamSide"]
+        if live_match: return live_match["game"], live_match["teamSide"]
+        elif upcoming_match: return upcoming_match["game"], upcoming_match["teamSide"]
+        else: return matching_games[-1]["game"], matching_games[-1]["teamSide"]
             
     return matching_games[0]["game"], matching_games[0]["teamSide"]
 
 # ==========================================
-# 3. HTML SUB-RENDERERS (COMPONENTS)
+# 3. HTML SUB-RENDERERS
 # ==========================================
 def render_badge_zone(player_id, team_side, my_game):
     game_raw = my_game.get("gameRaw", {})
-    opp_side = "home" if team_side == "away" else "away"
     my_team_id = game_raw.get("teams", {}).get(team_side, {}).get("team", {}).get("id", 119)
     tracking_node = my_game.get("lineupTracking", {}).get(team_side, {})
     
@@ -110,13 +141,13 @@ def render_badge_zone(player_id, team_side, my_game):
     is_postponed = "Postponed" in abstract_state or "Postponed" in detailed_state or game_raw.get("status", {}).get("statusCode") == "C"
     
     if is_postponed:
-        return `<div class="badge bg-danger p-2 w-100 shadow-sm text-uppercase fw-bold text-white">✕ GAME POSTPONED</div>`
+        return '<div class="badge bg-danger p-2 w-100 shadow-sm text-uppercase fw-bold text-white">✕ GAME POSTPONED</div>'
         
     is_starting_pitcher = (str(game_raw.get("teams", {}).get(team_side, {}).get("probablePitcher", {}).get("id", "")) == str(player_id) or 
                            str(my_game.get("projectedLineups", {}).get(team_side, {}).get("startingPitcher", {}).get("id", "")) == str(player_id))
                            
     if is_starting_pitcher:
-        badge_html = `<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Starting Pitcher</div>`
+        badge_html = '<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Starting Pitcher</div>'
     else:
         actual_lineup = game_raw.get("lineups", {}).get(f"{team_side}Players", [])
         has_live_lineup = len(actual_lineup) > 0
@@ -132,17 +163,17 @@ def render_badge_zone(player_id, team_side, my_game):
             slot_index = next((i for i, p in enumerate(proj_order) if str(p.get("id")) == str(player_id)), -1)
             
         if is_confirmed and slot_index != -1:
-            badge_html = f`<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Batting #{slot_index + 1}</div>`
+            badge_html = f'<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Batting #{slot_index + 1}</div>'
         elif is_confirmed and slot_index == -1:
-            badge_html = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT STARTING</div>`
+            badge_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT STARTING</div>'
         elif slot_index != -1:
-            badge_html = f`<div class="badge status-badge-projected p-2 w-100 shadow-sm text-uppercase text-dark">Projected #{slot_index + 1}</div>`
+            badge_html = f'<div class="badge status-badge-projected p-2 w-100 shadow-sm text-uppercase text-dark">Projected #{slot_index + 1}</div>'
         else:
-            badge_html = `<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT PROJECTED TO START</div>`
+            badge_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT PROJECTED TO START</div>'
             
     team_slug = get_slug_from_team_id(my_team_id)
     lineup_link_text = "View Official Lineup" if (tracking_node.get("status") in ["OFFICIAL", "CONFIRMED"]) else "View Projected Lineup"
-    link_html = f`<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>`
+    link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
     
     return f'<div class="mb-3">{badge_html}{link_html}</div>'
 
@@ -231,7 +262,6 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
     bvp_html = ""
     
     if not is_pitcher:
-        # Batter Analytics & HR Probability Engine
         split_r = p_deep_stats.get("split_vR", {})
         split_l = p_deep_stats.get("split_vL", {})
         opp_hand = my_game.get("lineupHandedness", {}).get(opp_pitcher_id, "R")
@@ -297,7 +327,6 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
             bvp_html = f"""<div class="border rounded p-2 text-center text-muted fst-italic bg-white shadow-sm mb-2" style="font-size: 0.8rem;">🚫 Potential Matchup: No previous history recorded against starting pitcher <strong>{opp_pitcher_name}</strong>.</div>"""
             
     else:
-        # Pitcher Analytics & Suppression Gauges
         split_r = p_deep_stats.get("split_vR", {})
         split_l = p_deep_stats.get("split_vL", {})
         t_hr = float(split_l.get("hr", 0)) + float(split_r.get("hr", 0))
@@ -336,7 +365,6 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
             </div>
         </div>"""
         
-        # Build Opponent Lineup Matchup Card Rows
         order_list = my_game.get("lineupTracking", {}).get(opp_side, {}).get("hash", "").split('-') if my_game.get("lineupTracking", {}).get(opp_side, {}).get("hash") else []
         if not order_list:
             order_list = [str(p.get("id")) for p in my_game.get("projectedLineups", {}).get(opp_side, {}).get("battingOrder", [])]
@@ -386,7 +414,6 @@ def generate_player_html(profile, slug, daily_data, live_data):
     team_name = profile.get("team_name", "Free Agent")
     position = profile.get("position", "Unknown Position")
     
-    # 1. Resolve slate presence & dynamic projection node weights
     my_game, team_side = resolve_active_matchup(player_id, team_name, daily_data)
     
     dk_proj_val, fd_proj_val = 'NA', 'NA'
@@ -415,12 +442,10 @@ def generate_player_html(profile, slug, daily_data, live_data):
         dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
         fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
         
-        # Render Components statically using full context
         badge_matrix_html = render_badge_zone(player_id, team_side, my_game)
         game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val)
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher)
 
-    # Pre-Bake Static Season Meta Strings & Table Rows
     if is_pitcher:
         title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
         desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
@@ -556,25 +581,18 @@ def generate_player_html(profile, slug, daily_data, live_data):
 </body>
 </html>"""
 
-# ==========================================
-# 5. EXECUTION HOOK WITH IO MONITORING
-# ==========================================
 def main():
     if not os.path.exists(MASTER_DATA_PATH):
-        print(f"❌ Error: Could not locate master log registry file at {MASTER_DATA_PATH}")
         return
 
     master_data = load_json_safe(MASTER_DATA_PATH)
     target_date_str = get_target_slate_date()
     
-    # Preload high-frequency live dependencies
     daily_data = load_json_safe(f"data/daily_files/games_{target_date_str}.json")
     live_data = load_json_safe(f"data/LIVE/live_mlb_{target_date_str}.json")
 
     all_player_urls = []
     updated_count = 0
-
-    print(f"📦 Commencing deployment processing loop for {len(master_data)} baseline player records...")
 
     for key, profile in master_data.items():
         player_name = profile.get("name", "Unknown Player")
@@ -586,22 +604,18 @@ def main():
         
         all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-        # Generate structural view markup entirely in-memory
         new_html_content = generate_player_html(profile, player_slug, daily_data, live_data)
         
-        # Read matching node if present to isolate file churn
         existing_html = ""
         if os.path.exists(index_file_path):
             with open(index_file_path, "r", encoding="utf-8") as f:
                 existing_html = f.read()
 
-        # Conditionally persist updates to disk only upon true data mutability
         if new_html_content != existing_html:
             with open(index_file_path, "w", encoding="utf-8") as html_out:
                 html_out.write(new_html_content)
             updated_count += 1
 
-    print(f"⚡ SSG Loop Complete. Total profiles actively updated: {updated_count}")
     update_sitemap(all_player_urls)
 
 if __name__ == "__main__":
