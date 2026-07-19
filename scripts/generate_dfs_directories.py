@@ -26,6 +26,20 @@ TEAM_GOOD_BOOST = 0.025
 TEAM_BAD_SCORE = 3.5
 TEAM_BAD_PENALTY = -0.050
 
+MLB_ABBR_MAP = {
+    "Arizona Diamondbacks": "ARI", "Atlanta Braves": "ATL", "Baltimore Orioles": "BAL",
+    "Boston Red Sox": "BOS", "Chicago Cubs": "CHC", "Chicago White Sox": "CWS",
+    "Cincinnati Reds": "CIN", "Cleveland Guardians": "CLE", "Colorado Rockies": "COL",
+    "Detroit Tigers": "DET", "Houston Astros": "HOU", "Kansas City Royals": "KC",
+    "Los Angeles Angels": "LAA", "Los Angeles Dodgers": "LAD", "Miami Marlins": "MIA",
+    "Milwaukee Brewers": "MIL", "Minnesota Twins": "MIN", "New York Mets": "NYM",
+    "New York Yankees": "NYY", "Oakland Athletics": "OAK", "Athletics": "OAK",
+    "Philadelphia Phillies": "PHI", "Pittsburgh Pirates": "PIT", "San Diego Padres": "SD",
+    "San Francisco Giants": "SF", "Seattle Mariners": "SEA", "St. Louis Cardinals": "STL",
+    "Tampa Bay Rays": "TB", "Texas Rangers": "TEX", "Toronto Blue Jays": "TOR",
+    "Washington Nationals": "WSH"
+}
+
 # =========================================================================
 # --- 2. SEO METADATA MATRIX ---
 # =========================================================================
@@ -81,14 +95,19 @@ def get_player_url(player_id, default_name):
 # =========================================================================
 # --- 4. PROPRIETARY ALGORITHM NUDGES ---
 # =========================================================================
-def get_team_name(game_node, side):
-    """Safely extracts full team names instead of abbreviations."""
-    if f"{side}Team" in game_node and isinstance(game_node[f"{side}Team"], dict) and "name" in game_node[f"{side}Team"]:
-        return game_node[f"{side}Team"]["name"]
+def get_team_data(game_node, side):
+    """Extracts team abbreviation and ID for logos."""
+    team_abbr = "AWAY" if side == "away" else "HOME"
+    team_id = 0
+    
     raw_teams = game_node.get("gameRaw", {}).get("teams", {})
-    if side in raw_teams and "team" in raw_teams[side] and "name" in raw_teams[side]["team"]:
-        return raw_teams[side]["team"]["name"]
-    return "AWAY" if side == "away" else "HOME"
+    if side in raw_teams and "team" in raw_teams[side]:
+        team_info = raw_teams[side]["team"]
+        team_name = team_info.get("name", "")
+        team_id = team_info.get("id", 0)
+        team_abbr = MLB_ABBR_MAP.get(team_name, team_name[:3].upper())
+        
+    return team_abbr, team_id
 
 def calculate_vegas_nudge(itt):
     if itt >= TEAM_MEGA_SCORE: return TEAM_MEGA_BOOST
@@ -97,7 +116,7 @@ def calculate_vegas_nudge(itt):
     elif 0 < itt <= TEAM_BAD_SCORE: return TEAM_BAD_PENALTY
     return 0.0
 
-def process_proprietary_projection(player, is_pitcher, team_name, opp_name, is_home, game, is_dk=False):
+def process_proprietary_projection(player, is_pitcher, team_abbr, team_id, opp_abbr, opp_id, is_home, game, is_dk=False):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
     
@@ -150,8 +169,10 @@ def process_proprietary_projection(player, is_pitcher, team_name, opp_name, is_h
     return {
         "id": player.get("id"),
         "name": player.get("name") or player.get("fullName"),
-        "team": team_name,
-        "opponent": f"vs. {opp_name}" if is_home else f"@ {opp_name}",
+        "team": team_abbr,
+        "team_id": team_id,
+        "opponent": f"vs. {opp_abbr}" if is_home else f"@ {opp_abbr}",
+        "opp_id": opp_id,
         "salary": salary,
         "proj": final_proj,
         "value": value,
@@ -168,7 +189,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Favicons -->
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -176,7 +196,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <title>{{ seo_title }}</title>
     <meta name="description" content="{{ seo_desc }}">
     
-    <!-- Open Graph Tags -->
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ page_url }}">
@@ -184,7 +203,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta property="og:description" content="{{ seo_desc }}">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
-    <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary">
     <meta property="twitter:domain" content="mlbstartingnine.com">
     <meta property="twitter:url" content="{{ page_url }}">
@@ -196,7 +214,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        /* Updated MLB Starting Nine Header Style */
         .header-brand { 
             font-weight: 900; 
             letter-spacing: -1px; 
@@ -218,12 +235,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
 
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
-        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; }
+        .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; }
+        .table th:hover { background-color: #343a40; }
         .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
-        .team-icon { width: 16px; height: 16px; margin-right: 6px; vertical-align: text-bottom; }
+        
+        /* Updated Icon Styling */
+        .team-icon { width: 22px; height: 22px; margin-right: 8px; vertical-align: middle; }
     </style>
 </head>
 <body>
@@ -245,7 +265,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
 
-    <!-- Dropdown Slate Row Filtering -->
     {% if distinct_slates %}
     <div class="d-flex align-items-center gap-2 mb-3">
         <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
@@ -258,24 +277,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
     {% endif %}
 
-    <!-- Proprietary Metric Disclaimer Box -->
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
         <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 
-    <!-- Core Dynamic Data Directory Table -->
     <div class="table-card shadow-sm">
         <div class="table-responsive">
             <table class="table table-hover mb-0" id="leaderboard-table">
                 <thead>
                     <tr>
-                        <th style="width: 5%;">Rank</th>
-                        <th>Player</th>
-                        <th>Team</th>
-                        <th>Matchup</th>
-                        <th class="text-end">Salary</th>
-                        <th class="text-end">Proj</th>
-                        <th class="text-end text-primary">Value</th>
+                        <th style="width: 5%;" onclick="sortTable(this, 0)">Rank &#x21D5;</th>
+                        <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                        <th onclick="sortTable(this, 2)">Team &#x21D5;</th>
+                        <th onclick="sortTable(this, 3)">Matchup &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 4)">Salary &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 5)">Proj &#x21D5;</th>
+                        <th class="text-end text-primary" onclick="sortTable(this, 6)">Value &#x21D5;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -289,13 +306,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                             </div>
                         </td>
                         <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content;">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> {{ p.team }}
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.85rem;">
+                                <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="{{ p.team }} Icon" class="team-icon"> {{ p.team }}
                             </span>
                         </td>
-                        <td class="text-muted font-monospace">
+                        <td class="text-muted font-monospace fw-semibold">
                             <div class="d-flex align-items-center">
-                                <img src="image_a3cc42.png" alt="Team Icon" class="team-icon"> {{ p.opponent }}
+                                <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opponent }} Icon" class="team-icon"> {{ p.opponent }}
                             </div>
                         </td>
                         <td class="text-end fw-semibold">${{ "{:,}".format(p.salary) }}</td>
@@ -310,6 +327,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>
+// Filter Slates Logic
 function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
@@ -324,6 +342,36 @@ function filterSlate(slateId) {
             row.style.display = 'none';
         }
     });
+}
+
+// Clickable Table Sorting Logic
+function sortTable(thElement, colIndex) {
+    const table = thElement.closest("table");
+    const tbody = table.querySelector("tbody");
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    const isAscending = thElement.classList.contains("asc");
+    
+    table.querySelectorAll("th").forEach(th => {
+        th.classList.remove("asc", "desc");
+    });
+
+    thElement.classList.add(isAscending ? "desc" : "asc");
+    const dirModifier = isAscending ? -1 : 1;
+
+    rows.sort((a, b) => {
+        // Strip out string characters ($ and x) for clean math sorting
+        const aText = a.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
+        const bText = b.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
+        
+        const aVal = isNaN(parseFloat(aText)) ? aText : parseFloat(aText);
+        const bVal = isNaN(parseFloat(bText)) ? bText : parseFloat(bText);
+
+        if (aVal > bVal) return 1 * dirModifier;
+        if (aVal < bVal) return -1 * dirModifier;
+        return 0;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
 }
 </script>
 </body>
@@ -381,26 +429,29 @@ def main():
     for game in games_list:
         p_data = game.get("projectedLineups", {})
         
-        # Use full team names instead of abbreviations
-        away_team = get_team_name(game, "away")
-        home_team = get_team_name(game, "home")
+        # Get abbreviation and team ID mapping
+        away_abbr, away_id = get_team_data(game, "away")
+        home_abbr, home_id = get_team_data(game, "home")
 
-        # Properly match side block with correct context flags
-        for side, team, opp, is_home in [("away", away_team, home_team, False), ("home", home_team, away_team, True)]:
+        # Match side block with correct context flags
+        for side, team_abbr, team_id, opp_abbr, opp_id, is_home in [
+            ("away", away_abbr, away_id, home_abbr, home_id, False), 
+            ("home", home_abbr, home_id, away_abbr, away_id, True)
+        ]:
             side_node = p_data.get(side, {})
             
             pitcher = side_node.get("startingPitcher")
             if pitcher:
                 if has_dk_data:
-                    p_res = process_proprietary_projection(pitcher, True, team, opp, is_home, game, is_dk=True)
+                    p_res = process_proprietary_projection(pitcher, True, team_abbr, team_id, opp_abbr, opp_id, is_home, game, is_dk=True)
                     if p_res: dk_pools["pitchers"].append(p_res)
                 if has_fd_data:
-                    p_res = process_proprietary_projection(pitcher, True, team, opp, is_home, game, is_dk=False)
+                    p_res = process_proprietary_projection(pitcher, True, team_abbr, team_id, opp_abbr, opp_id, is_home, game, is_dk=False)
                     if p_res: fd_pools["pitchers"].append(p_res)
 
             for batter in side_node.get("battingOrder", []):
                 if has_dk_data:
-                    p_res = process_proprietary_projection(batter, False, team, opp, is_home, game, is_dk=True)
+                    p_res = process_proprietary_projection(batter, False, team_abbr, team_id, opp_abbr, opp_id, is_home, game, is_dk=True)
                     if p_res:
                         dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
                         for raw_pos in dk_positions:
@@ -413,7 +464,7 @@ def main():
                             elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
 
                 if has_fd_data:
-                    p_res = process_proprietary_projection(batter, False, team, opp, is_home, game, is_dk=False)
+                    p_res = process_proprietary_projection(batter, False, team_abbr, team_id, opp_abbr, opp_id, is_home, game, is_dk=False)
                     if p_res:
                         fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
                         for raw_pos in fd_positions:
