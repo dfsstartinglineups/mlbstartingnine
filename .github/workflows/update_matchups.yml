@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 selenium webdriver-manager jinja2
+          pip install requests beautifulsoup4 selenium webdriver-manager jinja2 pytz
 
       - name: Run Matchup Fetcher
         run: python scripts/fetch_matchups.py
@@ -33,21 +33,25 @@ jobs:
       - name: Generate DFS Directories
         run: python scripts/generate_dfs_directories.py
 
+      - name: Generate Static Lineup Pages
+        run: python scripts/generate_team_pages.py
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Stage the cache, new daily files directory, live directory, DFS pages, and sitemap
+          # Stage the cache, daily files, live data, DFS pages, Lineups, and sitemap
           git add data/matchups.json
           git add data/daily_files/
           git add data/LIVE/
           git add dfs/
+          git add lineups/
           git add sitemap-dfs.xml
           
           # Check if there are staged changes ready to be committed
           if ! git diff --quiet --staged; then
-            git commit -m "📊 Automated update: Master Board, Live Stats & DFS Pages [skip ci]"
+            git commit -m "📊 Automated update: Matchups, Live Stats, DFS & Lineups [skip ci]"
             
             # 🛑 THE FIX: Pull latest changes, rebase, and aggressively force our new scrape to win any conflicts
             git pull origin main --rebase --strategy-option=theirs
