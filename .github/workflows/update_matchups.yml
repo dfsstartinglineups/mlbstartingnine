@@ -22,23 +22,32 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 selenium webdriver-manager
+          pip install requests beautifulsoup4 selenium webdriver-manager jinja2
 
       - name: Run Matchup Fetcher
         run: python scripts/fetch_matchups.py
+
+      - name: Run MLB Live Scraper
+        run: python scripts/scrape_mlb_live.py
+        
+      - name: Generate DFS Directories
+        run: python scripts/generate_dfs_directories.py
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Stage the cache AND the new daily files directory
+          # Stage the cache, new daily files directory, live directory, DFS pages, and sitemap
           git add data/matchups.json
           git add data/daily_files/
+          git add data/LIVE/
+          git add dfs/
+          git add sitemap-dfs.xml
           
           # Check if there are staged changes ready to be committed
           if ! git diff --quiet --staged; then
-            git commit -m "📊 Automated update: Master Board and Matchup Stats [skip ci]"
+            git commit -m "📊 Automated update: Master Board, Live Stats & DFS Pages [skip ci]"
             
             # 🛑 THE FIX: Pull latest changes, rebase, and aggressively force our new scrape to win any conflicts
             git pull origin main --rebase --strategy-option=theirs
@@ -46,5 +55,5 @@ jobs:
             # Push cleanly to the repository
             git push origin main
           else
-            echo "No new matchup stats or daily files. Skipping commit."
+            echo "No new updates generated. Skipping commit."
           fi
