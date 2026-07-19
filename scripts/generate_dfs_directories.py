@@ -66,6 +66,17 @@ SEO_METADATA = {
 # =========================================================================
 # --- 3. URL SLUG AND LOOKUP UTILITIES ---
 # =========================================================================
+TEAM_SLUG_MAP = {
+    108: "los-angeles-angels", 109: "arizona-diamondbacks", 110: "baltimore-orioles", 111: "boston-red-sox",
+    112: "chicago-cubs", 113: "cincinnati-reds", 114: "cleveland-guardians", 115: "colorado-rockies",
+    116: "detroit-tigers", 117: "houston-astros", 118: "kansas-city-royals", 119: "los-angeles-dodgers",
+    120: "washington-nationals", 121: "new-york-mets", 133: "athletics", 134: "pittsburgh-pirates",
+    135: "san-diego-padres", 136: "seattle-mariners", 137: "san-francisco-giants", 138: "st-louis-cardinals",
+    139: "tampa-bay-rays", 140: "texas-rangers", 141: "toronto-blue-jays", 142: "minnesota-twins",
+    143: "philadelphia-phillies", 144: "atlanta-braves", 145: "chicago-white-sox", 146: "miami-marlins",
+    147: "new-york-yankees", 158: "milwaukee-brewers"
+}
+
 def load_player_database():
     if os.path.exists(PLAYER_MASTER_PATH):
         try:
@@ -188,12 +199,16 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
                 "proj": f"{s_final_proj:.2f}",
                 "value": f"{s_val:.2f}x"
             }
+            
+    # Resolve team slug for lineups linking
+    team_slug = TEAM_SLUG_MAP.get(int(team_id) if team_id else 0, "los-angeles-dodgers")
 
     return {
         "id": player.get("id"),
         "name": player.get("name") or player.get("fullName"),
         "team": team_name,
         "team_id": team_id,
+        "team_slug": team_slug,
         "opp_indicator": "vs." if is_home else "@",
         "opp_name": opp_name,
         "opp_id": opp_id,
@@ -344,13 +359,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                         <td class="fw-bold text-muted col-rank">{{ loop.index }}</td>
                         <td>
                             <div class="d-flex align-items-center">
-                                {% if p.order_status == 'official' %}
-                                    <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
-                                {% elif p.order_status == 'projected' %}
-                                    <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
-                                {% elif p.order_status == 'ns' %}
-                                    <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Not Starting">NS</span>
-                                {% endif %}
+                                <a href="/lineups/{{ p.team_slug }}/" class="text-decoration-none">
+                                    {% if p.order_status == 'official' %}
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
+                                    {% elif p.order_status == 'projected' %}
+                                        <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
+                                    {% elif p.order_status == 'ns' %}
+                                        <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.65rem; width: 30px;" title="Not Starting">NS</span>
+                                    {% endif %}
+                                </a>
                                 
                                 <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
                                 <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
