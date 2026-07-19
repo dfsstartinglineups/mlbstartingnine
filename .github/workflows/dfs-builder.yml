@@ -1,0 +1,54 @@
+name: Generate DFS Directories
+
+on:
+  # Runs automatically every 15 minutes
+  # (Cron syntax: Minute, Hour, Day of Month, Month, Day of Week)
+  schedule:
+    - cron: '*/15 * * * *'
+  
+  # Allows you to manually trigger the script from the Actions tab in GitHub
+  workflow_dispatch: 
+
+# Grants the action permission to push commits back to your repo
+permissions:
+  contents: write
+
+jobs:
+  build-and-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jinja2
+
+      - name: Run DFS Directory Builder Script
+        # Executes the script from the /scripts/ folder
+        run: |
+          python scripts/generate_dfs_directories.py
+
+      - name: Commit and Push Changes
+        run: |
+          # Set up the GitHub Actions bot as the author
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Stage the newly created/updated DFS folder and sitemap
+          git add dfs/ sitemap-dfs.xml
+          
+          # Check if there are actual changes before trying to commit
+          if git diff --staged --quiet; then
+            echo "No new projection data found. Skipping commit."
+          else
+            git commit -m "Automated build: Update DFS directories and sitemap"
+            git push
+          fi
