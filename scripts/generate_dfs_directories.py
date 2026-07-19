@@ -26,6 +26,18 @@ TEAM_GOOD_BOOST = 0.025
 TEAM_BAD_SCORE = 3.5
 TEAM_BAD_PENALTY = -0.050
 
+# Position Dropdown Mappings
+POS_LABELS_DK = {
+    "pitchers": "Pitchers", "catchers": "Catchers", "first-base": "First Base",
+    "second-base": "Second Base", "third-base": "Third Base", 
+    "shortstops": "Shortstops", "outfielders": "Outfielders"
+}
+POS_LABELS_FD = {
+    "pitchers": "Pitchers", "catchers-first-base": "C / 1B",
+    "second-base": "Second Base", "third-base": "Third Base", 
+    "shortstops": "Shortstops", "outfielders": "Outfielders"
+}
+
 # =========================================================================
 # --- 2. SEO METADATA MATRIX ---
 # =========================================================================
@@ -82,7 +94,6 @@ def get_player_url(player_id, default_name):
 # --- 4. PROPRIETARY ALGORITHM NUDGES ---
 # =========================================================================
 def get_team_data(game_node, side):
-    """Extracts short team name mirroring the JavaScript logic, and team ID for logos."""
     team_name = "AWAY" if side == "away" else "HOME"
     team_id = 0
     
@@ -92,12 +103,10 @@ def get_team_data(game_node, side):
         full_name = team_info.get("name", "")
         team_id = team_info.get("id", 0)
         
-        # Mirroring script.js logic to parse short names
         team_name = team_info.get("teamName")
         if not team_name:
             team_name = full_name.split(' ')[-1] if full_name else ("AWAY" if side == "away" else "HOME")
             
-        # JS Exceptions for two-word names or abbreviations
         if "Red Sox" in full_name: team_name = "Red Sox"
         elif "White Sox" in full_name: team_name = "White Sox"
         elif "Blue Jays" in full_name: team_name = "Blue Jays"
@@ -153,14 +162,30 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
         if woba_avg > 105: park_nudge = -0.03 if is_pitcher else 0.04
         elif woba_avg < 96: park_nudge = 0.04 if is_pitcher else -0.03
 
+    # Calculate multiplier
     if is_pitcher:
         hitter_mult = 1.00 - (calculate_vegas_nudge(opp_itt) + park_nudge)
-        final_proj = round(raw_proj * hitter_mult, 2)
     else:
         hitter_mult = 1.00 + vegas_nudge + order_nudge + park_nudge
-        final_proj = round(raw_proj * hitter_mult, 2)
 
+    # Baseline calculations
+    final_proj = round(raw_proj * hitter_mult, 2)
     value = round(final_proj / (salary / 1000), 2) if salary > 0 else 0.0
+
+    # Build slate-specific stats dictionary for dynamic frontend swapping
+    slate_stats = {}
+    for s_id, s_data in slate_block.items():
+        if isinstance(s_data, dict):
+            s_raw_proj = float(s_data.get("proj", raw_proj))
+            s_salary = int(s_data.get("salary", salary))
+            s_final_proj = round(s_raw_proj * hitter_mult, 2)
+            s_val = round(s_final_proj / (s_salary / 1000), 2) if s_salary > 0 else 0.0
+            
+            slate_stats[s_id] = {
+                "salary": f"${s_salary:,}",
+                "proj": f"{s_final_proj:.2f}",
+                "value": f"{s_val:.2f}x"
+            }
 
     return {
         "id": player.get("id"),
@@ -174,6 +199,7 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
         "proj": final_proj,
         "value": value,
         "slates": ",".join(slate_ids),
+        "slate_stats_json": json.dumps(slate_stats),
         "url": get_player_url(player.get("id"), player.get("name") or player.get("fullName"))
     }
 
@@ -261,17 +287,29 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
 
-    {% if distinct_slates %}
-    <div class="d-flex align-items-center gap-2 mb-3">
-        <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-        <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
-            <option value="all">All Games</option>
-            {% for s_id, s_name in distinct_slates.items() %}
-            <option value="{{ s_id }}">{{ s_name }}</option>
-            {% endfor %}
-        </select>
+    <!-- Dropdown Controls for Slates & Positions -->
+    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+        {% if distinct_slates %}
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
+                <option value="all">All Games</option>
+                {% for s_id, s_name in distinct_slates.items() %}
+                <option value="{{ s_id }}">{{ s_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        
+        <div class="d-flex align-items-center gap-2 ms-md-3">
+            <span class="fw-bold text-secondary small text-uppercase">Position:</span>
+            <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="window.location.href=this.value">
+                {% for pos_key, pos_label in position_links.items() %}
+                <option value="/dfs/{{ platform_slug }}/top-{{ pos_key }}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
-    {% endif %}
 
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
         <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
@@ -293,7 +331,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 </thead>
                 <tbody>
                     {% for p in players %}
-                    <tr data-slates="{{ p.slates }}">
+                    <tr data-slates="{{ p.slates }}" 
+                        data-slate-stats='{{ p.slate_stats_json }}' 
+                        data-default-salary="${{ "{:,}".format(p.salary) }}" 
+                        data-default-proj="{{ p.proj }}" 
+                        data-default-value="{{ p.value }}x">
+                        
                         <td class="fw-bold text-muted">{{ loop.index }}</td>
                         <td>
                             <div class="d-flex align-items-center">
@@ -311,9 +354,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                                 {{ p.opp_indicator }} <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opp_name }} Icon" class="team-icon ms-2" style="margin-right: 4px;"> {{ p.opp_name }}
                             </div>
                         </td>
-                        <td class="text-end fw-semibold">${{ "{:,}".format(p.salary) }}</td>
-                        <td class="text-end fw-bold">{{ p.proj }}</td>
-                        <td class="text-end fw-bold text-success">{{ p.value }}x</td>
+                        <td class="text-end fw-semibold col-salary">${{ "{:,}".format(p.salary) }}</td>
+                        <td class="text-end fw-bold col-proj">{{ p.proj }}</td>
+                        <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -323,24 +366,35 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </div>
 
 <script>
-// Filter Slates Logic
 function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
+        const rowSlates = row.getAttribute('data-slates').split(',');
+        const statsRaw = row.getAttribute('data-slate-stats');
+        const stats = statsRaw ? JSON.parse(statsRaw) : {};
+
         if (slateId === 'all') {
             row.style.display = '';
-            return;
-        }
-        const rowSlates = row.getAttribute('data-slates').split(',');
-        if (rowSlates.includes(slateId)) {
-            row.style.display = '';
+            // Revert back to master base stats
+            row.querySelector('.col-salary').textContent = row.getAttribute('data-default-salary');
+            row.querySelector('.col-proj').textContent = row.getAttribute('data-default-proj');
+            row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
         } else {
-            row.style.display = 'none';
+            if (rowSlates.includes(slateId)) {
+                row.style.display = '';
+                // Inject the specific slate salary, projection, and value dynamically
+                if (stats[slateId]) {
+                    row.querySelector('.col-salary').textContent = stats[slateId].salary;
+                    row.querySelector('.col-proj').textContent = stats[slateId].proj;
+                    row.querySelector('.col-value').textContent = stats[slateId].value;
+                }
+            } else {
+                row.style.display = 'none';
+            }
         }
     });
 }
 
-// Clickable Table Sorting Logic
 function sortTable(thElement, colIndex) {
     const table = thElement.closest("table");
     const tbody = table.querySelector("tbody");
@@ -355,7 +409,6 @@ function sortTable(thElement, colIndex) {
     const dirModifier = isAscending ? -1 : 1;
 
     rows.sort((a, b) => {
-        // Strip out string characters ($ and x) for clean math sorting
         const aText = a.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
         const bText = b.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
         
@@ -425,11 +478,9 @@ def main():
     for game in games_list:
         p_data = game.get("projectedLineups", {})
         
-        # Get short names and team ID mapping
         away_name, away_id = get_team_data(game, "away")
         home_name, home_id = get_team_data(game, "home")
 
-        # Match side block with correct context flags
         for side, team_name, team_id, opp_name, opp_id, is_home in [
             ("away", away_name, away_id, home_name, home_id, False), 
             ("home", home_name, home_id, away_name, away_id, True)
@@ -476,7 +527,7 @@ def main():
     for key in fd_pools:
         fd_pools[key] = sorted(fd_pools[key], key=lambda x: x["value"], reverse=True)
 
-    def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, date_str, players_list, distinct_slates):
+    def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, platform_slug, current_pos, position_links, date_str, players_list, distinct_slates):
         try:
             from jinja2 import Template
             t = Template(HTML_TEMPLATE)
@@ -485,7 +536,10 @@ def main():
                 seo_desc=seo_desc, 
                 page_url=page_url,
                 page_heading=page_heading, 
-                platform_name=platform_name, 
+                platform_name=platform_name,
+                platform_slug=platform_slug,
+                current_pos=current_pos,
+                position_links=position_links,
                 date_str=date_str, 
                 players=players_list, 
                 distinct_slates=distinct_slates
@@ -512,6 +566,9 @@ def main():
                 page_url=page_url,
                 page_heading=f"Top Projected DraftKings {clean_title}",
                 platform_name="DraftKings",
+                platform_slug="draftkings",
+                current_pos=pos_slug,
+                position_links=POS_LABELS_DK,
                 date_str=today_str,
                 players_list=player_set,
                 distinct_slates=dk_slate_map
@@ -539,6 +596,9 @@ def main():
                 page_url=page_url,
                 page_heading=f"Top Projected FanDuel {clean_title}",
                 platform_name="FanDuel",
+                platform_slug="fanduel",
+                current_pos=pos_slug,
+                position_links=POS_LABELS_FD,
                 date_str=today_str,
                 players_list=player_set,
                 distinct_slates=fd_slate_map
