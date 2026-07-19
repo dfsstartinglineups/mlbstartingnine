@@ -36,22 +36,27 @@ jobs:
       - name: Generate Static Lineup Pages
         run: python scripts/generate_team_pages.py
 
+      - name: Generate Player Profiles
+        run: python scripts/generate_all_profiles.py
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          # Stage the cache, daily files, live data, DFS pages, Lineups, and sitemap
+          # Stage the cache, daily files, live data, DFS pages, Lineups, Player Profiles, and sitemap
           git add data/matchups.json
           git add data/daily_files/
           git add data/LIVE/
           git add dfs/
           git add lineups/
+          git add players/
+          git add sitemap.xml
           git add sitemap-dfs.xml
           
           # Check if there are staged changes ready to be committed
           if ! git diff --quiet --staged; then
-            git commit -m "📊 Automated update: Matchups, Live Stats, DFS & Lineups [skip ci]"
+            git commit -m "📊 Automated update: Matchups, Live Stats, DFS, Lineups & Profiles [skip ci]"
             
             # 🛑 THE FIX: Pull latest changes, rebase, and aggressively force our new scrape to win any conflicts
             git pull origin main --rebase --strategy-option=theirs
