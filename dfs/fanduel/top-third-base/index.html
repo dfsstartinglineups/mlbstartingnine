@@ -31,22 +31,43 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        .navbar-brand { font-weight: 800; letter-spacing: -0.5px; }
+        
+        /* Updated MLB Starting Nine Header Style */
+        .header-brand { 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            font-size: 2rem; 
+            color: #fff; 
+            font-style: italic; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+        .header-brand a { color: inherit; text-decoration: none; }
+        .header-brand span { 
+            text-shadow: none !important;
+            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
+            padding-right: 2px; 
+            display: inline-block; 
+        }
+
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
         .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; }
         .table td { vertical-align: middle; padding: 10px 12px; font-size: 0.85rem; border-bottom: 1px solid #edf2f4; }
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
-        .slate-btn { font-size: 0.75rem; font-weight: 700; padding: 4px 14px; border-radius: 20px; border: 1px solid #ced4da; background: #fff; color: #495057; transition: all 0.2s; }
-        .slate-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
-    <div class="container">
-        <a class="navbar-brand text-primary" href="/">MLB<span class="text-white">STARTINGNINE</span></a>
+<nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="header-brand mb-2 mb-md-0">
+            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
+        </div>
     </div>
 </nav>
 
@@ -59,30 +80,32 @@
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
 
-    <!-- Interactive Slate Row Filtering -->
+    <!-- Dropdown Slate Row Filtering -->
     
-    <div class="d-flex align-items-center gap-2 mb-3 overflow-auto pb-2" style="white-space: nowrap;">
+    <div class="d-flex align-items-center gap-2 mb-3">
         <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-        <button class="slate-btn active" data-slate="all" onclick="filterSlate('all', this)">All Games</button>
-        
-        <button class="slate-btn" data-slate="20603" onclick="filterSlate('20603', this)">9 Games  · Main SUN 1:35PM ET</button>
-        
-        <button class="slate-btn" data-slate="20604" onclick="filterSlate('20604', this)">4 Games  · Express SUN 2:10PM ET</button>
-        
-        <button class="slate-btn" data-slate="20605" onclick="filterSlate('20605', this)">4 Games  · Late SUN 4:05PM ET</button>
-        
-        <button class="slate-btn" data-slate="20606" onclick="filterSlate('20606', this)">CWS @ TOR SUN 12:15PM ET</button>
-        
-        <button class="slate-btn" data-slate="20607" onclick="filterSlate('20607', this)">CIN @ COL SUN 3:10PM ET</button>
-        
-        <button class="slate-btn" data-slate="20608" onclick="filterSlate('20608', this)">LAD @ NYY SUN 7:20PM ET</button>
-        
+        <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
+            <option value="all">All Games</option>
+            
+            <option value="20603">9 Games  · Main SUN 1:35PM ET</option>
+            
+            <option value="20604">4 Games  · Express SUN 2:10PM ET</option>
+            
+            <option value="20605">4 Games  · Late SUN 4:05PM ET</option>
+            
+            <option value="20606">CWS @ TOR SUN 12:15PM ET</option>
+            
+            <option value="20607">CIN @ COL SUN 3:10PM ET</option>
+            
+            <option value="20608">LAD @ NYY SUN 7:20PM ET</option>
+            
+        </select>
     </div>
     
 
     <!-- Proprietary Metric Disclaimer Box -->
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
-        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed above are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
+        <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 
     <!-- Core Dynamic Data Directory Table -->
@@ -104,7 +127,12 @@
                     
                     <tr data-slates="20603,20607">
                         <td class="fw-bold text-muted">1</td>
-                        <td><a href="/players/eugenio-suarez/" class="player-link">Eugenio Suarez</a></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/553993/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/eugenio-suarez/" class="player-link">Eugenio Suarez</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -112,9 +140,29 @@
                         <td class="text-end fw-bold text-success">4.51x</td>
                     </tr>
                     
-                    <tr data-slates="20603,20604">
+                    <tr data-slates="20604,20603">
                         <td class="fw-bold text-muted">2</td>
-                        <td><a href="/players/manny-machado/" class="player-link">Manny Machado</a></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668942/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/josh-rojas/" class="player-link">Josh Rojas</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,000</td>
+                        <td class="text-end fw-bold">8.92</td>
+                        <td class="text-end fw-bold text-success">4.46x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">3</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/592518/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/manny-machado/" class="player-link">Manny Machado</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -123,8 +171,13 @@
                     </tr>
                     
                     <tr data-slates="20605">
-                        <td class="fw-bold text-muted">3</td>
-                        <td><a href="/players/kevin-mcgonigle/" class="player-link">Kevin McGonigle</a></td>
+                        <td class="fw-bold text-muted">4</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805808/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/kevin-mcgonigle/" class="player-link">Kevin McGonigle</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,400</td>
@@ -132,9 +185,44 @@
                         <td class="text-end fw-bold text-success">3.91x</td>
                     </tr>
                     
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">5</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/650859/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/luis-rengifo/" class="player-link">Luis Rengifo</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,300</td>
+                        <td class="text-end fw-bold">8.92</td>
+                        <td class="text-end fw-bold text-success">3.88x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">6</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/608324/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/alex-bregman/" class="player-link">Alex Bregman</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,100</td>
+                        <td class="text-end fw-bold">11.86</td>
+                        <td class="text-end fw-bold text-success">3.83x</td>
+                    </tr>
+                    
                     <tr data-slates="20605">
-                        <td class="fw-bold text-muted">4</td>
-                        <td><a href="/players/curtis-mead/" class="player-link">Curtis Mead</a></td>
+                        <td class="fw-bold text-muted">7</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/678554/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/curtis-mead/" class="player-link">Curtis Mead</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -142,29 +230,59 @@
                         <td class="text-end fw-bold text-success">3.8x</td>
                     </tr>
                     
-                    <tr data-slates="20603,20607">
-                        <td class="fw-bold text-muted">5</td>
-                        <td><a href="/players/sal-stewart/" class="player-link">Sal Stewart</a></td>
-                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
-                        <td class="text-muted font-monospace">@ HOME</td>
-                        <td class="text-end fw-semibold">$4,000</td>
-                        <td class="text-end fw-bold">15.14</td>
-                        <td class="text-end fw-bold text-success">3.79x</td>
-                    </tr>
-                    
                     <tr data-slates="20605">
-                        <td class="fw-bold text-muted">6</td>
-                        <td><a href="/players/matt-vierling/" class="player-link">Matt Vierling</a></td>
+                        <td class="fw-bold text-muted">8</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663837/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/matt-vierling/" class="player-link">Matt Vierling</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$2,500</td>
-                        <td class="text-end fw-bold">9.12</td>
-                        <td class="text-end fw-bold text-success">3.65x</td>
+                        <td class="text-end fw-bold">9.43</td>
+                        <td class="text-end fw-bold text-success">3.77x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">9</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/670623/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/isaac-paredes/" class="player-link">Isaac Paredes</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,000</td>
+                        <td class="text-end fw-bold">11.13</td>
+                        <td class="text-end fw-bold text-success">3.71x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">10</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/679845/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/nick-loftin/" class="player-link">Nick Loftin</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,800</td>
+                        <td class="text-end fw-bold">10.15</td>
+                        <td class="text-end fw-bold text-success">3.63x</td>
                     </tr>
                     
                     <tr data-slates="20603">
-                        <td class="fw-bold text-muted">7</td>
-                        <td><a href="/players/bo-bichette/" class="player-link">Bo Bichette</a></td>
+                        <td class="fw-bold text-muted">11</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/666182/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/bo-bichette/" class="player-link">Bo Bichette</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -173,28 +291,133 @@
                     </tr>
                     
                     <tr data-slates="20603">
-                        <td class="fw-bold text-muted">8</td>
-                        <td><a href="/players/josh-jung/" class="player-link">Josh Jung</a></td>
+                        <td class="fw-bold text-muted">12</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/673962/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/josh-jung/" class="player-link">Josh Jung</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,100</td>
-                        <td class="text-end fw-bold">10.5</td>
-                        <td class="text-end fw-bold text-success">3.39x</td>
+                        <td class="text-end fw-bold">10.76</td>
+                        <td class="text-end fw-bold text-success">3.47x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603,20607">
+                        <td class="fw-bold text-muted">13</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/701398/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/sal-stewart/" class="player-link">Sal Stewart</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$4,000</td>
+                        <td class="text-end fw-bold">13.67</td>
+                        <td class="text-end fw-bold text-success">3.42x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">14</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/571448/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/nolan-arenado/" class="player-link">Nolan Arenado</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,800</td>
+                        <td class="text-end fw-bold">9.53</td>
+                        <td class="text-end fw-bold text-success">3.4x</td>
                     </tr>
                     
                     <tr data-slates="20603">
-                        <td class="fw-bold text-muted">9</td>
-                        <td><a href="/players/jared-triolo/" class="player-link">Jared Triolo</a></td>
-                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
-                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="fw-bold text-muted">15</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663586/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/austin-riley/" class="player-link">Austin Riley</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,700</td>
+                        <td class="text-end fw-bold">8.92</td>
+                        <td class="text-end fw-bold text-success">3.3x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">16</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/655316/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/andruw-monasterio/" class="player-link">Andruw Monasterio</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
                         <td class="text-end fw-semibold">$2,500</td>
                         <td class="text-end fw-bold">8.22</td>
                         <td class="text-end fw-bold text-success">3.29x</td>
                     </tr>
                     
-                    <tr data-slates="20603,20604">
-                        <td class="fw-bold text-muted">10</td>
-                        <td><a href="/players/royce-lewis/" class="player-link">Royce Lewis</a></td>
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">17</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/643289/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/mauricio-dubon/" class="player-link">Mauricio Dubon</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,800</td>
+                        <td class="text-end fw-bold">9.2</td>
+                        <td class="text-end fw-bold text-success">3.29x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">18</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/664761/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/alec-bohm/" class="player-link">Alec Bohm</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,700</td>
+                        <td class="text-end fw-bold">8.77</td>
+                        <td class="text-end fw-bold text-success">3.25x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">19</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669707/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/jared-triolo/" class="player-link">Jared Triolo</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$2,500</td>
+                        <td class="text-end fw-bold">8.12</td>
+                        <td class="text-end fw-bold text-success">3.25x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">20</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668904/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/royce-lewis/" class="player-link">Royce Lewis</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$2,900</td>
@@ -203,28 +426,73 @@
                     </tr>
                     
                     <tr data-slates="20603">
-                        <td class="fw-bold text-muted">11</td>
-                        <td><a href="/players/junior-caminero/" class="player-link">Junior Caminero</a></td>
-                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
-                        <td class="text-muted font-monospace">@ HOME</td>
-                        <td class="text-end fw-semibold">$4,000</td>
-                        <td class="text-end fw-bold">11.87</td>
-                        <td class="text-end fw-bold text-success">2.97x</td>
-                    </tr>
-                    
-                    <tr data-slates="20603">
-                        <td class="fw-bold text-muted">12</td>
-                        <td><a href="/players/ezequiel-duran/" class="player-link">Ezequiel Duran</a></td>
+                        <td class="fw-bold text-muted">21</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677649/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/ezequiel-duran/" class="player-link">Ezequiel Duran</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$2,900</td>
-                        <td class="text-end fw-bold">8.6</td>
-                        <td class="text-end fw-bold text-success">2.97x</td>
+                        <td class="text-end fw-bold">8.81</td>
+                        <td class="text-end fw-bold text-success">3.04x</td>
                     </tr>
                     
-                    <tr data-slates="20603,20604">
-                        <td class="fw-bold text-muted">13</td>
-                        <td><a href="/players/brooks-lee/" class="player-link">Brooks Lee</a></td>
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">22</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691406/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/junior-caminero/" class="player-link">Junior Caminero</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$4,000</td>
+                        <td class="text-end fw-bold">12.1</td>
+                        <td class="text-end fw-bold text-success">3.02x</td>
+                    </tr>
+                    
+                    <tr data-slates="20603">
+                        <td class="fw-bold text-muted">23</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/702332/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/caleb-durbin/" class="player-link">Caleb Durbin</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,900</td>
+                        <td class="text-end fw-bold">8.69</td>
+                        <td class="text-end fw-bold text-success">3.0x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">24</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687401/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/joey-ortiz/" class="player-link">Joey Ortiz</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,500</td>
+                        <td class="text-end fw-bold">7.18</td>
+                        <td class="text-end fw-bold text-success">2.87x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">25</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/686797/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/brooks-lee/" class="player-link">Brooks Lee</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,000</td>
@@ -233,8 +501,13 @@
                     </tr>
                     
                     <tr data-slates="20605">
-                        <td class="fw-bold text-muted">14</td>
-                        <td><a href="/players/casey-schmitt/" class="player-link">Casey Schmitt</a></td>
+                        <td class="fw-bold text-muted">26</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669477/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/casey-schmitt/" class="player-link">Casey Schmitt</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$3,200</td>
@@ -242,9 +515,29 @@
                         <td class="text-end fw-bold text-success">2.67x</td>
                     </tr>
                     
-                    <tr data-slates="20603,20604">
-                        <td class="fw-bold text-muted">15</td>
-                        <td><a href="/players/coby-mayo/" class="player-link">Coby Mayo</a></td>
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">27</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/694203/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/denzer-guzman/" class="player-link">Denzer Guzman</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,000</td>
+                        <td class="text-end fw-bold">7.99</td>
+                        <td class="text-end fw-bold text-success">2.66x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">28</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691723/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/coby-mayo/" class="player-link">Coby Mayo</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$2,600</td>
@@ -252,9 +545,29 @@
                         <td class="text-end fw-bold text-success">2.65x</td>
                     </tr>
                     
-                    <tr data-slates="20603,20604">
-                        <td class="fw-bold text-muted">16</td>
-                        <td><a href="/players/ryan-kreidler/" class="player-link">Ryan Kreidler</a></td>
+                    <tr data-slates="20603,20607">
+                        <td class="fw-bold text-muted">29</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691720/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/kyle-karros/" class="player-link">Kyle Karros</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,200</td>
+                        <td class="text-end fw-bold">8.16</td>
+                        <td class="text-end fw-bold text-success">2.55x</td>
+                    </tr>
+                    
+                    <tr data-slates="20604,20603">
+                        <td class="fw-bold text-muted">30</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668952/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/ryan-kreidler/" class="player-link">Ryan Kreidler</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$2,600</td>
@@ -263,8 +576,88 @@
                     </tr>
                     
                     <tr data-slates="20608">
-                        <td class="fw-bold text-muted">17</td>
-                        <td><a href="/players/max-muncy-571970/" class="player-link">Max Muncy</a></td>
+                        <td class="fw-bold text-muted">31</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641857/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/ryan-mcmahon/" class="player-link">Ryan McMahon</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,600</td>
+                        <td class="text-end fw-bold">7.07</td>
+                        <td class="text-end fw-bold text-success">1.96x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">32</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641857/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/ryan-mcmahon/" class="player-link">Ryan McMahon</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,600</td>
+                        <td class="text-end fw-bold">6.69</td>
+                        <td class="text-end fw-bold text-success">1.86x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">33</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/680474/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/max-schuemann/" class="player-link">Max Schuemann</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$3,800</td>
+                        <td class="text-end fw-bold">6.83</td>
+                        <td class="text-end fw-bold text-success">1.8x</td>
+                    </tr>
+                    
+                    <tr data-slates="20606">
+                        <td class="fw-bold text-muted">34</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/672960/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/kazuma-okamoto/" class="player-link">Kazuma Okamoto</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$10,000</td>
+                        <td class="text-end fw-bold">11.12</td>
+                        <td class="text-end fw-bold text-success">1.11x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">35</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/571970/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/max-muncy-571970/" class="player-link">Max Muncy</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
+                        <td class="text-muted font-monospace">@ HOME</td>
+                        <td class="text-end fw-semibold">$8,400</td>
+                        <td class="text-end fw-bold">9.22</td>
+                        <td class="text-end fw-bold text-success">1.1x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">36</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/571970/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/max-muncy-571970/" class="player-link">Max Muncy</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$8,400</td>
@@ -273,18 +666,43 @@
                     </tr>
                     
                     <tr data-slates="20608">
-                        <td class="fw-bold text-muted">18</td>
-                        <td><a href="/players/max-muncy-571970/" class="player-link">Max Muncy</a></td>
-                        <td><span class="badge bg-light text-dark border">AWAY</span></td>
-                        <td class="text-muted font-monospace">@ HOME</td>
-                        <td class="text-end fw-semibold">$8,400</td>
-                        <td class="text-end fw-bold">9.0</td>
-                        <td class="text-end fw-bold text-success">1.07x</td>
+                        <td class="fw-bold text-muted">37</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665862/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/jazz-chisholm-jr/" class="player-link">Jazz Chisholm</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$9,200</td>
+                        <td class="text-end fw-bold">9.94</td>
+                        <td class="text-end fw-bold text-success">1.08x</td>
+                    </tr>
+                    
+                    <tr data-slates="20608">
+                        <td class="fw-bold text-muted">38</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665862/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/jazz-chisholm-jr/" class="player-link">Jazz Chisholm</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$9,200</td>
+                        <td class="text-end fw-bold">9.7</td>
+                        <td class="text-end fw-bold text-success">1.05x</td>
                     </tr>
                     
                     <tr data-slates="20606">
-                        <td class="fw-bold text-muted">19</td>
-                        <td><a href="/players/miguel-vargas/" class="player-link">Miguel Vargas</a></td>
+                        <td class="fw-bold text-muted">39</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/678246/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/miguel-vargas/" class="player-link">Miguel Vargas</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$12,600</td>
@@ -293,13 +711,33 @@
                     </tr>
                     
                     <tr data-slates="20605">
-                        <td class="fw-bold text-muted">20</td>
-                        <td><a href="/players/jose-fermin-665877/" class="player-link">Jose Fermin</a></td>
+                        <td class="fw-bold text-muted">40</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665877/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/jose-fermin-665877/" class="player-link">Jose Fermin</a>
+                            </div>
+                        </td>
                         <td><span class="badge bg-light text-dark border">AWAY</span></td>
                         <td class="text-muted font-monospace">@ HOME</td>
                         <td class="text-end fw-semibold">$2,500</td>
                         <td class="text-end fw-bold">1.84</td>
                         <td class="text-end fw-bold text-success">0.74x</td>
+                    </tr>
+                    
+                    <tr data-slates="20605">
+                        <td class="fw-bold text-muted">41</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/806068/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #ced4da;">
+                                <a href="/players/colt-emerson/" class="player-link">Colt Emerson</a>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-light text-dark border">HOME</span></td>
+                        <td class="text-muted font-monospace">v. AWAY</td>
+                        <td class="text-end fw-semibold">$2,700</td>
+                        <td class="text-end fw-bold">1.42</td>
+                        <td class="text-end fw-bold text-success">0.53x</td>
                     </tr>
                     
                 </tbody>
@@ -309,10 +747,7 @@
 </div>
 
 <script>
-function filterSlate(slateId, btn) {
-    document.querySelectorAll('.slate-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
+function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
         if (slateId === 'all') {
