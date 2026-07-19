@@ -3,7 +3,6 @@
 // ==========================================
 const DEFAULT_DATE = new Date().toLocaleDateString('en-CA');
 let ALL_GAMES_DATA = []; 
-let GLOBAL_SLATES = { fanduel: [], draftkings: [] }; 
 
 let savedLineupState = localStorage.getItem('futbolLineupsExpanded');
 let globalLineupsExpanded = savedLineupState !== null ? savedLineupState === 'true' : true;
@@ -37,34 +36,11 @@ function slugify(text) {
 // --- CSS INJECTIONS FOR LEADERBOARD & CONTROLS ---
 const style = document.createElement('style');
 style.innerHTML = `
-    .leaderboard-tab {
-        font-size: 0.7rem; font-weight: 700; color: #adb5bd; cursor: pointer;
-        padding: 8px 0; text-align: center; text-transform: uppercase; letter-spacing: 0.5px;
-        border-bottom: 2px solid transparent; transition: all 0.2s ease;
-    }
-    .leaderboard-tab.active { color: #0d6efd; border-bottom: 2px solid #0d6efd; }
-    .leaderboard-tab:hover:not(.active) { color: #495057; }
-    .list-view::-webkit-scrollbar { width: 4px; }
-    .list-view::-webkit-scrollbar-thumb { background-color: #dee2e6; border-radius: 4px; }
-    
     .dk-btn-label { color: #6c9d2f; border-color: #6c9d2f; background-color: #fff; }
     .dk-btn-label:hover { color: #fff; background-color: #6c9d2f; border-color: #6c9d2f; }
     .btn-check:checked + .dk-btn-label { background-color: #6c9d2f !important; border-color: #6c9d2f !important; color: #fff !important; }
-
-    /* NEW POSITIONAL BUTTON STYLES */
-    .pos-filter-btn { font-size: 0.65rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; border: 1px solid #dee2e6; color: #6c757d; background: #fff; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-    .pos-filter-btn:hover { background: #e9ecef; }
-    .pos-filter-btn.active { background: #343a40; color: #fff; border-color: #343a40; }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 `;
 document.head.appendChild(style);
-
-// NEW GLOBALS FOR TOP PLAYS & LIVE DATA
-window.TOP_PLAYS_DATA = null;
-window.CURRENT_TOP_PLAYS_POS = 'ALL';
-let LIVE_GAMES_DATA = {};
-let livePollInterval;
 
 // ==========================================
 // 1. DEEP LINK SCROLLING
@@ -104,24 +80,8 @@ function handleHashNavigation() {
 }
 
 // ==========================================
-// 2. DATA FETCHING & SLATE HELPERS
+// 2. DATA FETCHING & DFS MENU
 // ==========================================
-async function pollLiveData(dateToFetch) {
-    try {
-        const response = await fetch(`data/LIVE/live_mlb_${dateToFetch}.json?v=` + new Date().getTime(), { cache: 'no-store' });
-        if (response.ok) {
-            LIVE_GAMES_DATA = await response.json();
-        } else {
-            LIVE_GAMES_DATA = {}; 
-        }
-        if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView(); 
-    } catch (e) {
-        LIVE_GAMES_DATA = {}; 
-        if (window.CURRENT_TOP_PLAYS_POS) window.updateTopPlaysView();
-        console.log("Live MLB data not available yet.");
-    }
-}
-
 function ensureDFSControls() {
     if (!document.getElementById('dfs-controls-row')) {
         const container = document.getElementById('games-container');
@@ -135,89 +95,58 @@ function ensureDFSControls() {
                         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
                         <label class="btn fw-bold px-3 py-1 dk-btn-label" for="btn-dk" style="font-size: 0.85rem;">DK</label>
                     </div>
-                    <select id="slate-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 180px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;">
-                        <option value="all">All Slates</option>
+                    <!-- Redirects instantly on change -->
+                    <select id="dfs-page-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 180px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
+                        <!-- Populated by JS -->
                     </select>
                 </div>
             `;
             container.insertAdjacentHTML('beforebegin', controlsHtml);
             
             document.querySelectorAll('.dfs-toggle').forEach(radio => radio.addEventListener('change', () => {
-                populateSlates();
-                renderGames();
+                populateDFSLinks();
+                renderGames(); // Re-render to update the FD/DK toggles inside the lineup cards
             }));
-            document.getElementById('slate-selector').addEventListener('change', renderGames);
         }
     }
 }
 
-function populateSlates() {
+function populateDFSLinks() {
     const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
     const platform = platformNode ? platformNode.value : 'fd';
-    const platKey = platform === 'dk' ? 'draftkings' : 'fanduel';
     
-    const selector = document.getElementById('slate-selector');
+    const selector = document.getElementById('dfs-page-selector');
     if (!selector) return;
     
-    const currentVal = selector.value;
-    selector.innerHTML = '<option value="all">All Slates</option>';
+    selector.innerHTML = '<option value="">Top DFS Plays...</option>';
     
-    const datePicker = document.getElementById('date-picker');
-    const dateToFetch = datePicker ? datePicker.value : DEFAULT_DATE;
+    const links = platform === 'dk' ? [
+        { slug: "pitchers", label: "Pitchers" },
+        { slug: "catchers", label: "Catchers" },
+        { slug: "first-base", label: "First Base" },
+        { slug: "second-base", label: "Second Base" },
+        { slug: "third-base", label: "Third Base" },
+        { slug: "shortstops", label: "Shortstops" },
+        { slug: "outfielders", label: "Outfielders" },
+        { slug: "util", label: "Util (All Hitters)" }
+    ] : [
+        { slug: "pitchers", label: "Pitchers" },
+        { slug: "catchers-first-base", label: "C / 1B" },
+        { slug: "second-base", label: "Second Base" },
+        { slug: "third-base", label: "Third Base" },
+        { slug: "shortstops", label: "Shortstops" },
+        { slug: "outfielders", label: "Outfielders" },
+        { slug: "util", label: "Utility" }
+    ];
     
-    let dateObj = new Date();
-    if (dateToFetch && dateToFetch.includes('-')) {
-        const [y, m, d] = dateToFetch.split('-');
-        dateObj = new Date(y, m - 1, d);
-    }
-    const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-
-    if (GLOBAL_SLATES[platKey] && Array.isArray(GLOBAL_SLATES[platKey])) {
-        GLOBAL_SLATES[platKey].forEach(slate => {
-            const upperName = slate.name.toUpperCase();
-            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-            const containsADay = days.some(day => upperName.includes(day));
-            
-            if (upperName.includes(dayOfWeek) || !containsADay) {
-                const opt = document.createElement('option');
-                opt.value = slate.id;
-                opt.textContent = slate.name;
-                selector.appendChild(opt);
-            }
-        });
-    }
+    const platSlug = platform === 'dk' ? 'draftkings' : 'fanduel';
     
-    if(Array.from(selector.options).some(opt => opt.value === currentVal)) selector.value = currentVal;
-    else selector.value = 'all';
-}
-
-function hasSlatePlayers(game, platform, selectedSlate) {
-    if (selectedSlate === 'all') return true; 
-    const checkRoster = (players) => {
-        if (!players) return false;
-        return players.some(p => {
-            if (!p) return false;
-            const slatesDict = platform === 'dk' ? (p.dk_slates || {}) : (p.fd_slates || {});
-            return !!slatesDict[selectedSlate];
-        });
-    };
-    
-    const pl = game.projectedLineups || {};
-    return checkRoster([pl.away?.startingPitcher]) || checkRoster(pl.away?.battingOrder) || 
-           checkRoster([pl.home?.startingPitcher]) || checkRoster(pl.home?.battingOrder);
-}
-
-function hasAnyDfsSalaries(game, platform) {
-    const checkRoster = (players) => {
-        if (!players) return false;
-        return players.some(p => {
-            if (!p) return false;
-            return (platform === 'dk' ? (p.dk_salary || 0) : (p.salary || 0)) > 0;
-        });
-    };
-    const pl = game.projectedLineups || {};
-    return checkRoster([pl.away?.startingPitcher]) || checkRoster(pl.away?.battingOrder) || 
-           checkRoster([pl.home?.startingPitcher]) || checkRoster(pl.home?.battingOrder);
+    links.forEach(link => {
+        const opt = document.createElement('option');
+        opt.value = `/dfs/${platSlug}/top-${link.slug}/`;
+        opt.textContent = link.label;
+        selector.appendChild(opt);
+    });
 }
 
 async function init(dateToFetch, isSilentRefresh = false) {
@@ -230,7 +159,6 @@ async function init(dateToFetch, isSilentRefresh = false) {
 
     if (container && !isSilentRefresh) {
         ALL_GAMES_DATA = [];  
-        LIVE_GAMES_DATA = {}; 
 
         container.innerHTML = `
             <div class="col-12 text-center mt-5 pt-5">
@@ -259,15 +187,13 @@ async function init(dateToFetch, isSilentRefresh = false) {
 
         if (Array.isArray(rawData)) {
             ALL_GAMES_DATA = rawData;
-            if(!isSilentRefresh) GLOBAL_SLATES = { fanduel: [], draftkings: [] };
         } else {
             ALL_GAMES_DATA = rawData.games || [];
-            if(!isSilentRefresh) GLOBAL_SLATES = rawData.slates || { fanduel: [], draftkings: [] };
         }
 
         if(!isSilentRefresh) {
             ensureDFSControls();
-            populateSlates();
+            populateDFSLinks();
         }
 
     } catch (error) {
@@ -286,7 +212,7 @@ async function init(dateToFetch, isSilentRefresh = false) {
             }
             if(!isSilentRefresh) {
                 ensureDFSControls();
-                populateSlates();
+                populateDFSLinks();
             }
         } catch (fallbackError) {
             if (container && !isSilentRefresh) container.innerHTML = `<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">Schedule pending for ${dateToFetch}</h5></div></div>`;
@@ -301,472 +227,7 @@ async function init(dateToFetch, isSilentRefresh = false) {
 
     renderGames(isSilentRefresh); 
     
-    if (!isSilentRefresh) {
-        pollLiveData(dateToFetch);
-        clearInterval(livePollInterval);
-        livePollInterval = setInterval(() => pollLiveData(dateToFetch), 30000);
-    }
-    
     if (!isSilentRefresh) handleHashNavigation();
-}
-
-// ==========================================
-// 3. LEADERBOARD BUILDERS
-// ==========================================
-window.setTopPlaysPos = function(el) {
-    document.querySelectorAll('.pos-filter-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    window.CURRENT_TOP_PLAYS_POS = el.getAttribute('data-pos');
-    window.updateTopPlaysView();
-};
-
-window.setTopPlaysTab = function(el) {
-    document.querySelectorAll('.leaderboard-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    window.updateTopPlaysView();
-};
-
-window.updateTopPlaysView = function() {
-    if (!window.TOP_PLAYS_DATA) return;
-
-    const pos = window.CURRENT_TOP_PLAYS_POS || 'ALL';
-    let tabEl = document.querySelector('.leaderboard-tab.active');
-    let tab = tabEl ? tabEl.getAttribute('data-tab') : 'value';
-
-    const bvpTab = document.querySelector('.leaderboard-tab[data-tab="bvp"]');
-    const hrTab = document.querySelector('.leaderboard-tab[data-tab="hr"]');
-
-    if (pos === 'P') {
-        if (bvpTab) bvpTab.style.display = 'none';
-        if (hrTab) hrTab.style.display = 'none';
-        if (tab === 'bvp' || tab === 'hr') {
-            tab = 'value';
-            document.querySelector('.leaderboard-tab[data-tab="value"]').classList.add('active');
-            if (tabEl) tabEl.classList.remove('active');
-        }
-    } else {
-        if (bvpTab) bvpTab.style.display = 'block';
-        if (hrTab) hrTab.style.display = 'block';
-    }
-
-    const platform = window.TOP_PLAYS_DATA.platform;
-    const posKey = platform === 'dk' ? 'dk_positions' : 'fd_positions';
-
-    let sourceArray = [];
-    if (pos === 'P') {
-        sourceArray = window.TOP_PLAYS_DATA.pitchers;
-    } else {
-        if (tab === 'value' || tab === 'proj') sourceArray = window.TOP_PLAYS_DATA.hitters;
-        else if (tab === 'bvp') sourceArray = window.TOP_PLAYS_DATA.bvp;
-        else if (tab === 'hr') sourceArray = window.TOP_PLAYS_DATA.hr;
-    }
-
-    let filtered = sourceArray;
-    if (pos !== 'ALL' && pos !== 'P') {
-        const targetPositions = pos.split('/'); 
-        
-        filtered = sourceArray.filter(p => {
-            const pPos = p[posKey] || '';
-            if (!pPos) return false;
-            const playerPositions = pPos.split('/'); 
-            return targetPositions.some(targetPos => playerPositions.includes(targetPos));
-        });
-    }
-
-    let sorted = [...filtered];
-    if (tab === 'value') sorted.sort((a, b) => (b.value || 0) - (a.value || 0));
-    else if (tab === 'proj') sorted.sort((a, b) => (b.proj || 0) - (a.proj || 0));
-    else if (tab === 'bvp') sorted.sort((a, b) => parseFloat(b.bvp.ops || 0) - parseFloat(a.bvp.ops || 0));
-    else if (tab === 'hr') sorted.sort((a, b) => (b.hrScore || 0) - (a.hrScore || 0));
-
-    const top20 = sorted.slice(0, 20);
-    const listContainer = document.getElementById('view-top-plays-list');
-    if (listContainer) listContainer.innerHTML = window.buildTopPlaysListHtml(top20, tab, platform);
-};
-
-window.buildTopPlaysListHtml = function(players, mode, platform) {
-    if (players.length === 0) return `<div class="p-3 text-center text-muted fw-bold" style="font-size:0.8rem;">No players found for this selection.</div>`;
-    const posKey = platform === 'dk' ? 'dk_positions' : 'fd_positions';
-
-    return players.map((p, index) => {
-        const photoHtml = `<img src="${p.photo}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">`;
-        const teamBadge = p.teamLogo ? `<img src="${p.teamLogo}" style="width: 20px; height: 20px; position: absolute; bottom: -2px; right: -4px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; object-fit: contain; padding: 1px;">` : '';
-        
-        let shortName = p.name;
-        if (shortName.includes(' ')) shortName = `${shortName.charAt(0)}. ${shortName.split(' ').slice(1).join(' ')}`;
-
-        let tabSpecificHtml = '';
-        let displayPos = p[posKey] || p.pos;
-
-        let livePlayer = null;
-        let liveGame = null;
-        let isGameFinal = false;
-        const pidStr = `ID${p.id}`; 
-        
-        for (const [gameId, lGame] of Object.entries(LIVE_GAMES_DATA || {})) {
-            const awayPlayers = lGame.players?.AWAY || {};
-            const homePlayers = lGame.players?.HOME || {};
-            const lPlayer = awayPlayers[pidStr] || homePlayers[pidStr];
-            
-            if (lPlayer) {
-                livePlayer = lPlayer;
-                liveGame = lGame;
-                isGameFinal = (lGame.status === 'Final');
-                break; 
-            }
-        }
-
-        let gameStatusBadge = '';
-        if (liveGame) {
-            if (isGameFinal) {
-                gameStatusBadge = `<span class="badge bg-secondary ms-2" style="font-size:0.55rem; padding: 0.25em 0.4em;">Final</span>`;
-            } else if (liveGame.status === 'Live' || liveGame.status === 'In Progress' || liveGame.inning) {
-                let halfMap = { 'Top': 'T', 'Bottom': 'B' };
-                let half = halfMap[liveGame.half] || '';
-                let inn = (liveGame.inning || '').replace(/\D/g, ''); 
-                let score = `${liveGame.away_score}-${liveGame.home_score}`;
-                if(inn || score !== '0-0') {
-                     gameStatusBadge = `<span class="badge bg-success ms-2" style="font-size:0.55rem; padding: 0.25em 0.4em;">${half}${inn} ${score}</span>`;
-                }
-            }
-        }
-
-        // --- WRAPPED IN LEADERBOARD META TILES ---
-        if (mode === 'bvp') {
-            let avg = p.bvp.avg;
-            if (!avg || avg === "-" || avg === ".000") {
-                if(p.bvp.ab > 0) {
-                    let calcAvg = p.bvp.hits / p.bvp.ab;
-                    avg = calcAvg.toFixed(3).replace('0.', '.');
-                } else {
-                    avg = ".000";
-                }
-            }
-            
-            let opsDisplay = parseFloat(p.bvp.ops).toFixed(3).replace('0.', '.');
-            let p_shortName = p.oppPitcher;
-            if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
-                p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
-            }
-
-            tabSpecificHtml = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-truncate pe-2" style="font-size: 0.95rem;"><a href="/players/${getPlayerSlug(p.id, p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
-                    <div class="text-end fw-bold text-dark" style="font-size: 1.0rem;">${opsDisplay} <span class="text-muted" style="font-size:0.6rem;">OPS</span></div>
-                </div>
-                <div class="text-muted text-truncate w-100" style="font-size: 0.72rem; margin-top: -2px;">
-                    v. <a href="/players/${getPlayerSlug(null, p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> • ${p.bvp.hits}-${p.bvp.ab} • ${avg} • ${p.bvp.hr} HR
-                </div>
-            `;
-            
-        } else if (mode === 'hr') {
-            let p_shortName = p.oppPitcher;
-            if (p_shortName.includes(' ') && !p_shortName.includes("(Proj)")) {
-                p_shortName = `${p_shortName.split(' ')[0].charAt(0)}. ${p_shortName.split(' ').slice(1).join(' ')}`;
-            }
-            
-            let hrIcon = '';
-            if (livePlayer) {
-                if (livePlayer.batting && livePlayer.batting.homeRuns > 0) {
-                    hrIcon = `<span title="Hit a Home Run Today!">✅</span>`;
-                } else if (isGameFinal) {
-                    hrIcon = `<span style="opacity: 0.5;" title="Game Final - No HR">❌</span>`;
-                }
-            }
-            
-            let pitcherSplitHtml = '';
-            if (p.oppPitcherSplit && p.oppPitcherSplit.ab > 0) {
-                pitcherSplitHtml = `<span><a href="/players/${getPlayerSlug(null, p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: ${p.oppPitcherSplit.ab} ABs • ${p.oppPitcherSplit.hr} HR</span>`;
-            } else {
-                pitcherSplitHtml = `<span><a href="/players/${getPlayerSlug(null, p.oppPitcher)}/" class="text-muted text-decoration-none fw-semibold">${p_shortName}</a> v${p.activeBatSide}: No History</span>`;
-            }
-            
-            tabSpecificHtml = `
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center pe-2" style="min-width: 0;">
-                        <div class="text-truncate" style="font-size: 0.95rem;"><a href="/players/${getPlayerSlug(p.id, p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
-                        ${gameStatusBadge}
-                    </div>
-                    <div class="text-end d-flex align-items-center h-100" style="font-size: 1.2rem; min-height: 20px;">${hrIcon}</div>
-                </div>
-                <div class="d-flex flex-column text-muted w-100" style="font-size: 0.70rem; line-height: 1.3; margin-top: -2px;">
-                    <span>Batter v${p.oppHand}: ${p.split.ab} ABs • ${p.split.hr} HR</span>
-                    ${pitcherSplitHtml}
-                    <span>BvP: ${p.bvp.ab} ABs • ${p.bvp.hr} HR</span>
-                </div>
-            `;
-            
-        } else {
-            const isValue = mode === 'value';
-            const salFmt = p.salary > 0 ? (p.salary / 1000).toFixed(1).replace('.0', '') + 'K' : '-';
-            
-            let topMetric = isValue 
-                ? `<div class="text-success fw-bold" style="font-size: 0.95rem;">${parseFloat(p.value || 0).toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.6rem;">Proj</span></div>` 
-                : `<div class="text-primary fw-bold" style="font-size: 0.95rem;">${parseFloat(p.proj || 0).toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.6rem;">Proj</span></div>`;
-
-            let actualPtsDisplay = `<div class="text-muted fw-bold" style="font-size: 0.95rem; opacity:0.4;">-- <span class="fw-normal" style="font-size:0.6rem;">Act</span></div>`;
-            let liveStatHtml = '';
-            
-            if (livePlayer) {
-                let actualPts = platform === 'dk' ? (livePlayer.dk_pts || 0) : (livePlayer.fd_pts || 0);
-                let actualValue = p.salary > 0 ? actualPts / (p.salary / 1000) : 0;
-                
-                let bat = livePlayer.batting;
-                let pit = livePlayer.pitching;
-                
-                let statParts = [];
-                if (pit && pit.battersFaced > 0) {
-                    statParts.push(`${pit.inningsPitched || '0.0'} IP`);
-                    statParts.push(`${pit.strikeOuts || 0} K`);
-                    statParts.push(`${pit.earnedRuns || 0} ER`);
-                    if (pit.wins > 0) statParts.push(`W`);
-                } 
-                else if (bat && (bat.plateAppearances > 0 || bat.atBats > 0)) {
-                    statParts.push(`${bat.hits || 0}-${bat.atBats || 0}`);
-                    if (bat.doubles > 0) statParts.push(`${bat.doubles} 2B`);
-                    if (bat.triples > 0) statParts.push(`${bat.triples} 3B`);
-                    if (bat.homeRuns > 0) statParts.push(`${bat.homeRuns} HR`);
-                    if (bat.runs > 0) statParts.push(`${bat.runs} R`);
-                    if (bat.rbi > 0) statParts.push(`${bat.rbi} RBI`);
-                    if (bat.baseOnBalls > 0) statParts.push(`${bat.baseOnBalls} BB`);
-                    if (bat.hitByPitch > 0) statParts.push(`${bat.hitByPitch} HBP`);
-                    if (bat.stolenBases > 0) statParts.push(`${bat.stolenBases} SB`);
-                }
-                
-                let bottomBadge = gameStatusBadge ? gameStatusBadge.replace('ms-2', 'me-2') : '';
-
-                if (statParts.length > 0) {
-                    let textColor = isGameFinal ? 'text-secondary' : 'text-success';
-                    liveStatHtml = `${bottomBadge}<span class="${textColor} fw-bold text-truncate pe-2" style="font-size:0.70rem;">${statParts.join(', ')}</span>`;
-                } else if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
-                    liveStatHtml = `${bottomBadge}<span class="text-muted fst-italic text-truncate pe-2" style="font-size:0.70rem;">No stats recorded</span>`;
-                } else if (bottomBadge) {
-                     liveStatHtml = `${bottomBadge}`;
-                }
-                
-                if (liveGame.status !== 'Preview' && liveGame.status !== 'Scheduled') {
-                    if (isValue) {
-                        actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size: 0.95rem;">${actualValue.toFixed(2)}x <span class="text-muted fw-normal" style="font-size:0.6rem;">Act</span></div>`;
-                    } else {
-                        actualPtsDisplay = `<div class="text-dark fw-bold" style="font-size: 0.95rem;">${actualPts.toFixed(1)} <span class="text-muted fw-normal" style="font-size:0.6rem;">Act</span></div>`;
-                    }
-                }
-            }
-
-            tabSpecificHtml = `
-                <div class="d-flex justify-content-between align-items-center w-100">
-                    <div class="d-flex align-items-baseline text-truncate pe-2" style="min-width: 0;">
-                        <div class="text-truncate me-1" style="font-size: 0.95rem;"><a href="/players/${getPlayerSlug(p.id, p.name)}/" class="fw-bold text-dark text-decoration-none" title="${p.name}">${shortName}</a></div>
-                        <div class="text-muted ms-1" style="font-size: 0.70rem; white-space: nowrap;">${displayPos} • ${salFmt}</div>
-                    </div>
-                    <div class="text-end flex-shrink-0 ms-2">${topMetric}</div>
-                </div>
-                
-                <div class="d-flex justify-content-between align-items-center w-100 mt-1">
-                    <div class="d-flex align-items-center text-truncate" style="min-width: 0; flex-grow: 1;">${liveStatHtml}</div>
-                    <div class="text-end flex-shrink-0 ms-auto ps-2">${actualPtsDisplay}</div>
-                </div>
-            `;
-        }
-
-        return `
-        <div class="d-flex align-items-center py-2 border-bottom user-select-none" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='transparent'">
-            <div class="fw-bold text-muted me-2 text-end flex-shrink-0" style="font-size: 0.85rem; width: 22px;">${index + 1}.</div>
-            <div class="me-3 position-relative flex-shrink-0">
-                ${photoHtml}
-                ${teamBadge}
-            </div>
-            
-            <div class="d-flex flex-column justify-content-center w-100" style="min-width: 0;">
-                ${tabSpecificHtml}
-            </div>
-        </div>`;
-    }).join('');
-};
-
-function buildTopPlaysCard(filteredGames, platform, selectedSlate) {
-    let allHitters = [];
-    let allPitchers = [];
-    let allBvP = []; 
-    let allHR = []; 
-    
-    filteredGames.forEach(game => {
-        const gameState = game.gameRaw?.status?.detailedState || '';
-        if (['Postponed', 'Delayed', 'Suspended', 'Cancelled', 'Delayed Start'].includes(gameState)) {
-            return; 
-        }
-        const pl = game.gameRaw?.teams || {}; 
-        const awayAbbr = pl.away?.team?.abbreviation || pl.away?.team?.name?.substring(0,3).toUpperCase();
-        const homeAbbr = pl.home?.team?.abbreviation || pl.home?.team?.name?.substring(0,3).toUpperCase();
-        const awayLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.away?.team?.id}.svg`;
-        const homeLogo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${pl.home?.team?.id}.svg`;
-        
-        const deepStats = game.deepStats || {};
-        const handDict = game.lineupHandedness || {};
-        const parkStats = game.parkStats || null; 
-
-        let posMap = {};
-        if (game.gamePositions) {
-            Object.assign(posMap, game.gamePositions);
-        }
-        if (game.gameRaw?.lineups?.awayPlayers) {
-            game.gameRaw.lineups.awayPlayers.forEach(p => {
-                if (p.primaryPosition?.abbreviation) posMap[p.id] = p.primaryPosition.abbreviation;
-            });
-        }
-        if (game.gameRaw?.lineups?.homePlayers) {
-            game.gameRaw.lineups.homePlayers.forEach(p => {
-                if (p.primaryPosition?.abbreviation) posMap[p.id] = p.primaryPosition.abbreviation;
-            });
-        }
-
-        const extract = (roster, teamAbbr, teamLogo, isPitcher, opposingPitcherName, opposingPitcherHand, opposingPitcherId) => {
-            if (!roster) return;
-            let arr = Array.isArray(roster) ? roster : [roster];
-            arr.forEach(p => {
-                if (!p) return;
-                let sal = 0, proj = 0, val = 0;
-                const slatesDict = platform === 'dk' ? (p.dk_slates || {}) : (p.fd_slates || {});
-                
-                if (selectedSlate !== 'all' && slatesDict[selectedSlate]) {
-                    sal = slatesDict[selectedSlate].salary; proj = slatesDict[selectedSlate].proj; val = slatesDict[selectedSlate].value;
-                } else if (selectedSlate === 'all') {
-                    sal = platform === 'dk' ? (p.dk_salary || 0) : (p.salary || 0); 
-                    proj = platform === 'dk' ? (p.dk_proj || 0) : (p.proj || 0); 
-                    val = platform === 'dk' ? (p.dk_value || 0) : (p.value || 0);
-                }
-                
-                let name = p.name || p.fullName || 'Unknown';
-                let photo = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.id}/headshot/67/current`;
-                let fieldPos = isPitcher ? 'P' : (posMap[p.id] || 'B');
-                
-                let fd_pos = p.fd_positions || '';
-                let dk_pos = p.dk_positions || '';
-                
-                if (sal > 0 || proj > 0) {
-                    let listToPush = isPitcher ? allPitchers : allHitters;
-                    listToPush.push({ id: p.id || name, name, pos: fieldPos, fd_positions: fd_pos, dk_positions: dk_pos, teamAbbrev: teamAbbr, teamLogo, photo, salary: sal, proj, value: val });
-                }
-
-                if (!isPitcher && p.id && deepStats[String(p.id)]) {
-                    const bvpStats = deepStats[String(p.id)].bvp;
-                    
-                    if (bvpStats && bvpStats.ab >= 5) {
-                        allBvP.push({
-                            id: p.id, name: name, pos: fieldPos, fd_positions: fd_pos, dk_positions: dk_pos, teamAbbrev: teamAbbr,
-                            teamLogo: teamLogo, photo: photo, bvp: bvpStats, oppPitcher: opposingPitcherName || "Unknown"
-                        });
-                    }
-                    
-                    let batterHand = handDict[String(p.id)] || 'R'; 
-                    let activeBatSide = batterHand;
-                    if (batterHand === 'S') activeBatSide = opposingPitcherHand === 'L' ? 'R' : 'L';
-
-                    let splitStats = opposingPitcherHand === 'L' ? deepStats[String(p.id)].split_vL : deepStats[String(p.id)].split_vR;
-                    let splitHrRate = 0;
-                    let bvpHrRate = 0;
-                    let oppPitcherHrRate = 0;
-                    let oppPitcherSplit = null;
-                    
-                    if (splitStats && splitStats.ab >= 10) splitHrRate = splitStats.hr / splitStats.ab;
-                    if (bvpStats && bvpStats.ab > 0) bvpHrRate = bvpStats.hr / bvpStats.ab;
-                    
-                    if (opposingPitcherId && deepStats[String(opposingPitcherId)]) {
-                        let oppPitcherStats = deepStats[String(opposingPitcherId)];
-                        oppPitcherSplit = activeBatSide === 'L' ? oppPitcherStats.split_vL : oppPitcherStats.split_vR;
-                        
-                        if (oppPitcherSplit && oppPitcherSplit.ab >= 10) {
-                            oppPitcherHrRate = oppPitcherSplit.hr / oppPitcherSplit.ab;
-                        }
-                    }
-                    
-                    let baseHrScore = splitHrRate + bvpHrRate + oppPitcherHrRate;
-                    let finalHrScore = baseHrScore;
-                    
-                    if (baseHrScore > 0 && parkStats) {
-                        let parkFactor = activeBatSide === 'L' ? parkStats.hr_l : parkStats.hr_r;
-                        if (parkFactor) finalHrScore = baseHrScore * (parkFactor / 100);
-                    }
-                    
-                    if (finalHrScore > 0) {
-                        allHR.push({
-                            id: p.id, name: name, pos: fieldPos, fd_positions: fd_pos, dk_positions: dk_pos, teamAbbrev: teamAbbr,
-                            teamLogo: teamLogo, photo: photo, 
-                            bvp: bvpStats || {ab: 0, hr: 0}, 
-                            split: splitStats || {ab: 0, hr: 0},
-                            oppPitcher: opposingPitcherName || "Unknown",
-                            oppHand: opposingPitcherHand,
-                            oppPitcherSplit: oppPitcherSplit || {ab: 0, hr: 0},
-                            activeBatSide: activeBatSide,
-                            hrScore: finalHrScore 
-                        });
-                    }
-                }
-            });
-        };
-        
-        const line = game.projectedLineups || {};
-        let awayPitcherName = line.away?.startingPitcher?.name || game.gameRaw?.teams?.away?.probablePitcher?.fullName || "TBD";
-        let homePitcherName = line.home?.startingPitcher?.name || game.gameRaw?.teams?.home?.probablePitcher?.fullName || "TBD";
-        let awayPitcherHand = game.gameRaw?.teams?.away?.probablePitcher?.pitchHand?.code || 'R';
-        let homePitcherHand = game.gameRaw?.teams?.home?.probablePitcher?.pitchHand?.code || 'R';
-        
-        let awayPitcherId = line.away?.startingPitcher?.id || game.gameRaw?.teams?.away?.probablePitcher?.id || null;
-        let homePitcherId = line.home?.startingPitcher?.id || game.gameRaw?.teams?.home?.probablePitcher?.id || null;
-
-        extract(line.away?.startingPitcher, awayAbbr, awayLogo, true, null, null, null);
-        extract(line.away?.battingOrder, awayAbbr, awayLogo, false, homePitcherName, homePitcherHand, homePitcherId);
-        extract(line.home?.startingPitcher, homeAbbr, homeLogo, true, null, null, null);
-        extract(line.home?.battingOrder, homeAbbr, homeLogo, false, awayPitcherName, awayPitcherHand, awayPitcherId);
-    });
-
-    if (allHitters.length === 0 && allPitchers.length === 0) return '';
-    
-    window.TOP_PLAYS_DATA = {
-        hitters: Array.from(new Map(allHitters.map(p => [p.id, p])).values()),
-        pitchers: Array.from(new Map(allPitchers.map(p => [p.id, p])).values()),
-        bvp: Array.from(new Map(allBvP.map(p => [p.id, p])).values()),
-        hr: Array.from(new Map(allHR.map(p => [p.id, p])).values()),
-        platform: platform
-    };
-
-    const posButtonsFD = ['ALL', 'P', 'C/1B', '2B', '3B', 'SS', 'OF'];
-    const posButtonsDK = ['ALL', 'P', 'C', '1B', '2B', '3B', 'SS', 'OF'];
-    const buttonsToUse = platform === 'dk' ? posButtonsDK : posButtonsFD;
-
-    let activePos = window.CURRENT_TOP_PLAYS_POS || 'ALL';
-    if (!buttonsToUse.includes(activePos)) activePos = 'ALL';
-    window.CURRENT_TOP_PLAYS_POS = activePos;
-
-    const buttonsHtml = buttonsToUse.map(pos => `<button class="pos-filter-btn ${pos === activePos ? 'active' : ''}" data-pos="${pos}" onclick="window.setTopPlaysPos(this)">${pos}</button>`).join('');
-
-    return `
-    <div class="col-md-6 col-lg-6 col-xl-4 px-1 mb-3">
-        <div class="card shadow-sm border overflow-hidden h-100" style="background-color: #fff; border-radius: 6px; border-color: #dee2e6 !important;">
-            <div class="card-header bg-dark text-white py-2 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold" style="font-size: 0.85rem;">⭐ Top Plays</h6>
-                <span class="badge bg-secondary" style="font-size: 0.6rem;">${platform === 'dk' ? 'DraftKings' : 'FanDuel'}</span>
-            </div>
-            
-            <div class="bg-light border-bottom d-flex align-items-center px-2 py-2 overflow-auto hide-scrollbar gap-1">
-                ${buttonsHtml}
-            </div>
-
-            <div class="bg-light border-bottom d-flex justify-content-center align-items-center px-2 py-0">
-                <div class="d-flex w-100">
-                    <div class="leaderboard-tab active w-100" style="width: 25%;" data-tab="value" onclick="window.setTopPlaysTab(this)">VALUE</div>
-                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="proj" onclick="window.setTopPlaysTab(this)">PROJ</div>
-                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="bvp" onclick="window.setTopPlaysTab(this)">BVP</div>
-                    <div class="leaderboard-tab w-100" style="width: 25%;" data-tab="hr" onclick="window.setTopPlaysTab(this)">HR</div>
-                </div>
-            </div>
-            
-            <div class="card-body p-0">
-                <div id="view-top-plays-list" class="px-2 list-view" style="max-height: 530px; overflow-y: auto;">
-                    </div>
-            </div>
-        </div>
-    </div>`;
 }
 
 window.ACTIVE_GAME_TABS = window.ACTIVE_GAME_TABS || {};
@@ -815,27 +276,18 @@ function adjustOverflowingNames() {
 }
 
 // ==========================================
-// 4. RENDERING ENGINE
+// 3. RENDERING ENGINE
 // ==========================================
 function renderGames(isSilentRefresh = false) {
     const container = document.getElementById('games-container');
     if (!container) return;
     
     let scrollY = 0;
-    let activeTopPlaysTab = 'value'; 
     let openStatsIds = [];
     let expandedCardIds = [];
-    let listViewScrollPositions = {}; 
 
      if (isSilentRefresh) {
         scrollY = window.scrollY;
-        
-        const activeTabEl = document.querySelector('.leaderboard-tab.active');
-        if (activeTabEl) activeTopPlaysTab = activeTabEl.getAttribute('data-tab');
-
-        document.querySelectorAll('.list-view').forEach(el => {
-            if (el.id) listViewScrollPositions[el.id] = el.scrollTop;
-        });
 
         document.querySelectorAll('.stats-collapse:not(.d-none)').forEach(el => {
             if (el.id) openStatsIds.push(el.id);
@@ -851,10 +303,6 @@ function renderGames(isSilentRefresh = false) {
 
     container.innerHTML = '';
 
-    const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
-    const platform = platformNode ? platformNode.value : 'fd';
-    const selectedSlate = document.getElementById('slate-selector')?.value || 'all';
-
     const searchInput = document.getElementById('team-search');
     const searchText = searchInput ? searchInput.value.toLowerCase() : '';
 
@@ -864,21 +312,9 @@ function renderGames(isSilentRefresh = false) {
         return matchString.includes(searchText);
     });
 
-    if (selectedSlate !== 'all') {
-        filteredGames = filteredGames.filter(item => hasSlatePlayers(item, platform, selectedSlate));
-    }
-
     if (filteredGames.length === 0) {
         container.innerHTML = `<div class="col-12 text-center py-5 text-muted fw-bold">No games match your filters.</div>`;
         return;
-    }
-
-    if (!searchText) {
-        const topPlaysHtml = buildTopPlaysCard(filteredGames, platform, selectedSlate);
-        if (topPlaysHtml) {
-            container.insertAdjacentHTML('beforeend', topPlaysHtml);
-            window.updateTopPlaysView(); 
-        }
     }
 
     let sortedGames = [...filteredGames].sort((a, b) => {
@@ -911,23 +347,11 @@ function renderGames(isSilentRefresh = false) {
         return new Date(a.gameRaw.gameDate) - new Date(b.gameRaw.gameDate);
     });
 
-    sortedGames.forEach(item => container.appendChild(createGameCard(item, platform, selectedSlate)));
+    sortedGames.forEach(item => container.appendChild(createGameCard(item)));
 
     adjustOverflowingNames();
 
     if (isSilentRefresh) {
-        const newActiveTab = document.querySelector(`.leaderboard-tab[data-tab="${activeTopPlaysTab}"]`);
-        if (newActiveTab) {
-            window.setTopPlaysTab(newActiveTab); 
-        } else {
-            window.updateTopPlaysView(); 
-        }
-
-        Object.keys(listViewScrollPositions).forEach(id => {
-            const listEl = document.getElementById(id);
-            if (listEl) listEl.scrollTop = listViewScrollPositions[id];
-        });
-
         openStatsIds.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.remove('d-none');
@@ -945,7 +369,7 @@ function renderGames(isSilentRefresh = false) {
     }
 } 
 
-function createGameCard(data, platform, selectedSlate) {
+function createGameCard(data) {
     const game = data.gameRaw;
     const handDict = data.lineupHandedness || {}; 
     const deepStats = data.deepStats || {};
@@ -1237,9 +661,10 @@ function createGameCard(data, platform, selectedSlate) {
                 ${topLineHtml}
                 <div class="text-muted text-truncate w-100" style="font-size: 0.60rem;">v${opposingPitcherHand}: ${splitHits}-${pSplit.ab}•${pSplit.avg}•${pSplit.ops}•${pSplit.hr} HR</div>`;
 
-            const fdSal = selectedSlate === 'all' ? (p.salary || 0) : (p.fd_slates?.[selectedSlate]?.salary || 0);
-            const fdProj = selectedSlate === 'all' ? (p.proj || 0) : (p.fd_slates?.[selectedSlate]?.proj || 0);
-            const fdVal = selectedSlate === 'all' ? (p.value || 0) : (p.fd_slates?.[selectedSlate]?.value || 0);
+            // Stripped slate dependencies: falls back to default daily projection 
+            const fdSal = p.salary || 0;
+            const fdProj = p.proj || 0;
+            const fdVal = p.value || 0;
             const fdSalStr = fdSal > 0 ? '$' + (fdSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewFd = `
                 ${topLineHtml}
@@ -1249,9 +674,9 @@ function createGameCard(data, platform, selectedSlate) {
                     <span class="text-success fw-bold">Value: ${fdVal > 0 ? parseFloat(fdVal).toFixed(1) + 'x' : '-'}</span>
                 </div>`;
 
-            const dkSal = selectedSlate === 'all' ? (p.dk_salary || 0) : (p.dk_slates?.[selectedSlate]?.salary || 0);
-            const dkProj = selectedSlate === 'all' ? (p.dk_proj || 0) : (p.dk_slates?.[selectedSlate]?.proj || 0);
-            const dkVal = selectedSlate === 'all' ? (p.dk_value || 0) : (p.dk_slates?.[selectedSlate]?.value || 0);
+            const dkSal = p.dk_salary || 0;
+            const dkProj = p.dk_proj || 0;
+            const dkVal = p.dk_value || 0;
             const dkSalStr = dkSal > 0 ? '$' + (dkSal/1000).toFixed(1).replace('.0','') + 'K' : '-';
             const viewDk = `
                 ${topLineHtml}
@@ -1395,7 +820,7 @@ function openTweetModal(text) {
 }
 
 // ==========================================
-// 5. EVENT LISTENERS & ACCORDION
+// 4. EVENT LISTENERS
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     init(DEFAULT_DATE);
