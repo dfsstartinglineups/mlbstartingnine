@@ -1,7 +1,7 @@
 import os
 import json
 import re
-import datetime
+from datetime import datetime, timedelta  # 👈 This fixes both .now() and timedelta
 import unicodedata
 
 # =========================================================================
