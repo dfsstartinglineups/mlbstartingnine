@@ -181,9 +181,9 @@ def find_game_in_slate(slate_data, team_id):
 def render_analytics_section(target_game, target_side, batters, game_num, player_db):
     if not target_game or not target_game.get("deepStats"): return ""
     
-    deep_stats = target_game.get("deepStats", {})
-    ump_stats = target_game.get("umpStats", {})
-    park_stats = target_game.get("parkStats", {})
+    deep_stats = target_game.get("deepStats") or {}
+    ump_stats = target_game.get("umpStats") or {}
+    park_stats = target_game.get("parkStats") or {}
     
     opp_side = 'home' if target_side == 'away' else 'away'
     opp_pitcher = get_safe_pitcher(target_game, opp_side, game_num)
