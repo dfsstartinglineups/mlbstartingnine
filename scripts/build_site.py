@@ -129,7 +129,7 @@ BASE_TEMPLATE = """<!DOCTYPE html>
     <p class="text-muted mb-2" style="font-size: 0.85rem;">Live BvP matchups, pitcher splits, umpire tendencies, daily fantasy projections, and park factors.</p>
 </div>
 
-<!-- Restored DFS Controls Row -->
+<!-- Restored DFS Controls Row (Global Expand/Collapse Button Removed) -->
 <div id="dfs-controls-row" class="container d-flex align-items-center mb-3 gap-2 px-2">
     <div class="btn-group shadow-sm flex-shrink-0" role="group">
         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
@@ -141,9 +141,6 @@ BASE_TEMPLATE = """<!DOCTYPE html>
     <select id="dfs-page-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 180px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
         <!-- Populated by JS -->
     </select>
-    
-    <!-- Restored Global Toggle Button -->
-    <button id="global-toggle-btn" class="btn btn-sm btn-outline-secondary ms-auto fw-bold" style="font-size: 0.80rem;">[+] Expand All</button>
 </div>
 
 <!-- Three Separated Partitions Built Pre-rendered by Python Backend -->
@@ -211,17 +208,28 @@ window.switchGameTab = function(gamePk, tabName, btnEl) {
     const card = document.getElementById(`game-${gamePk}`);
     if (!card) return;
     
+    const isAlreadyActive = btnEl.classList.contains('active');
+    
+    // Reset all buttons in this card to their default look
     card.querySelectorAll('.tab-btn').forEach(b => {
         b.classList.remove('active', 'btn-primary', 'text-white');
         b.classList.add('btn-outline-secondary', 'text-muted');
     });
-    btnEl.classList.add('active', 'btn-primary', 'text-white');
-    btnEl.classList.remove('btn-outline-secondary', 'text-muted');
-
-    window.ACTIVE_GAME_TABS[gamePk] = tabName;
-
+    
+    // Hide all view variants completely
     card.querySelectorAll('.player-view').forEach(v => v.classList.add('d-none'));
-    card.querySelectorAll(`.view-${tabName}`).forEach(v => v.classList.remove('d-none'));
+    
+    if (isAlreadyActive) {
+        // TOGGLE OFF: If they clicked an active button, return to the default clean view
+        card.querySelectorAll('.view-default').forEach(v => v.classList.remove('d-none'));
+        delete window.ACTIVE_GAME_TABS[gamePk];
+    } else {
+        // TOGGLE ON: Highlight the clicked button and show its specific stats view
+        btnEl.classList.add('active', 'btn-primary', 'text-white');
+        btnEl.classList.remove('btn-outline-secondary', 'text-muted');
+        window.ACTIVE_GAME_TABS[gamePk] = tabName;
+        card.querySelectorAll(`.view-${tabName}`).forEach(v => v.classList.remove('d-none'));
+    }
 };
 
 function filterTeams() {
@@ -300,14 +308,7 @@ document.addEventListener('click', (e) => {
         card.querySelectorAll('.stats-collapse').forEach(d => isExp ? d.classList.remove('d-none') : d.classList.add('d-none'));
         btn.textContent = isExp ? '[-] Collapse Matchups' : '[+] Expand Matchups';
     }
-    
-    if (e.target.closest('#global-toggle-btn')) {
-        const btn = e.target.closest('#global-toggle-btn');
-        const isExp = btn.textContent.includes('+');
-        document.querySelectorAll('.stats-collapse').forEach(d => isExp ? d.classList.remove('d-none') : d.classList.add('d-none'));
-        document.querySelectorAll('.card-toggle-btn').forEach(b => b.textContent = isExp ? '[-] Collapse Matchups' : '[+] Expand Matchups');
-        btn.textContent = isExp ? '[-] Collapse All' : '[+] Expand All';
-    }
+    // Global toggle event block completely stripped out from here
 });
 
 // ========================================================
@@ -749,13 +750,13 @@ def generate_games_html(date_str, player_db):
                     </div>
                 </div>
                 
-                <div class="d-flex justify-content-center align-items-center gap-2 my-2 px-2 pb-2 border-bottom w-100">
-                    <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 active btn-primary text-white" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'default', this)">DEFAULT</button>
-                    <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'season', this)">SEASON</button>
-                    <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'vsp', this)">VS P</button>
-                    <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'splits', this)">SPLITS</button>
-                    <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'fd', this)">FD</button>
-                    <button class="btn btn-sm fw-bold rounded-pill px-3 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'dk', this)">DK</button>
+                <!-- Reconfigured Sub-tabs Button Layout (Acts as stats toggles) -->
+                <div class="d-flex justify-content-center align-items-center gap-1 my-2 px-2 pb-2 border-bottom w-100">
+                    <button class="btn btn-sm fw-bold rounded-pill px-2 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'season', this)">SEASON</button>
+                    <button class="btn btn-sm fw-bold rounded-pill px-2 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'vsp', this)">VS P</button>
+                    <button class="btn btn-sm fw-bold rounded-pill px-2 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'splits', this)">SPLITS</button>
+                    <button class="btn btn-sm fw-bold rounded-pill px-2 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'fd', this)">FD</button>
+                    <button class="btn btn-sm fw-bold rounded-pill px-2 py-1 tab-btn flex-grow-1 btn-outline-secondary text-muted" style="font-size: 0.65rem;" onclick="switchGameTab('{game_pk}', 'dk', this)">DK</button>
                 </div>
                 
                 <div class="row g-0 bg-white stats-collapse">
