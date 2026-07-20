@@ -516,8 +516,14 @@ function sortTable(thElement, colIndex, forceDesc = false) {
 # =========================================================================
 # --- 6. COMPILING & BUILDING EXECUTION LOOP ---
 # =========================================================================
+def get_target_slate_date():
+    now = datetime.now(ZoneInfo("America/New_York"))
+    if now.hour < 3:
+        now = now - timedelta(days=1)
+    return now.strftime("%Y-%m-%d")
+
 def main():
-    today_str = datetime.date.today().strftime("%Y-%m-%d")
+    today_str = get_target_slate()
     target_pattern = f"games_{today_str}.json"
     target_path = os.path.join(DAILY_FILES_DIR, target_pattern)
 
