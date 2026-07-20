@@ -504,7 +504,7 @@ def main():
     else:
         start_date = today_est_str
         
-    end_date = (current_est_time + timedelta(days=7)).strftime('%Y-%m-%d') 
+    end_date = (current_est_time + timedelta(days=3)).strftime('%Y-%m-%d') 
     
     print(f"🚀 Building Master JSONs using the Daily File as Memory")
     
