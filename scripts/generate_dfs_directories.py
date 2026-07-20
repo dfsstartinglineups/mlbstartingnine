@@ -523,7 +523,7 @@ def get_target_slate_date():
     return now.strftime("%Y-%m-%d")
 
 def main():
-    today_str = get_target_slate()
+    today_str = get_target_slate_date()
     target_pattern = f"games_{today_str}.json"
     target_path = os.path.join(DAILY_FILES_DIR, target_pattern)
 
