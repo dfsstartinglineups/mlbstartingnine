@@ -341,7 +341,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         
         <div class="d-flex align-items-center gap-2 ms-md-3">
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
-            <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="window.location.href=this.value">
+            <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 {% for pos_key, pos_label in position_links.items() %}
                 <option value="/dfs/{{ platform_slug }}/top-{{ pos_key }}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
                 {% endfor %}
@@ -434,7 +434,32 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }, { passive: true });
     }
+
+    // NEW: URL Parameter check to restore slate selection
+    const urlParams = new URLSearchParams(window.location.search);
+    const slateParam = urlParams.get('slate');
+    if (slateParam) {
+        const slateSelector = document.getElementById('slate-selector');
+        if (slateSelector) {
+            // Verify the slate exists in this dropdown before applying
+            const optionExists = Array.from(slateSelector.options).some(opt => opt.value === slateParam);
+            if (optionExists) {
+                slateSelector.value = slateParam;
+                filterSlate(slateParam);
+            }
+        }
+    }
 });
+
+// Add this new function to handle navigating while preserving the slate
+function changePosition(base_url) {
+    const slateSelector = document.getElementById('slate-selector');
+    if (slateSelector && slateSelector.value !== 'all') {
+        window.location.href = base_url + '?slate=' + slateSelector.value;
+    } else {
+        window.location.href = base_url;
+    }
+}
 
 function filterSlate(slateId) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
