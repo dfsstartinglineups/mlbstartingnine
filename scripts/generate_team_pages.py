@@ -418,19 +418,15 @@ def generate_team_html(team, player_db, daily_slates):
         game_start_date = raw.get('gameDate', f"{game_date_raw}T00:00:00Z")
         venue_name = raw.get('venue', {}).get('name', '')
 
-        a_proj = target_game.get('projectedLineups', {}).get('away', {}).get('battingOrder', [])
-        h_proj = target_game.get('projectedLineups', {}).get('home', {}).get('battingOrder', [])
-        a_players = raw.get('lineups', {}).get('awayPlayers', [])
-        h_players = raw.get('lineups', {}).get('homePlayers', [])
+        # ONLY pull the roster arrays for the target team page
+        target_proj = target_game.get('projectedLineups', {}).get(target_side, {}).get('battingOrder', [])
+        target_players = raw.get('lineups', {}).get(f'{target_side}Players', [])
         
-        is_a_official = len(a_players) > 0
-        is_h_official = len(h_players) > 0
+        is_target_official = len(target_players) > 0
+        final_target_players = target_players if is_target_official else target_proj
         
-        final_away = a_players if is_a_official else a_proj
-        final_home = h_players if is_h_official else h_proj
-
-        away_roster = build_roster_schema(final_away, away_name, is_a_official)
-        home_roster = build_roster_schema(final_home, home_name, is_h_official)
+        target_team_name = away_name if target_side == 'away' else home_name
+        target_roster = build_roster_schema(final_target_players, target_team_name, is_target_official)
 
         schema_event = {
             "@context": "https://schema.org",
@@ -455,8 +451,11 @@ def generate_team_html(team, player_db, daily_slates):
             "url": page_url
         }
 
-        if away_roster: schema_event["competitor"][0]["subOrganization"] = away_roster
-        if home_roster: schema_event["competitor"][1]["subOrganization"] = home_roster
+        # ONLY attach the subOrganization to the team featured on this page
+        if target_side == 'away' and target_roster:
+            schema_event["competitor"][0]["subOrganization"] = target_roster
+        elif target_side == 'home' and target_roster:
+            schema_event["competitor"][1]["subOrganization"] = target_roster
         
         schema_json_str = json.dumps(schema_event, indent=4)
         
