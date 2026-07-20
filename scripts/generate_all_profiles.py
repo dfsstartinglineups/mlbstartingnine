@@ -191,7 +191,11 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
 
     active_live = live_data.get(game_pk)
     if active_live:
-        game_state_lbl = f"{active_live.get('status', 'Live')} {active_live.get('half', '')} {re.sub(r'\\D', '', active_live.get('inning', ''))}"
+        # THE FIX: Calculate the clean inning number BEFORE inserting it into the f-string
+        inning_raw = active_live.get('inning', '')
+        inning_clean = re.sub(r'\D', '', inning_raw)
+        game_state_lbl = f"{active_live.get('status', 'Live')} {active_live.get('half', '')} {inning_clean}".strip()
+        
         side_upper = team_side.upper()
         player_box = active_live.get("players", {}).get(side_upper, {}).get(f"ID{player_id}", {})
         profile = player_box.get("batting", {}) or player_box.get("pitching", {})
