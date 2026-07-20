@@ -1,7 +1,8 @@
 import os
 import json
 import re
-from datetime import datetime, timedelta  # 👈 This fixes both .now() and timedelta
+from datetime import datetime, timedelta  # Handles the time shifting
+from zoneinfo import ZoneInfo             # 👈 This clears the ZoneInfo NameError
 import unicodedata
 
 # =========================================================================
