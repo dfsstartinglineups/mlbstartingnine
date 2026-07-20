@@ -604,6 +604,13 @@ def generate_games_html(date_str, player_db):
         if 'Blue Jays' in home_name_full: home_name = 'Blue Jays'
         if home_name == 'Diamondbacks': home_name = 'Dbacks'
 
+        # Extract and format league records safely
+        a_rec = away_team.get('leagueRecord', {})
+        h_rec = home_team.get('leagueRecord', {})
+        
+        away_record = f"({a_rec.get('wins')}-{a_rec.get('losses')})" if a_rec.get('wins') is not None else ""
+        home_record = f"({h_rec.get('wins')}-{h_rec.get('losses')})" if h_rec.get('wins') is not None else ""
+
         away_logo = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{away_team.get('team',{}).get('id')}.svg"
         home_logo = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{home_team.get('team',{}).get('id')}.svg"
         
@@ -736,14 +743,18 @@ def generate_games_html(date_str, player_db):
                         <div class="d-flex flex-column" style="width: 48%;">
                             <div class="d-flex align-items-center text-truncate mb-1">
                                 <img src="{away_logo}" style="height: 24px; width: 24px; margin-right: 6px; flex-shrink: 0;">
-                                <span class="fw-bold text-truncate" style="font-size: 0.95rem;">{away_name}</span>
+                                <span class="fw-bold text-truncate" style="font-size: 0.95rem;">
+                                    {away_name} <span class="text-muted fw-normal" style="font-size: 0.8rem; margin-left: 2px;">{away_record}</span>
+                                </span>
                             </div>
                             {away_pitcher_box}
                         </div>
                         <div class="d-flex flex-column" style="width: 48%;">
                             <div class="d-flex align-items-center text-truncate mb-1">
                                 <img src="{home_logo}" style="height: 24px; width: 24px; margin-right: 6px; flex-shrink: 0;">
-                                <span class="fw-bold text-truncate" style="font-size: 0.95rem;">{home_name}</span>
+                                <span class="fw-bold text-truncate" style="font-size: 0.95rem;">
+                                    {home_name} <span class="text-muted fw-normal" style="font-size: 0.8rem; margin-left: 2px;">{home_record}</span>
+                                </span>
                             </div>
                             {home_pitcher_box}
                         </div>
