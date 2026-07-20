@@ -34,7 +34,7 @@ BASE_TEMPLATE = """<!DOCTYPE html>
     
     <title>MLB Starting Nine | Today's MLB Starting Lineups, Odds & Player Projections</title>
     
-    <!-- Restored SEO & Social Meta Tags -->
+    
     <meta name="description" content="Live MLB starting lineups, probable pitchers, moneylines, and totals. Plus daily MLB player projections, Batter vs. Pitcher (BvP) matchups, pitcher splits, umpire tendencies, and park factors.">
     <meta name="keywords" content="MLB starting lineups, MLB player projections, MLB odds, baseball projections, BvP matchups, batter vs pitcher, pitcher splits, umpire tendencies, stadium park factors, daily fantasy baseball, DFS lineups, MLB betting, MLB starting pitchers">
     <link rel="canonical" href="https://mlbstartingnine.com/">
