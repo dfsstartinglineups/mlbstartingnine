@@ -85,7 +85,17 @@ def slugify(text):
 
 def get_est_date_string(offset_days=0):
     tz = ZoneInfo("America/New_York")
-    target_date = datetime.now(tz) + timedelta(days=offset_days)
+    now_est = datetime.now(tz)
+    
+    # 🛑 3:00 AM EST Crossover Window
+    # If it's between midnight and 2:59:59 AM Eastern, operational today is pushed back 1 day
+    if now_est.hour < 3:
+        operational_today = now_est - timedelta(days=1)
+    else:
+        operational_today = now_est
+        
+    # Calculate the targeted day offset relative to the operational window baseline
+    target_date = operational_today + timedelta(days=offset_days)
     return target_date.strftime("%Y-%m-%d")
 
 def get_player_slug(player_id, default_name, player_db):
