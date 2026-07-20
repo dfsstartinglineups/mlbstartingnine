@@ -24,7 +24,7 @@ def slugify(text):
 
 def get_target_slate_date():
     now = datetime.now(ZoneInfo("America/New_York"))
-    if now.hour < 4:
+    if now.hour < 3:
         now = now - timedelta(days=1)
     return now.strftime("%Y-%m-%d")
 
