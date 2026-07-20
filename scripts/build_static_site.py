@@ -1,28 +1,56 @@
 import json
 import os
+from datetime import datetime, timedelta
+import pytz
 from jinja2 import Template
 
 def load_json(filepath):
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
-            # Ensure we return the games array
             if isinstance(data, list):
                 return data
             return data.get("games", [])
     except FileNotFoundError:
+        print(f"Warning: File not found {filepath}")
         return []
 
 def build_site():
     data_dir = 'data/daily_files'
     
+    # 1. Get the exact current time in US/Eastern (EST/EDT)
+    est_tz = pytz.timezone('US/Eastern')
+    now_est = datetime.now(est_tz)
+    
+    # 2. Apply the 3:00 AM EST Crossover Logic
+    # If it's between midnight and 2:59:59 AM EST, we are operationally still "yesterday"
+    if now_est.hour < 3:
+        operational_today = now_est - timedelta(days=1)
+    else:
+        operational_today = now_est
+
+    # 3. Calculate operational yesterday and tomorrow relative to our shifted "today"
+    operational_yesterday = operational_today - timedelta(days=1)
+    operational_tomorrow = operational_today + timedelta(days=1)
+
+    # 4. Format to string names matching your file system layout
+    yesterday_str = operational_yesterday.strftime('%Y-%m-%d')
+    today_str = operational_today.strftime('%Y-%m-%d')
+    tomorrow_str = operational_tomorrow.strftime('%Y-%m-%d')
+    
+    print(f"Operational Window (3AM EST Rollover) Configured:")
+    print(f" -> Yesterday Target: games_{yesterday_str}.json")
+    print(f" -> Today Target:     games_{today_str}.json")
+    print(f" -> Tomorrow Target:  games_{tomorrow_str}.json")
+
+    # 5. Extract the dynamic date payloads
     data = {
-        'yesterday': load_json(os.path.join(data_dir, 'yesterday.json')),
-        'today': load_json(os.path.join(data_dir, 'today.json')),
-        'tomorrow': load_json(os.path.join(data_dir, 'tomorrow.json'))
+        'yesterday': load_json(os.path.join(data_dir, f'games_{yesterday_str}.json')),
+        'today': load_json(os.path.join(data_dir, f'games_{today_str}.json')),
+        'tomorrow': load_json(os.path.join(data_dir, f'games_{tomorrow_str}.json'))
     }
 
-    # The fully consolidated template containing your exact index.html and script.js structures
+    # The consolidated production template structure
     html_template = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +104,6 @@ def build_site():
         #team-search::placeholder { color: #adb5bd !important; opacity: 1; }
         #team-search:focus { width: 150px; background-color: #495057 !important; color: #ffffff !important; border-color: #0d6efd !important; box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important; cursor: text; }
         
-        /* New Static Day Containers */
         .day-container { display: none; }
         #today-container { display: flex; } 
     </style>
@@ -90,7 +117,6 @@ def build_site():
         </div>
         <div class="d-flex align-items-center gap-2 gap-md-3">
             <input type="text" id="team-search" class="form-control form-control-sm" placeholder="🔍">
-            <!-- Day Toggles Replaced the Date Picker -->
             <div class="btn-group" role="group">
                 <button type="button" class="btn btn-sm btn-outline-light fw-bold" onclick="showDay('yesterday-container')">Yesterday</button>
                 <button type="button" class="btn btn-sm btn-light fw-bold" onclick="showDay('today-container')">Today</button>
@@ -105,7 +131,6 @@ def build_site():
     <p class="text-muted mb-2" style="font-size: 0.85rem;">Live BvP matchups, pitcher splits, umpire tendencies, daily fantasy projections, and park factors.</p>
 </div>
 
-<!-- GAME CARD MACRO -->
 {% macro render_game(item) %}
     {% set game = item.gameRaw %}
     {% set away_name = game.teams.away.team.teamName %}
@@ -198,7 +223,6 @@ def build_site():
 {% endmacro %}
 
 <div class="container">
-    <!-- Yesterday -->
     <div id="yesterday-container" class="row justify-content-center day-container">
         {% for game in data.yesterday %}
             {{ render_game(game) }}
@@ -207,7 +231,6 @@ def build_site():
         {% endfor %}
     </div>
 
-    <!-- Today (Default Active) -->
     <div id="today-container" class="row justify-content-center day-container">
         {% for game in data.today %}
             {{ render_game(game) }}
@@ -216,7 +239,6 @@ def build_site():
         {% endfor %}
     </div>
 
-    <!-- Tomorrow -->
     <div id="tomorrow-container" class="row justify-content-center day-container">
         {% for game in data.tomorrow %}
             {{ render_game(game) }}
@@ -233,7 +255,6 @@ def build_site():
 </footer>
 
 <script>
-    // Client-Side Day & Tab Toggle Logic (Kept inline to prevent rendering flashes)
     function showDay(containerId) {
         document.querySelectorAll('.day-container').forEach(el => {
             el.style.display = 'none';
@@ -260,9 +281,7 @@ def build_site():
     }
 </script>
 
-<!-- SILENT REFRESH LOGIC -->
 <script src="silent_refresh.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
