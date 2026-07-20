@@ -703,13 +703,22 @@ def generate_games_html(date_str, player_db):
         display_ump = f"{hp_umpire.split(' ')[0][0]}. {' '.join(hp_umpire.split(' ')[1:])}" if (' ' in hp_umpire and hp_umpire != "TBD") else hp_umpire
         ump_str = f'<span class="text-dark fw-bold">{html.escape(display_ump)}</span>'
         if ump_stats:
-            uk = float(ump_stats.get('k_rate', 0))
-            ubb = float(ump_stats.get('bb_rate', 0))
-            ur = float(ump_stats.get('rpg', 0))
-            kc = "text-danger" if uk>=23.0 else ("text-success" if uk<=21.0 else "text-dark")
-            bbc = "text-success" if ubb>=9.0 else ("text-danger" if ubb<=7.5 else "text-dark")
-            rc = "text-success" if ur>=9.5 else ("text-danger" if ur<=8.0 else "text-dark")
-            ump_str += f'<span class="text-muted fw-normal" style="margin-left: 4px;">(G: <span class="text-dark fw-bold">{ump_stats.get("games")}</span>•K: <span class="{kc} fw-bold">{uk}</span>•BB: <span class="{bbc} fw-bold">{ubb}</span>•Runs: <span class="{rc} fw-bold">{ur}</span>)</span>'
+            raw_k = ump_stats.get('k_rate', '-')
+            raw_bb = ump_stats.get('bb_rate', '-')
+            raw_r = ump_stats.get('rpg', '-')
+
+            # Safely strip out '%' signs to convert to floats for threshold comparisons
+            uk = float(str(raw_k).replace('%', '').strip()) if raw_k and raw_k != '-' else 0.0
+            ubb = float(str(raw_bb).replace('%', '').strip()) if raw_bb and raw_bb != '-' else 0.0
+            ur = float(str(raw_r).replace('%', '').strip()) if raw_r and raw_r != '-' else 0.0
+            
+            # Text coloring thresholds based on parsed floats
+            kc = "text-danger" if uk >= 23.0 else ("text-success" if uk <= 21.0 else "text-dark")
+            bbc = "text-success" if ubb >= 9.0 else ("text-danger" if ubb <= 7.5 else "text-dark")
+            rc = "text-success" if ur >= 9.5 else ("text-danger" if ur <= 8.0 else "text-dark")
+            
+            # Use the original raw values (like '20.8%') for the visual display strings
+            ump_str += f'<span class="text-muted fw-normal" style="margin-left: 4px;">(G: <span class="text-dark fw-bold">{ump_stats.get("games", "-")}</span>•K: <span class="{kc} fw-bold">{raw_k}</span>•BB: <span class="{bbc} fw-bold">{raw_bb}</span>•Runs: <span class="{rc} fw-bold">{raw_r}</span>)</span>'
 
         cards_html.append(f"""
         <div class="col-md-6 col-lg-6 col-xl-4 px-1 mb-3">
