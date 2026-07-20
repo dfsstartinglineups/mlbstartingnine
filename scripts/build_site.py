@@ -26,6 +26,8 @@ BASE_TEMPLATE = """<!DOCTYPE html>
       "url": "https://mlbstartingnine.com/"
     }
     </script>
+    <!-- Add this placeholder line right here -->
+    <!-- DYNAMIC_GAMES_SCHEMA -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -126,7 +128,7 @@ BASE_TEMPLATE = """<!DOCTYPE html>
 </nav>
 
 <div class="container mt-3 mb-3 text-center">
-    <h1 class="h5 fw-bold text-dark mb-1">MLB Starting Nine: Today's MLB Starting Lineups, Odds & Player Projections</h1>
+    <h1 id="main-page-header" class="h5 fw-bold text-dark mb-1">MLB Starting Lineups & Projections: <!-- PRETTY_TODAY --></h1>
     <p class="text-muted mb-2" style="font-size: 0.85rem;">Live BvP matchups, pitcher splits, umpire tendencies, daily fantasy projections, and park factors.</p>
 </div>
 
@@ -178,8 +180,21 @@ BASE_TEMPLATE = """<!DOCTYPE html>
 let currentActiveDay = 'today';
 window.ACTIVE_GAME_TABS = {};
 
+const HEADER_DATES = {
+    'yesterday': '<!-- PRETTY_YEST -->',
+    'today': '<!-- PRETTY_TODAY -->',
+    'tomorrow': '<!-- PRETTY_TOM -->'
+};
+
 function switchDay(targetDay) {
     currentActiveDay = targetDay;
+    
+    // Dynamically update the H1 text for the user
+    const h1El = document.getElementById('main-page-header');
+    if (h1El && HEADER_DATES[targetDay]) {
+        h1El.textContent = `MLB Starting Lineups & Projections: ${HEADER_DATES[targetDay]}`;
+    }
+
     document.getElementById('games-yesterday').classList.add('d-none');
     document.getElementById('games-today').classList.add('d-none');
     document.getElementById('games-tomorrow').classList.add('d-none');
@@ -420,6 +435,101 @@ def get_3day_dates():
 # ==========================================
 # 3. UTILITY HELPER FUNCTIONS
 # ==========================================
+def generate_games_schema(date_str):
+    file_path = f"data/daily_files/games_{date_str}.json"
+    if not os.path.exists(file_path):
+        return ""
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            raw_data = json.load(f)
+        games_list = raw_data if isinstance(raw_data, list) else raw_data.get('games', [])
+    except Exception:
+        return ""
+        
+    schema_events = []
+    for data in games_list:
+        game = data.get('gameRaw', {})
+        away_name = game.get('teams', {}).get('away', {}).get('team', {}).get('name', '')
+        home_name = game.get('teams', {}).get('home', {}).get('team', {}).get('name', '')
+        game_date = game.get('gameDate', '')
+        venue_name = game.get('venue', {}).get('name', '')
+        
+        # Pull down the arrays to determine official status
+        a_proj = data.get('projectedLineups', {}).get('away', {}).get('battingOrder', [])
+        h_proj = data.get('projectedLineups', {}).get('home', {}).get('battingOrder', [])
+        a_players = game.get('lineups', {}).get('awayPlayers', [])
+        h_players = game.get('lineups', {}).get('homePlayers', [])
+        
+        is_a_official = len(a_players) > 0
+        is_h_official = len(h_players) > 0
+        
+        final_away = a_players if is_a_official else a_proj
+        final_home = h_players if is_h_official else h_proj
+
+        # Convert the player structures into an ordered list schema with STATUS labels
+        def build_roster_schema(player_list, team_name, is_official):
+            if not player_list: 
+                return None
+            
+            status_label = "Official" if is_official else "Projected"
+            roster_items = []
+            
+            for idx, p in enumerate(player_list[:9]):
+                p_name = p.get('fullName', p.get('name', ''))
+                roster_items.append({
+                    "@type": "ListItem",
+                    "position": idx + 1,
+                    "item": {
+                        "@type": "Person",
+                        "name": p_name
+                    }
+                })
+                
+            return {
+                "@type": "ItemList", 
+                "name": f"{team_name} {status_label} Starting Lineup",
+                "itemListElement": roster_items
+            }
+
+        away_roster = build_roster_schema(final_away, away_name, is_a_official)
+        home_roster = build_roster_schema(final_home, home_name, is_h_official)
+
+        if away_name and home_name:
+            event = {
+                "@context": "https://schema.org",
+                "@type": "SportsEvent",
+                "name": f"{away_name} at {home_name} Matchup",
+                "startDate": game_date,
+                "location": {
+                    "@type": "Place",
+                    "name": venue_name
+                },
+                "competitor": [
+                    {
+                        "@type": "SportsTeam",
+                        "name": away_name,
+                        "subOrganization": away_roster if away_roster else {}
+                    },
+                    {
+                        "@type": "SportsTeam",
+                        "name": home_name,
+                        "subOrganization": home_roster if home_roster else {}
+                    }
+                ]
+            }
+            
+            # Clean up empty subOrganization keys if rosters are missing entirely
+            if not away_roster: event["competitor"][0].pop("subOrganization", None)
+            if not home_roster: event["competitor"][1].pop("subOrganization", None)
+            
+            schema_events.append(event)
+            
+    if not schema_events:
+        return ""
+        
+    return f'<script type="application/ld+json">\n{json.dumps(schema_events, indent=2)}\n</script>'
+
 def slugify(text):
     if not text:
         return ""
@@ -815,10 +925,26 @@ def main():
     html_yest = generate_games_html(yest, player_db)
     html_today = generate_games_html(today, player_db)
     html_tom = generate_games_html(tom, player_db)
+
+    # Generate Google Schema strictly for TODAY'S games
+    today_schema = generate_games_schema(today)
     
+    # Format a human-readable header date (e.g., "July 20, 2026")
+    import datetime
+    pretty_today = datetime.datetime.strptime(today, "%Y-%m-%d").strftime("%B %d, %Y")
+    pretty_yest = datetime.datetime.strptime(yest, "%Y-%m-%d").strftime("%B %d, %Y")
+    pretty_tom = datetime.datetime.strptime(tom, "%Y-%m-%d").strftime("%B %d, %Y")
+    
+    # Perform the replacements
     output = BASE_TEMPLATE.replace('<!-- GALAXY_YESTERDAY -->', html_yest)
     output = output.replace('<!-- GALAXY_TODAY -->', html_today)
     output = output.replace('<!-- GALAXY_TOMORROW -->', html_tom)
+    
+    # Inject the new SEO targeting schemas and dynamic UI dates
+    output = output.replace('<!-- DYNAMIC_GAMES_SCHEMA -->', today_schema)
+    output = output.replace('<!-- PRETTY_TODAY -->', pretty_today)
+    output = output.replace('<!-- PRETTY_YEST -->', pretty_yest)
+    output = output.replace('<!-- PRETTY_TOM -->', pretty_tom)
     
     with open('index.html', 'w', encoding='utf-8') as f:
         f.write(output)
