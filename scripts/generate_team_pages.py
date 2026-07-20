@@ -88,13 +88,11 @@ def get_est_date_string(offset_days=0):
     now_est = datetime.now(tz)
     
     # 🛑 3:00 AM EST Crossover Window
-    # If it's between midnight and 2:59:59 AM Eastern, operational today is pushed back 1 day
     if now_est.hour < 3:
         operational_today = now_est - timedelta(days=1)
     else:
         operational_today = now_est
         
-    # Calculate the targeted day offset relative to the operational window baseline
     target_date = operational_today + timedelta(days=offset_days)
     return target_date.strftime("%Y-%m-%d")
 
@@ -328,6 +326,14 @@ def generate_team_html(team, player_db, daily_slates):
     team_id = team["id"]
     theme = TEAM_THEMES.get(team_id, {"paperBg": "#f4f1ea", "paperLine": "rgba(0,0,0,0.2)", "markerInk": "#111"})
     
+    # ---------------------------------------------------------
+    # NEW SEO & METADATA PREP
+    # ---------------------------------------------------------
+    page_url = f"https://mlbstartingnine.com/lineups/{team['slug']}/"
+    seo_title = f"{team['name']} Starting Lineup Today | Batting Order & Pitcher"
+    seo_description = f"View the real-time {team['name']} starting lineup. Get official batting orders, starting pitcher splits, and proprietary daily fantasy analytics for today's game."
+    team_image_url = f"https://a.espncdn.com/combiner/i?img=/i/teamlogos/mlb/500/{team['abbr']}.png&h=200&w=200"
+    
     target_game, target_side, is_future, is_double_header, game_num, future_date_str = None, None, False, False, 1, ""
     
     for i in range(3):
@@ -342,8 +348,19 @@ def generate_team_html(team, player_db, daily_slates):
             
     capture_area_html = ""
     analytics_html = ""
+    schema_json_str = "{}"
     
     if not target_game:
+        # Fallback Schema for Off-Days
+        schema_dict = {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": seo_title,
+            "description": seo_description,
+            "url": page_url
+        }
+        schema_json_str = json.dumps(schema_dict, indent=4)
+        
         capture_area_html = f"""
         <div style="max-width: 550px; margin: 30px auto; background: {theme['paperBg']}; border: 2px dashed {theme['markerInk']}; border-radius: 10px; padding: 35px 20px; text-align: center; font-family: 'Montserrat', sans-serif; color: #222; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
             <img src="https://www.mlbstatic.com/team-logos/{team_id}.svg" style="height: 70px; margin-bottom: 12px; opacity: 0.8;">
@@ -372,6 +389,78 @@ def generate_team_html(team, player_db, daily_slates):
         opp_anchor = f'<a href="/lineups/{opp_slug}/" style="color: inherit; text-decoration: none; border-bottom: 1px dashed #888;">{opp_short_name}</a>'
         
         game_date_raw = raw.get("officialDate") or future_date_str or datetime.now().strftime("%Y-%m-%d")
+
+        # ---------------------------------------------------------
+        # NEW DYNAMIC SPORTSEVENT SCHEMA (WITH ROSTERS)
+        # ---------------------------------------------------------
+        def build_roster_schema(player_list, team_name, is_official):
+            if not player_list: return None
+            status_label = "Official" if is_official else "Projected"
+            roster_items = []
+            for idx, p in enumerate(player_list[:9]):
+                p_name = p.get('fullName', p.get('name', ''))
+                roster_items.append({
+                    "@type": "ListItem",
+                    "position": idx + 1,
+                    "item": {
+                        "@type": "Person",
+                        "name": p_name
+                    }
+                })
+            return {
+                "@type": "ItemList", 
+                "name": f"{team_name} {status_label} Starting Lineup",
+                "itemListElement": roster_items
+            }
+
+        away_name = raw.get('teams', {}).get('away', {}).get('team', {}).get('name', '')
+        home_name = raw.get('teams', {}).get('home', {}).get('team', {}).get('name', '')
+        game_start_date = raw.get('gameDate', f"{game_date_raw}T00:00:00Z")
+        venue_name = raw.get('venue', {}).get('name', '')
+
+        a_proj = target_game.get('projectedLineups', {}).get('away', {}).get('battingOrder', [])
+        h_proj = target_game.get('projectedLineups', {}).get('home', {}).get('battingOrder', [])
+        a_players = raw.get('lineups', {}).get('awayPlayers', [])
+        h_players = raw.get('lineups', {}).get('homePlayers', [])
+        
+        is_a_official = len(a_players) > 0
+        is_h_official = len(h_players) > 0
+        
+        final_away = a_players if is_a_official else a_proj
+        final_home = h_players if is_h_official else h_proj
+
+        away_roster = build_roster_schema(final_away, away_name, is_a_official)
+        home_roster = build_roster_schema(final_home, home_name, is_h_official)
+
+        schema_event = {
+            "@context": "https://schema.org",
+            "@type": "SportsEvent",
+            "name": f"{away_name} at {home_name} Matchup",
+            "startDate": game_start_date,
+            "description": seo_description,
+            "location": {
+                "@type": "Place",
+                "name": venue_name
+            },
+            "competitor": [
+                {
+                    "@type": "SportsTeam",
+                    "name": away_name
+                },
+                {
+                    "@type": "SportsTeam",
+                    "name": home_name
+                }
+            ],
+            "url": page_url
+        }
+
+        if away_roster: schema_event["competitor"][0]["subOrganization"] = away_roster
+        if home_roster: schema_event["competitor"][1]["subOrganization"] = home_roster
+        
+        schema_json_str = json.dumps(schema_event, indent=4)
+        
+        # HTML formatting updates
         yy, mm, dd = game_date_raw.split('-')
         d_obj = datetime(int(yy), int(mm), int(dd))
         display_date = d_obj.strftime("%a, %B %d").upper()
@@ -391,7 +480,6 @@ def generate_team_html(team, player_db, daily_slates):
             badge_html = '<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block;">⏳ PROJECTED BATTING ORDER</span>'
             
         vs_symbol = f"@ {opp_anchor}" if target_side == 'away' else f"vs {opp_anchor}"
-        venue_name = raw.get("venue", {}).get("name", "Stadium")
         
         odds_str = ""
         if target_game.get("odds") and target_game["odds"].get("moneyline") and not is_postponed:
@@ -494,14 +582,34 @@ def generate_team_html(team, player_db, daily_slates):
             
         capture_area_html = card_html
 
-    # The HTML string formatting uses doubled curly braces {{ and }} for CSS classes to avoid python f-string errors
+    schema_block = f'<script type="application/ld+json">\n{schema_json_str}\n</script>'
+
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{team['name']} Starting Lineup Today | Batting Order & Pitcher</title>
-    
+    <title>{seo_title}</title>
+    <meta name="description" content="{seo_description}">
+    <link rel="canonical" href="{page_url}">
+
+    <!-- Open Graph / Social Media Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{page_url}">
+    <meta property="og:title" content="{seo_title}">
+    <meta property="og:description" content="{seo_description}">
+    <meta property="og:image" content="{team_image_url}">
+
+    <!-- Twitter Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta property="twitter:domain" content="mlbstartingnine.com">
+    <meta property="twitter:url" content="{page_url}">
+    <meta name="twitter:title" content="{seo_title}">
+    <meta name="twitter:description" content="{seo_description}">
+    <meta name="twitter:image" content="{team_image_url}">
+
+    {schema_block}
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles.css">
     
