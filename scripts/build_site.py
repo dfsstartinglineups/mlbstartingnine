@@ -551,6 +551,7 @@ def build_lineup_html(players, opposing_pitcher_hand, game_data, player_db):
         list_items.append(f"""
         <li class="d-flex align-items-center w-100 px-2 py-1 border-bottom" style="min-height: 36px;">
             <div class="d-flex align-items-center flex-grow-1 text-truncate w-100 lh-sm">
+                <!-- Clean default view shows first on load -->
                 <div class="player-view view-default align-items-center w-100">{v_default}</div>
                 <div class="player-view view-season flex-column justify-content-center w-100 d-none">{v_season}</div>
                 <div class="player-view view-vsp flex-column justify-content-center w-100 d-none">{v_vsp}</div>
