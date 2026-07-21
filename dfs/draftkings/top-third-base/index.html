@@ -100,6 +100,26 @@
     <!-- Dropdown Controls for Slates & Positions -->
     <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
         
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
+                <option value="all">All Games</option>
+                
+                <option value="24E23">2 Games  · Turbo TUE 6:40PM ET</option>
+                
+                <option value="24D7F">13 Games TUE 7:05PM ET</option>
+                
+                <option value="24E29">4 Games  · Turbo TUE 8:05PM ET</option>
+                
+                <option value="24E2A">3 Games  · Night TUE 9:38PM ET</option>
+                
+                <option value="24E28">SD @ ATL TUE 7:15PM ET</option>
+                
+                <option value="24E2C">ATH @ ARI TUE 9:40PM ET</option>
+                
+            </select>
+        </div>
+        
         
         <div class="d-flex align-items-center gap-2 ms-md-3">
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
@@ -181,8 +201,8 @@
                         <td class="text-end fw-bold col-proj">6.67</td>
                     </tr>
                     
-                    <tr data-slates="24E2C,24D7F,24E2A" 
-                        data-slate-stats='{"24E2C": {"salary": "$6,200", "proj": "9.39", "value": "1.51x"}, "24D7F": {"salary": "$3,300", "proj": "9.39", "value": "2.85x"}, "24E2A": {"salary": "$3,300", "proj": "9.39", "value": "2.85x"}}' 
+                    <tr data-slates="24E2A,24D7F,24E2C" 
+                        data-slate-stats='{"24E2A": {"salary": "$3,300", "proj": "9.39", "value": "2.85x"}, "24D7F": {"salary": "$3,300", "proj": "9.39", "value": "2.85x"}, "24E2C": {"salary": "$6,200", "proj": "9.39", "value": "1.51x"}}' 
                         data-default-salary="$3,300" 
                         data-default-proj="9.39" 
                         data-default-value="2.85x">
@@ -385,8 +405,8 @@
                         <td class="text-end fw-bold col-proj">5.74</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$3,700", "proj": "8.37", "value": "2.26x"}, "24D7F": {"salary": "$3,700", "proj": "8.37", "value": "2.26x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$3,700", "proj": "8.37", "value": "2.26x"}, "24E29": {"salary": "$3,700", "proj": "8.37", "value": "2.26x"}}' 
                         data-default-salary="$3,700" 
                         data-default-proj="8.37" 
                         data-default-value="2.26x">
@@ -419,8 +439,8 @@
                         <td class="text-end fw-bold col-proj">8.37</td>
                     </tr>
                     
-                    <tr data-slates="24D7F,24E2A" 
-                        data-slate-stats='{"24D7F": {"salary": "$2,900", "proj": "6.50", "value": "2.24x"}, "24E2A": {"salary": "$2,900", "proj": "6.50", "value": "2.24x"}}' 
+                    <tr data-slates="24E2A,24D7F" 
+                        data-slate-stats='{"24E2A": {"salary": "$2,900", "proj": "6.50", "value": "2.24x"}, "24D7F": {"salary": "$2,900", "proj": "6.50", "value": "2.24x"}}' 
                         data-default-salary="$2,900" 
                         data-default-proj="6.5" 
                         data-default-value="2.24x">
@@ -487,8 +507,8 @@
                         <td class="text-end fw-bold col-proj">7.14</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$2,900", "proj": "6.27", "value": "2.16x"}, "24D7F": {"salary": "$2,900", "proj": "6.27", "value": "2.16x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$2,900", "proj": "6.27", "value": "2.16x"}, "24E29": {"salary": "$2,900", "proj": "6.27", "value": "2.16x"}}' 
                         data-default-salary="$2,900" 
                         data-default-proj="6.27" 
                         data-default-value="2.16x">
@@ -521,8 +541,8 @@
                         <td class="text-end fw-bold col-proj">6.27</td>
                     </tr>
                     
-                    <tr data-slates="24D7F,24E2A" 
-                        data-slate-stats='{"24D7F": {"salary": "$2,900", "proj": "6.26", "value": "2.16x"}, "24E2A": {"salary": "$2,900", "proj": "6.26", "value": "2.16x"}}' 
+                    <tr data-slates="24E2A,24D7F" 
+                        data-slate-stats='{"24E2A": {"salary": "$2,900", "proj": "6.26", "value": "2.16x"}, "24D7F": {"salary": "$2,900", "proj": "6.26", "value": "2.16x"}}' 
                         data-default-salary="$2,900" 
                         data-default-proj="6.26" 
                         data-default-value="2.16x">
@@ -555,8 +575,8 @@
                         <td class="text-end fw-bold col-proj">6.26</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$4,500", "proj": "9.67", "value": "2.15x"}, "24D7F": {"salary": "$4,500", "proj": "9.67", "value": "2.15x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$4,500", "proj": "9.67", "value": "2.15x"}, "24E29": {"salary": "$4,500", "proj": "9.67", "value": "2.15x"}}' 
                         data-default-salary="$4,500" 
                         data-default-proj="9.67" 
                         data-default-value="2.15x">
@@ -589,8 +609,8 @@
                         <td class="text-end fw-bold col-proj">9.67</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$5,600", "proj": "11.98", "value": "2.14x"}, "24D7F": {"salary": "$5,600", "proj": "11.98", "value": "2.14x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$5,600", "proj": "11.98", "value": "2.14x"}, "24E29": {"salary": "$5,600", "proj": "11.98", "value": "2.14x"}}' 
                         data-default-salary="$5,600" 
                         data-default-proj="11.98" 
                         data-default-value="2.14x">
@@ -657,8 +677,8 @@
                         <td class="text-end fw-bold col-proj">8.4</td>
                     </tr>
                     
-                    <tr data-slates="24E2C,24D7F,24E2A" 
-                        data-slate-stats='{"24E2C": {"salary": "$6,800", "proj": "7.35", "value": "1.08x"}, "24D7F": {"salary": "$3,500", "proj": "7.35", "value": "2.10x"}, "24E2A": {"salary": "$3,500", "proj": "7.35", "value": "2.10x"}}' 
+                    <tr data-slates="24E2A,24D7F,24E2C" 
+                        data-slate-stats='{"24E2A": {"salary": "$3,500", "proj": "7.35", "value": "2.10x"}, "24D7F": {"salary": "$3,500", "proj": "7.35", "value": "2.10x"}, "24E2C": {"salary": "$6,800", "proj": "7.35", "value": "1.08x"}}' 
                         data-default-salary="$3,500" 
                         data-default-proj="7.35" 
                         data-default-value="2.1x">
@@ -691,8 +711,8 @@
                         <td class="text-end fw-bold col-proj">7.35</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$4,000", "proj": "8.22", "value": "2.06x"}, "24D7F": {"salary": "$4,000", "proj": "8.22", "value": "2.06x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$4,000", "proj": "8.22", "value": "2.06x"}, "24E29": {"salary": "$4,000", "proj": "8.22", "value": "2.06x"}}' 
                         data-default-salary="$4,000" 
                         data-default-proj="8.22" 
                         data-default-value="2.06x">
@@ -759,8 +779,8 @@
                         <td class="text-end fw-bold col-proj">8.95</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$3,900", "proj": "7.77", "value": "1.99x"}, "24D7F": {"salary": "$3,900", "proj": "7.77", "value": "1.99x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$3,900", "proj": "7.77", "value": "1.99x"}, "24E29": {"salary": "$3,900", "proj": "7.77", "value": "1.99x"}}' 
                         data-default-salary="$3,900" 
                         data-default-proj="7.77" 
                         data-default-value="1.99x">
@@ -895,8 +915,8 @@
                         <td class="text-end fw-bold col-proj">5.77</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$4,200", "proj": "7.70", "value": "1.83x"}, "24D7F": {"salary": "$4,200", "proj": "7.70", "value": "1.83x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$4,200", "proj": "7.70", "value": "1.83x"}, "24E29": {"salary": "$4,200", "proj": "7.70", "value": "1.83x"}}' 
                         data-default-salary="$4,200" 
                         data-default-proj="7.7" 
                         data-default-value="1.83x">
@@ -929,8 +949,8 @@
                         <td class="text-end fw-bold col-proj">7.7</td>
                     </tr>
                     
-                    <tr data-slates="24D7F,24E2A" 
-                        data-slate-stats='{"24D7F": {"salary": "$3,100", "proj": "5.54", "value": "1.79x"}, "24E2A": {"salary": "$3,100", "proj": "5.54", "value": "1.79x"}}' 
+                    <tr data-slates="24E2A,24D7F" 
+                        data-slate-stats='{"24E2A": {"salary": "$3,100", "proj": "5.54", "value": "1.79x"}, "24D7F": {"salary": "$3,100", "proj": "5.54", "value": "1.79x"}}' 
                         data-default-salary="$3,100" 
                         data-default-proj="5.54" 
                         data-default-value="1.79x">
@@ -1065,8 +1085,8 @@
                         <td class="text-end fw-bold col-proj">7.67</td>
                     </tr>
                     
-                    <tr data-slates="24D7F,24E2A" 
-                        data-slate-stats='{"24D7F": {"salary": "$3,800", "proj": "6.63", "value": "1.74x"}, "24E2A": {"salary": "$3,800", "proj": "6.63", "value": "1.74x"}}' 
+                    <tr data-slates="24E2A,24D7F" 
+                        data-slate-stats='{"24E2A": {"salary": "$3,800", "proj": "6.63", "value": "1.74x"}, "24D7F": {"salary": "$3,800", "proj": "6.63", "value": "1.74x"}}' 
                         data-default-salary="$3,800" 
                         data-default-proj="6.63" 
                         data-default-value="1.74x">
@@ -1099,8 +1119,8 @@
                         <td class="text-end fw-bold col-proj">6.63</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$3,600", "proj": "6.20", "value": "1.72x"}, "24D7F": {"salary": "$3,600", "proj": "6.20", "value": "1.72x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$3,600", "proj": "6.20", "value": "1.72x"}, "24E29": {"salary": "$3,600", "proj": "6.20", "value": "1.72x"}}' 
                         data-default-salary="$3,600" 
                         data-default-proj="6.2" 
                         data-default-value="1.72x">
@@ -1269,8 +1289,8 @@
                         <td class="text-end fw-bold col-proj">9.08</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$5,300", "proj": "7.38", "value": "1.39x"}, "24D7F": {"salary": "$5,300", "proj": "7.38", "value": "1.39x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$5,300", "proj": "7.38", "value": "1.39x"}, "24E29": {"salary": "$5,300", "proj": "7.38", "value": "1.39x"}}' 
                         data-default-salary="$5,300" 
                         data-default-proj="7.38" 
                         data-default-value="1.39x">
@@ -1303,8 +1323,8 @@
                         <td class="text-end fw-bold col-proj">7.38</td>
                     </tr>
                     
-                    <tr data-slates="24D7F,24E2A" 
-                        data-slate-stats='{"24D7F": {"salary": "$5,000", "proj": "6.97", "value": "1.39x"}, "24E2A": {"salary": "$5,000", "proj": "6.97", "value": "1.39x"}}' 
+                    <tr data-slates="24E2A,24D7F" 
+                        data-slate-stats='{"24E2A": {"salary": "$5,000", "proj": "6.97", "value": "1.39x"}, "24D7F": {"salary": "$5,000", "proj": "6.97", "value": "1.39x"}}' 
                         data-default-salary="$5,000" 
                         data-default-proj="6.97" 
                         data-default-value="1.39x">
@@ -1337,8 +1357,8 @@
                         <td class="text-end fw-bold col-proj">6.97</td>
                     </tr>
                     
-                    <tr data-slates="24E29,24D7F" 
-                        data-slate-stats='{"24E29": {"salary": "$4,900", "proj": "6.63", "value": "1.35x"}, "24D7F": {"salary": "$4,900", "proj": "6.63", "value": "1.35x"}}' 
+                    <tr data-slates="24D7F,24E29" 
+                        data-slate-stats='{"24D7F": {"salary": "$4,900", "proj": "6.63", "value": "1.35x"}, "24E29": {"salary": "$4,900", "proj": "6.63", "value": "1.35x"}}' 
                         data-default-salary="$4,900" 
                         data-default-proj="6.63" 
                         data-default-value="1.35x">
@@ -1406,10 +1426,10 @@
                     </tr>
                     
                     <tr data-slates="24D7F" 
-                        data-slate-stats='{"24D7F": {"salary": "$3,000", "proj": "3.48", "value": "1.16x"}}' 
+                        data-slate-stats='{"24D7F": {"salary": "$3,000", "proj": "2.56", "value": "0.85x"}}' 
                         data-default-salary="$3,000" 
-                        data-default-proj="3.48" 
-                        data-default-value="1.16x">
+                        data-default-proj="2.56" 
+                        data-default-value="0.85x">
                         
                         <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">38</td>
                         <td>
@@ -1424,7 +1444,7 @@
                                 <a href="/players/jorge-polanco/" class="player-link">Jorge Polanco</a>
                             </div>
                         </td>
-                        <td class="text-end fw-bold text-success col-value">1.16x</td>
+                        <td class="text-end fw-bold text-success col-value">0.85x</td>
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon"> Mets
@@ -1436,11 +1456,11 @@
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,000</td>
-                        <td class="text-end fw-bold col-proj">3.48</td>
+                        <td class="text-end fw-bold col-proj">2.56</td>
                     </tr>
                     
-                    <tr data-slates="24D7F,24E2A" 
-                        data-slate-stats='{"24D7F": {"salary": "$2,200", "proj": "1.49", "value": "0.68x"}, "24E2A": {"salary": "$2,200", "proj": "1.49", "value": "0.68x"}}' 
+                    <tr data-slates="24E2A,24D7F" 
+                        data-slate-stats='{"24E2A": {"salary": "$2,200", "proj": "1.49", "value": "0.68x"}, "24D7F": {"salary": "$2,200", "proj": "1.49", "value": "0.68x"}}' 
                         data-default-salary="$2,200" 
                         data-default-proj="1.49" 
                         data-default-value="0.68x">
