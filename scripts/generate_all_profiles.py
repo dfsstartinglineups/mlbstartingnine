@@ -464,7 +464,7 @@ def generate_player_html(profile, slug, daily_data, live_data):
         avg, hr = profile.get("season", {}).get("avg", "-"), profile.get("season", {}).get("hr", 0)
         season_string = f"{position} • {team_name} • {avg} AVG • {hr} HR"
         split_vl_header, split_vr_header = 'Splits VS Left-Handed', 'Splits VS Right-Handed'
-        split_vol_label, split_hr_label = "Volume:", "Power Stat:"
+        split_vol_label, split_hr_label = "ABs:", "Homeruns:"
 
     vl, vr = profile.get("split_vL", {}), profile.get("split_vR", {})
     historical_table_rows = "".join([f"<tr><td class='text-start ps-3 fw-bold'>{log.get('date','')}</td><td>{log.get('summary','')}</td><td class='dk-accent'>{log.get('dk_pts',0.0):.2f}</td><td class='fd-accent'>{log.get('fd_pts',0.0):.1f}</td></tr>" for log in profile.get("game_log", [])])
