@@ -16,45 +16,29 @@
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <title>Best DraftKings Outfield Projections Today - DFS OF Value Grid</title>
-    <meta name="description" content="Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly.">
+    <meta name="description" content="Comprehensive DraftKings outfield rankings and value projections.">
     
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://mlbstartingnine.com/dfs/draftkings/top-outfielders/">
     <meta property="og:title" content="Best DraftKings Outfield Projections Today - DFS OF Value Grid">
-    <meta property="og:description" content="Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly.">
+    <meta property="og:description" content="Comprehensive DraftKings outfield rankings and value projections.">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <meta name="twitter:card" content="summary">
     <meta property="twitter:domain" content="mlbstartingnine.com">
     <meta property="twitter:url" content="https://mlbstartingnine.com/dfs/draftkings/top-outfielders/">
     <meta name="twitter:title" content="Best DraftKings Outfield Projections Today - DFS OF Value Grid">
-    <meta name="twitter:description" content="Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly.">
+    <meta name="twitter:description" content="Comprehensive DraftKings outfield rankings and value projections.">
     <meta name="twitter:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        .header-brand { 
-            font-weight: 900; 
-            letter-spacing: -1px; 
-            font-size: 2rem; 
-            color: #fff; 
-            font-style: italic; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
-        }
+        .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .header-brand a { color: inherit; text-decoration: none; }
-        .header-brand span { 
-            text-shadow: none !important;
-            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
-            padding-right: 2px; 
-            display: inline-block; 
-        }
+        .header-brand span { background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-right: 2px; display: inline-block; }
 
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
         .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; white-space: nowrap; }
@@ -65,13 +49,8 @@
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
         .team-icon { width: 22px; height: 22px; margin-right: 6px; vertical-align: middle; }
 
-        /* Mobile Compacting Styles */
         @media (max-width: 768px) {
-            .table th, .table td { 
-                padding: 8px 6px; 
-                font-size: 0.75rem; 
-                white-space: nowrap; 
-            }
+            .table th, .table td { padding: 8px 6px; font-size: 0.75rem; white-space: nowrap; }
             .player-link { font-size: 0.80rem; }
             .team-icon { width: 16px; height: 16px; margin-right: 4px; }
             .col-rank { padding-right: 4px !important; padding-left: 4px !important; }
@@ -80,11 +59,10 @@
 </head>
 <body>
 
-<nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
+<nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div class="header-brand mb-2 mb-md-0">
-            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
-        </div>
+        <div class="header-brand mb-0"><a href="/">MLB Starting <span>Nine</span></a></div>
+        <div><a href="/" class="btn btn-sm btn-outline-light font-weight-bold">← Back To Slate</a></div>
     </div>
 </nav>
 
@@ -97,7 +75,6 @@
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
 
-    <!-- Dropdown Controls for Slates & Positions -->
     <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
         
         <div class="d-flex align-items-center gap-2">
@@ -141,13 +118,13 @@
                 
                 <option value="/dfs/draftkings/top-util/" >Util (All Hitters)</option>
                 
+                <option value="/dfs/draftkings/live-slate-leaderboard/" >🔴 Live Leaderboard</option>
+                
             </select>
         </div>
     </div>
 
     <div class="table-card shadow-sm mb-4 position-relative">
-        
-        <!-- Animated Horizontal Scroll Indicator for Mobile -->
         <div id="scroll-indicator" class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
             &larr; Swipe
         </div>
@@ -158,7 +135,9 @@
                     <tr>
                         <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                        
                         <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
+                        
                         <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
                         <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
                         <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
@@ -186,7 +165,11 @@
                                 <a href="/players/steven-kwan/" class="player-link">Steven Kwan</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">3.19x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon"> Guardians
@@ -220,7 +203,11 @@
                                 <a href="/players/kahlil-watson/" class="player-link">Kahlil Watson</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">3.15x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon"> Guardians
@@ -254,7 +241,11 @@
                                 <a href="/players/tyler-oneill/" class="player-link">Tyler O'Neill</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">3.05x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon"> Orioles
@@ -288,7 +279,11 @@
                                 <a href="/players/ben-malgeri/" class="player-link">Ben Malgeri</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.9x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
@@ -322,7 +317,11 @@
                                 <a href="/players/masataka-yoshida/" class="player-link">Masataka Yoshida</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.81x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon"> Red Sox
@@ -356,7 +355,11 @@
                                 <a href="/players/esmerlyn-valdez/" class="player-link">Esmerlyn Valdez</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.64x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon"> Pirates
@@ -390,7 +393,11 @@
                                 <a href="/players/max-kepler/" class="player-link">Max Kepler</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.63x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon"> Dbacks
@@ -424,7 +431,11 @@
                                 <a href="/players/daylen-lile/" class="player-link">Daylen Lile</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.59x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon"> Nationals
@@ -458,7 +469,11 @@
                                 <a href="/players/ryan-waldschmidt/" class="player-link">Ryan Waldschmidt</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.57x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon"> Dbacks
@@ -492,7 +507,11 @@
                                 <a href="/players/victor-mesa-jr/" class="player-link">Victor Mesa Jr.</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.55x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon"> Rays
@@ -526,7 +545,11 @@
                                 <a href="/players/jo-adell/" class="player-link">Jo Adell</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.47x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon"> Angels
@@ -560,7 +583,11 @@
                                 <a href="/players/austin-martin/" class="player-link">Austin Martin</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.45x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon"> Twins
@@ -594,7 +621,11 @@
                                 <a href="/players/jose-siri/" class="player-link">Jose Siri</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.45x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon"> Angels
@@ -628,7 +659,11 @@
                                 <a href="/players/tim-tawa/" class="player-link">Tim Tawa</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.45x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon"> Dbacks
@@ -662,7 +697,11 @@
                                 <a href="/players/jeremiah-jackson/" class="player-link">Jeremiah Jackson</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.44x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon"> Orioles
@@ -696,7 +735,11 @@
                                 <a href="/players/gavin-sheets/" class="player-link">Gavin Sheets</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.43x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon"> Padres
@@ -730,7 +773,11 @@
                                 <a href="/players/lars-nootbaar/" class="player-link">Lars Nootbaar</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.42x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon"> Cardinals
@@ -764,7 +811,11 @@
                                 <a href="/players/chandler-simpson/" class="player-link">Chandler Simpson</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.4x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon"> Rays
@@ -798,7 +849,11 @@
                                 <a href="/players/dominic-smith/" class="player-link">Dominic Smith</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.37x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon"> Braves
@@ -832,7 +887,11 @@
                                 <a href="/players/jacob-young/" class="player-link">Jacob Young</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.34x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon"> Nationals
@@ -866,7 +925,11 @@
                                 <a href="/players/heriberto-hernandez/" class="player-link">Heriberto Hernandez</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.33x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon"> Marlins
@@ -900,7 +963,11 @@
                                 <a href="/players/jake-mangum/" class="player-link">Jake Mangum</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.32x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon"> Pirates
@@ -934,7 +1001,11 @@
                                 <a href="/players/trent-grisham/" class="player-link">Trent Grisham</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.32x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" class="team-icon"> Yankees
@@ -968,7 +1039,11 @@
                                 <a href="/players/lane-thomas/" class="player-link">Lane Thomas</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.31x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon"> Royals
@@ -1002,7 +1077,11 @@
                                 <a href="/players/isaac-collins/" class="player-link">Isaac Collins</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.31x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon"> Royals
@@ -1036,7 +1115,11 @@
                                 <a href="/players/griffin-conine/" class="player-link">Griffin Conine</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.28x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon"> Marlins
@@ -1070,7 +1153,11 @@
                                 <a href="/players/cole-carrigg/" class="player-link">Cole Carrigg</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.28x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon"> Rockies
@@ -1104,7 +1191,11 @@
                                 <a href="/players/daulton-varsho/" class="player-link">Daulton Varsho</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.27x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" class="team-icon"> Blue Jays
@@ -1138,7 +1229,11 @@
                                 <a href="/players/michael-harris-ii/" class="player-link">Michael Harris</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.27x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon"> Braves
@@ -1172,7 +1267,11 @@
                                 <a href="/players/nathan-lukes/" class="player-link">Nathan Lukes</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.25x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" class="team-icon"> Blue Jays
@@ -1206,7 +1305,11 @@
                                 <a href="/players/jarren-duran/" class="player-link">Jarren Duran</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.24x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon"> Red Sox
@@ -1240,7 +1343,11 @@
                                 <a href="/players/jackson-merrill/" class="player-link">Jackson Merrill</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.23x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon"> Padres
@@ -1274,7 +1381,11 @@
                                 <a href="/players/jung-hoo-lee/" class="player-link">Jung Hoo Lee</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.22x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon"> Giants
@@ -1308,7 +1419,11 @@
                                 <a href="/players/nathan-church/" class="player-link">Nathan Church</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.2x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon"> Cardinals
@@ -1342,7 +1457,11 @@
                                 <a href="/players/cedric-mullins/" class="player-link">Cedric Mullins</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.19x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon"> Rays
@@ -1376,7 +1495,11 @@
                                 <a href="/players/carson-benge/" class="player-link">Carson Benge</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.17x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon"> Mets
@@ -1410,7 +1533,11 @@
                                 <a href="/players/ceddanne-rafaela/" class="player-link">Ceddanne Rafaela</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.16x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon"> Red Sox
@@ -1444,7 +1571,11 @@
                                 <a href="/players/javier-sanoja/" class="player-link">Javier Sanoja</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.16x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon"> Marlins
@@ -1478,7 +1609,11 @@
                                 <a href="/players/jakob-marsee/" class="player-link">Jakob Marsee</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.14x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon"> Marlins
@@ -1512,7 +1647,11 @@
                                 <a href="/players/braden-montgomery/" class="player-link">Braden Montgomery</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.13x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon"> White Sox
@@ -1546,7 +1685,11 @@
                                 <a href="/players/jasson-dominguez/" class="player-link">Jasson Dominguez</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.13x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" class="team-icon"> Yankees
@@ -1580,7 +1723,11 @@
                                 <a href="/players/jorge-soler/" class="player-link">Jorge Soler</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.12x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon"> Angels
@@ -1614,7 +1761,11 @@
                                 <a href="/players/brandon-nimmo/" class="player-link">Brandon Nimmo</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.11x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon"> Rangers
@@ -1648,7 +1799,11 @@
                                 <a href="/players/james-wood/" class="player-link">James Wood</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.11x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon"> Nationals
@@ -1682,7 +1837,11 @@
                                 <a href="/players/andrew-benintendi/" class="player-link">Andrew Benintendi</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.1x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon"> White Sox
@@ -1716,7 +1875,11 @@
                                 <a href="/players/troy-johnston/" class="player-link">Troy Johnston</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.1x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon"> Rockies
@@ -1750,7 +1913,11 @@
                                 <a href="/players/henry-bolte/" class="player-link">Henry Bolte</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.1x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon"> Athletics
@@ -1784,7 +1951,11 @@
                                 <a href="/players/cam-smith/" class="player-link">Cam Smith</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.09x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon"> Astros
@@ -1818,7 +1989,11 @@
                                 <a href="/players/matt-vierling/" class="player-link">Matt Vierling</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.08x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
@@ -1852,7 +2027,11 @@
                                 <a href="/players/lamonte-wade-jr/" class="player-link">LaMonte Wade Jr</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.08x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon"> Astros
@@ -1886,7 +2065,11 @@
                                 <a href="/players/aj-ewing/" class="player-link">A.J. Ewing</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.07x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon"> Mets
@@ -1920,7 +2103,11 @@
                                 <a href="/players/mauricio-dubon/" class="player-link">Mauricio Dubon</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.06x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon"> Braves
@@ -1954,7 +2141,11 @@
                                 <a href="/players/noelvi-marte/" class="player-link">Noelvi Marte</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.06x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon"> Reds
@@ -1988,7 +2179,11 @@
                                 <a href="/players/wilyer-abreu/" class="player-link">Wilyer Abreu</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">2.04x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon"> Red Sox
@@ -2022,7 +2217,11 @@
                                 <a href="/players/jac-caglianone/" class="player-link">Jac Caglianone</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.99x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon"> Royals
@@ -2056,7 +2255,11 @@
                                 <a href="/players/tyler-soderstrom/" class="player-link">Tyler Soderstrom</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.99x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon"> Athletics
@@ -2090,7 +2293,11 @@
                                 <a href="/players/leody-taveras/" class="player-link">Leody Taveras</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.95x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon"> Orioles
@@ -2124,7 +2331,11 @@
                                 <a href="/players/christian-yelich/" class="player-link">Christian Yelich</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.95x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
@@ -2158,7 +2369,11 @@
                                 <a href="/players/luke-keaschall/" class="player-link">Luke Keaschall</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.94x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon"> Twins
@@ -2192,7 +2407,11 @@
                                 <a href="/players/tristan-peters/" class="player-link">Tristan Peters</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.94x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon"> White Sox
@@ -2226,7 +2445,11 @@
                                 <a href="/players/seiya-suzuki/" class="player-link">Seiya Suzuki</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.92x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon"> Cubs
@@ -2260,7 +2483,11 @@
                                 <a href="/players/sam-antonacci/" class="player-link">Sam Antonacci</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.91x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon"> White Sox
@@ -2294,7 +2521,11 @@
                                 <a href="/players/cody-bellinger/" class="player-link">Cody Bellinger</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.91x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" class="team-icon"> Yankees
@@ -2328,7 +2559,11 @@
                                 <a href="/players/jonatan-clase/" class="player-link">Jonatan Clase</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.9x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" class="team-icon"> Blue Jays
@@ -2362,7 +2597,11 @@
                                 <a href="/players/heliot-ramos/" class="player-link">Heliot Ramos</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.89x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon"> Giants
@@ -2396,7 +2635,11 @@
                                 <a href="/players/taylor-ward/" class="player-link">Taylor Ward</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.88x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon"> Orioles
@@ -2430,7 +2673,11 @@
                                 <a href="/players/luke-raley/" class="player-link">Luke Raley</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.88x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
@@ -2464,7 +2711,11 @@
                                 <a href="/players/fernando-tatis-jr/" class="player-link">Fernando Tatis Jr</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.86x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon"> Padres
@@ -2498,7 +2749,11 @@
                                 <a href="/players/tj-friedl/" class="player-link">T.J. Friedl</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.85x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon"> Reds
@@ -2532,7 +2787,11 @@
                                 <a href="/players/jackson-chourio/" class="player-link">Jackson Chourio</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.81x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
@@ -2566,7 +2825,11 @@
                                 <a href="/players/garrett-mitchell/" class="player-link">Garrett Mitchell</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.79x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
@@ -2600,7 +2863,11 @@
                                 <a href="/players/corbin-carroll/" class="player-link">Corbin Carroll</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.79x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon"> Dbacks
@@ -2634,7 +2901,11 @@
                                 <a href="/players/dominic-canzone/" class="player-link">Dominic Canzone</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.79x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
@@ -2668,7 +2939,11 @@
                                 <a href="/players/riley-greene/" class="player-link">Riley Greene</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.78x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
@@ -2702,7 +2977,11 @@
                                 <a href="/players/jj-bleday/" class="player-link">JJ Bleday</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.77x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon"> Reds
@@ -2736,7 +3015,11 @@
                                 <a href="/players/kyle-tucker/" class="player-link">Kyle Tucker</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.75x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon"> Dodgers
@@ -2770,7 +3053,11 @@
                                 <a href="/players/ryan-kreidler/" class="player-link">Ryan Kreidler</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.73x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon"> Twins
@@ -2804,7 +3091,11 @@
                                 <a href="/players/yordan-alvarez/" class="player-link">Yordan Alvarez</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.69x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon"> Astros
@@ -2838,7 +3129,11 @@
                                 <a href="/players/bryan-reynolds/" class="player-link">Bryan Reynolds</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.69x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon"> Pirates
@@ -2872,7 +3167,11 @@
                                 <a href="/players/shohei-ohtani/" class="player-link">Shohei Ohtani</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.64x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon"> Dodgers
@@ -2906,7 +3205,11 @@
                                 <a href="/players/teoscar-hernandez/" class="player-link">Teoscar Hernandez</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.62x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon"> Dodgers
@@ -2940,7 +3243,11 @@
                                 <a href="/players/juan-soto/" class="player-link">Juan Soto</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.61x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon"> Mets
@@ -2974,7 +3281,11 @@
                                 <a href="/players/brandon-marsh/" class="player-link">Brandon Marsh</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.6x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon"> Phillies
@@ -3008,7 +3319,11 @@
                                 <a href="/players/drew-gilbert/" class="player-link">Drew Gilbert</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.6x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon"> Giants
@@ -3042,7 +3357,11 @@
                                 <a href="/players/ian-happ/" class="player-link">Ian Happ</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.59x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon"> Cubs
@@ -3076,7 +3395,11 @@
                                 <a href="/players/randy-arozarena/" class="player-link">Randy Arozarena</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.57x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
@@ -3110,7 +3433,11 @@
                                 <a href="/players/andy-pages/" class="player-link">Andy Pages</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.53x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon"> Dodgers
@@ -3144,7 +3471,11 @@
                                 <a href="/players/kyle-schwarber/" class="player-link">Kyle Schwarber</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.53x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon"> Phillies
@@ -3178,7 +3509,11 @@
                                 <a href="/players/jordan-walker/" class="player-link">Jordan Walker</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.51x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon"> Cardinals
@@ -3212,7 +3547,11 @@
                                 <a href="/players/james-outman/" class="player-link">James Outman</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.43x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
@@ -3246,7 +3585,11 @@
                                 <a href="/players/spencer-steer/" class="player-link">Spencer Steer</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.42x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon"> Reds
@@ -3280,7 +3623,11 @@
                                 <a href="/players/tommy-edman/" class="player-link">Tommy Edman</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.29x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon"> Dodgers
@@ -3314,7 +3661,11 @@
                                 <a href="/players/pete-crow-armstrong/" class="player-link">Pete Crow-Armstrong</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">1.26x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon"> Cubs
@@ -3348,7 +3699,11 @@
                                 <a href="/players/victor-robles/" class="player-link">Victor Robles</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.61x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
@@ -3382,7 +3737,11 @@
                                 <a href="/players/david-fry/" class="player-link">David Fry</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.49x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon"> Guardians
@@ -3416,7 +3775,11 @@
                                 <a href="/players/justin-crawford/" class="player-link">Justin Crawford</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.47x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon"> Phillies
@@ -3450,7 +3813,11 @@
                                 <a href="/players/joc-pederson/" class="player-link">Joc Pederson</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.47x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon"> Rangers
@@ -3484,7 +3851,11 @@
                                 <a href="/players/lawrence-butler/" class="player-link">Lawrence Butler</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.45x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon"> Athletics
@@ -3518,7 +3889,11 @@
                                 <a href="/players/tyler-freeman/" class="player-link">Tyler Freeman</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.42x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon"> Rockies
@@ -3552,7 +3927,11 @@
                                 <a href="/players/carlos-cortes/" class="player-link">Carlos Cortes</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.39x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon"> Athletics
@@ -3586,7 +3965,11 @@
                                 <a href="/players/jake-bauers/" class="player-link">Jake Bauers</a>
                             </div>
                         </td>
+                        
+                        
                         <td class="text-end fw-bold text-success col-value">0.33x</td>
+                        
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
@@ -3605,14 +3988,12 @@
             </table>
         </div>
     </div>
-    
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
         <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 </div>
 
 <script>
-// Fade out swipe indicator on scroll
 document.addEventListener("DOMContentLoaded", () => {
     const scrollContainer = document.getElementById('table-scroll-container');
     const scrollIndicator = document.getElementById('scroll-indicator');
@@ -3627,13 +4008,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }, { passive: true });
     }
 
-    // NEW: URL Parameter check to restore slate selection
     const urlParams = new URLSearchParams(window.location.search);
     const slateParam = urlParams.get('slate');
     if (slateParam) {
         const slateSelector = document.getElementById('slate-selector');
         if (slateSelector) {
-            // Verify the slate exists in this dropdown before applying
             const optionExists = Array.from(slateSelector.options).some(opt => opt.value === slateParam);
             if (optionExists) {
                 slateSelector.value = slateParam;
@@ -3643,7 +4022,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Add this new function to handle navigating while preserving the slate
 function changePosition(base_url) {
     const slateSelector = document.getElementById('slate-selector');
     if (slateSelector && slateSelector.value !== 'all') {
@@ -3662,18 +4040,16 @@ function filterSlate(slateId) {
 
         if (slateId === 'all') {
             row.style.display = '';
-            // Revert back to master base stats
             row.querySelector('.col-salary').textContent = row.getAttribute('data-default-salary');
             row.querySelector('.col-proj').textContent = row.getAttribute('data-default-proj');
-            row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
+            if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
         } else {
             if (rowSlates.includes(slateId)) {
                 row.style.display = '';
-                // Inject the specific slate salary, projection, and value dynamically
                 if (stats[slateId]) {
                     row.querySelector('.col-salary').textContent = stats[slateId].salary;
                     row.querySelector('.col-proj').textContent = stats[slateId].proj;
-                    row.querySelector('.col-value').textContent = stats[slateId].value;
+                    if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = stats[slateId].value;
                 }
             } else {
                 row.style.display = 'none';
@@ -3681,19 +4057,18 @@ function filterSlate(slateId) {
         }
     });
 
-    // Automatically trigger a Sort by Value (Col Index 2) descending when a slate is changed
-    const valueHeader = document.querySelectorAll('#leaderboard-table th')[2];
-    sortTable(valueHeader, 2, true);
+    const isLive = document.querySelector('#leaderboard-table th:nth-child(3)').textContent.includes("Live Stats");
+    const sortIndex = isLive ? 6 : 2; 
+    const targetHeader = document.querySelectorAll('#leaderboard-table th')[isLive ? 6 : 2];
+    if (targetHeader) sortTable(targetHeader, sortIndex, true);
 }
 
 function sortTable(thElement, colIndex, forceDesc = false) {
     const table = thElement.closest("table");
     const tbody = table.querySelector("tbody");
     const rows = Array.from(tbody.querySelectorAll("tr"));
-    
     let isAscending = thElement.classList.contains("asc");
     
-    // If we are forcing a descending sort (e.g. from the filter function), override here
     if (forceDesc) isAscending = true; 
     
     table.querySelectorAll("th").forEach(th => {
@@ -3706,7 +4081,6 @@ function sortTable(thElement, colIndex, forceDesc = false) {
     rows.sort((a, b) => {
         const aText = a.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
         const bText = b.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
-        
         const aVal = isNaN(parseFloat(aText)) ? aText : parseFloat(aText);
         const bVal = isNaN(parseFloat(bText)) ? bText : parseFloat(bText);
 
@@ -3715,10 +4089,8 @@ function sortTable(thElement, colIndex, forceDesc = false) {
         return 0;
     });
 
-    // Re-append sorted rows to the DOM
     rows.forEach(row => tbody.appendChild(row));
 
-    // Recalculate rank numbers (1, 2, 3...) for whatever rows are currently visible
     let currentRank = 1;
     rows.forEach(row => {
         if (row.style.display !== 'none') {
