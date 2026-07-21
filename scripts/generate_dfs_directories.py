@@ -287,6 +287,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <title>{{ seo_title }}</title>
     <meta name="description" content="{{ seo_desc }}">
     
+    <link rel="canonical" href="{{ page_url }}" />
+    
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ page_url }}">
