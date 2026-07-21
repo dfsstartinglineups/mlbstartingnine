@@ -1,23 +1,23 @@
 import os
 import json
 import re
-from datetime import datetime, timedelta  # Handles the time shifting
-from zoneinfo import ZoneInfo             # 👈 This clears the ZoneInfo NameError
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import unicodedata
 
 # =========================================================================
-# --- 1. DYNAMIC PATH ROUTING (Adjusted for /scripts/ folder) ---
+# --- 1. DYNAMIC PATH ROUTING ---
 # =========================================================================
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 DAILY_FILES_DIR = os.path.join(DATA_DIR, "daily_files")
+LIVE_FILES_DIR = os.path.join(DATA_DIR, "LIVE") # Updated Live Directory path
 PLAYER_MASTER_PATH = os.path.join(DATA_DIR, "player_master_data.json")
 OUTPUT_BASE_DIR = os.path.join(ROOT_DIR, "dfs")
 SITEMAP_PATH = os.path.join(ROOT_DIR, "sitemap-dfs.xml")
 
-# Nudge Matrix Thresholds
 TEAM_MEGA_SCORE = 5.5
 TEAM_MEGA_BOOST = 0.050
 TEAM_ELITE_SCORE = 5.0
@@ -27,16 +27,17 @@ TEAM_GOOD_BOOST = 0.025
 TEAM_BAD_SCORE = 3.5
 TEAM_BAD_PENALTY = -0.050
 
-# Position Dropdown Mappings
 POS_LABELS_DK = {
     "pitchers": "Pitchers", "catchers": "Catchers", "first-base": "First Base",
     "second-base": "Second Base", "third-base": "Third Base", 
-    "shortstops": "Shortstops", "outfielders": "Outfielders", "util": "Util (All Hitters)"
+    "shortstops": "Shortstops", "outfielders": "Outfielders", "util": "Util (All Hitters)",
+    "live-slate-leaderboard": "🔴 Live Leaderboard"
 }
 POS_LABELS_FD = {
     "pitchers": "Pitchers", "catchers-first-base": "C / 1B",
     "second-base": "Second Base", "third-base": "Third Base", 
-    "shortstops": "Shortstops", "outfielders": "Outfielders", "util": "Utility"
+    "shortstops": "Shortstops", "outfielders": "Outfielders", "util": "Utility",
+    "live-slate-leaderboard": "🔴 Live Leaderboard"
 }
 
 # =========================================================================
@@ -44,23 +45,25 @@ POS_LABELS_FD = {
 # =========================================================================
 SEO_METADATA = {
     "draftkings": {
-        "pitchers": {"title": "Top DraftKings Pitcher Projections Today - DFS Lineup Values", "desc": "Optimized DraftKings pitcher projections for today's MLB slate. Discover proprietary value ratings, projected stats, and custom vegas splits."},
-        "catchers": {"title": "Best DraftKings Catchers Today - Daily Fantasy C Projections", "desc": "Daily fantasy baseball rankings for DraftKings catchers. View calculated values, salaries, and platoon advantages for today's games."},
-        "first-base": {"title": "Top DraftKings 1B Projections Today - Elite First Base Value", "desc": "Analyze today's DraftKings first base projections. Get proprietary performance multipliers, matchup stats, and salary rankings."},
-        "second-base": {"title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings", "desc": "Unlock top-rated DraftKings second base projections. Real-time situational performance matrices for today's fantasy baseball slates."},
-        "third-base": {"title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base", "desc": "Premium DraftKings third base projections featuring advanced park factor adjustments, batting order weights, and optimizer data."},
-        "shortstops": {"title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections", "desc": "Compare daily fantasy shortstop values on DraftKings. Updated projections utilizing proprietary BvP and Vegas linescoring data."},
-        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Comprehensive DraftKings outfield rankings and value projections for today's MLB slate. Filter by individual main and late slates instantly."},
-        "util": {"title": "Top DraftKings Hitters Today - DFS Overall Value Rankings", "desc": "View the highest projected DraftKings hitters across all positions. The ultimate leaderboard for finding pure salary value and lineup upside."}
+        "pitchers": {"title": "Top DraftKings Pitcher Projections Today - DFS Lineup Values", "desc": "Optimized DraftKings pitcher projections for today's MLB slate."},
+        "catchers": {"title": "Best DraftKings Catchers Today - Daily Fantasy C Projections", "desc": "Daily fantasy baseball rankings for DraftKings catchers."},
+        "first-base": {"title": "Top DraftKings 1B Projections Today - Elite First Base Value", "desc": "Analyze today's DraftKings first base projections."},
+        "second-base": {"title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings", "desc": "Unlock top-rated DraftKings second base projections."},
+        "third-base": {"title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base", "desc": "Premium DraftKings third base projections."},
+        "shortstops": {"title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections", "desc": "Compare daily fantasy shortstop values on DraftKings."},
+        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Comprehensive DraftKings outfield rankings and value projections."},
+        "util": {"title": "Top DraftKings Hitters Today - DFS Overall Value Rankings", "desc": "View the highest projected DraftKings hitters across all positions."},
+        "live-slate-leaderboard": {"title": "Live DraftKings DFS Leaderboard - Real-Time Fantasy Baseball Scores", "desc": "Live updating DraftKings fantasy baseball leaderboard. Track real-time player points and contextual stat lines across all active MLB slates."}
     },
     "fanduel": {
-        "pitchers": {"title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball", "desc": "Maximize your FanDuel pitching slot with real-time projections, advanced umpire data, and proprietary situational matchup scoring."},
-        "catchers-first-base": {"title": "Best FanDuel C/1B Projections Today - Catchers & First Base Value", "desc": "Optimized FanDuel combined Catcher and First Base projections. View real-time value scores adjusted for park metrics and platoon splits."},
-        "second-base": {"title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks", "desc": "Find the highest-value second basemen on FanDuel today. Projections calculated via proprietary live vegas total adjustments."},
-        "third-base": {"title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value", "desc": "Advanced FanDuel third base projections. Tap into custom hitter multipliers and game environment tracking data for today's games."},
-        "shortstops": {"title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings", "desc": "Daily updated FanDuel shortstop projections. Real-time value tiers using current matchup analytics and confirmed official starting lineups."},
-        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Deep-dive FanDuel outfielder value tables. The ultimate tool for finding elite, mid-tier, and value salary plays for tonight's slates."},
-        "util": {"title": "Best FanDuel Utility Projections Today - DFS UTIL Picks", "desc": "Fill your FanDuel Utility slot with the highest value hitters. Optimized projections comparing all non-pitchers on today's main and late MLB slates."}
+        "pitchers": {"title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball", "desc": "Maximize your FanDuel pitching slot with real-time projections."},
+        "catchers-first-base": {"title": "Best FanDuel C/1B Projections Today - Catchers & First Base Value", "desc": "Optimized FanDuel combined Catcher and First Base projections."},
+        "second-base": {"title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks", "desc": "Find the highest-value second basemen on FanDuel today."},
+        "third-base": {"title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value", "desc": "Advanced FanDuel third base projections."},
+        "shortstops": {"title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings", "desc": "Daily updated FanDuel shortstop projections."},
+        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Deep-dive FanDuel outfielder value tables."},
+        "util": {"title": "Best FanDuel Utility Projections Today - DFS UTIL Picks", "desc": "Fill your FanDuel Utility slot with the highest value hitters."},
+        "live-slate-leaderboard": {"title": "Live FanDuel DFS Leaderboard - Real-Time Fantasy Baseball Scores", "desc": "Live updating FanDuel fantasy baseball leaderboard. Track real-time player points and contextual stat lines across all active MLB slates."}
     }
 }
 
@@ -105,27 +108,23 @@ def get_player_url(player_id, default_name):
     return f"/players/{slugify(default_name)}/"
 
 # =========================================================================
-# --- 4. PROPRIETARY ALGORITHM NUDGES ---
+# --- 4. ALGORITHMS & LIVE LOGIC ---
 # =========================================================================
 def get_team_data(game_node, side):
     team_name = "AWAY" if side == "away" else "HOME"
     team_id = 0
-    
     raw_teams = game_node.get("gameRaw", {}).get("teams", {})
     if side in raw_teams and "team" in raw_teams[side]:
         team_info = raw_teams[side]["team"]
         full_name = team_info.get("name", "")
         team_id = team_info.get("id", 0)
-        
         team_name = team_info.get("teamName")
         if not team_name:
             team_name = full_name.split(' ')[-1] if full_name else ("AWAY" if side == "away" else "HOME")
-            
         if "Red Sox" in full_name: team_name = "Red Sox"
         elif "White Sox" in full_name: team_name = "White Sox"
         elif "Blue Jays" in full_name: team_name = "Blue Jays"
         elif team_name == "Diamondbacks": team_name = "Dbacks"
-        
     return team_name, team_id
 
 def calculate_vegas_nudge(itt):
@@ -138,16 +137,12 @@ def calculate_vegas_nudge(itt):
 def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos="", order_status=""):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
-    
-    if raw_proj <= 0 or salary <= 0:
-        return None
-
+    if raw_proj <= 0 or salary <= 0: return None
     slate_block = player.get("dk_slates" if is_dk else "fd_slates", {})
     slate_ids = list(slate_block.keys()) if isinstance(slate_block, dict) else []
 
     odds = game.get("odds", {})
     total = 0.0
-    
     if odds and "bookmakers" in odds and len(odds["bookmakers"]) > 0:
         market_totals = odds["bookmakers"][0].get("markets", [])
         for m in market_totals:
@@ -156,9 +151,8 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
     
     away_itt = round(total / 2.0, 2) if total > 0 else 4.2
     home_itt = round(total / 2.0, 2) if total > 0 else 4.2
-    
-    my_itt = home_itt if is_home else away_itt
     opp_itt = away_itt if is_home else home_itt
+    my_itt = home_itt if is_home else away_itt
 
     vegas_nudge = calculate_vegas_nudge(my_itt if not is_pitcher else opp_itt)
     
@@ -176,17 +170,10 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
         if woba_avg > 105: park_nudge = -0.03 if is_pitcher else 0.04
         elif woba_avg < 96: park_nudge = 0.04 if is_pitcher else -0.03
 
-    # Calculate multiplier
-    if is_pitcher:
-        hitter_mult = 1.00 - (calculate_vegas_nudge(opp_itt) + park_nudge)
-    else:
-        hitter_mult = 1.00 + vegas_nudge + order_nudge + park_nudge
-
-    # Baseline calculations
+    hitter_mult = 1.00 - (calculate_vegas_nudge(opp_itt) + park_nudge) if is_pitcher else 1.00 + vegas_nudge + order_nudge + park_nudge
     final_proj = round(raw_proj * hitter_mult, 2)
     value = round(final_proj / (salary / 1000), 2) if salary > 0 else 0.0
 
-    # Build slate-specific stats dictionary for dynamic frontend swapping
     slate_stats = {}
     for s_id, s_data in slate_block.items():
         if isinstance(s_data, dict):
@@ -194,37 +181,88 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
             s_salary = int(s_data.get("salary", salary))
             s_final_proj = round(s_raw_proj * hitter_mult, 2)
             s_val = round(s_final_proj / (s_salary / 1000), 2) if s_salary > 0 else 0.0
+            slate_stats[s_id] = {"salary": f"${s_salary:,}", "proj": f"{s_final_proj:.2f}", "value": f"{s_val:.2f}x"}
             
-            slate_stats[s_id] = {
-                "salary": f"${s_salary:,}",
-                "proj": f"{s_final_proj:.2f}",
-                "value": f"{s_val:.2f}x"
-            }
-            
-    # Resolve team slug for lineups linking
     team_slug = TEAM_SLUG_MAP.get(int(team_id) if team_id else 0, "los-angeles-dodgers")
 
     return {
-        "id": player.get("id"),
-        "name": player.get("name") or player.get("fullName"),
-        "team": team_name,
-        "team_id": team_id,
-        "team_slug": team_slug,
-        "opp_indicator": "vs." if is_home else "@",
-        "opp_name": opp_name,
-        "opp_id": opp_id,
-        "salary": salary,
-        "proj": final_proj,
-        "value": value,
-        "slates": ",".join(slate_ids),
+        "id": player.get("id"), "name": player.get("name") or player.get("fullName"),
+        "team": team_name, "team_id": team_id, "team_slug": team_slug,
+        "opp_indicator": "vs." if is_home else "@", "opp_name": opp_name, "opp_id": opp_id,
+        "salary": salary, "proj": final_proj, "value": value,
+        "slates": ",".join(slate_ids), "slate_stats_json": json.dumps(slate_stats),
+        "lineup_pos": lineup_pos, "order_status": order_status, "is_pitcher": is_pitcher,
+        "url": get_player_url(player.get("id"), player.get("name") or player.get("fullName")),
+        "raw_live_stats": "", "live_points": 0.0 
+    }
+
+def process_live_leaderboard_player(base_player, live_data, platform):
+    pid = str(base_player["id"])
+    
+    # Initialize default pre-game state
+    live_pts = 0.0
+    stat_string = "Pre-game"
+    
+    # Check for live data
+    if isinstance(live_data, dict):
+        p_live = live_data.get(pid, {})
+    else:
+        p_live = next((item for item in live_data if str(item.get("id")) == pid), {})
+
+    # If live data exists, overwrite the default states
+    if p_live:
+        live_pts = p_live.get("dk_pts" if platform == "dk" else "fd_pts", 0.0)
+        stats = p_live.get("stats", {})
+        
+        if stats:
+            if base_player["is_pitcher"]:
+                ip = stats.get("inningsPitched", "0.0")
+                k = stats.get("strikeOuts", 0)
+                er = stats.get("earnedRuns", 0)
+                bb = stats.get("baseOnBalls", 0)
+                w = "W, " if stats.get("wins", 0) > 0 else ""
+                stat_string = f"{w}{ip} IP, {k} K, {er} ER, {bb} BB"
+            else:
+                h = stats.get("hits", 0)
+                ab = stats.get("atBats", 0)
+                hr = stats.get("homeRuns", 0)
+                rbi = stats.get("rbi", 0)
+                r = stats.get("runs", 0)
+                sb = stats.get("stolenBases", 0)
+                
+                pieces = [f"{h}-{ab}"]
+                if hr > 0: pieces.append(f"{hr} HR")
+                if rbi > 0: pieces.append(f"{rbi} RBI")
+                if r > 0: pieces.append(f"{r} R")
+                if sb > 0: pieces.append(f"{sb} SB")
+                stat_string = ", ".join(pieces)
+            
+    # Calculate baseline values
+    salary = base_player["salary"]
+    live_value = round(live_pts / (salary / 1000), 2) if salary > 0 else 0.0
+
+    # Build slate stats dynamically based on current live points
+    slate_stats = {}
+    original_slate_stats = json.loads(base_player["slate_stats_json"])
+    for s_id, s_data in original_slate_stats.items():
+        s_salary = int(str(s_data["salary"]).replace('$', '').replace(',', ''))
+        s_val = round(live_pts / (s_salary / 1000), 2) if s_salary > 0 else 0.0
+        slate_stats[s_id] = {
+            "salary": s_data["salary"],
+            "proj": f"{live_pts:.2f}", 
+            "value": f"{s_val:.2f}x"
+        }
+
+    return {
+        **base_player,
+        "proj": round(live_pts, 2), 
+        "value": live_value,
         "slate_stats_json": json.dumps(slate_stats),
-        "lineup_pos": lineup_pos,
-        "order_status": order_status,
-        "url": get_player_url(player.get("id"), player.get("name") or player.get("fullName"))
+        "raw_live_stats": stat_string
     }
 
 # =========================================================================
-# --- 5. THE JINJA2 MASTER HTML DIRECTORY TEMPLATE ---
+# --- 5. JINJA2 HTML TEMPLATE ---
 # =========================================================================
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -264,25 +302,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <style>
         body { background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         
-        .header-brand { 
-            font-weight: 900; 
-            letter-spacing: -1px; 
-            font-size: 2rem; 
-            color: #fff; 
-            font-style: italic; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
-        }
+        .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .header-brand a { color: inherit; text-decoration: none; }
-        .header-brand span { 
-            text-shadow: none !important;
-            background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 12px rgba(26, 140, 255, 0.8));
-            padding-right: 2px; 
-            display: inline-block; 
-        }
+        .header-brand span { background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-right: 2px; display: inline-block; }
 
         .table-card { border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #dee2e6; overflow: hidden; background: #fff; }
         .table th { background-color: #212529; color: #fff; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; padding: 12px; cursor: pointer; user-select: none; white-space: nowrap; }
@@ -293,13 +315,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
         .team-icon { width: 22px; height: 22px; margin-right: 6px; vertical-align: middle; }
 
-        /* Mobile Compacting Styles */
         @media (max-width: 768px) {
-            .table th, .table td { 
-                padding: 8px 6px; 
-                font-size: 0.75rem; 
-                white-space: nowrap; 
-            }
+            .table th, .table td { padding: 8px 6px; font-size: 0.75rem; white-space: nowrap; }
             .player-link { font-size: 0.80rem; }
             .team-icon { width: 16px; height: 16px; margin-right: 4px; }
             .col-rank { padding-right: 4px !important; padding-left: 4px !important; }
@@ -308,11 +325,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </head>
 <body>
 
-<nav class="navbar shadow-sm py-3 mb-2" style="background-color: #212529;">
+<nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
-        <div class="header-brand mb-2 mb-md-0">
-            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
-        </div>
+        <div class="header-brand mb-0"><a href="/">MLB Starting <span>Nine</span></a></div>
+        <div><a href="/" class="btn btn-sm btn-outline-light font-weight-bold">← Back To Slate</a></div>
     </div>
 </nav>
 
@@ -325,7 +341,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
 
-    <!-- Dropdown Controls for Slates & Positions -->
     <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
         {% if distinct_slates %}
         <div class="d-flex align-items-center gap-2">
@@ -343,15 +358,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 {% for pos_key, pos_label in position_links.items() %}
-                <option value="/dfs/{{ platform_slug }}/top-{{ pos_key }}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
+                <option value="/dfs/{{ platform_slug }}/{% if pos_key == 'live-slate-leaderboard' %}live-slate-leaderboard{% else %}top-{{ pos_key }}{% endif %}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
                 {% endfor %}
             </select>
         </div>
     </div>
 
     <div class="table-card shadow-sm mb-4 position-relative">
-        
-        <!-- Animated Horizontal Scroll Indicator for Mobile -->
         <div id="scroll-indicator" class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
             &larr; Swipe
         </div>
@@ -362,11 +375,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     <tr>
                         <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                        {% if current_pos == 'live-slate-leaderboard' %}
+                        <th onclick="sortTable(this, 2)">Live Stats &#x21D5;</th>
+                        {% else %}
                         <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
+                        {% endif %}
                         <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
                         <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
                         <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 6)">Proj &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 6)">{{ score_col_name }} &#x21D5;</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -394,7 +411,13 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                                 <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
                             </div>
                         </td>
+                        
+                        {% if current_pos == 'live-slate-leaderboard' %}
+                        <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">{{ p.raw_live_stats }}</td>
+                        {% else %}
                         <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
+                        {% endif %}
+                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
                                 <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="{{ p.team }} Icon" class="team-icon"> {{ p.team }}
@@ -413,14 +436,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </table>
         </div>
     </div>
-    
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
         <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 </div>
 
 <script>
-// Fade out swipe indicator on scroll
 document.addEventListener("DOMContentLoaded", () => {
     const scrollContainer = document.getElementById('table-scroll-container');
     const scrollIndicator = document.getElementById('scroll-indicator');
@@ -435,13 +456,11 @@ document.addEventListener("DOMContentLoaded", () => {
         }, { passive: true });
     }
 
-    // NEW: URL Parameter check to restore slate selection
     const urlParams = new URLSearchParams(window.location.search);
     const slateParam = urlParams.get('slate');
     if (slateParam) {
         const slateSelector = document.getElementById('slate-selector');
         if (slateSelector) {
-            // Verify the slate exists in this dropdown before applying
             const optionExists = Array.from(slateSelector.options).some(opt => opt.value === slateParam);
             if (optionExists) {
                 slateSelector.value = slateParam;
@@ -451,7 +470,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Add this new function to handle navigating while preserving the slate
 function changePosition(base_url) {
     const slateSelector = document.getElementById('slate-selector');
     if (slateSelector && slateSelector.value !== 'all') {
@@ -470,18 +488,16 @@ function filterSlate(slateId) {
 
         if (slateId === 'all') {
             row.style.display = '';
-            // Revert back to master base stats
             row.querySelector('.col-salary').textContent = row.getAttribute('data-default-salary');
             row.querySelector('.col-proj').textContent = row.getAttribute('data-default-proj');
-            row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
+            if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
         } else {
             if (rowSlates.includes(slateId)) {
                 row.style.display = '';
-                // Inject the specific slate salary, projection, and value dynamically
                 if (stats[slateId]) {
                     row.querySelector('.col-salary').textContent = stats[slateId].salary;
                     row.querySelector('.col-proj').textContent = stats[slateId].proj;
-                    row.querySelector('.col-value').textContent = stats[slateId].value;
+                    if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = stats[slateId].value;
                 }
             } else {
                 row.style.display = 'none';
@@ -489,19 +505,18 @@ function filterSlate(slateId) {
         }
     });
 
-    // Automatically trigger a Sort by Value (Col Index 2) descending when a slate is changed
-    const valueHeader = document.querySelectorAll('#leaderboard-table th')[2];
-    sortTable(valueHeader, 2, true);
+    const isLive = document.querySelector('#leaderboard-table th:nth-child(3)').textContent.includes("Live Stats");
+    const sortIndex = isLive ? 6 : 2; 
+    const targetHeader = document.querySelectorAll('#leaderboard-table th')[isLive ? 6 : 2];
+    if (targetHeader) sortTable(targetHeader, sortIndex, true);
 }
 
 function sortTable(thElement, colIndex, forceDesc = false) {
     const table = thElement.closest("table");
     const tbody = table.querySelector("tbody");
     const rows = Array.from(tbody.querySelectorAll("tr"));
-    
     let isAscending = thElement.classList.contains("asc");
     
-    // If we are forcing a descending sort (e.g. from the filter function), override here
     if (forceDesc) isAscending = true; 
     
     table.querySelectorAll("th").forEach(th => {
@@ -514,7 +529,6 @@ function sortTable(thElement, colIndex, forceDesc = false) {
     rows.sort((a, b) => {
         const aText = a.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
         const bText = b.cells[colIndex].textContent.trim().replace(/[$,x]/g, '');
-        
         const aVal = isNaN(parseFloat(aText)) ? aText : parseFloat(aText);
         const bVal = isNaN(parseFloat(bText)) ? bText : parseFloat(bText);
 
@@ -523,10 +537,8 @@ function sortTable(thElement, colIndex, forceDesc = false) {
         return 0;
     });
 
-    // Re-append sorted rows to the DOM
     rows.forEach(row => tbody.appendChild(row));
 
-    // Recalculate rank numbers (1, 2, 3...) for whatever rows are currently visible
     let currentRank = 1;
     rows.forEach(row => {
         if (row.style.display !== 'none') {
@@ -540,12 +552,11 @@ function sortTable(thElement, colIndex, forceDesc = false) {
 """
 
 # =========================================================================
-# --- 6. COMPILING & BUILDING EXECUTION LOOP ---
+# --- 6. EXECUTION LOOP ---
 # =========================================================================
 def get_target_slate_date():
     now = datetime.now(ZoneInfo("America/New_York"))
-    if now.hour < 3:
-        now = now - timedelta(days=1)
+    if now.hour < 3: now = now - timedelta(days=1)
     return now.strftime("%Y-%m-%d")
 
 def main():
@@ -561,12 +572,20 @@ def main():
             target_path = all_json_files[0]
             today_str = os.path.basename(target_path).replace("games_", "").replace(".json", "")
         else:
-            print(f"❌ Error: No games JSON files discovered inside directory: {DAILY_FILES_DIR}")
             return
 
-    print(f"📂 Processing Live JSON Source Stream: {target_path}")
     with open(target_path, "r", encoding="utf-8") as f:
         data_stream = json.load(f)
+
+    # 1. Load live data
+    live_path = os.path.join(LIVE_FILES_DIR, f"live_{today_str}.json")
+    live_data = {}
+    if os.path.exists(live_path):
+        try:
+            with open(live_path, "r", encoding="utf-8") as f:
+                live_data = json.load(f)
+        except Exception:
+            pass
 
     games_list = data_stream.get("games", []) if isinstance(data_stream, dict) else data_stream
     slates_dictionary = data_stream.get("slates", {"fanduel": [], "draftkings": []}) if isinstance(data_stream, dict) else {"fanduel": [], "draftkings": []}
@@ -582,21 +601,15 @@ def main():
         for side in ["away", "home"]:
             batters = p_data.get(side, {}).get("battingOrder", [])
             pitcher = p_data.get(side, {}).get("startingPitcher", {})
-            
-            if any(b.get("dk_salary", 0) > 0 for b in batters) or pitcher.get("dk_salary", 0) > 0:
-                has_dk_data = True
-            if any(b.get("salary", 0) > 0 for b in batters) or pitcher.get("salary", 0) > 0:
-                has_fd_data = True
+            if any(b.get("dk_salary", 0) > 0 for b in batters) or pitcher.get("dk_salary", 0) > 0: has_dk_data = True
+            if any(b.get("salary", 0) > 0 for b in batters) or pitcher.get("salary", 0) > 0: has_fd_data = True
 
-    print(f"🏁 Constraint Status Check -> DraftKings Data Found: {has_dk_data} | FanDuel Data Found: {has_fd_data}")
-
-    # Add util to initialization pools
     dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
     fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
+    dk_live_pool, fd_live_pool = [], []
 
     for game in games_list:
         p_data = game.get("projectedLineups", {})
-        
         away_name, away_id = get_team_data(game, "away")
         home_name, home_id = get_team_data(game, "home")
 
@@ -605,8 +618,6 @@ def main():
             ("home", home_name, home_id, away_name, away_id, True)
         ]:
             side_node = p_data.get(side, {})
-            
-            # Setup official lineup verification cross-checking
             raw_lineups = game.get("gameRaw", {}).get("lineups", {})
             official_players_raw = raw_lineups.get(f"{side}Players", [])
             is_official = len(official_players_raw) > 0
@@ -614,46 +625,34 @@ def main():
             
             pitcher = side_node.get("startingPitcher")
             if pitcher:
-                pitcher_id = str(pitcher.get("id"))
-                prob_pitcher = game.get("gameRaw", {}).get("teams", {}).get(side, {}).get("probablePitcher", {})
-                prob_id = str(prob_pitcher.get("id", ""))
-                
+                pid = str(pitcher.get("id"))
+                prob_id = str(game.get("gameRaw", {}).get("teams", {}).get(side, {}).get("probablePitcher", {}).get("id", ""))
                 lineup_pos = "P"
-                if is_official:
-                    if prob_id == pitcher_id or pitcher_id in official_ids:
-                        order_status = "official"
-                    else:
-                        order_status = "ns"
-                        lineup_pos = "NS"
-                else:
-                    order_status = "projected"
+                order_status = "official" if (is_official and (prob_id == pid or pid in official_ids)) else ("ns" if is_official else "projected")
 
                 if has_dk_data:
                     p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
-                    if p_res: dk_pools["pitchers"].append(p_res)
+                    if p_res: 
+                        dk_pools["pitchers"].append(p_res)
+                        l_res = process_live_leaderboard_player(p_res, live_data, "dk")
+                        if l_res: dk_live_pool.append(l_res)
+
                 if has_fd_data:
                     p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
-                    if p_res: fd_pools["pitchers"].append(p_res)
+                    if p_res: 
+                        fd_pools["pitchers"].append(p_res)
+                        l_res = process_live_leaderboard_player(p_res, live_data, "fd")
+                        if l_res: fd_live_pool.append(l_res)
 
             for batter in side_node.get("battingOrder", []):
-                batter_id = str(batter.get("id"))
+                bid = str(batter.get("id"))
                 lineup_pos = str(batter.get("order", ""))
-                
-                if is_official:
-                    if batter_id in official_ids:
-                        order_status = "official"
-                    else:
-                        order_status = "ns"
-                        lineup_pos = "NS"
-                else:
-                    order_status = "projected"
+                order_status = "official" if (is_official and bid in official_ids) else ("ns" if is_official else "projected")
 
                 if has_dk_data:
                     p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res:
-                        # Add every non-pitcher to the util array
                         dk_pools["util"].append(p_res)
-                        
                         dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
                         for raw_pos in dk_positions:
                             if "P" in raw_pos: dk_pools["pitchers"].append(p_res)
@@ -663,13 +662,14 @@ def main():
                             elif "3B" == raw_pos: dk_pools["third-base"].append(p_res)
                             elif "SS" == raw_pos: dk_pools["shortstops"].append(p_res)
                             elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
+                            
+                        l_res = process_live_leaderboard_player(p_res, live_data, "dk")
+                        if l_res: dk_live_pool.append(l_res)
 
                 if has_fd_data:
                     p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res:
-                        # Add every non-pitcher to the util array
                         fd_pools["util"].append(p_res)
-                        
                         fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
                         for raw_pos in fd_positions:
                             if "P" in raw_pos: fd_pools["pitchers"].append(p_res)
@@ -679,32 +679,27 @@ def main():
                             elif "SS" in raw_pos: fd_pools["shortstops"].append(p_res)
                             elif "OF" in raw_pos: fd_pools["outfielders"].append(p_res)
 
-    for key in dk_pools:
-        dk_pools[key] = sorted(dk_pools[key], key=lambda x: x["value"], reverse=True)
-    for key in fd_pools:
-        fd_pools[key] = sorted(fd_pools[key], key=lambda x: x["value"], reverse=True)
+                        l_res = process_live_leaderboard_player(p_res, live_data, "fd")
+                        if l_res: fd_live_pool.append(l_res)
 
-    def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, platform_slug, current_pos, position_links, date_str, players_list, distinct_slates):
+    for key in dk_pools: dk_pools[key] = sorted(dk_pools[key], key=lambda x: x["value"], reverse=True)
+    for key in fd_pools: fd_pools[key] = sorted(fd_pools[key], key=lambda x: x["value"], reverse=True)
+    dk_live_pool = sorted(dk_live_pool, key=lambda x: x["proj"], reverse=True)
+    fd_live_pool = sorted(fd_live_pool, key=lambda x: x["proj"], reverse=True)
+
+    def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, platform_slug, current_pos, position_links, date_str, players_list, distinct_slates, score_col_name="Proj"):
         try:
             from jinja2 import Template
             t = Template(HTML_TEMPLATE)
             return t.render(
-                seo_title=seo_title, 
-                seo_desc=seo_desc, 
-                page_url=page_url,
-                page_heading=page_heading, 
-                platform_name=platform_name,
-                platform_slug=platform_slug,
-                current_pos=current_pos,
-                position_links=position_links,
-                date_str=date_str, 
-                players=players_list, 
-                distinct_slates=distinct_slates
+                seo_title=seo_title, seo_desc=seo_desc, page_url=page_url, page_heading=page_heading, 
+                platform_name=platform_name, platform_slug=platform_slug, current_pos=current_pos,
+                position_links=position_links, date_str=date_str, players=players_list, 
+                distinct_slates=distinct_slates, score_col_name=score_col_name
             )
         except ImportError:
-            return "Jinja2 parsing engine dependency required to compile static structure outputs."
+            return "Jinja2 dependency required."
 
-    # URLs for the Sitemap & OG Tags
     generated_urls = []
     base_domain = "https://mlbstartingnine.com"
 
@@ -712,91 +707,51 @@ def main():
         for pos_slug, player_set in dk_pools.items():
             folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", f"top-{pos_slug}")
             os.makedirs(folder_path, exist_ok=True)
-            
             meta = SEO_METADATA["draftkings"].get(pos_slug, {"title": f"DraftKings {pos_slug.title()}", "desc": "MLB Projections"})
-            
-            if pos_slug == "util":
-                clean_title = "Utility (All Hitters)"
-            else:
-                clean_title = pos_slug.replace("-", " ").title()
-                
+            clean_title = "Utility (All Hitters)" if pos_slug == "util" else pos_slug.replace("-", " ").title()
             page_url = f"{base_domain}/dfs/draftkings/top-{pos_slug}/"
-
-            html_output = render_static_html(
-                seo_title=meta["title"],
-                seo_desc=meta["desc"],
-                page_url=page_url,
-                page_heading=f"Top Projected DraftKings {clean_title}",
-                platform_name="DraftKings",
-                platform_slug="draftkings",
-                current_pos=pos_slug,
-                position_links=POS_LABELS_DK,
-                date_str=today_str,
-                players_list=player_set,
-                distinct_slates=dk_slate_map
-            )
-            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file:
-                file.write(html_output)
-            
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected DraftKings {clean_title}", "DraftKings", "draftkings", pos_slug, POS_LABELS_DK, today_str, player_set, dk_slate_map)
+            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
-            
-        print("✅ DraftKings Directory Pages Generated.")
+
+        # 3. GENERATE LIVE DRAFTKINGS LEADERBOARD
+        if dk_live_pool:
+            folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", "live-slate-leaderboard")
+            os.makedirs(folder_path, exist_ok=True)
+            meta = SEO_METADATA["draftkings"]["live-slate-leaderboard"]
+            page_url = f"{base_domain}/dfs/draftkings/live-slate-leaderboard/"
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live DraftKings Slate Leaderboard", "DraftKings", "draftkings", "live-slate-leaderboard", POS_LABELS_DK, today_str, dk_live_pool, dk_slate_map, "Live Pts")
+            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
+            generated_urls.append(page_url)
 
     if has_fd_data:
         for pos_slug, player_set in fd_pools.items():
             folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", f"top-{pos_slug}")
             os.makedirs(folder_path, exist_ok=True)
-            
             meta = SEO_METADATA["fanduel"].get(pos_slug, {"title": f"FanDuel {pos_slug.title()}", "desc": "MLB Projections"})
-            
-            if pos_slug == "util":
-                clean_title = "Utility"
-            else:
-                clean_title = pos_slug.replace("-", " ").title()
-                if "Catchers" in clean_title: clean_title = "C / 1B Split"
-                
+            clean_title = "Utility" if pos_slug == "util" else pos_slug.replace("-", " ").title()
+            if "Catchers" in clean_title: clean_title = "C / 1B Split"
             page_url = f"{base_domain}/dfs/fanduel/top-{pos_slug}/"
-
-            html_output = render_static_html(
-                seo_title=meta["title"],
-                seo_desc=meta["desc"],
-                page_url=page_url,
-                page_heading=f"Top Projected FanDuel {clean_title}",
-                platform_name="FanDuel",
-                platform_slug="fanduel",
-                current_pos=pos_slug,
-                position_links=POS_LABELS_FD,
-                date_str=today_str,
-                players_list=player_set,
-                distinct_slates=fd_slate_map
-            )
-            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file:
-                file.write(html_output)
-            
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected FanDuel {clean_title}", "FanDuel", "fanduel", pos_slug, POS_LABELS_FD, today_str, player_set, fd_slate_map)
+            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
-            
-        print("✅ FanDuel Directory Pages Generated.")
 
-    # =========================================================================
-    # --- 7. XML SITEMAP GENERATOR ---
-    # =========================================================================
+        # 4. GENERATE LIVE FANDUEL LEADERBOARD
+        if fd_live_pool:
+            folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", "live-slate-leaderboard")
+            os.makedirs(folder_path, exist_ok=True)
+            meta = SEO_METADATA["fanduel"]["live-slate-leaderboard"]
+            page_url = f"{base_domain}/dfs/fanduel/live-slate-leaderboard/"
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live FanDuel Slate Leaderboard", "FanDuel", "fanduel", "live-slate-leaderboard", POS_LABELS_FD, today_str, fd_live_pool, fd_slate_map, "Live Pts")
+            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
+            generated_urls.append(page_url)
+
     if generated_urls:
-        sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        sitemap_xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        
+        sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         for url in generated_urls:
-            sitemap_xml += "  <url>\n"
-            sitemap_xml += f"    <loc>{url}</loc>\n"
-            sitemap_xml += f"    <lastmod>{today_str}</lastmod>\n"
-            sitemap_xml += "    <changefreq>daily</changefreq>\n"
-            sitemap_xml += "    <priority>0.8</priority>\n"
-            sitemap_xml += "  </url>\n"
-            
+            sitemap_xml += f"  <url>\n    <loc>{url}</loc>\n    <lastmod>{today_str}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n"
         sitemap_xml += '</urlset>'
-        
-        with open(SITEMAP_PATH, "w", encoding="utf-8") as f:
-            f.write(sitemap_xml)
-        print(f"✅ Sitemap successfully generated at true site root: {SITEMAP_PATH}")
+        with open(SITEMAP_PATH, "w", encoding="utf-8") as f: f.write(sitemap_xml)
 
 if __name__ == "__main__":
     main()
