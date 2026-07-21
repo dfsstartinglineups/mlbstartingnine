@@ -13,7 +13,7 @@ ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
 
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 DAILY_FILES_DIR = os.path.join(DATA_DIR, "daily_files")
-LIVE_FILES_DIR = os.path.join(DATA_DIR, "LIVE") # Updated Live Directory path
+LIVE_FILES_DIR = os.path.join(DATA_DIR, "LIVE")
 PLAYER_MASTER_PATH = os.path.join(DATA_DIR, "player_master_data.json")
 OUTPUT_BASE_DIR = os.path.join(ROOT_DIR, "dfs")
 SITEMAP_PATH = os.path.join(ROOT_DIR, "sitemap-dfs.xml")
@@ -137,9 +137,12 @@ def calculate_vegas_nudge(itt):
 def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos="", order_status=""):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
-    if raw_proj <= 0 or salary <= 0: return None
+    
+    # Check ONLY for salary presence to ensure deep bench players still populate Live Slates
+    if salary <= 0: return None
+    
     slate_block = player.get("dk_slates" if is_dk else "fd_slates", {})
-    slate_ids = list(slate_block.keys()) if isinstance(slate_block, dict) else []
+    slate_ids = [str(k).strip() for k in slate_block.keys()] if isinstance(slate_block, dict) else []
 
     odds = game.get("odds", {})
     total = 0.0
@@ -181,7 +184,7 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
             s_salary = int(s_data.get("salary", salary))
             s_final_proj = round(s_raw_proj * hitter_mult, 2)
             s_val = round(s_final_proj / (s_salary / 1000), 2) if s_salary > 0 else 0.0
-            slate_stats[s_id] = {"salary": f"${s_salary:,}", "proj": f"{s_final_proj:.2f}", "value": f"{s_val:.2f}x"}
+            slate_stats[str(s_id).strip()] = {"salary": f"${s_salary:,}", "proj": f"{s_final_proj:.2f}", "value": f"{s_val:.2f}x"}
             
     team_slug = TEAM_SLUG_MAP.get(int(team_id) if team_id else 0, "los-angeles-dodgers")
 
@@ -313,12 +316,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
-        .team-icon { width: 22px; height: 22px; margin-right: 6px; vertical-align: middle; }
 
         @media (max-width: 768px) {
             .table th, .table td { padding: 8px 6px; font-size: 0.75rem; white-space: nowrap; }
             .player-link { font-size: 0.80rem; }
-            .team-icon { width: 16px; height: 16px; margin-right: 4px; }
             .col-rank { padding-right: 4px !important; padding-left: 4px !important; }
         }
     </style>
@@ -354,14 +355,16 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         </div>
         {% endif %}
         
+        {% if current_pos != 'live-slate-leaderboard' %}
         <div class="d-flex align-items-center gap-2 ms-md-3">
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 {% for pos_key, pos_label in position_links.items() %}
-                <option value="/dfs/{{ platform_slug }}/{% if pos_key == 'live-slate-leaderboard' %}live-slate-leaderboard{% else %}top-{{ pos_key }}{% endif %}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
+                <option value="/dfs/{{ platform_slug }}/top-{{ pos_key }}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
                 {% endfor %}
             </select>
         </div>
+        {% endif %}
     </div>
 
     <div class="table-card shadow-sm mb-4 position-relative">
@@ -375,15 +378,17 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                     <tr>
                         <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                        
                         {% if current_pos == 'live-slate-leaderboard' %}
-                        <th onclick="sortTable(this, 2)">Live Stats &#x21D5;</th>
+                        <th class="text-end" onclick="sortTable(this, 2)">{{ score_col_name }} &#x21D5;</th>
+                        <th onclick="sortTable(this, 3)">Live Stats &#x21D5;</th>
                         {% else %}
                         <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
-                        {% endif %}
                         <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
                         <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
                         <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
                         <th class="text-end" onclick="sortTable(this, 6)">{{ score_col_name }} &#x21D5;</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -407,29 +412,33 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                                     {% endif %}
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="{{ p.url }}" class="player-link">{{ p.name }}</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="{{ p.url }}" class="player-link text-nowrap">{{ p.name }}</a>
                             </div>
                         </td>
                         
                         {% if current_pos == 'live-slate-leaderboard' %}
+                        <td class="text-end fw-bold col-proj fs-6">{{ p.proj }}</td>
                         <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">{{ p.raw_live_stats }}</td>
                         {% else %}
                         <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
-                        {% endif %}
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="{{ p.team }} Icon" class="team-icon"> {{ p.team }}
+                                {{ p.team }}
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                {{ p.opp_indicator }} <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opp_name }} Icon" class="team-icon ms-2" style="margin-right: 4px;"> {{ p.opp_name }}
+                            <div class="d-flex align-items-center text-nowrap">
+                                {{ p.opp_indicator }} <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opp_name }} Icon" style="width: 18px; height: 18px; margin: 0 4px;"> {{ p.opp_name }}
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">${{ "{:,}".format(p.salary) }}</td>
                         <td class="text-end fw-bold col-proj">{{ p.proj }}</td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -479,7 +488,7 @@ function changePosition(base_url) {
     }
 }
 
-function filterSlate(slateId) {
+function filterSlate(slateId, preserveSort = false) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
         const rowSlates = row.getAttribute('data-slates').split(',');
@@ -488,16 +497,25 @@ function filterSlate(slateId) {
 
         if (slateId === 'all') {
             row.style.display = '';
-            row.querySelector('.col-salary').textContent = row.getAttribute('data-default-salary');
-            row.querySelector('.col-proj').textContent = row.getAttribute('data-default-proj');
-            if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
+            
+            const salCol = row.querySelector('.col-salary');
+            const projCol = row.querySelector('.col-proj');
+            const valCol = row.querySelector('.col-value');
+            
+            if (salCol) salCol.textContent = row.getAttribute('data-default-salary');
+            if (projCol) projCol.textContent = row.getAttribute('data-default-proj');
+            if (valCol) valCol.textContent = row.getAttribute('data-default-value');
         } else {
             if (rowSlates.includes(slateId)) {
                 row.style.display = '';
                 if (stats[slateId]) {
-                    row.querySelector('.col-salary').textContent = stats[slateId].salary;
-                    row.querySelector('.col-proj').textContent = stats[slateId].proj;
-                    if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = stats[slateId].value;
+                    const salCol = row.querySelector('.col-salary');
+                    const projCol = row.querySelector('.col-proj');
+                    const valCol = row.querySelector('.col-value');
+
+                    if (salCol) salCol.textContent = stats[slateId].salary;
+                    if (projCol) projCol.textContent = stats[slateId].proj;
+                    if (valCol) valCol.textContent = stats[slateId].value;
                 }
             } else {
                 row.style.display = 'none';
@@ -505,10 +523,27 @@ function filterSlate(slateId) {
         }
     });
 
-    const isLive = document.querySelector('#leaderboard-table th:nth-child(3)').textContent.includes("Live Stats");
-    const sortIndex = isLive ? 6 : 2; 
-    const targetHeader = document.querySelectorAll('#leaderboard-table th')[isLive ? 6 : 2];
-    if (targetHeader) sortTable(targetHeader, sortIndex, true);
+    let targetHeader, sortIndex, forceDesc = false;
+
+    if (preserveSort) {
+        targetHeader = document.querySelector('#leaderboard-table th.asc, #leaderboard-table th.desc');
+        if (targetHeader) {
+            const headers = Array.from(document.querySelectorAll('#leaderboard-table th'));
+            sortIndex = headers.indexOf(targetHeader);
+            const isDesc = targetHeader.classList.contains('desc');
+            
+            targetHeader.classList.remove('desc', 'asc');
+            targetHeader.classList.add(isDesc ? 'asc' : 'desc');
+        }
+    }
+
+    if (!targetHeader) {
+        sortIndex = 2; // Column index 2 handles default sorting correctly for both Proj Value AND Live Pts
+        targetHeader = document.querySelectorAll('#leaderboard-table th')[sortIndex];
+        forceDesc = true;
+    }
+
+    if (targetHeader) sortTable(targetHeader, sortIndex, forceDesc);
 }
 
 function sortTable(thElement, colIndex, forceDesc = false) {
@@ -546,6 +581,39 @@ function sortTable(thElement, colIndex, forceDesc = false) {
         }
     });
 }
+
+// ==========================================================
+// SILENT REFRESH LOGIC (Only runs on Live Leaderboard Pages)
+// ==========================================================
+{% if current_pos == 'live-slate-leaderboard' %}
+setInterval(() => {
+    fetch(window.location.href, { cache: 'no-store' })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const newTbody = doc.querySelector('#leaderboard-table tbody');
+            const currentTbody = document.querySelector('#leaderboard-table tbody');
+            
+            if (newTbody && currentTbody) {
+                const scrollContainer = document.getElementById('table-scroll-container');
+                const scrollTop = scrollContainer.scrollTop;
+                const scrollLeft = scrollContainer.scrollLeft;
+                
+                const slateSelector = document.getElementById('slate-selector');
+                const currentSlate = slateSelector ? slateSelector.value : 'all';
+
+                currentTbody.innerHTML = newTbody.innerHTML;
+                filterSlate(currentSlate, true);
+
+                scrollContainer.scrollTop = scrollTop;
+                scrollContainer.scrollLeft = scrollLeft;
+            }
+        })
+        .catch(error => console.error('Silent refresh failed:', error));
+}, 60000); 
+{% endif %}
 </script>
 </body>
 </html>
@@ -590,8 +658,8 @@ def main():
     games_list = data_stream.get("games", []) if isinstance(data_stream, dict) else data_stream
     slates_dictionary = data_stream.get("slates", {"fanduel": [], "draftkings": []}) if isinstance(data_stream, dict) else {"fanduel": [], "draftkings": []}
 
-    dk_slate_map = {s["id"]: s["name"] for s in slates_dictionary.get("draftkings", []) if "id" in s}
-    fd_slate_map = {s["id"]: s["name"] for s in slates_dictionary.get("fanduel", []) if "id" in s}
+    dk_slate_map = {str(s["id"]).strip(): str(s["name"]) for s in slates_dictionary.get("draftkings", []) if "id" in s}
+    fd_slate_map = {str(s["id"]).strip(): str(s["name"]) for s in slates_dictionary.get("fanduel", []) if "id" in s}
 
     has_dk_data = False
     has_fd_data = False
@@ -714,7 +782,6 @@ def main():
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
 
-        # 3. GENERATE LIVE DRAFTKINGS LEADERBOARD
         if dk_live_pool:
             folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", "live-slate-leaderboard")
             os.makedirs(folder_path, exist_ok=True)
@@ -736,7 +803,6 @@ def main():
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
 
-        # 4. GENERATE LIVE FANDUEL LEADERBOARD
         if fd_live_pool:
             folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", "live-slate-leaderboard")
             os.makedirs(folder_path, exist_ok=True)
