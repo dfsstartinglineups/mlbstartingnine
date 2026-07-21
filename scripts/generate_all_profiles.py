@@ -314,7 +314,7 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         </div>"""
         return game_state_lbl, console_html
 
-def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher):
+def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data):
     game_raw = my_game.get("gameRaw", {})
     opp_side = "home" if team_side == "away" else "away"
     opp_pitcher_name = game_raw.get("teams", {}).get(opp_side, {}).get("probablePitcher", {}).get("fullName", "TBD")
@@ -440,11 +440,21 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
             bvp = b_stats.get("bvp", {})
             b_name = b_stats.get("name") or next((p.get("name") for p in my_game.get("projectedLineups", {}).get(opp_side, {}).get("battingOrder", []) if str(p.get("id")) == str(b_id)), f"Batter #{idx+1}")
             
+            # --- NEW: Check master_data to build the link dynamically ---
+            master_key = f"ID{b_id}"
+            if master_data and master_key in master_data:
+                b_slug = master_data[master_key].get("slug") or slugify(b_name)
+                b_profile_url = f"{DOMAIN}/players/{b_slug}/"
+                b_name_html = f'<a href="{b_profile_url}" class="text-primary text-decoration-none">{b_name}</a>'
+            else:
+                b_name_html = f'<span class="text-dark">{b_name}</span>'
+            # ------------------------------------------------------------
+
             if bvp and float(bvp.get("ab", 0)) > 0:
                 hist_count += 1
-                rows_html += f"<tr><td class='text-start fw-semibold'>{idx + 1}. {b_name}</td><td><strong>{bvp['ab']}</strong></td><td>{bvp['hits']}</td><td>{bvp['hr']}</td><td class='text-success fw-bold'>{bvp['ops']}</td></tr>"
+                rows_html += f"<tr><td class='text-start fw-semibold'>{idx + 1}. {b_name_html}</td><td><strong>{bvp['ab']}</strong></td><td>{bvp['hits']}</td><td>{bvp['hr']}</td><td class='text-success fw-bold'>{bvp['ops']}</td></tr>"
             else:
-                rows_html += f"<tr><td class='text-start text-muted'>{idx + 1}. {b_name}</td><td colspan='4' class='text-muted fst-italic text-center' style='font-size: 0.7rem;'>No historic matchups recorded</td></tr>"
+                rows_html += f"<tr><td class='text-start text-muted'>{idx + 1}. {b_name_html}</td><td colspan='4' class='text-muted fst-italic text-center' style='font-size: 0.7rem;'>No historic matchups recorded</td></tr>"
                 
         opp_team_name = game_raw.get("teams", {}).get(opp_side, {}).get("teamName", "Opponent")
         bvp_html = f"""
@@ -507,7 +517,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
         badge_matrix_html = render_badge_zone(player_id, team_side, my_game)
         game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data)
-        hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher)
+        hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
 
     if is_pitcher:
         title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
