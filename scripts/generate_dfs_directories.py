@@ -360,7 +360,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">{{ page_heading }}</h1>
-            <p class="text-muted small mb-0">Updated: {{ date_str }} | Real-time Context Performance Matrix</p>
+            <p class="text-muted small mb-0">Updated: {{ date_str }}</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
@@ -655,6 +655,10 @@ def main():
     target_pattern = f"games_{today_str}.json"
     target_path = os.path.join(DAILY_FILES_DIR, target_pattern)
 
+    # Format current execution time cleanly for the header
+    now_est = datetime.now(ZoneInfo("America/New_York"))
+    display_time = now_est.strftime("%Y-%m-%d %I:%M %p ET")
+
     if not os.path.exists(target_path):
         import glob
         all_json_files = glob.glob(os.path.join(DAILY_FILES_DIR, "games_*.json"))
@@ -827,7 +831,8 @@ def main():
             meta = SEO_METADATA["draftkings"].get(pos_slug, {"title": f"DraftKings {pos_slug.title()}", "desc": "MLB Projections"})
             clean_title = "Utility (All Hitters)" if pos_slug == "util" else pos_slug.replace("-", " ").title()
             page_url = f"{base_domain}/dfs/draftkings/top-{pos_slug}/"
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected DraftKings {clean_title}", "DraftKings", "draftkings", pos_slug, POS_LABELS_DK, today_str, player_set, dk_slate_map)
+            # Pass display_time directly in place of today_str
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected DraftKings {clean_title}", "DraftKings", "draftkings", pos_slug, POS_LABELS_DK, display_time, player_set, dk_slate_map)
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
 
@@ -836,7 +841,7 @@ def main():
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["draftkings"]["live-slate-leaderboard"]
             page_url = f"{base_domain}/dfs/draftkings/live-slate-leaderboard/"
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live DraftKings Slate Leaderboard", "DraftKings", "draftkings", "live-slate-leaderboard", POS_LABELS_DK, today_str, dk_live_pool, dk_slate_map, "Live Pts")
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live DraftKings Slate Leaderboard", "DraftKings", "draftkings", "live-slate-leaderboard", POS_LABELS_DK, display_time, dk_live_pool, dk_slate_map, "Live Pts")
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
 
@@ -848,7 +853,7 @@ def main():
             clean_title = "Utility" if pos_slug == "util" else pos_slug.replace("-", " ").title()
             if "Catchers" in clean_title: clean_title = "C / 1B Split"
             page_url = f"{base_domain}/dfs/fanduel/top-{pos_slug}/"
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected FanDuel {clean_title}", "FanDuel", "fanduel", pos_slug, POS_LABELS_FD, today_str, player_set, fd_slate_map)
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected FanDuel {clean_title}", "FanDuel", "fanduel", pos_slug, POS_LABELS_FD, display_time, player_set, fd_slate_map)
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
 
@@ -857,7 +862,7 @@ def main():
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["fanduel"]["live-slate-leaderboard"]
             page_url = f"{base_domain}/dfs/fanduel/live-slate-leaderboard/"
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live FanDuel Slate Leaderboard", "FanDuel", "fanduel", "live-slate-leaderboard", POS_LABELS_FD, today_str, fd_live_pool, fd_slate_map, "Live Pts")
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live FanDuel Slate Leaderboard", "FanDuel", "fanduel", "live-slate-leaderboard", POS_LABELS_FD, display_time, fd_live_pool, fd_slate_map, "Live Pts")
             with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
             generated_urls.append(page_url)
 
