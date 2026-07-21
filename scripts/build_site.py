@@ -275,11 +275,13 @@ function populateDFSLinks() {
     selector.innerHTML = '<option value="">Top DFS Plays...</option>';
     
     const links = platform === 'dk' ? [
+        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" },
         { slug: "pitchers", label: "Pitchers" }, { slug: "catchers", label: "Catchers" },
         { slug: "first-base", label: "First Base" }, { slug: "second-base", label: "Second Base" },
         { slug: "third-base", label: "Third Base" }, { slug: "shortstops", label: "Shortstops" },
         { slug: "outfielders", label: "Outfielders" }, { slug: "util", label: "Util (All Hitters)" }
     ] : [
+        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" },
         { slug: "pitchers", label: "Pitchers" }, { slug: "catchers-first-base", label: "C / 1B" },
         { slug: "second-base", label: "Second Base" }, { slug: "third-base", label: "Third Base" },
         { slug: "shortstops", label: "Shortstops" }, { slug: "outfielders", label: "Outfielders" },
@@ -290,7 +292,14 @@ function populateDFSLinks() {
     
     links.forEach(link => {
         const opt = document.createElement('option');
-        opt.value = `/dfs/${platSlug}/top-${link.slug}/`;
+        
+        // Check if it's the live leaderboard to omit the "top-" prefix
+        if (link.slug === "live-slate-leaderboard") {
+            opt.value = `/dfs/${platSlug}/${link.slug}/`;
+        } else {
+            opt.value = `/dfs/${platSlug}/top-${link.slug}/`;
+        }
+        
         opt.textContent = link.label;
         selector.appendChild(opt);
     });
