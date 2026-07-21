@@ -236,26 +236,47 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         
         opp_pitcher_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("probablePitcher", {}).get("id", ""))
         opp_team_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("team", {}).get("id", ""))
+        # 2. Safely Fetch Season Stats and Links from master_data
         opp_w, opp_l, opp_era, opp_so = "-", "-", "-", "-"
         master_key = f"ID{opp_pitcher_id}"
+        has_profile = False
+        opp_profile_url = ""
+        
         if opp_pitcher_id and master_data and master_key in master_data:
-            p_season = master_data[master_key].get("season", {})
+            p_profile = master_data[master_key]
+            p_season = p_profile.get("season", {})
             opp_w = p_season.get("w", "-")
             opp_l = p_season.get("l", "-")
             opp_era = p_season.get("era", "-")
             opp_so = p_season.get("so", p_season.get("k", "-"))
             
+            opp_slug = p_profile.get("slug") or slugify(opp_pitcher_name)
+            opp_profile_url = f"{DOMAIN}/players/{opp_slug}/"
+            has_profile = True
+            
+        # 3. Build Asset URLs
         opp_team_logo = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{opp_team_id}.svg" if opp_team_id else ""
         opp_headshot = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{opp_pitcher_id}/headshot/67/current" if opp_pitcher_id else ""
 
+        # 4. Construct the UI Display conditionally
         if opp_pitcher_id:
+            # Increased headshot size to 50px and name size to 1rem
+            if has_profile:
+                image_html = f'<a href="{opp_profile_url}"><img src="{opp_headshot}" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #dee2e6; object-fit: cover; background: #fff;" alt="{opp_pitcher_name}"></a>'
+                name_html = f'<a href="{opp_profile_url}" class="text-primary fw-bold text-decoration-none" style="font-size: 1rem;">{opp_pitcher_name}</a>'
+            else:
+                image_html = f'<img src="{opp_headshot}" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #dee2e6; object-fit: cover; background: #fff;" alt="{opp_pitcher_name}">'
+                name_html = f'<span class="text-dark fw-bold" style="font-size: 1rem;">{opp_pitcher_name}</span>'
+
+            # Changed from flex-column to align-items-center (horizontal line)
+            # Increased team logo to 32px and stat font size to 0.85rem
             pitcher_display = f'''
-            <div class="d-flex align-items-center mt-1 gap-2">
-                <img src="{opp_team_logo}" style="width: 24px; height: 24px; object-fit: contain;" alt="Team">
-                <img src="{opp_headshot}" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff;" alt="{opp_pitcher_name}">
-                <div class="d-flex flex-column">
-                    <span class="text-dark fw-bold" style="font-size: 0.85rem;">{opp_pitcher_name}</span>
-                    <div class="d-flex gap-2 text-muted" style="font-size: 0.7rem; margin-top: -2px;">
+            <div class="d-flex align-items-center gap-3">
+                <img src="{opp_team_logo}" style="width: 32px; height: 32px; object-fit: contain;" alt="Team">
+                {image_html}
+                <div class="d-flex align-items-center gap-3">
+                    {name_html}
+                    <div class="d-flex align-items-center gap-3 text-muted border-start ps-3" style="font-size: 0.85rem;">
                         <span><strong class="text-dark">{opp_w}-{opp_l}</strong> REC</span>
                         <span><strong class="text-dark">{opp_era}</strong> ERA</span>
                         <span><strong class="text-dark">{opp_so}</strong> SO</span>
@@ -264,13 +285,14 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
             </div>
             '''
         else:
-            pitcher_display = f'<span class="text-dark fw-semibold" style="font-size: 0.85rem;">vs. {opp_pitcher_name}</span>'
+            pitcher_display = f'<span class="text-dark fw-semibold" style="font-size: 1rem;">vs. {opp_pitcher_name}</span>'
 
+        # Wrapped the badge and pitcher_display in a d-flex row so they sit side-by-side
         console_html = f"""
         <div class="p-3 border-bottom" style="background-color: #edf4f8;">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
-                    <span class="badge bg-secondary text-uppercase mb-1" style="font-size:0.65rem;">Upcoming Matchup</span>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-secondary text-uppercase shadow-sm" style="font-size:0.7rem; padding: 6px 10px;">Upcoming Matchup</span>
                     {pitcher_display}
                 </div>
                 <div class="d-flex align-items-center gap-2">
