@@ -236,10 +236,10 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         
         opp_pitcher_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("probablePitcher", {}).get("id", ""))
         opp_team_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("team", {}).get("id", ""))
-        
         opp_w, opp_l, opp_era, opp_so = "-", "-", "-", "-"
-        if opp_pitcher_id and master_data and opp_pitcher_id in master_data:
-            p_season = master_data[opp_pitcher_id].get("season", {})
+        master_key = f"ID{opp_pitcher_id}"
+        if opp_pitcher_id and master_data and master_key in master_data:
+            p_season = master_data[master_key].get("season", {})
             opp_w = p_season.get("w", "-")
             opp_l = p_season.get("l", "-")
             opp_era = p_season.get("era", "-")
