@@ -666,7 +666,17 @@ def main():
     has_dk_data = False
     has_fd_data = False
 
+    # Check for salary presence, skipping postponed games
     for game in games_list:
+        game_raw = game.get("gameRaw", {})
+        game_status = game_raw.get("status", {}).get("abstractGameState", "")
+        detailed_status = game_raw.get("status", {}).get("detailedState", "")
+        status_code = game_raw.get("status", {}).get("statusCode", "")
+
+        # Skip postponed games individually
+        if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C":
+            continue
+
         p_data = game.get("projectedLineups", {})
         for side in ["away", "home"]:
             batters = p_data.get(side, {}).get("battingOrder", [])
@@ -678,7 +688,17 @@ def main():
     fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
     dk_live_pool, fd_live_pool = [], []
 
+    # Main player extraction loop
     for game in games_list:
+        game_raw = game.get("gameRaw", {})
+        game_status = game_raw.get("status", {}).get("abstractGameState", "")
+        detailed_status = game_raw.get("status", {}).get("detailedState", "")
+        status_code = game_raw.get("status", {}).get("statusCode", "")
+
+        # Skip postponed games individually to handle doubleheaders cleanly
+        if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C":
+            continue
+
         p_data = game.get("projectedLineups", {})
         away_name, away_id = get_team_data(game, "away")
         home_name, home_id = get_team_data(game, "home")
@@ -688,15 +708,14 @@ def main():
             ("home", home_name, home_id, away_name, away_id, True)
         ]:
             side_node = p_data.get(side, {})
-            raw_lineups = game.get("gameRaw", {}).get("lineups", {})
-            official_players_raw = raw_lineups.get(f"{side}Players", [])
+            official_players_raw = game_raw.get("lineups", {}).get(f"{side}Players", [])
             is_official = len(official_players_raw) > 0
             official_ids = [str(p.get("id")) for p in official_players_raw]
             
             pitcher = side_node.get("startingPitcher")
             if pitcher:
                 pid = str(pitcher.get("id"))
-                prob_id = str(game.get("gameRaw", {}).get("teams", {}).get(side, {}).get("probablePitcher", {}).get("id", ""))
+                prob_id = str(game_raw.get("teams", {}).get(side, {}).get("probablePitcher", {}).get("id", ""))
                 lineup_pos = "P"
                 order_status = "official" if (is_official and (prob_id == pid or pid in official_ids)) else ("ns" if is_official else "projected")
 
