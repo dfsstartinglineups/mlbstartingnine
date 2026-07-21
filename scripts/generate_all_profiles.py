@@ -177,7 +177,7 @@ def render_badge_zone(player_id, team_side, my_game):
     
     return f'<div class="mb-3">{badge_html}{link_html}</div>'
 
-def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val):
+def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val, master_data):
     game_raw = my_game.get("gameRaw", {})
     game_pk = str(game_raw.get("gamePk", ""))
     opp_side = "home" if team_side == "away" else "away"
@@ -191,7 +191,6 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
 
     active_live = live_data.get(game_pk)
     if active_live:
-        # THE FIX: Calculate the clean inning number BEFORE inserting it into the f-string
         inning_raw = active_live.get('inning', '')
         inning_clean = re.sub(r'\D', '', inning_raw)
         game_state_lbl = f"{active_live.get('status', 'Live')} {active_live.get('half', '')} {inning_clean}".strip()
@@ -234,12 +233,45 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         return game_state_lbl, console_html
     else:
         game_state_lbl = game_raw.get("status", {}).get("abstractGameState", "Scheduled")
+        
+        opp_pitcher_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("probablePitcher", {}).get("id", ""))
+        opp_team_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("team", {}).get("id", ""))
+        
+        opp_w, opp_l, opp_era, opp_so = "-", "-", "-", "-"
+        if opp_pitcher_id and master_data and opp_pitcher_id in master_data:
+            p_season = master_data[opp_pitcher_id].get("season", {})
+            opp_w = p_season.get("w", "-")
+            opp_l = p_season.get("l", "-")
+            opp_era = p_season.get("era", "-")
+            opp_so = p_season.get("so", p_season.get("k", "-"))
+            
+        opp_team_logo = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{opp_team_id}.svg" if opp_team_id else ""
+        opp_headshot = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{opp_pitcher_id}/headshot/67/current" if opp_pitcher_id else ""
+
+        if opp_pitcher_id:
+            pitcher_display = f'''
+            <div class="d-flex align-items-center mt-1 gap-2">
+                <img src="{opp_team_logo}" style="width: 24px; height: 24px; object-fit: contain;" alt="Team">
+                <img src="{opp_headshot}" style="width: 40px; height: 40px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff;" alt="{opp_pitcher_name}">
+                <div class="d-flex flex-column">
+                    <span class="text-dark fw-bold" style="font-size: 0.85rem;">{opp_pitcher_name}</span>
+                    <div class="d-flex gap-2 text-muted" style="font-size: 0.7rem; margin-top: -2px;">
+                        <span><strong class="text-dark">{opp_w}-{opp_l}</strong> REC</span>
+                        <span><strong class="text-dark">{opp_era}</strong> ERA</span>
+                        <span><strong class="text-dark">{opp_so}</strong> SO</span>
+                    </div>
+                </div>
+            </div>
+            '''
+        else:
+            pitcher_display = f'<span class="text-dark fw-semibold" style="font-size: 0.85rem;">vs. {opp_pitcher_name}</span>'
+
         console_html = f"""
         <div class="p-3 border-bottom" style="background-color: #edf4f8;">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
-                    <span class="badge bg-secondary text-uppercase me-2" style="font-size:0.65rem;">Upcoming Matchup</span>
-                    <span class="text-dark fw-semibold" style="font-size: 0.85rem;">vs. {opp_pitcher_name}</span>
+                    <span class="badge bg-secondary text-uppercase mb-1" style="font-size:0.65rem;">Upcoming Matchup</span>
+                    {pitcher_display}
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
@@ -409,7 +441,7 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
 # ==========================================
 # 4. PRIMARY HTML LAYOUT BUILDER
 # ==========================================
-def generate_player_html(profile, slug, daily_data, live_data):
+def generate_player_html(profile, slug, daily_data, live_data, master_data):
     player_id = profile.get("player_id", "")
     team_id = profile.get("team_id", "")
     team_logo_url = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{team_id}.svg" if team_id else "https://www.mlbstatic.com/team-logos/team-cap-on-light/blank.svg"
@@ -447,7 +479,7 @@ def generate_player_html(profile, slug, daily_data, live_data):
         fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
         
         badge_matrix_html = render_badge_zone(player_id, team_side, my_game)
-        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val)
+        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data)
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher)
 
     if is_pitcher:
@@ -608,7 +640,7 @@ def main():
         
         all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-        new_html_content = generate_player_html(profile, player_slug, daily_data, live_data)
+        new_html_content = generate_player_html(profile, player_slug, daily_data, live_data, master_data)
         
         existing_html = ""
         if os.path.exists(index_file_path):
