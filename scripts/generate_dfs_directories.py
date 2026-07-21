@@ -199,46 +199,67 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
         "raw_live_stats": "", "live_points": 0.0 
     }
 
-def process_live_leaderboard_player(base_player, live_data, platform):
-    pid = str(base_player["id"])
+def flatten_live_data(live_json):
+    """Flattens game-level live JSON into a single player ID lookup dictionary."""
+    flat_map = {}
+    if not isinstance(live_json, dict):
+        return flat_map
+    
+    for game_id, game_data in live_json.items():
+        if not isinstance(game_data, dict):
+            continue
+        players_node = game_data.get("players", {})
+        if not isinstance(players_node, dict):
+            continue
+        for side in ["AWAY", "HOME"]:
+            side_players = players_node.get(side, {})
+            if isinstance(side_players, dict):
+                for p_key, p_val in side_players.items():
+                    clean_id = str(p_key).replace("ID", "").strip()
+                    flat_map[clean_id] = p_val
+    return flat_map
+
+def process_live_leaderboard_player(base_player, flat_live_data, platform):
+    pid = str(base_player["id"]).replace("ID", "").strip()
     
     # Initialize default pre-game state
     live_pts = 0.0
     stat_string = "Pre-game"
     
-    # Check for live data
-    if isinstance(live_data, dict):
-        p_live = live_data.get(pid, {})
-    else:
-        p_live = next((item for item in live_data if str(item.get("id")) == pid), {})
+    p_live = flat_live_data.get(pid, {})
 
-    # If live data exists, overwrite the default states
     if p_live:
-        live_pts = p_live.get("dk_pts" if platform == "dk" else "fd_pts", 0.0)
-        stats = p_live.get("stats", {})
+        live_pts = float(p_live.get("dk_pts" if platform == "dk" else "fd_pts", 0.0))
         
-        if stats:
-            if base_player["is_pitcher"]:
-                ip = stats.get("inningsPitched", "0.0")
-                k = stats.get("strikeOuts", 0)
-                er = stats.get("earnedRuns", 0)
-                bb = stats.get("baseOnBalls", 0)
-                w = "W, " if stats.get("wins", 0) > 0 else ""
-                stat_string = f"{w}{ip} IP, {k} K, {er} ER, {bb} BB"
-            else:
-                h = stats.get("hits", 0)
-                ab = stats.get("atBats", 0)
-                hr = stats.get("homeRuns", 0)
-                rbi = stats.get("rbi", 0)
-                r = stats.get("runs", 0)
-                sb = stats.get("stolenBases", 0)
-                
-                pieces = [f"{h}-{ab}"]
-                if hr > 0: pieces.append(f"{hr} HR")
-                if rbi > 0: pieces.append(f"{rbi} RBI")
-                if r > 0: pieces.append(f"{r} R")
-                if sb > 0: pieces.append(f"{sb} SB")
-                stat_string = ", ".join(pieces)
+        if base_player["is_pitcher"]:
+            pitching = p_live.get("pitching")
+            if isinstance(pitching, dict):
+                stat_string = pitching.get("summary") or ""
+                if not stat_string:
+                    ip = pitching.get("inningsPitched", "0.0")
+                    k = pitching.get("strikeOuts", 0)
+                    er = pitching.get("earnedRuns", 0)
+                    bb = pitching.get("baseOnBalls", 0)
+                    w = "W, " if pitching.get("wins", 0) > 0 else ""
+                    stat_string = f"{w}{ip} IP, {k} K, {er} ER, {bb} BB"
+        else:
+            batting = p_live.get("batting")
+            if isinstance(batting, dict):
+                stat_string = batting.get("summary") or ""
+                if not stat_string:
+                    h = batting.get("hits", 0)
+                    ab = batting.get("atBats", 0)
+                    hr = batting.get("homeRuns", 0)
+                    rbi = batting.get("rbi", 0)
+                    r = batting.get("runs", 0)
+                    sb = batting.get("stolenBases", 0)
+                    
+                    pieces = [f"{h}-{ab}"]
+                    if hr > 0: pieces.append(f"{hr} HR")
+                    if rbi > 0: pieces.append(f"{rbi} RBI")
+                    if r > 0: pieces.append(f"{r} R")
+                    if sb > 0: pieces.append(f"{sb} SB")
+                    stat_string = ", ".join(pieces)
             
     # Calculate baseline values
     salary = base_player["salary"]
@@ -261,7 +282,7 @@ def process_live_leaderboard_player(base_player, live_data, platform):
         "proj": round(live_pts, 2), 
         "value": live_value,
         "slate_stats_json": json.dumps(slate_stats),
-        "raw_live_stats": stat_string
+        "raw_live_stats": stat_string or "In Game"
     }
 
 # =========================================================================
@@ -647,15 +668,22 @@ def main():
     with open(target_path, "r", encoding="utf-8") as f:
         data_stream = json.load(f)
 
-    # 1. Load live data
-    live_path = os.path.join(LIVE_FILES_DIR, f"live_{today_str}.json")
-    live_data = {}
-    if os.path.exists(live_path):
+    # 1. Load live data (handles live_mlb_YYYY-MM-DD.json and live_YYYY-MM-DD.json)
+    live_data_raw = {}
+    live_path_mlb = os.path.join(LIVE_FILES_DIR, f"live_mlb_{today_str}.json")
+    live_path_std = os.path.join(LIVE_FILES_DIR, f"live_{today_str}.json")
+    
+    target_live_path = live_path_mlb if os.path.exists(live_path_mlb) else live_path_std
+
+    if os.path.exists(target_live_path):
         try:
-            with open(live_path, "r", encoding="utf-8") as f:
-                live_data = json.load(f)
-        except Exception:
-            pass
+            with open(target_live_path, "r", encoding="utf-8") as f:
+                live_data_raw = json.load(f)
+        except Exception as e:
+            print(f"⚠️ Warning: Could not parse live file: {e}")
+
+    # Flatten nested game JSON into a direct player ID map
+    flat_live_data = flatten_live_data(live_data_raw)
 
     games_list = data_stream.get("games", []) if isinstance(data_stream, dict) else data_stream
     slates_dictionary = data_stream.get("slates", {"fanduel": [], "draftkings": []}) if isinstance(data_stream, dict) else {"fanduel": [], "draftkings": []}
@@ -723,14 +751,14 @@ def main():
                     p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res: 
                         dk_pools["pitchers"].append(p_res)
-                        l_res = process_live_leaderboard_player(p_res, live_data, "dk")
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "dk")
                         if l_res: dk_live_pool.append(l_res)
 
                 if has_fd_data:
                     p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
                     if p_res: 
                         fd_pools["pitchers"].append(p_res)
-                        l_res = process_live_leaderboard_player(p_res, live_data, "fd")
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "fd")
                         if l_res: fd_live_pool.append(l_res)
 
             for batter in side_node.get("battingOrder", []):
@@ -752,7 +780,7 @@ def main():
                             elif "SS" == raw_pos: dk_pools["shortstops"].append(p_res)
                             elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
                             
-                        l_res = process_live_leaderboard_player(p_res, live_data, "dk")
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "dk")
                         if l_res: dk_live_pool.append(l_res)
 
                 if has_fd_data:
@@ -768,7 +796,7 @@ def main():
                             elif "SS" in raw_pos: fd_pools["shortstops"].append(p_res)
                             elif "OF" in raw_pos: fd_pools["outfielders"].append(p_res)
 
-                        l_res = process_live_leaderboard_player(p_res, live_data, "fd")
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "fd")
                         if l_res: fd_live_pool.append(l_res)
 
     for key in dk_pools: dk_pools[key] = sorted(dk_pools[key], key=lambda x: x["value"], reverse=True)
