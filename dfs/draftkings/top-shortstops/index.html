@@ -47,12 +47,10 @@
         .player-link { font-weight: 700; color: #212529; text-decoration: none; }
         .player-link:hover { color: #0d6efd; text-decoration: underline; }
         .disclaimer-box { background-color: #fff9db; border: 1px solid #ffe3e3; border-radius: 6px; font-size: 0.75rem; color: #616161; line-height: 1.4; }
-        .team-icon { width: 22px; height: 22px; margin-right: 6px; vertical-align: middle; }
 
         @media (max-width: 768px) {
             .table th, .table td { padding: 8px 6px; font-size: 0.75rem; white-space: nowrap; }
             .player-link { font-size: 0.80rem; }
-            .team-icon { width: 16px; height: 16px; margin-right: 4px; }
             .col-rank { padding-right: 4px !important; padding-left: 4px !important; }
         }
     </style>
@@ -98,6 +96,7 @@
         </div>
         
         
+        
         <div class="d-flex align-items-center gap-2 ms-md-3">
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
@@ -118,10 +117,11 @@
                 
                 <option value="/dfs/draftkings/top-util/" >Util (All Hitters)</option>
                 
-                <option value="/dfs/draftkings/live-slate-leaderboard/" >🔴 Live Leaderboard</option>
+                <option value="/dfs/draftkings/top-live-slate-leaderboard/" >🔴 Live Leaderboard</option>
                 
             </select>
         </div>
+        
     </div>
 
     <div class="table-card shadow-sm mb-4 position-relative">
@@ -136,12 +136,13 @@
                         <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
                         <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
                         
-                        <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
                         
+                        <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
                         <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
                         <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
                         <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
                         <th class="text-end" onclick="sortTable(this, 6)">Proj &#x21D5;</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -161,31 +162,34 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669707/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/jared-triolo/" class="player-link">Jared Triolo</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669707/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/jared-triolo/" class="player-link text-nowrap">Jared Triolo</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.9x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon"> Pirates
+                                Pirates
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" class="team-icon ms-2" style="margin-right: 4px;"> Yankees
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,300</td>
                         <td class="text-end fw-bold col-proj">6.67</td>
+                        
                     </tr>
                     
-                    <tr data-slates="24D7F,24E28" 
-                        data-slate-stats='{"24D7F": {"salary": "$2,500", "proj": "6.47", "value": "2.59x"}, "24E28": {"salary": "$3,600", "proj": "6.47", "value": "1.80x"}}' 
+                    <tr data-slates="24E28,24D7F" 
+                        data-slate-stats='{"24E28": {"salary": "$3,600", "proj": "6.47", "value": "1.80x"}, "24D7F": {"salary": "$2,500", "proj": "6.47", "value": "2.59x"}}' 
                         data-default-salary="$2,500" 
                         data-default-proj="6.47" 
                         data-default-value="2.59x">
@@ -199,27 +203,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805347/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/jim-jarvis/" class="player-link">James Jarvis</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805347/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/jim-jarvis/" class="player-link text-nowrap">James Jarvis</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.59x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon"> Braves
+                                Braves
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon ms-2" style="margin-right: 4px;"> Padres
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Padres
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,500</td>
                         <td class="text-end fw-bold col-proj">6.47</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -237,31 +244,34 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687401/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/joey-ortiz/" class="player-link">Joey Ortiz</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687401/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/joey-ortiz/" class="player-link text-nowrap">Joey Ortiz</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.54x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
+                                Brewers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon ms-2" style="margin-right: 4px;"> Mets
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Mets
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,700</td>
                         <td class="text-end fw-bold col-proj">6.87</td>
+                        
                     </tr>
                     
-                    <tr data-slates="24E2A,24E2C,24D7F" 
-                        data-slate-stats='{"24E2A": {"salary": "$4,200", "proj": "10.65", "value": "2.54x"}, "24E2C": {"salary": "$8,600", "proj": "10.65", "value": "1.24x"}, "24D7F": {"salary": "$4,200", "proj": "10.65", "value": "2.54x"}}' 
+                    <tr data-slates="24E2A,24D7F,24E2C" 
+                        data-slate-stats='{"24E2A": {"salary": "$4,200", "proj": "10.65", "value": "2.54x"}, "24D7F": {"salary": "$4,200", "proj": "10.65", "value": "2.54x"}, "24E2C": {"salary": "$8,600", "proj": "10.65", "value": "1.24x"}}' 
                         data-default-salary="$4,200" 
                         data-default-proj="10.65" 
                         data-default-value="2.54x">
@@ -275,31 +285,34 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805779/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/jacob-wilson/" class="player-link">Jacob Wilson</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805779/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/jacob-wilson/" class="player-link text-nowrap">Jacob Wilson</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.54x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon"> Athletics
+                                Athletics
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon ms-2" style="margin-right: 4px;"> Dbacks
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Dbacks
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,200</td>
                         <td class="text-end fw-bold col-proj">10.65</td>
+                        
                     </tr>
                     
-                    <tr data-slates="24E2A,24E2C,24D7F" 
-                        data-slate-stats='{"24E2A": {"salary": "$4,000", "proj": "9.90", "value": "2.48x"}, "24E2C": {"salary": "$7,800", "proj": "9.90", "value": "1.27x"}, "24D7F": {"salary": "$4,000", "proj": "9.90", "value": "2.48x"}}' 
+                    <tr data-slates="24E2A,24D7F,24E2C" 
+                        data-slate-stats='{"24E2A": {"salary": "$4,000", "proj": "9.90", "value": "2.48x"}, "24D7F": {"salary": "$4,000", "proj": "9.90", "value": "2.48x"}, "24E2C": {"salary": "$7,800", "proj": "9.90", "value": "1.27x"}}' 
                         data-default-salary="$4,000" 
                         data-default-proj="9.9" 
                         data-default-value="2.48x">
@@ -313,27 +326,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/672695/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/geraldo-perdomo/" class="player-link">Geraldo Perdomo</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/672695/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/geraldo-perdomo/" class="player-link text-nowrap">Geraldo Perdomo</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.48x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/109.svg" alt="Dbacks Icon" class="team-icon"> Dbacks
+                                Dbacks
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" class="team-icon ms-2" style="margin-right: 4px;"> Athletics
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/133.svg" alt="Athletics Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Athletics
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,000</td>
                         <td class="text-end fw-bold col-proj">9.9</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -351,27 +367,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691907/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/tsung-che-cheng/" class="player-link">Tsung-Che Cheng</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691907/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/tsung-che-cheng/" class="player-link text-nowrap">Tsung-Che Cheng</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.43x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon"> Red Sox
+                                Red Sox
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon ms-2" style="margin-right: 4px;"> Orioles
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Orioles
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,200</td>
                         <td class="text-end fw-bold col-proj">5.35</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E23" 
@@ -389,27 +408,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677587/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/brayan-rocchio/" class="player-link">Brayan Rocchio</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677587/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/brayan-rocchio/" class="player-link text-nowrap">Brayan Rocchio</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.41x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon"> Guardians
+                                Guardians
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon ms-2" style="margin-right: 4px;"> Twins
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Twins
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,800</td>
                         <td class="text-end fw-bold col-proj">9.15</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -427,27 +449,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/656716/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/zach-mckinstry/" class="player-link">Zach McKinstry</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/656716/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/zach-mckinstry/" class="player-link text-nowrap">Zach McKinstry</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.39x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
+                                Tigers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon ms-2" style="margin-right: 4px;"> Cubs
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Cubs
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,600</td>
                         <td class="text-end fw-bold col-proj">6.21</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E2A,24D7F" 
@@ -465,27 +490,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691026/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/masyn-winn/" class="player-link">Masyn Winn</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691026/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/masyn-winn/" class="player-link text-nowrap">Masyn Winn</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.28x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon"> Cardinals
+                                Cardinals
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon ms-2" style="margin-right: 4px;"> Angels
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Angels
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,100</td>
                         <td class="text-end fw-bold col-proj">7.07</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -503,27 +531,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/642715/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/willy-adames/" class="player-link">Willy Adames</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/642715/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/willy-adames/" class="player-link text-nowrap">Willy Adames</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.25x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon"> Giants
+                                Giants
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon ms-2" style="margin-right: 4px;"> Royals
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Royals
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,700</td>
                         <td class="text-end fw-bold col-proj">8.31</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -541,27 +572,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/678662/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/ezequiel-tovar/" class="player-link">Ezequiel Tovar</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/678662/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/ezequiel-tovar/" class="player-link text-nowrap">Ezequiel Tovar</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.22x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon"> Rockies
+                                Rockies
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon ms-2" style="margin-right: 4px;"> Nationals
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Nationals
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,900</td>
                         <td class="text-end fw-bold col-proj">8.66</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -579,31 +613,34 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/670764/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/taylor-walls/" class="player-link">Taylor Walls</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/670764/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/taylor-walls/" class="player-link text-nowrap">Taylor Walls</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.19x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon"> Rays
+                                Rays
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" class="team-icon ms-2" style="margin-right: 4px;"> Blue Jays
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Blue Jays
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,700</td>
                         <td class="text-end fw-bold col-proj">5.92</td>
+                        
                     </tr>
                     
-                    <tr data-slates="24D7F,24E28" 
-                        data-slate-stats='{"24D7F": {"salary": "$3,500", "proj": "7.58", "value": "2.17x"}, "24E28": {"salary": "$7,000", "proj": "7.58", "value": "1.08x"}}' 
+                    <tr data-slates="24E28,24D7F" 
+                        data-slate-stats='{"24E28": {"salary": "$7,000", "proj": "7.58", "value": "1.08x"}, "24D7F": {"salary": "$3,500", "proj": "7.58", "value": "2.17x"}}' 
                         data-default-salary="$3,500" 
                         data-default-proj="7.58" 
                         data-default-value="2.17x">
@@ -617,27 +654,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/593428/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/xander-bogaerts/" class="player-link">Xander Bogaerts</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/593428/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/xander-bogaerts/" class="player-link text-nowrap">Xander Bogaerts</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.17x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/135.svg" alt="Padres Icon" class="team-icon"> Padres
+                                Padres
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" class="team-icon ms-2" style="margin-right: 4px;"> Braves
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Braves
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,500</td>
                         <td class="text-end fw-bold col-proj">7.58</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E2A,24D7F" 
@@ -655,27 +695,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687263/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/zach-neto/" class="player-link">Zach Neto</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687263/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/zach-neto/" class="player-link text-nowrap">Zach Neto</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.17x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" class="team-icon"> Angels
+                                Angels
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" class="team-icon ms-2" style="margin-right: 4px;"> Cardinals
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/138.svg" alt="Cardinals Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Cardinals
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,700</td>
                         <td class="text-end fw-bold col-proj">10.22</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E2A,24D7F" 
@@ -693,27 +736,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641487/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/jp-crawford/" class="player-link">J.P. Crawford</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641487/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/jp-crawford/" class="player-link text-nowrap">J.P. Crawford</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.16x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
+                                Mariners
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon ms-2" style="margin-right: 4px;"> Reds
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Reds
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,900</td>
                         <td class="text-end fw-bold col-proj">6.26</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -731,27 +777,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676609/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/jose-caballero/" class="player-link">Jose Caballero</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676609/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/jose-caballero/" class="player-link text-nowrap">Jose Caballero</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.13x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" class="team-icon"> Yankees
+                                Yankees
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" class="team-icon ms-2" style="margin-right: 4px;"> Pirates
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/134.svg" alt="Pirates Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Pirates
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,500</td>
                         <td class="text-end fw-bold col-proj">7.46</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -769,27 +818,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/596019/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/francisco-lindor/" class="player-link">Francisco Lindor</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/596019/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/francisco-lindor/" class="player-link text-nowrap">Francisco Lindor</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.09x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon"> Mets
+                                Mets
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Brewers
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Brewers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,100</td>
                         <td class="text-end fw-bold col-proj">8.57</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -807,27 +859,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/683083/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/nasim-nunez/" class="player-link">Nasim Nunez</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/683083/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/nasim-nunez/" class="player-link text-nowrap">Nasim Nunez</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.07x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon"> Nationals
+                                Nationals
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rockies
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rockies
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,400</td>
                         <td class="text-end fw-bold col-proj">9.12</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E23" 
@@ -845,27 +900,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/607208/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/trea-turner/" class="player-link">Trea Turner</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/607208/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/trea-turner/" class="player-link text-nowrap">Trea Turner</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.06x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon"> Phillies
+                                Phillies
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Dodgers
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Dodgers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,800</td>
                         <td class="text-end fw-bold col-proj">9.9</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -883,27 +941,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665161/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/jeremy-pena/" class="player-link">Jeremy Pena</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665161/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/jeremy-pena/" class="player-link text-nowrap">Jeremy Pena</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.06x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon"> Astros
+                                Astros
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon ms-2" style="margin-right: 4px;"> Marlins
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Marlins
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,600</td>
                         <td class="text-end fw-bold col-proj">9.48</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -921,27 +982,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682928/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/cj-abrams/" class="player-link">CJ Abrams</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682928/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/cj-abrams/" class="player-link text-nowrap">CJ Abrams</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">2.05x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/120.svg" alt="Nationals Icon" class="team-icon"> Nationals
+                                Nationals
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rockies
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/115.svg" alt="Rockies Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rockies
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$6,400</td>
                         <td class="text-end fw-bold col-proj">13.1</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -959,27 +1023,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665926/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/andres-gimenez/" class="player-link">Andres Gimenez</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/665926/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/andres-gimenez/" class="player-link text-nowrap">Andres Gimenez</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.97x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" class="team-icon"> Blue Jays
+                                Blue Jays
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rays
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,900</td>
                         <td class="text-end fw-bold col-proj">5.72</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -997,27 +1064,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676391/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/ernie-clement/" class="player-link">Ernie Clement</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676391/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/ernie-clement/" class="player-link text-nowrap">Ernie Clement</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.92x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/141.svg" alt="Blue Jays Icon" class="team-icon"> Blue Jays
+                                Blue Jays
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rays
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,800</td>
                         <td class="text-end fw-bold col-proj">7.28</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -1035,27 +1105,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805808/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/kevin-mcgonigle/" class="player-link">Kevin McGonigle</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/805808/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/kevin-mcgonigle/" class="player-link text-nowrap">Kevin McGonigle</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.92x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon"> Tigers
+                                Tigers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon ms-2" style="margin-right: 4px;"> Cubs
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Cubs
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,500</td>
                         <td class="text-end fw-bold col-proj">8.63</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -1073,27 +1146,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677951/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/bobby-witt-jr/" class="player-link">Bobby Witt Jr.</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677951/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/bobby-witt-jr/" class="player-link text-nowrap">Bobby Witt Jr.</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.77x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/118.svg" alt="Royals Icon" class="team-icon"> Royals
+                                Royals
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" class="team-icon ms-2" style="margin-right: 4px;"> Giants
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/137.svg" alt="Giants Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Giants
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$6,300</td>
                         <td class="text-end fw-bold col-proj">11.16</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -1111,27 +1187,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/806198/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/cooper-pratt/" class="player-link">Cooper Pratt</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/806198/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/cooper-pratt/" class="player-link text-nowrap">Cooper Pratt</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.77x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" class="team-icon"> Brewers
+                                Brewers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" class="team-icon ms-2" style="margin-right: 4px;"> Mets
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/121.svg" alt="Mets Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Mets
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,200</td>
                         <td class="text-end fw-bold col-proj">5.67</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E23" 
@@ -1149,27 +1228,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668952/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/ryan-kreidler/" class="player-link">Ryan Kreidler</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668952/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/ryan-kreidler/" class="player-link text-nowrap">Ryan Kreidler</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.73x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Twins Icon" class="team-icon"> Twins
+                                Twins
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" class="team-icon ms-2" style="margin-right: 4px;"> Guardians
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Guardians
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,000</td>
                         <td class="text-end fw-bold col-proj">5.2</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -1187,27 +1269,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677649/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/ezequiel-duran/" class="player-link">Ezequiel Duran</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/677649/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/ezequiel-duran/" class="player-link text-nowrap">Ezequiel Duran</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.72x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon"> Rangers
+                                Rangers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon ms-2" style="margin-right: 4px;"> White Sox
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" style="width: 18px; height: 18px; margin: 0 4px;"> White Sox
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,600</td>
                         <td class="text-end fw-bold col-proj">6.2</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -1225,27 +1310,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/672640/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/otto-lopez/" class="player-link">Otto Lopez</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/672640/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/otto-lopez/" class="player-link text-nowrap">Otto Lopez</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.71x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/146.svg" alt="Marlins Icon" class="team-icon"> Marlins
+                                Marlins
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" class="team-icon ms-2" style="margin-right: 4px;"> Astros
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/117.svg" alt="Astros Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Astros
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,800</td>
                         <td class="text-end fw-bold col-proj">8.2</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -1263,27 +1351,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/695657/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/colson-montgomery/" class="player-link">Colson Montgomery</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/695657/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/colson-montgomery/" class="player-link text-nowrap">Colson Montgomery</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.64x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon"> White Sox
+                                White Sox
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Rangers
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rangers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,900</td>
                         <td class="text-end fw-bold col-proj">8.06</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -1301,27 +1392,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/670032/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/nicky-lopez/" class="player-link">Nicky Lopez</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/670032/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/nicky-lopez/" class="player-link text-nowrap">Nicky Lopez</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.63x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/140.svg" alt="Rangers Icon" class="team-icon"> Rangers
+                                Rangers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" class="team-icon ms-2" style="margin-right: 4px;"> White Sox
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" style="width: 18px; height: 18px; margin: 0 4px;"> White Sox
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,800</td>
                         <td class="text-end fw-bold col-proj">4.56</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E2A,24D7F" 
@@ -1339,27 +1433,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682829/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/elly-de-la-cruz/" class="player-link">Elly De La Cruz</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682829/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/elly-de-la-cruz/" class="player-link text-nowrap">Elly De La Cruz</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.6x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon"> Reds
+                                Reds
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon ms-2" style="margin-right: 4px;"> Mariners
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Mariners
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$6,000</td>
                         <td class="text-end fw-bold col-proj">9.6</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F" 
@@ -1377,27 +1474,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/683002/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/gunnar-henderson/" class="player-link">Gunnar Henderson</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/683002/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/gunnar-henderson/" class="player-link text-nowrap">Gunnar Henderson</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.59x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" class="team-icon"> Orioles
+                                Orioles
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" class="team-icon ms-2" style="margin-right: 4px;"> Red Sox
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/111.svg" alt="Red Sox Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Red Sox
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$5,100</td>
                         <td class="text-end fw-bold col-proj">8.1</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E2A,24D7F" 
@@ -1415,27 +1515,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/806068/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/colt-emerson/" class="player-link">Colt Emerson</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/806068/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/colt-emerson/" class="player-link text-nowrap">Colt Emerson</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.54x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/136.svg" alt="Mariners Icon" class="team-icon"> Mariners
+                                Mariners
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" class="team-icon ms-2" style="margin-right: 4px;"> Reds
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/113.svg" alt="Reds Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Reds
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,000</td>
                         <td class="text-end fw-bold col-proj">4.61</td>
+                        
                     </tr>
                     
                     <tr data-slates="24E23" 
@@ -1453,27 +1556,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/605141/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/mookie-betts/" class="player-link">Mookie Betts</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/605141/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/mookie-betts/" class="player-link text-nowrap">Mookie Betts</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.44x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/119.svg" alt="Dodgers Icon" class="team-icon"> Dodgers
+                                Dodgers
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                @ <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" class="team-icon ms-2" style="margin-right: 4px;"> Phillies
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/143.svg" alt="Phillies Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Phillies
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,700</td>
                         <td class="text-end fw-bold col-proj">6.79</td>
+                        
                     </tr>
                     
                     <tr data-slates="24D7F,24E29" 
@@ -1491,27 +1597,30 @@
                                     
                                 </a>
                                 
-                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/621020/headshot/67/current" alt="headshot" class="rounded-circle me-2" style="width: 28px; height: 28px; object-fit: cover; border: 1px solid #ced4da;">
-                                <a href="/players/dansby-swanson/" class="player-link">Dansby Swanson</a>
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/621020/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/dansby-swanson/" class="player-link text-nowrap">Dansby Swanson</a>
                             </div>
                         </td>
                         
                         
                         <td class="text-end fw-bold text-success col-value">1.44x</td>
-                        
-                        
                         <td>
                             <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                <img src="https://www.mlbstatic.com/team-logos/112.svg" alt="Cubs Icon" class="team-icon"> Cubs
+                                Cubs
                             </span>
                         </td>
                         <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" class="team-icon ms-2" style="margin-right: 4px;"> Tigers
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/116.svg" alt="Tigers Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Tigers
                             </div>
                         </td>
                         <td class="text-end fw-semibold col-salary">$4,300</td>
                         <td class="text-end fw-bold col-proj">6.21</td>
+                        
                     </tr>
                     
                 </tbody>
@@ -1561,7 +1670,7 @@ function changePosition(base_url) {
     }
 }
 
-function filterSlate(slateId) {
+function filterSlate(slateId, preserveSort = false) {
     const rows = document.querySelectorAll('#leaderboard-table tbody tr');
     rows.forEach(row => {
         const rowSlates = row.getAttribute('data-slates').split(',');
@@ -1570,16 +1679,25 @@ function filterSlate(slateId) {
 
         if (slateId === 'all') {
             row.style.display = '';
-            row.querySelector('.col-salary').textContent = row.getAttribute('data-default-salary');
-            row.querySelector('.col-proj').textContent = row.getAttribute('data-default-proj');
-            if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = row.getAttribute('data-default-value');
+            
+            const salCol = row.querySelector('.col-salary');
+            const projCol = row.querySelector('.col-proj');
+            const valCol = row.querySelector('.col-value');
+            
+            if (salCol) salCol.textContent = row.getAttribute('data-default-salary');
+            if (projCol) projCol.textContent = row.getAttribute('data-default-proj');
+            if (valCol) valCol.textContent = row.getAttribute('data-default-value');
         } else {
             if (rowSlates.includes(slateId)) {
                 row.style.display = '';
                 if (stats[slateId]) {
-                    row.querySelector('.col-salary').textContent = stats[slateId].salary;
-                    row.querySelector('.col-proj').textContent = stats[slateId].proj;
-                    if (row.querySelector('.col-value')) row.querySelector('.col-value').textContent = stats[slateId].value;
+                    const salCol = row.querySelector('.col-salary');
+                    const projCol = row.querySelector('.col-proj');
+                    const valCol = row.querySelector('.col-value');
+
+                    if (salCol) salCol.textContent = stats[slateId].salary;
+                    if (projCol) projCol.textContent = stats[slateId].proj;
+                    if (valCol) valCol.textContent = stats[slateId].value;
                 }
             } else {
                 row.style.display = 'none';
@@ -1587,10 +1705,27 @@ function filterSlate(slateId) {
         }
     });
 
-    const isLive = document.querySelector('#leaderboard-table th:nth-child(3)').textContent.includes("Live Stats");
-    const sortIndex = isLive ? 6 : 2; 
-    const targetHeader = document.querySelectorAll('#leaderboard-table th')[isLive ? 6 : 2];
-    if (targetHeader) sortTable(targetHeader, sortIndex, true);
+    let targetHeader, sortIndex, forceDesc = false;
+
+    if (preserveSort) {
+        targetHeader = document.querySelector('#leaderboard-table th.asc, #leaderboard-table th.desc');
+        if (targetHeader) {
+            const headers = Array.from(document.querySelectorAll('#leaderboard-table th'));
+            sortIndex = headers.indexOf(targetHeader);
+            const isDesc = targetHeader.classList.contains('desc');
+            
+            targetHeader.classList.remove('desc', 'asc');
+            targetHeader.classList.add(isDesc ? 'asc' : 'desc');
+        }
+    }
+
+    if (!targetHeader) {
+        sortIndex = 2; // Column index 2 handles default sorting correctly for both Proj Value AND Live Pts
+        targetHeader = document.querySelectorAll('#leaderboard-table th')[sortIndex];
+        forceDesc = true;
+    }
+
+    if (targetHeader) sortTable(targetHeader, sortIndex, forceDesc);
 }
 
 function sortTable(thElement, colIndex, forceDesc = false) {
@@ -1628,6 +1763,11 @@ function sortTable(thElement, colIndex, forceDesc = false) {
         }
     });
 }
+
+// ==========================================================
+// SILENT REFRESH LOGIC (Only runs on Live Leaderboard Pages)
+// ==========================================================
+
 </script>
 </body>
 </html>
