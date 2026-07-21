@@ -177,7 +177,7 @@ def render_badge_zone(player_id, team_side, my_game):
     
     return f'<div class="mb-3">{badge_html}{link_html}</div>'
 
-def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val, master_data):
+def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val, master_data, is_pitcher):
     game_raw = my_game.get("gameRaw", {})
     game_pk = str(game_raw.get("gamePk", ""))
     opp_side = "home" if team_side == "away" else "away"
@@ -190,6 +190,16 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
                 '<div class="p-3 border-bottom text-center" style="background-color: #fdf2f2;"><span class="badge bg-danger text-uppercase mb-1" style="font-size:0.6rem;">PPD</span><span class="text-dark d-block fw-semibold" style="font-size: 0.85rem;">This matchup has been called off.</span></div>')
 
     active_live = live_data.get(game_pk)
+    
+    # Pre-calculate routing URLs based on Live state and Position Type
+    if active_live:
+        dk_leaderboard_url = f"{DOMAIN}/dfs/draftkings/live-slate-leaderboard/"
+        fd_leaderboard_url = f"{DOMAIN}/dfs/fanduel/live-slate-leaderboard/"
+    else:
+        pos_slug = "pitchers" if is_pitcher else "util"
+        dk_leaderboard_url = f"{DOMAIN}/dfs/draftkings/top-{pos_slug}/"
+        fd_leaderboard_url = f"{DOMAIN}/dfs/fanduel/top-{pos_slug}/"
+
     if active_live:
         inning_raw = active_live.get('inning', '')
         inning_clean = re.sub(r'\D', '', inning_raw)
@@ -211,22 +221,22 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
                     <strong class="text-dark" style="font-size: 0.9rem;">{summary if summary else "Active in Game"}</strong>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                    <a href="{dk_leaderboard_url}" class="bg-white border rounded px-3 py-1 shadow-sm text-center text-decoration-none" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="transition: transform 0.15s ease-in-out; display: block;">
                         <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DraftKings</span>
-                        <div class="d-flex align-items-baseline gap-1">
+                        <div class="d-flex align-items-baseline justify-content-center gap-1">
                             <span class="dk-accent" style="font-size: 1.1rem;">{dk_pts:.1f}</span>
                             <span class="text-muted" style="font-size:0.75rem;">/</span>
                             <span class="text-secondary fw-bold" style="font-size:0.85rem;">{dk_val}</span>
                         </div>
-                    </div>
-                    <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                    </a>
+                    <a href="{fd_leaderboard_url}" class="bg-white border rounded px-3 py-1 shadow-sm text-center text-decoration-none" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="transition: transform 0.15s ease-in-out; display: block;">
                         <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">FanDuel</span>
-                        <div class="d-flex align-items-baseline gap-1">
+                        <div class="d-flex align-items-baseline justify-content-center gap-1">
                             <span class="fd-accent" style="font-size: 1.1rem;">{fd_pts:.1f}</span>
                             <span class="text-muted" style="font-size:0.75rem;">/</span>
                             <span class="text-secondary fw-bold" style="font-size:0.85rem;">{fd_val}</span>
                         </div>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>"""
@@ -236,7 +246,7 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         
         opp_pitcher_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("probablePitcher", {}).get("id", ""))
         opp_team_id = str(game_raw.get("teams", {}).get(opp_side, {}).get("team", {}).get("id", ""))
-        # 2. Safely Fetch Season Stats and Links from master_data
+        
         opp_w, opp_l, opp_era, opp_so = "-", "-", "-", "-"
         master_key = f"ID{opp_pitcher_id}"
         has_profile = False
@@ -254,11 +264,9 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
             opp_profile_url = f"{DOMAIN}/players/{opp_slug}/"
             has_profile = True
             
-        # 3. Build Asset URLs
         opp_team_logo = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{opp_team_id}.svg" if opp_team_id else ""
         opp_headshot = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{opp_pitcher_id}/headshot/67/current" if opp_pitcher_id else ""
 
-        # 4. Construct the UI Display conditionally
         if opp_pitcher_id:
             if has_profile:
                 image_html = f'<a href="{opp_profile_url}"><img src="{opp_headshot}" style="width: 45px; height: 45px; border-radius: 50%; border: 2px solid #dee2e6; object-fit: cover; background: #fff;" alt="{opp_pitcher_name}"></a>'
@@ -288,26 +296,23 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         <div class="p-3 border-bottom overflow-hidden" style="background-color: #edf4f8;">
             <div class="d-flex justify-content-between align-items-center flex-wrap flex-xl-nowrap gap-2 w-100">
                 
-                <!-- 1. Left: Badge -->
                 <div class="flex-shrink-0">
                     <span class="badge bg-secondary text-uppercase shadow-sm" style="font-size:0.7rem; padding: 6px 10px;">Upcoming Matchup</span>
                 </div>
                 
-                <!-- 2. Center: Pitcher Info -->
                 <div class="flex-grow-1 d-flex justify-content-start px-xl-2 my-2 my-xl-0" style="min-width: 0;">
                     {pitcher_display}
                 </div>
                 
-                <!-- 3. Right: Projections -->
                 <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-auto">
-                    <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                    <a href="{dk_leaderboard_url}" class="bg-white border rounded px-3 py-1 shadow-sm text-center text-decoration-none" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="transition: transform 0.15s ease-in-out; display: block;">
                         <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DK Proj</span>
                         <span class="text-dark fw-bold" style="font-size: 1rem;">{dk_val}</span>
-                    </div>
-                    <div class="bg-white border rounded px-3 py-1 shadow-sm text-center">
+                    </a>
+                    <a href="{fd_leaderboard_url}" class="bg-white border rounded px-3 py-1 shadow-sm text-center text-decoration-none" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="transition: transform 0.15s ease-in-out; display: block;">
                         <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">FD Proj</span>
                         <span class="text-dark fw-bold" style="font-size: 1rem;">{fd_val}</span>
-                    </div>
+                    </a>
                 </div>
                 
             </div>
@@ -440,7 +445,6 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
             bvp = b_stats.get("bvp", {})
             b_name = b_stats.get("name") or next((p.get("name") for p in my_game.get("projectedLineups", {}).get(opp_side, {}).get("battingOrder", []) if str(p.get("id")) == str(b_id)), f"Batter #{idx+1}")
             
-            # --- NEW: Check master_data to build the link dynamically ---
             master_key = f"ID{b_id}"
             if master_data and master_key in master_data:
                 b_slug = master_data[master_key].get("slug") or slugify(b_name)
@@ -448,7 +452,6 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
                 b_name_html = f'<a href="{b_profile_url}" class="text-primary text-decoration-none">{b_name}</a>'
             else:
                 b_name_html = f'<span class="text-dark">{b_name}</span>'
-            # ------------------------------------------------------------
 
             if bvp and float(bvp.get("ab", 0)) > 0:
                 hist_count += 1
@@ -516,7 +519,10 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
         
         badge_matrix_html = render_badge_zone(player_id, team_side, my_game)
-        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data)
+        
+        # ADDED is_pitcher TO THE FUNCTION CALL HERE
+        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher) 
+        
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
 
     if is_pitcher:
