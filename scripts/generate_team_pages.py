@@ -173,6 +173,32 @@ def find_game_in_slate(slate_data, team_id):
     
     return selected, target_side, is_double_header, game_num
 
+def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
+    """Appends newly updated URLs to the IndexNow JSON queue safely."""
+    if not new_urls:
+        return
+
+    if not os.path.exists(queue_file):
+        os.makedirs(os.path.dirname(queue_file), exist_ok=True)
+        queue_data = {
+            "last_sent": "2000-01-01T00:00:00",
+            "urls": []
+        }
+    else:
+        with open(queue_file, "r", encoding="utf-8") as f:
+            try:
+                queue_data = json.load(f)
+            except json.JSONDecodeError:
+                queue_data = {
+                    "last_sent": "2000-01-01T00:00:00",
+                    "urls": []
+                }
+
+    queue_data["urls"].extend(new_urls)
+
+    with open(queue_file, "w", encoding="utf-8") as f:
+        json.dump(queue_data, f, indent=2)
+
 # ==========================================
 # 3. HTML GENERATORS
 # ==========================================
@@ -659,6 +685,7 @@ def main():
         2: load_json_safe(f"data/daily_files/games_{get_est_date_string(2)}.json")
     }
 
+    updated_urls = [] # --- NEW: List to track changed URLs ---
     updated_files = 0
     
     for team in MLB_TEAMS:
@@ -677,6 +704,14 @@ def main():
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(new_html)
             updated_files += 1
+            
+            # --- NEW: Append to our tracking list ---
+            page_url = f"https://mlbstartingnine.com/lineups/{team['slug']}/"
+            updated_urls.append(page_url)
+
+    # --- NEW: Send to queue if we have updates ---
+    if updated_urls:
+        queue_urls_for_indexnow(updated_urls)
 
 if __name__ == "__main__":
     main()
