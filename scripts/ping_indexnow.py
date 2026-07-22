@@ -68,19 +68,27 @@ def main():
 
     if ping_standard_sitemap:
         sitemap_url = f"{BASE_URL}/sitemap.xml"
+        google_ping_url = f"https://www.google.com/ping?sitemap={sitemap_url}"
+        
+        print(f"🚀 Pinging Google Standard Sitemap...")
+        print(f"🔗 Request URL: {google_ping_url}")
         try:
-            r = requests.get(f"https://www.google.com/ping?sitemap={sitemap_url}", timeout=10)
-            print(f"✅ Google Pinged for Standard Sitemap | Status: {r.status_code}")
+            r = requests.get(google_ping_url, timeout=10)
+            print(f"✅ Google Response Code: {r.status_code}")
         except Exception as e:
-            print(f"⚠️ Google Standard Sitemap Ping Failed: {e}")
+            print(f"❌ Error pinging Google Standard Sitemap: {e}")
 
     if ping_dfs_sitemap:
         sitemap_dfs_url = f"{BASE_URL}/sitemap-dfs.xml"
+        google_ping_dfs_url = f"https://www.google.com/ping?sitemap={sitemap_dfs_url}"
+        
+        print(f"🚀 Pinging Google DFS Sitemap...")
+        print(f"🔗 Request URL: {google_ping_dfs_url}")
         try:
-            r = requests.get(f"https://www.google.com/ping?sitemap={sitemap_dfs_url}", timeout=10)
-            print(f"✅ Google Pinged for DFS Sitemap | Status: {r.status_code}")
+            r = requests.get(google_ping_dfs_url, timeout=10)
+            print(f"✅ Google Response Code: {r.status_code}")
         except Exception as e:
-            print(f"⚠️ Google DFS Sitemap Ping Failed: {e}")
+            print(f"❌ Error pinging Google DFS Sitemap: {e}")
 
     # ==========================================
     # 4. INDEXNOW API POST (BING/YAHOO/YANDEX)
@@ -92,15 +100,18 @@ def main():
         "urlList": unique_urls
     }
 
+    print(f"🚀 Pinging IndexNow with {len(unique_urls)} URLs...")
+    print(f"📦 Payload being sent:\n{json.dumps(indexnow_payload, indent=2)}")
+
     headers = {"Content-Type": "application/json; charset=utf-8"}
     try:
         response = requests.post("https://api.indexnow.org/indexnow", json=indexnow_payload, headers=headers, timeout=10)
-        if response.status_code in [200, 202]:
-            print(f"✅ IndexNow Ping Successful | Sent {len(unique_urls)} URLs | Status: {response.status_code}")
-        else:
-            print(f"⚠️ IndexNow Ping Returned Status {response.status_code}: {response.text}")
+        print(f"✅ IndexNow Response Code: {response.status_code}")
+        
+        if response.status_code not in [200, 202]:
+            print(f"⚠️ IndexNow Response Text: {response.text}")
     except Exception as e:
-        print(f"⚠️ IndexNow POST Failed: {e}")
+        print(f"❌ Error pinging IndexNow: {e}")
 
     # ==========================================
     # 5. CLEAR QUEUE & SAVE TIMESTAMP
