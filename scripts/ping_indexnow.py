@@ -55,43 +55,7 @@ def main():
         return
 
     # ==========================================
-    # 3. ROUTING & GOOGLE SITEMAP PINGS
-    # ==========================================
-    ping_standard_sitemap = False
-    ping_dfs_sitemap = False
-
-    for url in unique_urls:
-        if "/dfs/" in url:
-            ping_dfs_sitemap = True
-        elif "/lineups/" in url or "/players/" in url or url.strip() == BASE_URL or url.strip() == f"{BASE_URL}/":
-            ping_standard_sitemap = True
-
-    if ping_standard_sitemap:
-        sitemap_url = f"{BASE_URL}/sitemap.xml"
-        google_ping_url = f"https://www.google.com/ping?sitemap={sitemap_url}"
-        
-        print(f"🚀 Pinging Google Standard Sitemap...")
-        print(f"🔗 Request URL: {google_ping_url}")
-        try:
-            r = requests.get(google_ping_url, timeout=10)
-            print(f"✅ Google Response Code: {r.status_code}")
-        except Exception as e:
-            print(f"❌ Error pinging Google Standard Sitemap: {e}")
-
-    if ping_dfs_sitemap:
-        sitemap_dfs_url = f"{BASE_URL}/sitemap-dfs.xml"
-        google_ping_dfs_url = f"https://www.google.com/ping?sitemap={sitemap_dfs_url}"
-        
-        print(f"🚀 Pinging Google DFS Sitemap...")
-        print(f"🔗 Request URL: {google_ping_dfs_url}")
-        try:
-            r = requests.get(google_ping_dfs_url, timeout=10)
-            print(f"✅ Google Response Code: {r.status_code}")
-        except Exception as e:
-            print(f"❌ Error pinging Google DFS Sitemap: {e}")
-
-    # ==========================================
-    # 4. INDEXNOW API POST (BING/YAHOO/YANDEX)
+    # 3. INDEXNOW API POST (BING/YAHOO/YANDEX)
     # ==========================================
     indexnow_payload = {
         "host": DOMAIN,
@@ -114,7 +78,7 @@ def main():
         print(f"❌ Error pinging IndexNow: {e}")
 
     # ==========================================
-    # 5. CLEAR QUEUE & SAVE TIMESTAMP
+    # 4. CLEAR QUEUE & SAVE TIMESTAMP
     # ==========================================
     queue_data["last_sent"] = now_utc.isoformat(timespec='seconds')
     queue_data["urls"] = []  # Empty the queue now that they are sent
