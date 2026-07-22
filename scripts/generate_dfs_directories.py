@@ -360,7 +360,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">{{ page_heading }}</h1>
-            <p class="text-muted small mb-0">Updated: {{ date_str }}</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: {{ date_str }}</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
@@ -618,6 +618,8 @@ setInterval(() => {
             
             const newTbody = doc.querySelector('#leaderboard-table tbody');
             const currentTbody = document.querySelector('#leaderboard-table tbody');
+            const newUpdatedText = doc.querySelector('#last-updated-text');
+            const currentUpdatedText = document.querySelector('#last-updated-text');
             
             if (newTbody && currentTbody) {
                 const scrollContainer = document.getElementById('table-scroll-container');
@@ -628,6 +630,11 @@ setInterval(() => {
                 const currentSlate = slateSelector ? slateSelector.value : 'all';
 
                 currentTbody.innerHTML = newTbody.innerHTML;
+                
+                if (newUpdatedText && currentUpdatedText) {
+                    currentUpdatedText.innerHTML = newUpdatedText.innerHTML;
+                }
+                
                 filterSlate(currentSlate, true);
 
                 scrollContainer.scrollTop = scrollTop;
