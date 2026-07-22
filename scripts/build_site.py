@@ -762,8 +762,7 @@ def generate_games_html(date_str, player_db):
     if not games_list:
         return f'<div class="col-12 text-center mt-5"><div class="alert alert-light border shadow-sm py-4"><h5 class="text-muted mb-0">No games scheduled for {date_str}</h5></div></div>'
 
-    games_list.sort(key=lambda x: (get_status_weight(x), x.get('gameRaw', {}).get('gameDate', '')))
-
+    games_list.sort(key=lambda x: (get_status_weight(x.get('gameRaw', {})), x.get('gameRaw', {}).get('gameDate', '')))
     cards_html = []
     for data in games_list:
         game = data.get('gameRaw', {})
