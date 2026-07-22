@@ -4,7 +4,7 @@ import re
 import unicodedata
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 # Path Configurations
@@ -50,43 +50,52 @@ def load_json_safe(path):
             pass
     return {}
 
-def update_sitemap(new_player_urls):
-    existing_urls = set()
+def update_sitemap(all_player_urls, updated_urls):
+    """Updates the sitemap with accurate <lastmod> dates and removes deprecated tags."""
+    existing_data = {}
+    
+    # 1. Parse existing dates to prevent overwriting unchanged URLs
     if os.path.exists(SITEMAP_OUTPUT_PATH):
         try:
             ET.register_namespace('', "http://www.sitemaps.org/schemas/sitemap/0.9")
             tree = ET.parse(SITEMAP_OUTPUT_PATH)
             root = tree.getroot()
-            for loc in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc"):
-                if loc.text: existing_urls.add(loc.text.strip())
+            for url_node in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}url"):
+                loc_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+                lastmod_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}lastmod")
+                if loc_node is not None and loc_node.text:
+                    loc = loc_node.text.strip()
+                    lastmod = lastmod_node.text.strip() if lastmod_node is not None and lastmod_node.text else None
+                    existing_data[loc] = lastmod
         except Exception:
             pass
 
     home_url = f"{DOMAIN}/"
-    existing_urls.add(home_url)
-    for url in new_player_urls:
-        existing_urls.add(url)
+    all_urls_set = set(all_player_urls)
+    all_urls_set.add(home_url)
+    
+    # Merge newly generated URLs with any pre-existing URLs (like /lineups/) that share this sitemap
+    final_urls = sorted(list(all_urls_set.union(existing_data.keys())))
+    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     xml_root = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
-    for url in sorted(list(existing_urls)):
+    
+    for url in final_urls:
         url_node = ET.SubElement(xml_root, 'url')
         ET.SubElement(url_node, 'loc').text = url
-        if url == home_url:
-            ET.SubElement(url_node, 'changefreq').text = "always"
-            ET.SubElement(url_node, 'priority').text = "1.0"
-        elif "/lineups/" in url:
-            ET.SubElement(url_node, 'changefreq').text = "daily"
-            ET.SubElement(url_node, 'priority').text = "0.9"
-        elif "/players/" in url:
-            ET.SubElement(url_node, 'changefreq').text = "daily"
-            ET.SubElement(url_node, 'priority').text = "0.8"
+        
+        # 2. Assign accurate lastmod date based on update status
+        if url in updated_urls:
+            lastmod = today_str
         else:
-            ET.SubElement(url_node, 'changefreq').text = "weekly"
-            ET.SubElement(url_node, 'priority').text = "0.6"
+            lastmod = existing_data.get(url) or today_str
+            
+        ET.SubElement(url_node, 'lastmod').text = lastmod
 
     raw_xml = ET.tostring(xml_root, 'utf-8')
     parsed_xml = minidom.parseString(raw_xml)
     pretty_xml = parsed_xml.toprettyxml(indent="  ")
+    
     with open(SITEMAP_OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write("\n".join([line for line in pretty_xml.splitlines() if line.strip()]))
 
@@ -546,7 +555,6 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
         badge_matrix_html = render_badge_zone(player_id, team_side, my_game)
         
-        # ADDED is_pitcher TO THE FUNCTION CALL HERE
         game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher) 
         
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
@@ -697,7 +705,7 @@ def main():
     live_data = load_json_safe(f"data/LIVE/live_mlb_{target_date_str}.json")
 
     all_player_urls = []
-    updated_urls = [] # --- NEW: List to track strictly updated URLs ---
+    updated_urls = [] 
     updated_count = 0
 
     for key, profile in master_data.items():
@@ -722,12 +730,11 @@ def main():
                 html_out.write(new_html_content)
             updated_count += 1
             
-            # --- NEW: Append to tracking list for IndexNow ---
             updated_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-    update_sitemap(all_player_urls)
+    # 3. Pass both arrays into the newly configured update_sitemap module
+    update_sitemap(all_player_urls, updated_urls)
 
-    # --- NEW: Send to queue if any profiles updated ---
     if updated_urls:
         queue_urls_for_indexnow(updated_urls)
 
