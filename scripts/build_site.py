@@ -571,6 +571,32 @@ def get_status_weight(game):
         return 1
     return 0
 
+def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
+    """Appends newly updated URLs to the IndexNow JSON queue safely."""
+    if not new_urls:
+        return
+
+    if not os.path.exists(queue_file):
+        os.makedirs(os.path.dirname(queue_file), exist_ok=True)
+        queue_data = {
+            "last_sent": "2000-01-01T00:00:00",
+            "urls": []
+        }
+    else:
+        with open(queue_file, "r", encoding="utf-8") as f:
+            try:
+                queue_data = json.load(f)
+            except json.JSONDecodeError:
+                queue_data = {
+                    "last_sent": "2000-01-01T00:00:00",
+                    "urls": []
+                }
+
+    queue_data["urls"].extend(new_urls)
+
+    with open(queue_file, "w", encoding="utf-8") as f:
+        json.dump(queue_data, f, indent=2)
+
 # ==========================================
 # 4. CARD & LINEUP BUILDERS
 # ==========================================
@@ -955,10 +981,20 @@ def main():
     output = output.replace('<!-- PRETTY_YEST -->', pretty_yest)
     output = output.replace('<!-- PRETTY_TOM -->', pretty_tom)
     
-    with open('index.html', 'w', encoding='utf-8') as f:
-        f.write(output)
+    existing_html = ""
+    if os.path.exists('index.html'):
+        with open('index.html', 'r', encoding='utf-8') as f:
+            existing_html = f.read()
+
+    if output != existing_html:
+        with open('index.html', 'w', encoding='utf-8') as f:
+            f.write(output)
         
-    print(f"Build Complete! Target Dates -> Yesterday: {yest} | Today: {today} | Tomorrow: {tom}")
+        # --- NEW: Queue the homepage for IndexNow ---
+        queue_urls_for_indexnow(["https://mlbstartingnine.com/"])
+        print(f"Build Complete! Target Dates -> Yesterday: {yest} | Today: {today} | Tomorrow: {tom} (Updates Queued)")
+    else:
+        print(f"Build Complete! Target Dates -> Yesterday: {yest} | Today: {today} | Tomorrow: {tom} (No Changes Detected)")
 
 if __name__ == "__main__":
     main()
