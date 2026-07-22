@@ -878,17 +878,25 @@ def generate_games_html(date_str, player_db):
         final_home = h_players if is_h_official else h_proj
 
         tracking = data.get('lineupTracking', {'away': {}, 'home': {}})
-        def get_banner(side, is_official, has_p):
+        
+        def get_banner(side, is_official, has_p, team_full_name):
             if not has_p: return ''
             track = tracking.get(side, {})
+            
+            # Generate the URL route (e.g., /lineups/boston-red-sox/)
+            team_slug = slugify(team_full_name)
+            link_url = f"/lineups/{team_slug}/"
+            
+            # Build the anchor tags with 'd-block' and 'text-decoration-none' so they act exactly like the old divs
             if is_official:
                 if track.get('status') == 'MODIFIED':
-                    return f'<div class="text-center py-1 fw-bold text-white w-100 border-bottom" style="background-color: #dc3545; font-size: 0.75rem;">⚠️ LATE SWAP <span style="font-size:0.65rem; font-weight:normal;">({track.get("modifiedAt","")})</span></div>'
-                return f'<div class="text-center py-1 fw-bold text-white w-100 border-bottom" style="background-color: #198754; font-size: 0.75rem;">OFFICIAL {"("+track.get("officialAt")+")" if track.get("officialAt") else ""}</div>'
-            return '<div class="text-center py-1 fw-bold text-dark w-100 border-bottom" style="background-color: #ffecb5; font-size: 0.75rem;">⏳ PROJECTED</div>'
+                    return f'<a href="{link_url}" class="d-block text-center py-1 fw-bold text-white w-100 border-bottom text-decoration-none" style="background-color: #dc3545; font-size: 0.75rem;">⚠️ LATE SWAP <span style="font-size:0.65rem; font-weight:normal;">({track.get("modifiedAt","")})</span></a>'
+                return f'<a href="{link_url}" class="d-block text-center py-1 fw-bold text-white w-100 border-bottom text-decoration-none" style="background-color: #198754; font-size: 0.75rem;">OFFICIAL {"("+track.get("officialAt")+")" if track.get("officialAt") else ""}</a>'
+            
+            return f'<a href="{link_url}" class="d-block text-center py-1 fw-bold text-dark w-100 border-bottom text-decoration-none" style="background-color: #ffecb5; font-size: 0.75rem;">⏳ PROJECTED</a>'
 
-        away_banner = get_banner('away', is_a_official, len(final_away)>0)
-        home_banner = get_banner('home', is_h_official, len(final_home)>0)
+        away_banner = get_banner('away', is_a_official, len(final_away)>0, away_name_full)
+        home_banner = get_banner('home', is_h_official, len(final_home)>0, home_name_full)
 
         away_order = build_lineup_html(final_away, h_hand, data, player_db)
         home_order = build_lineup_html(final_home, a_hand, data, player_db)
