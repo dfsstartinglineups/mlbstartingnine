@@ -2,6 +2,8 @@ import os
 import json
 import re
 import unicodedata
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -198,6 +200,56 @@ def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
 
     with open(queue_file, "w", encoding="utf-8") as f:
         json.dump(queue_data, f, indent=2)
+
+def update_lineup_sitemap_dates(updated_urls, sitemap_path="sitemap.xml"):
+    """Updates the <lastmod> node for given URLs within the master sitemap.xml."""
+    if not updated_urls: 
+        return
+        
+    if not os.path.exists(sitemap_path):
+        return
+
+    try:
+        ET.register_namespace('', "http://www.sitemaps.org/schemas/sitemap/0.9")
+        tree = ET.parse(sitemap_path)
+        root = tree.getroot()
+        
+        today_str = datetime.now(ZoneInfo("UTC")).strftime("%Y-%m-%d")
+        changed = False
+        
+        for target_url in updated_urls:
+            found = False
+            for url_node in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}url"):
+                loc_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+                if loc_node is not None and loc_node.text and loc_node.text.strip() == target_url:
+                    found = True
+                    lastmod_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}lastmod")
+                    if lastmod_node is not None:
+                        if lastmod_node.text != today_str:
+                            lastmod_node.text = today_str
+                            changed = True
+                    else:
+                        ET.SubElement(url_node, 'lastmod').text = today_str
+                        changed = True
+                    break
+            
+            # If the lineup URL is missing from the sitemap altogether, add it natively
+            if not found:
+                url_node = ET.SubElement(root, 'url')
+                ET.SubElement(url_node, 'loc').text = target_url
+                ET.SubElement(url_node, 'lastmod').text = today_str
+                changed = True
+
+        if changed:
+            raw_xml = ET.tostring(root, 'utf-8')
+            parsed_xml = minidom.parseString(raw_xml)
+            pretty_xml = "\n".join([line for line in parsed_xml.toprettyxml(indent="  ").splitlines() if line.strip()])
+            
+            with open(sitemap_path, "w", encoding="utf-8") as f:
+                f.write(pretty_xml)
+                
+    except Exception as e:
+        print(f"⚠️ Error updating sitemap: {e}")
 
 # ==========================================
 # 3. HTML GENERATORS
@@ -712,6 +764,7 @@ def main():
     # --- NEW: Send to queue if we have updates ---
     if updated_urls:
         queue_urls_for_indexnow(updated_urls)
+        update_lineup_sitemap_dates(updated_urls)
 
 if __name__ == "__main__":
     main()
