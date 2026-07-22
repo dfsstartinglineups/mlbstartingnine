@@ -1,6 +1,8 @@
 import os
 import json
 import html
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 from datetime import datetime, timedelta
 import pytz
 
@@ -444,6 +446,42 @@ def get_3day_dates():
 # ==========================================
 # 3. UTILITY HELPER FUNCTIONS
 # ==========================================
+def update_homepage_sitemap_date(target_url="https://mlbstartingnine.com/"):
+    """Updates the <lastmod> date specifically for the homepage URL in the sitemap."""
+    sitemap_path = "sitemap.xml"
+    if not os.path.exists(sitemap_path):
+        return
+    
+    try:
+        ET.register_namespace('', "http://www.sitemaps.org/schemas/sitemap/0.9")
+        tree = ET.parse(sitemap_path)
+        root = tree.getroot()
+        
+        today_str = datetime.now(pytz.utc).strftime("%Y-%m-%d")
+        updated = False
+        
+        for url_node in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}url"):
+            loc_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}loc")
+            if loc_node is not None and loc_node.text and loc_node.text.strip() == target_url:
+                lastmod_node = url_node.find("{http://www.sitemaps.org/schemas/sitemap/0.9}lastmod")
+                if lastmod_node is not None:
+                    lastmod_node.text = today_str
+                else:
+                    ET.SubElement(url_node, 'lastmod').text = today_str
+                updated = True
+                break
+        
+        if updated:
+            raw_xml = ET.tostring(root, 'utf-8')
+            parsed_xml = minidom.parseString(raw_xml)
+            pretty_xml = parsed_xml.toprettyxml(indent="  ")
+            
+            with open(sitemap_path, "w", encoding="utf-8") as f:
+                f.write("\n".join([line for line in pretty_xml.splitlines() if line.strip()]))
+                
+    except Exception as e:
+        print(f"⚠️ Error updating sitemap: {e}")
+
 def generate_games_schema(date_str):
     file_path = f"data/daily_files/games_{date_str}.json"
     if not os.path.exists(file_path):
@@ -965,10 +1003,10 @@ def main():
     today_schema = generate_games_schema(today)
     
     # Format a human-readable header date (e.g., "July 20, 2026")
-    import datetime
-    pretty_today = datetime.datetime.strptime(today, "%Y-%m-%d").strftime("%B %d, %Y")
-    pretty_yest = datetime.datetime.strptime(yest, "%Y-%m-%d").strftime("%B %d, %Y")
-    pretty_tom = datetime.datetime.strptime(tom, "%Y-%m-%d").strftime("%B %d, %Y")
+    import datetime as dt_module
+    pretty_today = dt_module.datetime.strptime(today, "%Y-%m-%d").strftime("%B %d, %Y")
+    pretty_yest = dt_module.datetime.strptime(yest, "%Y-%m-%d").strftime("%B %d, %Y")
+    pretty_tom = dt_module.datetime.strptime(tom, "%Y-%m-%d").strftime("%B %d, %Y")
     
     # Perform the replacements
     output = BASE_TEMPLATE.replace('<!-- GALAXY_YESTERDAY -->', html_yest)
@@ -992,7 +1030,11 @@ def main():
         
         # --- NEW: Queue the homepage for IndexNow ---
         queue_urls_for_indexnow(["https://mlbstartingnine.com/"])
-        print(f"Build Complete! Target Dates -> Yesterday: {yest} | Today: {today} | Tomorrow: {tom} (Updates Queued)")
+        
+        # --- NEW: Update the XML Sitemap Date for the Homepage ---
+        update_homepage_sitemap_date("https://mlbstartingnine.com/")
+        
+        print(f"Build Complete! Target Dates -> Yesterday: {yest} | Today: {today} | Tomorrow: {tom} (Updates Queued & Sitemap Modified)")
     else:
         print(f"Build Complete! Target Dates -> Yesterday: {yest} | Today: {today} | Tomorrow: {tom} (No Changes Detected)")
 
