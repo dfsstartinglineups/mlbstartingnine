@@ -107,6 +107,25 @@ def get_player_url(player_id, default_name):
             return f"/players/{PLAYER_DATABASE[db_key]['slug']}/"
     return f"/players/{slugify(default_name)}/"
 
+def has_page_changed(file_path, new_html):
+    """Compares new HTML to existing HTML, ignoring the dynamic timestamp."""
+    if not os.path.exists(file_path):
+        return True
+
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            old_html = f.read()
+            
+        pattern = re.compile(r'<p id="last-updated-text".*?>.*?</p>', re.IGNORECASE)
+        
+        old_stripped = pattern.sub('', old_html)
+        new_stripped = pattern.sub('', new_html)
+        
+        return old_stripped != new_stripped
+    except Exception as e:
+        print(f"⚠️ Error reading existing file for comparison: {e}")
+        return True
+
 # =========================================================================
 # --- 4. ALGORITHMS & LIVE LOGIC ---
 # =========================================================================
@@ -138,7 +157,6 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
     
-    # Check ONLY for salary presence to ensure deep bench players still populate Live Slates
     if salary <= 0: return None
     
     slate_block = player.get("dk_slates" if is_dk else "fd_slates", {})
@@ -200,7 +218,6 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
     }
 
 def flatten_live_data(live_json):
-    """Flattens game-level live JSON into a single player ID lookup dictionary."""
     flat_map = {}
     if not isinstance(live_json, dict):
         return flat_map
@@ -221,11 +238,8 @@ def flatten_live_data(live_json):
 
 def process_live_leaderboard_player(base_player, flat_live_data, platform):
     pid = str(base_player["id"]).replace("ID", "").strip()
-    
-    # Initialize default pre-game state
     live_pts = 0.0
     stat_string = "Pre-game"
-    
     p_live = flat_live_data.get(pid, {})
 
     if p_live:
@@ -261,11 +275,9 @@ def process_live_leaderboard_player(base_player, flat_live_data, platform):
                     if sb > 0: pieces.append(f"{sb} SB")
                     stat_string = ", ".join(pieces)
             
-    # Calculate baseline values
     salary = base_player["salary"]
     live_value = round(live_pts / (salary / 1000), 2) if salary > 0 else 0.0
 
-    # Build slate stats dynamically based on current live points
     slate_stats = {}
     original_slate_stats = json.loads(base_player["slate_stats_json"])
     for s_id, s_data in original_slate_stats.items():
@@ -657,12 +669,37 @@ def get_target_slate_date():
     if now.hour < 3: now = now - timedelta(days=1)
     return now.strftime("%Y-%m-%d")
 
+def queue_urls_for_indexnow(new_urls, queue_file=os.path.join(DATA_DIR, "updates_queue.json")):
+    """Appends newly updated URLs to the IndexNow JSON queue safely."""
+    if not new_urls:
+        return
+
+    if not os.path.exists(queue_file):
+        os.makedirs(os.path.dirname(queue_file), exist_ok=True)
+        queue_data = {
+            "last_sent": "2000-01-01T00:00:00",
+            "urls": []
+        }
+    else:
+        with open(queue_file, "r", encoding="utf-8") as f:
+            try:
+                queue_data = json.load(f)
+            except json.JSONDecodeError:
+                queue_data = {
+                    "last_sent": "2000-01-01T00:00:00",
+                    "urls": []
+                }
+
+    queue_data["urls"].extend(new_urls)
+
+    with open(queue_file, "w", encoding="utf-8") as f:
+        json.dump(queue_data, f, indent=2)
+
 def main():
     today_str = get_target_slate_date()
     target_pattern = f"games_{today_str}.json"
     target_path = os.path.join(DAILY_FILES_DIR, target_pattern)
 
-    # Format current execution time cleanly for the header
     now_est = datetime.now(ZoneInfo("America/New_York"))
     display_time = now_est.strftime("%Y-%m-%d %I:%M %p ET")
 
@@ -679,7 +716,6 @@ def main():
     with open(target_path, "r", encoding="utf-8") as f:
         data_stream = json.load(f)
 
-    # 1. Load live data (handles live_mlb_YYYY-MM-DD.json and live_YYYY-MM-DD.json)
     live_data_raw = {}
     live_path_mlb = os.path.join(LIVE_FILES_DIR, f"live_mlb_{today_str}.json")
     live_path_std = os.path.join(LIVE_FILES_DIR, f"live_{today_str}.json")
@@ -693,7 +729,6 @@ def main():
         except Exception as e:
             print(f"⚠️ Warning: Could not parse live file: {e}")
 
-    # Flatten nested game JSON into a direct player ID map
     flat_live_data = flatten_live_data(live_data_raw)
 
     games_list = data_stream.get("games", []) if isinstance(data_stream, dict) else data_stream
@@ -705,14 +740,12 @@ def main():
     has_dk_data = False
     has_fd_data = False
 
-    # Check for salary presence, skipping postponed games
     for game in games_list:
         game_raw = game.get("gameRaw", {})
         game_status = game_raw.get("status", {}).get("abstractGameState", "")
         detailed_status = game_raw.get("status", {}).get("detailedState", "")
         status_code = game_raw.get("status", {}).get("statusCode", "")
 
-        # Skip postponed games individually
         if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C":
             continue
 
@@ -727,14 +760,12 @@ def main():
     fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
     dk_live_pool, fd_live_pool = [], []
 
-    # Main player extraction loop
     for game in games_list:
         game_raw = game.get("gameRaw", {})
         game_status = game_raw.get("status", {}).get("abstractGameState", "")
         detailed_status = game_raw.get("status", {}).get("detailedState", "")
         status_code = game_raw.get("status", {}).get("statusCode", "")
 
-        # Skip postponed games individually to handle doubleheaders cleanly
         if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C":
             continue
 
@@ -838,19 +869,28 @@ def main():
             meta = SEO_METADATA["draftkings"].get(pos_slug, {"title": f"DraftKings {pos_slug.title()}", "desc": "MLB Projections"})
             clean_title = "Utility (All Hitters)" if pos_slug == "util" else pos_slug.replace("-", " ").title()
             page_url = f"{base_domain}/dfs/draftkings/top-{pos_slug}/"
-            # Pass display_time directly in place of today_str
+            
             html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected DraftKings {clean_title}", "DraftKings", "draftkings", pos_slug, POS_LABELS_DK, display_time, player_set, dk_slate_map)
-            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
-            generated_urls.append(page_url)
+            file_path = os.path.join(folder_path, "index.html")
+            
+            if has_page_changed(file_path, html_output):
+                with open(file_path, "w", encoding="utf-8") as file: 
+                    file.write(html_output)
+                generated_urls.append(page_url)
 
         if dk_live_pool:
             folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", "live-slate-leaderboard")
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["draftkings"]["live-slate-leaderboard"]
             page_url = f"{base_domain}/dfs/draftkings/live-slate-leaderboard/"
+            
             html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live DraftKings Slate Leaderboard", "DraftKings", "draftkings", "live-slate-leaderboard", POS_LABELS_DK, display_time, dk_live_pool, dk_slate_map, "Live Pts")
-            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
-            generated_urls.append(page_url)
+            file_path = os.path.join(folder_path, "index.html")
+            
+            if has_page_changed(file_path, html_output):
+                with open(file_path, "w", encoding="utf-8") as file: 
+                    file.write(html_output)
+                generated_urls.append(page_url)
 
     if has_fd_data:
         for pos_slug, player_set in fd_pools.items():
@@ -860,18 +900,28 @@ def main():
             clean_title = "Utility" if pos_slug == "util" else pos_slug.replace("-", " ").title()
             if "Catchers" in clean_title: clean_title = "C / 1B Split"
             page_url = f"{base_domain}/dfs/fanduel/top-{pos_slug}/"
+            
             html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected FanDuel {clean_title}", "FanDuel", "fanduel", pos_slug, POS_LABELS_FD, display_time, player_set, fd_slate_map)
-            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
-            generated_urls.append(page_url)
+            file_path = os.path.join(folder_path, "index.html")
+            
+            if has_page_changed(file_path, html_output):
+                with open(file_path, "w", encoding="utf-8") as file: 
+                    file.write(html_output)
+                generated_urls.append(page_url)
 
         if fd_live_pool:
             folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", "live-slate-leaderboard")
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["fanduel"]["live-slate-leaderboard"]
             page_url = f"{base_domain}/dfs/fanduel/live-slate-leaderboard/"
+            
             html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live FanDuel Slate Leaderboard", "FanDuel", "fanduel", "live-slate-leaderboard", POS_LABELS_FD, display_time, fd_live_pool, fd_slate_map, "Live Pts")
-            with open(os.path.join(folder_path, "index.html"), "w", encoding="utf-8") as file: file.write(html_output)
-            generated_urls.append(page_url)
+            file_path = os.path.join(folder_path, "index.html")
+            
+            if has_page_changed(file_path, html_output):
+                with open(file_path, "w", encoding="utf-8") as file: 
+                    file.write(html_output)
+                generated_urls.append(page_url)
 
     if generated_urls:
         sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -879,6 +929,9 @@ def main():
             sitemap_xml += f"  <url>\n    <loc>{url}</loc>\n    <lastmod>{today_str}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n"
         sitemap_xml += '</urlset>'
         with open(SITEMAP_PATH, "w", encoding="utf-8") as f: f.write(sitemap_xml)
+        
+        # Send dynamically changed URLs to the queue
+        queue_urls_for_indexnow(generated_urls)
 
 if __name__ == "__main__":
     main()
