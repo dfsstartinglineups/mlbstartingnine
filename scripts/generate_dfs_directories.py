@@ -1,7 +1,7 @@
 import os
 import json
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import unicodedata
 
@@ -125,6 +125,20 @@ def has_page_changed(file_path, new_html):
     except Exception as e:
         print(f"⚠️ Error reading existing file for comparison: {e}")
         return True
+
+def load_existing_sitemap_dates(sitemap_path):
+    """Parses existing <lastmod> dates from sitemap-dfs.xml to preserve unchanged URLs."""
+    dates = {}
+    if os.path.exists(sitemap_path):
+        try:
+            with open(sitemap_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            matches = re.findall(r'<url>\s*<loc>(.*?)</loc>\s*<lastmod>(.*?)</lastmod>', content, re.DOTALL)
+            for loc, lastmod in matches:
+                dates[loc.strip()] = lastmod.strip()
+        except Exception as e:
+            print(f"⚠️ Could not parse existing sitemap dates: {e}")
+    return dates
 
 # =========================================================================
 # --- 4. ALGORITHMS & LIVE LOGIC ---
@@ -702,6 +716,7 @@ def main():
 
     now_est = datetime.now(ZoneInfo("America/New_York"))
     display_time = now_est.strftime("%Y-%m-%d %I:%M %p ET")
+    w3c_today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     if not os.path.exists(target_path):
         import glob
@@ -859,7 +874,9 @@ def main():
         except ImportError:
             return "Jinja2 dependency required."
 
-    generated_urls = []
+    existing_dates = load_existing_sitemap_dates(SITEMAP_PATH)
+    all_dfs_urls = {}
+    changed_urls = []
     base_domain = "https://mlbstartingnine.com"
 
     if has_dk_data:
@@ -876,7 +893,10 @@ def main():
             if has_page_changed(file_path, html_output):
                 with open(file_path, "w", encoding="utf-8") as file: 
                     file.write(html_output)
-                generated_urls.append(page_url)
+                changed_urls.append(page_url)
+                all_dfs_urls[page_url] = w3c_today
+            else:
+                all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
         if dk_live_pool:
             folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", "live-slate-leaderboard")
@@ -890,7 +910,10 @@ def main():
             if has_page_changed(file_path, html_output):
                 with open(file_path, "w", encoding="utf-8") as file: 
                     file.write(html_output)
-                generated_urls.append(page_url)
+                changed_urls.append(page_url)
+                all_dfs_urls[page_url] = w3c_today
+            else:
+                all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
     if has_fd_data:
         for pos_slug, player_set in fd_pools.items():
@@ -907,7 +930,10 @@ def main():
             if has_page_changed(file_path, html_output):
                 with open(file_path, "w", encoding="utf-8") as file: 
                     file.write(html_output)
-                generated_urls.append(page_url)
+                changed_urls.append(page_url)
+                all_dfs_urls[page_url] = w3c_today
+            else:
+                all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
         if fd_live_pool:
             folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", "live-slate-leaderboard")
@@ -921,17 +947,23 @@ def main():
             if has_page_changed(file_path, html_output):
                 with open(file_path, "w", encoding="utf-8") as file: 
                     file.write(html_output)
-                generated_urls.append(page_url)
+                changed_urls.append(page_url)
+                all_dfs_urls[page_url] = w3c_today
+            else:
+                all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
-    if generated_urls:
+    # Rebuild sitemap & queue IndexNow pings only if changes were detected
+    if changed_urls:
         sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        for url in generated_urls:
-            sitemap_xml += f"  <url>\n    <loc>{url}</loc>\n    <lastmod>{today_str}</lastmod>\n    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n"
+        for url, lastmod in all_dfs_urls.items():
+            sitemap_xml += f"  <url>\n    <loc>{url}</loc>\n    <lastmod>{lastmod}</lastmod>\n  </url>\n"
         sitemap_xml += '</urlset>'
-        with open(SITEMAP_PATH, "w", encoding="utf-8") as f: f.write(sitemap_xml)
+        
+        with open(SITEMAP_PATH, "w", encoding="utf-8") as f: 
+            f.write(sitemap_xml)
         
         # Send dynamically changed URLs to the queue
-        queue_urls_for_indexnow(generated_urls)
+        queue_urls_for_indexnow(changed_urls)
 
 if __name__ == "__main__":
     main()
