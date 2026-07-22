@@ -43,6 +43,10 @@ jobs:
       - name: Generate Main Index Page
         run: python scripts/build_site.py
 
+      # 🚀 NEW STEP: Execute the IndexNow & Google ping logic
+      - name: Ping Search Engines
+        run: python scripts/ping_indexnow.py
+
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'github-actions[bot]'
