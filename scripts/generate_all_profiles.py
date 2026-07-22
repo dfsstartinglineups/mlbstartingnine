@@ -90,6 +90,32 @@ def update_sitemap(new_player_urls):
     with open(SITEMAP_OUTPUT_PATH, "w", encoding="utf-8") as f:
         f.write("\n".join([line for line in pretty_xml.splitlines() if line.strip()]))
 
+def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
+    """Appends newly updated URLs to the IndexNow JSON queue safely."""
+    if not new_urls:
+        return
+
+    if not os.path.exists(queue_file):
+        os.makedirs(os.path.dirname(queue_file), exist_ok=True)
+        queue_data = {
+            "last_sent": "2000-01-01T00:00:00",
+            "urls": []
+        }
+    else:
+        with open(queue_file, "r", encoding="utf-8") as f:
+            try:
+                queue_data = json.load(f)
+            except json.JSONDecodeError:
+                queue_data = {
+                    "last_sent": "2000-01-01T00:00:00",
+                    "urls": []
+                }
+
+    queue_data["urls"].extend(new_urls)
+
+    with open(queue_file, "w", encoding="utf-8") as f:
+        json.dump(queue_data, f, indent=2)
+
 # ==========================================
 # 2. MATCHUP ENGINE
 # ==========================================
@@ -671,6 +697,7 @@ def main():
     live_data = load_json_safe(f"data/LIVE/live_mlb_{target_date_str}.json")
 
     all_player_urls = []
+    updated_urls = [] # --- NEW: List to track strictly updated URLs ---
     updated_count = 0
 
     for key, profile in master_data.items():
@@ -694,8 +721,15 @@ def main():
             with open(index_file_path, "w", encoding="utf-8") as html_out:
                 html_out.write(new_html_content)
             updated_count += 1
+            
+            # --- NEW: Append to tracking list for IndexNow ---
+            updated_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
     update_sitemap(all_player_urls)
+
+    # --- NEW: Send to queue if any profiles updated ---
+    if updated_urls:
+        queue_urls_for_indexnow(updated_urls)
 
 if __name__ == "__main__":
     main()
