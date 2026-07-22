@@ -888,7 +888,8 @@ async def run_engines(memory):
         144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#JupilerProLeague", "url_slug": "belgian-pro-league"},
         119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "danish-superliga"},
         81:  {"name": "🇩🇪 DFB-POKAL", "tag": "#DFBPokal", "url_slug": "dfb-pokal"},
-        4:   {"name": "🇪🇺 UEFA EURO", "tag": "#Euro", "url_slug": "uefa-euro"}
+        4:   {"name": "🇪🇺 UEFA EURO", "tag": "#Euro", "url_slug": "uefa-euro"},
+        292: {"name": "🇰🇷 K LEAGUE 1", "tag": "#KLeague #KLeague1", "url_slug": "k-league-1"}
     }
     INTL_FLAGS = {
         "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
