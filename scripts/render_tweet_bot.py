@@ -293,6 +293,19 @@ def fetch_initial_memory():
         mem = {}
     return mem
 
+def log_x_tweet_audit(engine_name, base_key, date_string):
+    """Logs successful X (Twitter) posts to Firebase for cost auditing."""
+    if not DRY_RUN and firebase_admin._apps:
+        try:
+            # Sanitize key to prevent Firebase path errors (no ., #, $, [, ])
+            safe_key = str(base_key).replace('.', '').replace('#', '').replace('$', '').replace('[', '').replace(']', '').replace('/', '_')
+            audit_key = f"{safe_key}_{date_string}"
+            
+            # Log with the current unix timestamp as the value
+            db.reference(f'X_Audit/{engine_name}').update({audit_key: int(time.time())})
+        except Exception as e:
+            print(f"⚠️ Failed to log X Audit for {engine_name}: {e}")
+
 # ==========================================
 # 5. CORE BOT ENGINE (RUNS EVERY LOOP)
 # ==========================================
@@ -474,6 +487,7 @@ async def run_engines(memory):
                             media = nba_api_v1.media_upload("nba_matchup.png")
                             nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
                             nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                            log_x_tweet_audit("NBA", team_date_key, date_str)
                             twitter_success = True
                             break 
                         except Exception as e: pass
@@ -546,6 +560,7 @@ async def run_engines(memory):
                         media = mlb_api_v1.media_upload("mlb_weather.png")
                         mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
                         mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
+                        log_x_tweet_audit("MLB_WEATHER", weather_key, date_str)
                         twitter_success = True
                         print("✅ Successfully tweeted MLB Weather Report to X!")
                         break
@@ -662,10 +677,12 @@ async def run_engines(memory):
                     
                     # Send Main Tweet & Capture Response
                     response = mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    log_x_tweet_audit("MLB_LINEUPS", f"{full_key}_main", date_str)
                     
                     # Fire Threaded Reply Using Tweet ID
                     tweet_id = response.data['id']
                     mlb_client.create_tweet(text=reply_text, in_reply_to_tweet_id=tweet_id)
+                    log_x_tweet_audit("MLB_LINEUPS", f"{full_key}_reply", date_str)
                     
                     twitter_success = True
                     break 
@@ -729,6 +746,7 @@ async def run_engines(memory):
                         try:
                             if attempt == 1: await asyncio.sleep(3)
                             mlb_client.create_tweet(text=alert_text)
+                            log_x_tweet_audit("MLB_ALERTS", postponed_key, date_str)
                             twitter_success = True
                             break
                         except Exception as e: pass
@@ -962,7 +980,9 @@ async def run_engines(memory):
                     h_title = f"{e} OFFICIAL STARTING XI: {h_name}\n\n{h_name} has released their starting lineup against {a_name} in {league_info['name']} action!"
                     h_tweet = f"{h_title}\n\nView the official tactical board and live stats here:\n{home_link}\n\n{odds_str}\n\n{league_info['tag']} #{h_hash} #{a_hash}"
                     
-                    if target_client: target_client.create_tweet(text=h_tweet)
+                    if target_client: 
+                        target_client.create_tweet(text=h_tweet)
+                        log_x_tweet_audit("FUTBOL_LINEUPS", f"{team_key}_home", target_date_str)
                     if target_bsky_client:
                         h_bsky = client_utils.TextBuilder()
                         h_bsky.text(f"{h_title}\n\nView the official tactical board and live stats here:\n")
@@ -977,7 +997,9 @@ async def run_engines(memory):
                     a_title = f"{e} OFFICIAL STARTING XI: {a_name}\n\n{a_name} has released their starting lineup against {h_name} in {league_info['name']} action!"
                     a_tweet = f"{a_title}\n\nView the official tactical board and live stats here:\n{away_link}\n\n{odds_str}\n\n{league_info['tag']} #{a_hash} #{h_hash}"
                     
-                    if target_client: target_client.create_tweet(text=a_tweet)
+                    if target_client: 
+                        target_client.create_tweet(text=a_tweet)
+                        log_x_tweet_audit("FUTBOL_LINEUPS", f"{team_key}_away", target_date_str)
                     if target_bsky_client:
                         a_bsky = client_utils.TextBuilder()
                         a_bsky.text(f"{a_title}\n\nView the official tactical board and live stats here:\n")
@@ -1146,7 +1168,9 @@ async def run_engines(memory):
                             upload_success = False
                             try:
                                 target_client = league_info.get("x_client") or futbol_client
-                                if target_client: target_client.create_tweet(text=ft_tweet_text)
+                                if target_client: 
+                                    target_client.create_tweet(text=ft_tweet_text)
+                                    log_x_tweet_audit("FUTBOL_ALERTS", ft_key, target_date_str)
                                 
                                 target_bsky_client = league_info.get("bsky_client")
                                 if target_bsky_client: target_bsky_client.send_post(bsky_ft)
@@ -1512,7 +1536,9 @@ async def run_engines(memory):
                     upload_success = False
                     try:
                         target_client = league_info.get("x_client") or futbol_client
-                        if target_client: target_client.create_tweet(text=tweet_text)
+                        if target_client: 
+                            target_client.create_tweet(text=tweet_text)
+                            log_x_tweet_audit("FUTBOL_ALERTS", event_key, target_date_str)
                         upload_success = True 
                     except Exception as e: pass
 
