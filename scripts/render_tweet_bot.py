@@ -487,7 +487,9 @@ async def run_engines(memory):
                             media = nba_api_v1.media_upload("nba_matchup.png")
                             nba_api_v1.create_media_metadata(media.media_id, nba_alt_text)
                             nba_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                            
                             log_x_tweet_audit("NBA", team_date_key, date_str)
+                            
                             twitter_success = True
                             break 
                         except Exception as e: pass
@@ -560,7 +562,9 @@ async def run_engines(memory):
                         media = mlb_api_v1.media_upload("mlb_weather.png")
                         mlb_api_v1.create_media_metadata(media.media_id, "MLB Daily Weather Report & Stadium Wind Speeds")
                         mlb_client.create_tweet(text=weather_text, media_ids=[media.media_id])
-                        log_x_tweet_audit("MLB_WEATHER", weather_key, date_str)
+                        
+                        log_x_tweet_audit("MLB", weather_key, date_str)
+                        
                         twitter_success = True
                         print("✅ Successfully tweeted MLB Weather Report to X!")
                         break
@@ -677,12 +681,12 @@ async def run_engines(memory):
                     
                     # Send Main Tweet & Capture Response
                     response = mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                    log_x_tweet_audit("MLB_LINEUPS", f"{full_key}_main", date_str)
+                    log_x_tweet_audit("MLB", f"{memory_key}_main", date_string)
                     
                     # Fire Threaded Reply Using Tweet ID
                     tweet_id = response.data['id']
                     mlb_client.create_tweet(text=reply_text, in_reply_to_tweet_id=tweet_id)
-                    log_x_tweet_audit("MLB_LINEUPS", f"{full_key}_reply", date_str)
+                    log_x_tweet_audit("MLB", f"{memory_key}_reply", date_string)
                     
                     twitter_success = True
                     break 
@@ -746,7 +750,9 @@ async def run_engines(memory):
                         try:
                             if attempt == 1: await asyncio.sleep(3)
                             mlb_client.create_tweet(text=alert_text)
-                            log_x_tweet_audit("MLB_ALERTS", postponed_key, date_str)
+                            
+                            log_x_tweet_audit("MLB", postponed_key, date_str)
+                            
                             twitter_success = True
                             break
                         except Exception as e: pass
@@ -869,45 +875,45 @@ async def run_engines(memory):
     # FUTBOL ENGINE (Lineups & Live Alerts)
     # ==========================================
     FUTBOL_LEAGUES = {
-        143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copa-del-rey", "x_client": seriea_client, "v1_client": seriea_api_v1},
-        140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "la-liga", "x_client": seriea_client, "v1_client": seriea_api_v1},
-        137: {"name": "🇮🇹 COPPA ITALIA", "tag": "#CoppaItalia", "url_slug": "coppa-italia", "x_client": seriea_client, "v1_client": seriea_api_v1},
-        61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue-1", "x_client": seriea_client, "v1_client": seriea_api_v1},     
-        135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "serie-a", "x_client": seriea_client, "v1_client": seriea_api_v1},    
-        11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "copa-sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
-        239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombian-primera-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1},    
-        13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "copa-libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-        71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brasileirao-serie-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-        128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentine-liga-profesional", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-        9:   {"name": "🌎 COPA AMERICA", "tag": "#CopaAmerica", "url_slug": "copa-america", "x_client": argbracol_client, "v1_client": argbracol_api_v1},
-        531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacaf-nations-league", "x_client": mls_client, "v1_client": mls_api_v1},    
-        262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "liga-mx", "x_client": mls_client, "v1_client": mls_api_v1},    
-        16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf-champions-cup", "x_client": mls_client, "v1_client": mls_api_v1},    
-        254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1},
-        253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1},
-        528: {"name": "🌎 LEAGUES CUP", "tag": "#LeaguesCup", "url_slug": "leagues-cup", "x_client": mls_client, "v1_client": mls_api_v1},
-        179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scottish-premiership", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
-        45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "fa-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
-        39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "english-premier-league", "x_client": nwsl_client, "v1_client": nwsl_api_v1},    
-        40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "efl-championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1},
-        48:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f EFL CUP", "tag": "#CarabaoCup", "url_slug": "efl-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1},
-        10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "international-friendlies"},
-        1:   {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "fifa-world-cup"},
-        2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "uefa-champions-league"},
-        3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "uefa-europa-league"},
-        188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "a-league"},
-        5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefa-nations-league"},
-        848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "uefa-conference-league" },    
-        307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi-pro-league"},
-        78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga"},
-        88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie"},
-        94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "primeira-liga"},
-        203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "super-lig"},
-        144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#JupilerProLeague", "url_slug": "belgian-pro-league"},
-        119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "danish-superliga"},
-        81:  {"name": "🇩🇪 DFB-POKAL", "tag": "#DFBPokal", "url_slug": "dfb-pokal"},
-        4:   {"name": "🇪🇺 UEFA EURO", "tag": "#Euro", "url_slug": "uefa-euro"},
-        292: {"name": "🇰🇷 K LEAGUE 1", "tag": "#KLeague #KLeague1", "url_slug": "k-league-1"}
+        143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copa-del-rey", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},
+        140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "la-liga", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},
+        137: {"name": "🇮🇹 COPPA ITALIA", "tag": "#CoppaItalia", "url_slug": "coppa-italia", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},
+        61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue-1", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},     
+        135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "serie-a", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},    
+        11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "copa-sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},    
+        239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombian-primera-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},    
+        13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "copa-libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
+        71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brasileirao-serie-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
+        128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentine-liga-profesional", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
+        9:   {"name": "🌎 COPA AMERICA", "tag": "#CopaAmerica", "url_slug": "copa-america", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
+        531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacaf-nations-league", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},    
+        262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "liga-mx", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},    
+        16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf-champions-cup", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},    
+        254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},
+        253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},
+        528: {"name": "🌎 LEAGUES CUP", "tag": "#LeaguesCup", "url_slug": "leagues-cup", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},
+        179: {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scottish-premiership", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},    
+        45:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f FA CUP", "tag": "#FACup", "url_slug": "fa-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},    
+        39:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f PREMIER LEAGUE", "tag": "#EPL", "url_slug": "english-premier-league", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},    
+        40:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f CHAMPIONSHIP", "tag": "#Championship", "url_slug": "efl-championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},
+        48:  {"name": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f EFL CUP", "tag": "#CarabaoCup", "url_slug": "efl-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},
+        10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "international-friendlies", "account_name": "FUTBOL"},
+        1:   {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "fifa-world-cup", "account_name": "FUTBOL"},
+        2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "uefa-champions-league", "account_name": "FUTBOL"},
+        3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "uefa-europa-league", "account_name": "FUTBOL"},
+        188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "a-league", "account_name": "FUTBOL"},
+        5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefa-nations-league", "account_name": "FUTBOL"},
+        848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "uefa-conference-league", "account_name": "FUTBOL" },    
+        307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi-pro-league", "account_name": "FUTBOL"},
+        78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "account_name": "FUTBOL"},
+        88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie", "account_name": "FUTBOL"},
+        94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "primeira-liga", "account_name": "FUTBOL"},
+        203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "super-lig", "account_name": "FUTBOL"},
+        144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#JupilerProLeague", "url_slug": "belgian-pro-league", "account_name": "FUTBOL"},
+        119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "danish-superliga", "account_name": "FUTBOL"},
+        81:  {"name": "🇩🇪 DFB-POKAL", "tag": "#DFBPokal", "url_slug": "dfb-pokal", "account_name": "FUTBOL"},
+        4:   {"name": "🇪🇺 UEFA EURO", "tag": "#Euro", "url_slug": "uefa-euro", "account_name": "FUTBOL"},
+        292: {"name": "🇰🇷 K LEAGUE 1", "tag": "#KLeague #KLeague1", "url_slug": "k-league-1", "account_name": "FUTBOL"}
     }
     INTL_FLAGS = {
         "England": "\U0001f3f4\U000e0067\U000e0062\U000e0065\U000e006e\U000e0067\U000e007f", "Scotland": "\U0001f3f4\U000e0067\U000e0062\U000e0073\U000e0063\U000e0074\U000e007f", "Wales": "\U0001f3f4\U000e0067\U000e0062\U000e0077\U000e006c\U000e0073\U000e007f",
@@ -982,7 +988,9 @@ async def run_engines(memory):
                     
                     if target_client: 
                         target_client.create_tweet(text=h_tweet)
-                        log_x_tweet_audit("FUTBOL_LINEUPS", f"{team_key}_home", target_date_str)
+                        account_name = league_info.get("account_name", "FUTBOL")
+                        log_x_tweet_audit(account_name, f"{team_key}_home", target_date_str)
+                        
                     if target_bsky_client:
                         h_bsky = client_utils.TextBuilder()
                         h_bsky.text(f"{h_title}\n\nView the official tactical board and live stats here:\n")
@@ -999,7 +1007,9 @@ async def run_engines(memory):
                     
                     if target_client: 
                         target_client.create_tweet(text=a_tweet)
-                        log_x_tweet_audit("FUTBOL_LINEUPS", f"{team_key}_away", target_date_str)
+                        account_name = league_info.get("account_name", "FUTBOL")
+                        log_x_tweet_audit(account_name, f"{team_key}_away", target_date_str)
+                        
                     if target_bsky_client:
                         a_bsky = client_utils.TextBuilder()
                         a_bsky.text(f"{a_title}\n\nView the official tactical board and live stats here:\n")
@@ -1170,7 +1180,8 @@ async def run_engines(memory):
                                 target_client = league_info.get("x_client") or futbol_client
                                 if target_client: 
                                     target_client.create_tweet(text=ft_tweet_text)
-                                    log_x_tweet_audit("FUTBOL_ALERTS", ft_key, target_date_str)
+                                    account_name = league_info.get("account_name", "FUTBOL")
+                                    log_x_tweet_audit(account_name, ft_key, target_date_str)
                                 
                                 target_bsky_client = league_info.get("bsky_client")
                                 if target_bsky_client: target_bsky_client.send_post(bsky_ft)
@@ -1538,7 +1549,8 @@ async def run_engines(memory):
                         target_client = league_info.get("x_client") or futbol_client
                         if target_client: 
                             target_client.create_tweet(text=tweet_text)
-                            log_x_tweet_audit("FUTBOL_ALERTS", event_key, target_date_str)
+                            account_name = league_info.get("account_name", "FUTBOL")
+                            log_x_tweet_audit(account_name, event_key, target_date_str)
                         upload_success = True 
                     except Exception as e: pass
 
