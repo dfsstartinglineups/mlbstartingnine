@@ -70,12 +70,32 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected DraftKings Third Base</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-07-25 03:19 PM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-07-25 03:21 PM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
 
     <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+        
+        <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
+                <option value="all">All Games</option>
+                
+                <option value="24F19">4 Games  · Early SAT 4:05PM ET</option>
+                
+                <option value="24E10">10 Games SAT 6:05PM ET</option>
+                
+                <option value="24F17">KC @ DET SAT 1:10PM ET</option>
+                
+                <option value="24F1B">TOR @ BOS SAT 4:10PM ET</option>
+                
+                <option value="24F1F">NYY @ PHI SAT 6:05PM ET</option>
+                
+                <option value="24F20">LAD @ NYM SAT 7:15PM ET</option>
+                
+            </select>
+        </div>
         
         
         
@@ -416,13 +436,54 @@
                         
                     </tr>
                     
+                    <tr data-slates="24E10" 
+                        data-slate-stats='{"24E10": {"salary": "$3,200", "proj": "7.84", "value": "2.45x"}}' 
+                        data-default-salary="$3,200" 
+                        data-default-proj="7.84" 
+                        data-default-value="2.45x">
+                        
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">8</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <a href="/lineups/baltimore-orioles/" class="text-decoration-none">
+                                    
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
+                                    
+                                </a>
+                                
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687952/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/christian-encarnacion-strand/" class="player-link text-nowrap">Christian Encarnacion-Strand</a>
+                            </div>
+                        </td>
+                        
+                        
+                        <td class="text-end fw-bold text-success col-value">2.45x</td>
+                        <td>
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                Orioles
+                            </span>
+                        </td>
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                            <div class="d-flex align-items-center text-nowrap">
+                                vs. <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Braves
+                            </div>
+                        </td>
+                        <td class="text-end fw-semibold col-salary">$3,200</td>
+                        <td class="text-end fw-bold col-proj">7.84</td>
+                        
+                    </tr>
+                    
                     <tr data-slates="24F19" 
                         data-slate-stats='{"24F19": {"salary": "$3,400", "proj": "7.99", "value": "2.35x"}}' 
                         data-default-salary="$3,400" 
                         data-default-proj="7.99" 
                         data-default-value="2.35x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">8</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">9</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/arizona-diamondbacks/" class="text-decoration-none">
@@ -463,7 +524,7 @@
                         data-default-proj="5.26" 
                         data-default-value="2.29x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">9</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">10</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/st-louis-cardinals/" class="text-decoration-none">
@@ -504,7 +565,7 @@
                         data-default-proj="6.6" 
                         data-default-value="2.28x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">10</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">11</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
@@ -545,7 +606,7 @@
                         data-default-proj="8.22" 
                         data-default-value="2.28x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">11</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">12</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cincinnati-reds/" class="text-decoration-none">
@@ -586,7 +647,7 @@
                         data-default-proj="7.04" 
                         data-default-value="2.27x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">12</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">13</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-angels/" class="text-decoration-none">
@@ -627,7 +688,7 @@
                         data-default-proj="6.87" 
                         data-default-value="2.15x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">13</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">14</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/colorado-rockies/" class="text-decoration-none">
@@ -668,7 +729,7 @@
                         data-default-proj="6.45" 
                         data-default-value="2.15x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">14</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">15</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/seattle-mariners/" class="text-decoration-none">
@@ -709,7 +770,7 @@
                         data-default-proj="6.2" 
                         data-default-value="2.14x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">15</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">16</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/san-diego-padres/" class="text-decoration-none">
@@ -750,7 +811,7 @@
                         data-default-proj="7.8" 
                         data-default-value="2.05x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">16</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">17</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -791,7 +852,7 @@
                         data-default-proj="10.19" 
                         data-default-value="1.96x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">17</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">18</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
@@ -832,7 +893,7 @@
                         data-default-proj="6.34" 
                         data-default-value="1.92x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">18</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">19</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/boston-red-sox/" class="text-decoration-none">
@@ -873,7 +934,7 @@
                         data-default-proj="7.31" 
                         data-default-value="1.92x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">19</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">20</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/minnesota-twins/" class="text-decoration-none">
@@ -905,47 +966,6 @@
                         </td>
                         <td class="text-end fw-semibold col-salary">$3,800</td>
                         <td class="text-end fw-bold col-proj">7.31</td>
-                        
-                    </tr>
-                    
-                    <tr data-slates="24E10" 
-                        data-slate-stats='{"24E10": {"salary": "$4,100", "proj": "7.73", "value": "1.89x"}}' 
-                        data-default-salary="$4,100" 
-                        data-default-proj="7.73" 
-                        data-default-value="1.89x">
-                        
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">20</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <a href="/lineups/atlanta-braves/" class="text-decoration-none">
-                                    
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">4</span>
-                                    
-                                </a>
-                                
-                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663586/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                    <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                </div>
-                                
-                                <a href="/players/austin-riley/" class="player-link text-nowrap">Austin Riley</a>
-                            </div>
-                        </td>
-                        
-                        
-                        <td class="text-end fw-bold text-success col-value">1.89x</td>
-                        <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                Braves
-                            </span>
-                        </td>
-                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center text-nowrap">
-                                @ <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Orioles
-                            </div>
-                        </td>
-                        <td class="text-end fw-semibold col-salary">$4,100</td>
-                        <td class="text-end fw-bold col-proj">7.73</td>
                         
                     </tr>
                     
@@ -990,13 +1010,54 @@
                         
                     </tr>
                     
+                    <tr data-slates="24E10" 
+                        data-slate-stats='{"24E10": {"salary": "$4,100", "proj": "7.58", "value": "1.85x"}}' 
+                        data-default-salary="$4,100" 
+                        data-default-proj="7.58" 
+                        data-default-value="1.85x">
+                        
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">22</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <a href="/lineups/atlanta-braves/" class="text-decoration-none">
+                                    
+                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">7</span>
+                                    
+                                </a>
+                                
+                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/663586/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                    <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                </div>
+                                
+                                <a href="/players/austin-riley/" class="player-link text-nowrap">Austin Riley</a>
+                            </div>
+                        </td>
+                        
+                        
+                        <td class="text-end fw-bold text-success col-value">1.85x</td>
+                        <td>
+                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                Braves
+                            </span>
+                        </td>
+                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                            <div class="d-flex align-items-center text-nowrap">
+                                @ <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Orioles Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Orioles
+                            </div>
+                        </td>
+                        <td class="text-end fw-semibold col-salary">$4,100</td>
+                        <td class="text-end fw-bold col-proj">7.58</td>
+                        
+                    </tr>
+                    
                     <tr data-slates="24F19" 
                         data-slate-stats='{"24F19": {"salary": "$3,200", "proj": "5.87", "value": "1.83x"}}' 
                         data-default-salary="$3,200" 
                         data-default-proj="5.87" 
                         data-default-value="1.83x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">22</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">23</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-angels/" class="text-decoration-none">
@@ -1037,7 +1098,7 @@
                         data-default-proj="7.7" 
                         data-default-value="1.83x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">23</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">24</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/pittsburgh-pirates/" class="text-decoration-none">
@@ -1078,7 +1139,7 @@
                         data-default-proj="8.48" 
                         data-default-value="1.77x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">24</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">25</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/cincinnati-reds/" class="text-decoration-none">
@@ -1119,7 +1180,7 @@
                         data-default-proj="7.0" 
                         data-default-value="1.71x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">25</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">26</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/toronto-blue-jays/" class="text-decoration-none">
@@ -1160,7 +1221,7 @@
                         data-default-proj="6.66" 
                         data-default-value="1.71x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">26</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">27</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/chicago-cubs/" class="text-decoration-none">
@@ -1201,7 +1262,7 @@
                         data-default-proj="7.82" 
                         data-default-value="1.66x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">27</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">28</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/san-francisco-giants/" class="text-decoration-none">
@@ -1242,7 +1303,7 @@
                         data-default-proj="8.11" 
                         data-default-value="1.66x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">28</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">29</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/san-diego-padres/" class="text-decoration-none">
@@ -1283,7 +1344,7 @@
                         data-default-proj="8.53" 
                         data-default-value="1.64x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">29</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">30</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
@@ -1324,7 +1385,7 @@
                         data-default-proj="7.85" 
                         data-default-value="1.6x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">30</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">31</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/chicago-white-sox/" class="text-decoration-none">
@@ -1359,13 +1420,13 @@
                         
                     </tr>
                     
-                    <tr data-slates="24E10,24F20" 
-                        data-slate-stats='{"24E10": {"salary": "$5,600", "proj": "8.41", "value": "1.50x"}, "24F20": {"salary": "$8,600", "proj": "8.41", "value": "0.98x"}}' 
+                    <tr data-slates="24F20,24E10" 
+                        data-slate-stats='{"24F20": {"salary": "$8,600", "proj": "8.41", "value": "0.98x"}, "24E10": {"salary": "$5,600", "proj": "8.41", "value": "1.50x"}}' 
                         data-default-salary="$5,600" 
                         data-default-proj="8.41" 
                         data-default-value="1.5x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">31</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">32</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -1406,7 +1467,7 @@
                         data-default-proj="6.03" 
                         data-default-value="1.47x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">32</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">33</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/texas-rangers/" class="text-decoration-none">
@@ -1447,7 +1508,7 @@
                         data-default-proj="9.05" 
                         data-default-value="1.46x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">33</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">34</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
@@ -1482,13 +1543,13 @@
                         
                     </tr>
                     
-                    <tr data-slates="24E10,24F20" 
-                        data-slate-stats='{"24E10": {"salary": "$4,200", "proj": "6.06", "value": "1.44x"}, "24F20": {"salary": "$7,000", "proj": "6.06", "value": "0.87x"}}' 
+                    <tr data-slates="24F20,24E10" 
+                        data-slate-stats='{"24F20": {"salary": "$7,000", "proj": "6.06", "value": "0.87x"}, "24E10": {"salary": "$4,200", "proj": "6.06", "value": "1.44x"}}' 
                         data-default-salary="$4,200" 
                         data-default-proj="6.06" 
                         data-default-value="1.44x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">34</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">35</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -1523,13 +1584,13 @@
                         
                     </tr>
                     
-                    <tr data-slates="24E10,24F20" 
-                        data-slate-stats='{"24E10": {"salary": "$4,700", "proj": "6.58", "value": "1.40x"}, "24F20": {"salary": "$7,800", "proj": "6.58", "value": "0.84x"}}' 
+                    <tr data-slates="24F20,24E10" 
+                        data-slate-stats='{"24F20": {"salary": "$7,800", "proj": "6.58", "value": "0.84x"}, "24E10": {"salary": "$4,700", "proj": "6.58", "value": "1.40x"}}' 
                         data-default-salary="$4,700" 
                         data-default-proj="6.58" 
                         data-default-value="1.4x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">35</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">36</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -1570,7 +1631,7 @@
                         data-default-proj="7.49" 
                         data-default-value="1.31x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">36</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">37</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/chicago-white-sox/" class="text-decoration-none">
@@ -1611,7 +1672,7 @@
                         data-default-proj="6.55" 
                         data-default-value="1.13x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">37</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">38</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/detroit-tigers/" class="text-decoration-none">
@@ -1652,7 +1713,7 @@
                         data-default-proj="5.4" 
                         data-default-value="0.9x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">38</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">39</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/kansas-city-royals/" class="text-decoration-none">
@@ -1693,7 +1754,7 @@
                         data-default-proj="7.59" 
                         data-default-value="0.9x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">39</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">40</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/detroit-tigers/" class="text-decoration-none">
@@ -1734,7 +1795,7 @@
                         data-default-proj="2.02" 
                         data-default-value="0.7x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">40</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">41</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-yankees/" class="text-decoration-none">
@@ -1769,13 +1830,13 @@
                         
                     </tr>
                     
-                    <tr data-slates="24E10,24F20" 
-                        data-slate-stats='{"24E10": {"salary": "$2,400", "proj": "1.41", "value": "0.59x"}, "24F20": {"salary": "$4,000", "proj": "1.41", "value": "0.35x"}}' 
+                    <tr data-slates="24F20,24E10" 
+                        data-slate-stats='{"24F20": {"salary": "$4,000", "proj": "1.41", "value": "0.35x"}, "24E10": {"salary": "$2,400", "proj": "1.41", "value": "0.59x"}}' 
                         data-default-salary="$2,400" 
                         data-default-proj="1.41" 
                         data-default-value="0.59x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">41</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">42</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -1816,7 +1877,7 @@
                         data-default-proj="1.55" 
                         data-default-value="0.55x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">42</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">43</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/athletics/" class="text-decoration-none">
@@ -1851,13 +1912,13 @@
                         
                     </tr>
                     
-                    <tr data-slates="24E10,24F20" 
-                        data-slate-stats='{"24E10": {"salary": "$2,700", "proj": "1.46", "value": "0.54x"}, "24F20": {"salary": "$4,800", "proj": "1.46", "value": "0.30x"}}' 
+                    <tr data-slates="24F20,24E10" 
+                        data-slate-stats='{"24F20": {"salary": "$4,800", "proj": "1.46", "value": "0.30x"}, "24E10": {"salary": "$2,700", "proj": "1.46", "value": "0.54x"}}' 
                         data-default-salary="$2,700" 
                         data-default-proj="1.46" 
                         data-default-value="0.54x">
                         
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">43</td>
+                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">44</td>
                         <td>
                             <div class="d-flex align-items-center">
                                 <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -1889,47 +1950,6 @@
                         </td>
                         <td class="text-end fw-semibold col-salary">$2,700</td>
                         <td class="text-end fw-bold col-proj">1.46</td>
-                        
-                    </tr>
-                    
-                    <tr data-slates="24E10" 
-                        data-slate-stats='{"24E10": {"salary": "$3,100", "proj": "1.54", "value": "0.50x"}}' 
-                        data-default-salary="$3,100" 
-                        data-default-proj="1.54" 
-                        data-default-value="0.5x">
-                        
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">44</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <a href="/lineups/baltimore-orioles/" class="text-decoration-none">
-                                    
-                                        <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Not Starting">NS</span>
-                                    
-                                </a>
-                                
-                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/691723/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                    <img src="https://www.mlbstatic.com/team-logos/110.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                </div>
-                                
-                                <a href="/players/coby-mayo/" class="player-link text-nowrap">Coby Mayo</a>
-                            </div>
-                        </td>
-                        
-                        
-                        <td class="text-end fw-bold text-success col-value">0.5x</td>
-                        <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                Orioles
-                            </span>
-                        </td>
-                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center text-nowrap">
-                                vs. <img src="https://www.mlbstatic.com/team-logos/144.svg" alt="Braves Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Braves
-                            </div>
-                        </td>
-                        <td class="text-end fw-semibold col-salary">$3,100</td>
-                        <td class="text-end fw-bold col-proj">1.54</td>
                         
                     </tr>
                     
