@@ -923,7 +923,12 @@ async def run_engines(memory):
     futbol_dates_to_check = [date_str]
     if today_est.hour >= 20: futbol_dates_to_check.append(tomorrow_str)
     if today_est.hour <= 2: futbol_dates_to_check.append(yesterday_str)   
-
+    
+    
+    # 👇 ADD THIS LINE TO TEMPORARILY DISABLE FUTBOL 👇
+    futbol_dates_to_check = []
+    
+    
     for target_date_str in futbol_dates_to_check:
         if target_date_str not in memory: memory[target_date_str] = []
         log_target_date = memory[target_date_str]
