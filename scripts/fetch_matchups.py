@@ -548,8 +548,15 @@ def main():
         # --- 📖 READ THE DAILY FILE MEMORY (Updated for Dictionary structure) ---
         daily_file_path = os.path.join(DAILY_FILES_DIR, f'games_{date_str}.json')
         daily_memory = {}
+        saved_slates = {"fanduel": [], "draftkings": []}
+        
         if os.path.exists(daily_file_path):
             existing_data = load_json(daily_file_path, {})
+            
+            # Extract existing slates if they are present
+            if isinstance(existing_data, dict) and 'slates' in existing_data:
+                saved_slates = existing_data['slates']
+                
             # Gracefully handle both old Array structures and new Object structures
             existing_games = existing_data.get('games', []) if isinstance(existing_data, dict) else existing_data
             for g in existing_games:
@@ -958,7 +965,7 @@ def main():
         # ALWAYS save as the new Object structure to standardize the Frontend
         final_output = {
             "last_updated": current_est_time.strftime("%b %d, %I:%M %p ET"),
-            "slates": formatted_slates if has_valid_dfs else {"fanduel": [], "draftkings": []},
+            "slates": formatted_slates if has_valid_dfs else saved_slates,
             "games": master_dates[date_str]
         }
 
