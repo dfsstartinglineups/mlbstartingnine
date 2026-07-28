@@ -45,24 +45,24 @@ POS_LABELS_FD = {
 # =========================================================================
 SEO_METADATA = {
     "draftkings": {
-        "pitchers": {"title": "Top DraftKings Pitcher Projections Today - DFS Lineup Values", "desc": "Optimized DraftKings pitcher projections for today's MLB slate."},
-        "catchers": {"title": "Best DraftKings Catchers Today - Daily Fantasy C Projections", "desc": "Daily fantasy baseball rankings for DraftKings catchers."},
-        "first-base": {"title": "Top DraftKings 1B Projections Today - Elite First Base Value", "desc": "Analyze today's DraftKings first base projections."},
-        "second-base": {"title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings", "desc": "Unlock top-rated DraftKings second base projections."},
-        "third-base": {"title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base", "desc": "Premium DraftKings third base projections."},
-        "shortstops": {"title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections", "desc": "Compare daily fantasy shortstop values on DraftKings."},
-        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Comprehensive DraftKings outfield rankings and value projections."},
-        "util": {"title": "Top DraftKings Hitters Today - DFS Overall Value Rankings", "desc": "View the highest projected DraftKings hitters across all positions."},
+        "pitchers": {"title": "Top DraftKings Pitcher Projections Today - DFS Lineup Values", "desc": "Today's top pitcher selections for your DraftKings lineups tonight for all slates."},
+        "catchers": {"title": "Best DraftKings Catchers Today - Daily Fantasy C Projections", "desc": "Today's top catcher selections for your DraftKings lineups tonight for all slates."},
+        "first-base": {"title": "Top DraftKings 1B Projections Today - Elite First Base Value", "desc": "Today's top first base selections for your DraftKings lineups tonight for all slates."},
+        "second-base": {"title": "Optimized DraftKings 2B Value Picks Today - DFS Rankings", "desc": "Today's top second base selections for your DraftKings lineups tonight for all slates."},
+        "third-base": {"title": "Best DraftKings 3B Projections Today - Daily Fantasy Third Base", "desc": "Today's top third base selections for your DraftKings lineups tonight for all slates."},
+        "shortstops": {"title": "Top DraftKings Shortstop Picks Today - Advanced SS Projections", "desc": "Today's top shortstop selections for your DraftKings lineups tonight for all slates."},
+        "outfielders": {"title": "Best DraftKings Outfield Projections Today - DFS OF Value Grid", "desc": "Today's top outfield selections for your DraftKings lineups tonight for all slates."},
+        "util": {"title": "Top DraftKings Hitters Today - DFS Overall Value Rankings", "desc": "Today's top utility selections for your DraftKings lineups tonight for all slates."},
         "live-slate-leaderboard": {"title": "Live DraftKings DFS Leaderboard - Real-Time Fantasy Baseball Scores", "desc": "Live updating DraftKings fantasy baseball leaderboard. Track real-time player points and contextual stat lines across all active MLB slates."}
     },
     "fanduel": {
-        "pitchers": {"title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball", "desc": "Maximize your FanDuel pitching slot with real-time projections."},
-        "catchers-first-base": {"title": "Best FanDuel C/1B Projections Today - Catchers & First Base Value", "desc": "Optimized FanDuel combined Catcher and First Base projections."},
-        "second-base": {"title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks", "desc": "Find the highest-value second basemen on FanDuel today."},
-        "third-base": {"title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value", "desc": "Advanced FanDuel third base projections."},
-        "shortstops": {"title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings", "desc": "Daily updated FanDuel shortstop projections."},
-        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Deep-dive FanDuel outfielder value tables."},
-        "util": {"title": "Best FanDuel Utility Projections Today - DFS UTIL Picks", "desc": "Fill your FanDuel Utility slot with the highest value hitters."},
+        "pitchers": {"title": "Top FanDuel Pitcher Projections Today - Daily Fantasy Baseball", "desc": "Today's top pitcher selections for your FanDuel lineups tonight for all slates."},
+        "catchers-first-base": {"title": "Best FanDuel C/1B Projections Today - Catchers & First Base Value", "desc": "Today's top catcher and first base selections for your FanDuel lineups tonight for all slates."},
+        "second-base": {"title": "Top FanDuel 2B Rankings Today - Daily Fantasy Second Base Picks", "desc": "Today's top second base selections for your FanDuel lineups tonight for all slates."},
+        "third-base": {"title": "Optimized FanDuel 3B Projections Today - Fantasy Third Base Value", "desc": "Today's top third base selections for your FanDuel lineups tonight for all slates."},
+        "shortstops": {"title": "Best FanDuel Shortstop Picks Today - DFS SS Rankings", "desc": "Today's top shortstop selections for your FanDuel lineups tonight for all slates."},
+        "outfielders": {"title": "Top FanDuel Outfield Projections Today - DFS Outfielder Rankings", "desc": "Today's top outfield selections for your FanDuel lineups tonight for all slates."},
+        "util": {"title": "Best FanDuel Utility Projections Today - DFS UTIL Picks", "desc": "Today's top utility selections for your FanDuel lineups tonight for all slates."},
         "live-slate-leaderboard": {"title": "Live FanDuel DFS Leaderboard - Real-Time Fantasy Baseball Scores", "desc": "Live updating FanDuel fantasy baseball leaderboard. Track real-time player points and contextual stat lines across all active MLB slates."}
     }
 }
