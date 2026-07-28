@@ -842,7 +842,7 @@ async def run_engines(memory):
             mlb_alt_parts.append(f"Starting Pitcher: {team_p_ref}.")
             mlb_alt_text = " ".join(mlb_alt_parts)[:1000]
 
-            previously_tweeted_keys = [k for k in tweeted_recently if k.startswith(base_key + "_")]
+            previously_tweeted_keys = [k for k in tweeted_recently if k and isinstance(k, str) and k.startswith(base_key + "_")]
 
             if not previously_tweeted_keys:
                 if await send_mlb_tweet(game_pk, team_short_ref, team_full_ref, side, date_str, team_short_ref.replace(" ", ""), team_o_ref, total_string, mlb_alt_text, full_key):
