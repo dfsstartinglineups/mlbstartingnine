@@ -916,7 +916,7 @@ async def run_engines(memory):
         formation_suffix = f" ({formation})" if formation else ""
 
         # --- Link-Free X (Twitter) Text ---
-        title = f"{e} STARTING XI: {team_name}{formation_suffix}\nProvided by @FutbolEleven (see profile for link)"
+        title = f"{e} STARTING XI: {team_name}{formation_suffix}\nProvided by futbolstartingeleven (see profile for link)"
         match_info = f"vs {opponent_name} | {league_name}"
         
         tweet_text = f"{title}\n\n{match_info}\n\n{players_block}\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
