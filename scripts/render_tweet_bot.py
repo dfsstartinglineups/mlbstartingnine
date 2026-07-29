@@ -1080,13 +1080,6 @@ async def run_engines(memory):
             "ctas": ["Can the trailing side mount a comeback? Track live:", "Follow the live match center and pitch data here:"]
         },
         "blowout": {
-            "titles": ["🚨 THE ROUT IS ON!", "🚨 ABSOLUTE DOMINANCE!", "🚨 RUNNING RIOT!", "🚨 OUT OF REACH!"],
-            "blurbs": [
-                "It is turning into a nightmare for {conceding_team_name}. {scoring_team_name} extends their massive lead to three goals!",
-                "{scoring_team_name} is running riot! They pour it on {conceding_team_name} to turn this match into an absolute blowout."
-            ],
-            "ctas": ["Track the rest of the blowout live here:", "Follow the live match stats and ratings here:"]
-        },
         "standard_upset": {
             "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
             "blurbs": [
