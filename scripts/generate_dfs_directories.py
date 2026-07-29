@@ -641,6 +641,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // 🎯 NEW: Check for day parameter on load and switch active partition
+    const dayParam = urlParams.get('day');
+    if (dayParam && ['yesterday', 'today', 'tomorrow'].includes(dayParam)) {
+        switchDay(dayParam);
+    }
+
     const slateParam = urlParams.get('slate');
     if (slateParam) {
         document.querySelectorAll('.slate-selector').forEach(selector => {
@@ -653,13 +660,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// 🎯 NEW: Preserve the current active day when changing positions
 function changePosition(base_url) {
     const activeSelector = document.querySelector(`#games-${currentActiveDay} .slate-selector`);
+    let targetUrl = `${base_url}?day=${currentActiveDay}`;
     if (activeSelector && activeSelector.value !== 'all') {
-        window.location.href = base_url + '?slate=' + activeSelector.value;
-    } else {
-        window.location.href = base_url;
+        targetUrl += '&slate=' + activeSelector.value;
     }
+    window.location.href = targetUrl;
 }
 
 function filterSlate(slateId, targetDay, preserveSort = false) {
