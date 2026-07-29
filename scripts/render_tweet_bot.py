@@ -896,31 +896,43 @@ async def run_engines(memory):
         if not team_name or not starting_xi:
             continue
 
-        # Separate Goalkeeper (category 'G') from outfield players
-        gk_players = [p['short_name'] for p in starting_xi if p.get('category') == 'G']
-        field_players = [p['short_name'] for p in starting_xi if p.get('category') != 'G']
+        # Extract player short names grouped by category (G, D, M, F)
+        gk_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'G']
+        def_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'D']
+        mid_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'M']
+        fwd_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'F']
 
-        # Format player list text
-        gk_str = f"🧤 GK: {', '.join(gk_players)}" if gk_players else ""
-        field_str = f"📋 XI: {', '.join(field_players)}" if field_players else ""
-        players_block = f"{gk_str}\n{field_str}".strip()
+        # Assemble the formation and vertical category lines
+        lineup_lines = []
+        if formation:
+            lineup_lines.append(f"Formation: {formation}")
 
-        # Clean team and opponent names into hashtags
+        if gk_players:
+            lineup_lines.append(f"🧤 GK: {', '.join(gk_players)}")
+        if def_players:
+            lineup_lines.append(f"🛡️ DEF: {', '.join(def_players)}")
+        if mid_players:
+            lineup_lines.append(f"⚙️ MID: {', '.join(mid_players)}")
+        if fwd_players:
+            lineup_lines.append(f"🎯 FWD: {', '.join(fwd_players)}")
+
+        players_block = "\n".join(lineup_lines)
+
+        # Clean team and opponent names into clean hashtags
         team_hash = team_name.replace(' ', '').replace('-', '').replace('.', '')
         opponent_hash = opponent_name.replace(' ', '').replace('-', '').replace('.', '')
 
         e = random.choice(EMOJIS)
-        formation_suffix = f" ({formation})" if formation else ""
 
         # --- Link-Free X (Twitter) Text ---
-        title = f"{e} STARTING XI: {team_name}{formation_suffix}\nProvided by futbolstartingeleven (see profile for link)"
+        title = f"{e} STARTING XI: {team_name}\nprovided by futbolstartingeleven (see profile for link)"
         match_info = f"vs {opponent_name} | {league_name}"
         
         tweet_text = f"{title}\n\n{match_info}\n\n{players_block}\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
 
-        # --- Bluesky Rich Text (Includes tactical pitch link) ---
+        # --- Bluesky Rich Text ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{e} STARTING XI: {team_name}{formation_suffix}\nvs {opponent_name} | {league_name}\n\n{players_block}\n\nView tactical board & live stats:\n")
+        bsky_tb.text(f"{e} STARTING XI: {team_name}\n{match_info}\n\n{players_block}\n\nView tactical board & live stats:\n")
         bsky_tb.link(lineup_url, lineup_url)
         bsky_tb.text(f"\n\n{league_hashtag} #{team_hash} #{opponent_hash}")
 
@@ -943,8 +955,8 @@ async def run_engines(memory):
                 print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
 
             # --- Post to Bluesky ---
-            config = LEAGUE_CONFIG.get("futbol") # or default bsky client
-            bsky_client_inst = setup_bsky_client("futbol_account")
+            config = LEAGUE_CONFIG.get("futbol")
+            bsky_client_inst = config.get("bsky_client") if config else setup_bsky_client("futbol_account")
             if bsky_client_inst:
                 try:
                     bsky_client_inst.send_post(bsky_tb)
