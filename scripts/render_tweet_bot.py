@@ -616,26 +616,25 @@ async def run_engines(memory):
     async def send_mlb_tweet(game_pk, team_short, full_team_name, side, date_string, team_hash, team_odds, total_string, alt_text, memory_key, alert_header=None):
         if memory_key in memory.get(date_str, []): return False
         
-        # 1. GENERATE THE NEW PROGRAMMATIC SEO URL
+        # 1. URL Setup for Bluesky
         team_slug = get_team_slug(full_team_name)
         team_url = f"https://mlbstartingnine.com/lineups/{team_slug}/"
-        reply_text = f"View the {full_team_name} daily starting lineups at our new team lineup page:\n{team_url}"
-
-        # 2. BUILD THE MAIN TWEET (Link at the top!)
         main_link = f"https://mlbstartingnine.com/#game-{game_pk}"
+
+        # 2. BUILD X (TWITTER) TEXT - Link-Free (No URLs, Plain Site Name)
+        cta_suffix = "Provided by mlbstartingnine (see profile for link)"
         
-        # --- Build X (Twitter) Text ---
         if alert_header:
-            tweet_text = f"{alert_header}\n\nLive matchups & stats provided by:\n{main_link}\n\n"
+            tweet_text = f"{alert_header}\n{cta_suffix}\n\n"
         else:
-            tweet_text = f"{game_date_short} ⚾ {team_short} Lineup is Out provided by:\n{main_link}\n\n"
+            tweet_text = f"{game_date_short} ⚾ {team_short} Lineup is Out!\n{cta_suffix}\n\n"
             
         if team_odds != "TBD": 
             tweet_text += f"📊 Live Line: {team_short} {team_odds}{total_string}\n\n"
             
         tweet_text += f"#{team_hash} #{team_hash}Lineup #MLB"
         
-        # --- Build Bluesky Rich Text ---
+        # 3. BUILD BLUESKY TEXT - Includes Direct Link
         bsky_tb = client_utils.TextBuilder()
         
         if alert_header:
@@ -651,7 +650,7 @@ async def run_engines(memory):
             
         bsky_tb.text(f"#{team_hash} #{team_hash}Lineup #MLB")
 
-        # 3. GENERATE SCREENSHOT
+        # 4. GENERATE SCREENSHOT
         screenshot_success = False
         for attempt in range(2):
             try:
@@ -660,39 +659,36 @@ async def run_engines(memory):
                     screenshot_success = True
                     break 
                 await asyncio.sleep(5)
-            except: await asyncio.sleep(5)
+            except: 
+                await asyncio.sleep(5)
                 
         if not screenshot_success: return False
 
         if DRY_RUN:
-            print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking MLB Tweet for {team_short}:")
+            print(f"\n[SHADOW] 🛑 DRY RUN ACTIVE. Mocking MLB Tweet for {team_short}:\n{tweet_text}")
             if os.path.exists("mlb_matchup.png"): os.remove("mlb_matchup.png")
             return True
         else:
             twitter_success = False
             bsky_success = False
             
-            # --- X (TWITTER) UPLOAD & THREADED REPLY ---
+            # --- X (TWITTER) UPLOAD (Single Tweet with Image, No Link, No Reply) ---
             for attempt in range(2):
                 try:
                     if attempt == 1: await asyncio.sleep(3) 
                     media = mlb_api_v1.media_upload("mlb_matchup.png")
                     mlb_api_v1.create_media_metadata(media.media_id, alt_text)
                     
-                    # Send Main Tweet & Capture Response
-                    response = mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
-                    log_x_tweet_audit("MLB", f"{memory_key}_main", date_string)
-                    
-                    # Fire Threaded Reply Using Tweet ID
-                    tweet_id = response.data['id']
-                    mlb_client.create_tweet(text=reply_text, in_reply_to_tweet_id=tweet_id)
-                    log_x_tweet_audit("MLB", f"{memory_key}_reply", date_string)
+                    # Post single tweet with attached image
+                    mlb_client.create_tweet(text=tweet_text, media_ids=[media.media_id])
+                    log_x_tweet_audit("MLB", memory_key, date_string)
                     
                     twitter_success = True
                     break 
-                except Exception as e: pass
+                except Exception as e:
+                    print(f"⚠️ Failed to post MLB tweet to X: {e}")
                 
-            # --- BLUESKY UPLOAD & THREADED REPLY ---
+            # --- BLUESKY UPLOAD (Main Image Post + Threaded Reply) ---
             config = LEAGUE_CONFIG.get("mlb")
             if config and config.get("bsky_client"):
                 for attempt in range(2):
@@ -701,12 +697,12 @@ async def run_engines(memory):
                         with open("mlb_matchup.jpg", "rb") as f:
                             img_data = f.read()
                         
-                        # Send Main Post & Capture Response
+                        # 1. Main Post
                         post_response = config["bsky_client"].send_image(text=bsky_tb, image=img_data, image_alt=alt_text)
                         
-                        # Build and Fire Threaded Reply
+                        # 2. Threaded Reply
                         reply_tb = client_utils.TextBuilder()
-                        reply_tb.text(f"View the {full_team_name} daily starting lineups at our new team lineup page:\n")
+                        reply_tb.text(f"View the {full_team_name} daily starting lineups at our team lineup page:\n")
                         reply_tb.link(team_url, team_url)
                         
                         parent_ref = models.create_strong_ref(post_response)
@@ -715,7 +711,8 @@ async def run_engines(memory):
                         
                         bsky_success = True
                         break 
-                    except Exception as e: pass
+                    except Exception as e:
+                        print(f"⚠️ Failed to post MLB to Bluesky: {e}")
 
             upload_success = twitter_success or bsky_success
             
