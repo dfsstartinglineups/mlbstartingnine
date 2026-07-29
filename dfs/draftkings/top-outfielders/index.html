@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected DraftKings Outfielders</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-07-29 06:57 AM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-07-29 07:15 AM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
@@ -102,7 +102,7 @@
                 
                 <option value="/dfs/draftkings/top-util/" >Util (All Hitters)</option>
                 
-                <option value="/dfs/draftkings/top-live-slate-leaderboard/" >🔴 Live Leaderboard</option>
+                <option value="/dfs/draftkings/live-slate-leaderboard/" >🔴 Live Leaderboard</option>
                 
             </select>
         </div>
@@ -9385,6 +9385,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // 🎯 NEW: Check for day parameter on load and switch active partition
+    const dayParam = urlParams.get('day');
+    if (dayParam && ['yesterday', 'today', 'tomorrow'].includes(dayParam)) {
+        switchDay(dayParam);
+    }
+
     const slateParam = urlParams.get('slate');
     if (slateParam) {
         document.querySelectorAll('.slate-selector').forEach(selector => {
@@ -9397,13 +9404,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// 🎯 NEW: Preserve the current active day when changing positions
 function changePosition(base_url) {
     const activeSelector = document.querySelector(`#games-${currentActiveDay} .slate-selector`);
+    let targetUrl = `${base_url}?day=${currentActiveDay}`;
     if (activeSelector && activeSelector.value !== 'all') {
-        window.location.href = base_url + '?slate=' + activeSelector.value;
-    } else {
-        window.location.href = base_url;
+        targetUrl += '&slate=' + activeSelector.value;
     }
+    window.location.href = targetUrl;
 }
 
 function filterSlate(slateId, targetDay, preserveSort = false) {

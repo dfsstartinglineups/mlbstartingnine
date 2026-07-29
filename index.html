@@ -40456,6 +40456,9 @@ function switchDay(targetDay) {
     }
     filterTeams();
     adjustOverflowingNames(); // Fix names when unhiding containers
+
+    // 🎯 NEW: Re-populate DFS links whenever the day is switched
+    populateDFSLinks();
 }
 
 window.switchGameTab = function(gamePk, tabName, btnEl) {
@@ -40531,12 +40534,12 @@ function populateDFSLinks() {
     links.forEach(link => {
         const opt = document.createElement('option');
         
-        // Check if it's the live leaderboard to omit the "top-" prefix
-        if (link.slug === "live-slate-leaderboard") {
-            opt.value = `/dfs/${platSlug}/${link.slug}/`;
-        } else {
-            opt.value = `/dfs/${platSlug}/top-${link.slug}/`;
-        }
+        let basePath = (link.slug === "live-slate-leaderboard") 
+            ? `/dfs/${platSlug}/${link.slug}/` 
+            : `/dfs/${platSlug}/top-${link.slug}/`;
+        
+        // 🎯 NEW: Attach the active day query parameter
+        opt.value = `${basePath}?day=${currentActiveDay}`;
         
         opt.textContent = link.label;
         selector.appendChild(opt);
