@@ -874,11 +874,6 @@ async def run_engines(memory):
     # ==========================================
     # FUTBOL ENGINE (Lineups Only)
     # ==========================================
-    """
-    
-    """
-
-    # 1. Fetch daily_lineups.json using full public URL
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
         daily_lineups = requests.get(daily_lineups_url, timeout=10).json()
@@ -888,7 +883,6 @@ async def run_engines(memory):
 
     EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
 
-    # 2. Process each independent team lineup entry
     for entry_key, lineup_data in daily_lineups.items():
         # Memory Check: Skip if this specific team key was already tweeted today
         if entry_key in tweeted_recently or entry_key in memory.get(date_str, []):
@@ -899,23 +893,37 @@ async def run_engines(memory):
         league_name = lineup_data.get('league_name', '')
         league_hashtag = lineup_data.get('league_hashtag', '')
         lineup_url = lineup_data.get('lineup_url', '')
+        formation = lineup_data.get('formation', '')
+        starting_xi = lineup_data.get('starting_xi', [])
 
-        if not team_name or not lineup_url:
+        if not team_name or not starting_xi:
             continue
 
-        # Clean team and opponent names into clean hashtags
+        # Separate Goalkeeper (category 'G') from outfield players
+        gk_players = [p['short_name'] for p in starting_xi if p.get('category') == 'G']
+        field_players = [p['short_name'] for p in starting_xi if p.get('category') != 'G']
+
+        # Format player list text
+        gk_str = f"🧤 GK: {', '.join(gk_players)}" if gk_players else ""
+        field_str = f"📋 XI: {', '.join(field_players)}" if field_players else ""
+        players_block = f"{gk_str}\n{field_str}".strip()
+
+        # Clean team and opponent names into hashtags
         team_hash = team_name.replace(' ', '').replace('-', '').replace('.', '')
         opponent_hash = opponent_name.replace(' ', '').replace('-', '').replace('.', '')
 
         e = random.choice(EMOJIS)
+        formation_suffix = f" ({formation})" if formation else ""
 
-        # Original exact phrasing
-        title = f"{e} OFFICIAL STARTING XI: {team_name}\n\n{team_name} has released their starting lineup against {opponent_name} in {league_name} action!"
-        tweet_text = f"{title}\n\nView the official tactical board and live stats here:\n{lineup_url}\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
+        # --- Link-Free X (Twitter) Text ---
+        title = f"{e} STARTING XI: {team_name}{formation_suffix}\nProvided by @FutbolEleven (see profile for link)"
+        match_info = f"vs {opponent_name} | {league_name}"
+        
+        tweet_text = f"{title}\n\n{match_info}\n\n{players_block}\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
 
-        # Bluesky Rich Text
+        # --- Bluesky Rich Text (Includes tactical pitch link) ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{title}\n\nView the official tactical board and live stats here:\n")
+        bsky_tb.text(f"{e} STARTING XI: {team_name}{formation_suffix}\nvs {opponent_name} | {league_name}\n\n{players_block}\n\nView tactical board & live stats:\n")
         bsky_tb.link(lineup_url, lineup_url)
         bsky_tb.text(f"\n\n{league_hashtag} #{team_hash} #{opponent_hash}")
 
@@ -925,15 +933,29 @@ async def run_engines(memory):
             upload_success = True
             print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name}:\n{tweet_text}")
         else:
+            twitter_success = False
+            bsky_success = False
+
+            # --- Post to X ---
             try:
-                # Main Futbol Twitter Account
                 if futbol_client:
                     futbol_client.create_tweet(text=tweet_text)
                     log_x_tweet_audit("FUTBOL", entry_key, date_str)
-
-                upload_success = True
+                    twitter_success = True
             except Exception as err:
-                print(f"⚠️ Failed to post Futbol lineup for {entry_key}: {err}")
+                print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
+
+            # --- Post to Bluesky ---
+            config = LEAGUE_CONFIG.get("futbol") # or default bsky client
+            bsky_client_inst = setup_bsky_client("futbol_account")
+            if bsky_client_inst:
+                try:
+                    bsky_client_inst.send_post(bsky_tb)
+                    bsky_success = True
+                except Exception as err:
+                    print(f"⚠️ Failed to post Futbol lineup to Bluesky for {entry_key}: {err}")
+
+            upload_success = twitter_success or bsky_success
 
         if upload_success:
             log_today.append(entry_key)
@@ -947,7 +969,6 @@ async def run_engines(memory):
                 except Exception as e:
                     print(f"⚠️ Failed to update Firebase log: {e}")
 
-            # Small 2-second delay to prevent rapid-fire rate limits on X
             time.sleep(2)
 
     """
