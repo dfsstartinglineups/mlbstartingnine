@@ -485,7 +485,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 {% for pos_key, pos_label in position_links.items() %}
-                <option value="/dfs/{{ platform_slug }}/top-{{ pos_key }}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
+                <option value="/dfs/{{ platform_slug }}/{% if pos_key == 'live-slate-leaderboard' %}{{ pos_key }}{% else %}top-{{ pos_key }}{% endif %}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
                 {% endfor %}
             </select>
         </div>
