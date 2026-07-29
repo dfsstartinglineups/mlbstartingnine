@@ -924,7 +924,7 @@ async def run_engines(memory):
 
         e = random.choice(EMOJIS)
 
-        # --- Link-Free X (Twitter) Text ---
+        # --- Link-Free X (Twitter) Text ---/
         tweet_text = (
             f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\n"
             f"Follow the action at futbolstartingeleven(link in profile)\n\n"
@@ -1189,8 +1189,8 @@ async def run_engines(memory):
         home_hash = home_team.replace(' ', '').replace('-', '').replace('.', '')
         away_hash = away_team.replace(' ', '').replace('-', '').replace('.', '')
 
-        # --- Link-Free X (Twitter) Text ("provided by" right after title) ---
-        tweet_text = f"{title}\nprovided by futbolstartingeleven (see profile for link)\n\n{body_content}\n\n{league_hashtag} #{home_hash} #{away_hash}"
+        # --- Link-Free X (Twitter) Text ---
+        tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile)\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
 
         # --- Bluesky Rich Text ---
         bsky_tb = client_utils.TextBuilder()
