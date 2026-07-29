@@ -1080,6 +1080,22 @@ async def run_engines(memory):
             "ctas": ["Can the trailing side mount a comeback? Track live:", "Follow the live match center and pitch data here:"]
         },
         "blowout": {
+            "titles": ["🚨 THE ROUT IS ON!", "🚨 ABSOLUTE DOMINANCE!", "🚨 RUNNING RIOT!", "🚨 OUT OF REACH!"],
+            "blurbs": [
+                "It is turning into a nightmare for {conceding_team_name}. {scoring_team_name} extends their massive lead!",
+                "{scoring_team_name} is running riot! They pour it on {conceding_team_name} to turn this match into an absolute blowout."
+            ],
+            "ctas": ["Track the rest of the blowout live here:", "Follow the live match stats and ratings here:"]
+        },
+        "consolation_goal": {
+            "titles": ["⚽ MATCH GOAL!", "⚽ ON THE BOARD!", "⚽ PULLING ONE BACK!"],
+            "blurbs": [
+                "{scoring_team_name} finds the back of the net to pull one back, but they still have a mountain to climb against {conceding_team_name}.",
+                "A goal for {scoring_team_name} gives the fans something to cheer about, but {conceding_team_name} remains in complete control of the match.",
+                "{scoring_team_name} gets on the board, but they still heavily trail {conceding_team_name} with the clock ticking down."
+            ],
+            "ctas": ["See the live match center and stats here:", "Follow the rest of the action live here:"]
+        },
         "standard_upset": {
             "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
             "blurbs": [
