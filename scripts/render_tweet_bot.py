@@ -990,7 +990,7 @@ async def run_engines(memory):
         print(f"⚠️ Could not fetch daily_goals.json: {e}")
         daily_goals = {}
 
-    MAX_GOAL_AGE_SECONDS = 600  # Skip goals older than 10 minutes
+    MAX_GOAL_AGE_SECONDS = 300  # Skip goals older than 5 minutes
 
     PHRASES = {
         "hat_trick": {
