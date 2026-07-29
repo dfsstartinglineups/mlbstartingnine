@@ -86,8 +86,7 @@ def load_player_database():
         try:
             with open(PLAYER_MASTER_PATH, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception as e:
-            print(f"⚠️ Warning: Could not parse player_master_data.json: {e}")
+        except Exception: pass
     return {}
 
 PLAYER_DATABASE = load_player_database()
@@ -108,36 +107,21 @@ def get_player_url(player_id, default_name):
     return f"/players/{slugify(default_name)}/"
 
 def has_page_changed(file_path, new_html):
-    """Compares new HTML to existing HTML, ignoring the dynamic timestamp."""
-    if not os.path.exists(file_path):
-        return True
-
+    if not os.path.exists(file_path): return True
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            old_html = f.read()
-            
+        with open(file_path, "r", encoding="utf-8") as f: old_html = f.read()
         pattern = re.compile(r'<p id="last-updated-text".*?>.*?</p>', re.IGNORECASE)
-        
-        old_stripped = pattern.sub('', old_html)
-        new_stripped = pattern.sub('', new_html)
-        
-        return old_stripped != new_stripped
-    except Exception as e:
-        print(f"⚠️ Error reading existing file for comparison: {e}")
-        return True
+        return pattern.sub('', old_html) != pattern.sub('', new_html)
+    except Exception: return True
 
 def load_existing_sitemap_dates(sitemap_path):
-    """Parses existing <lastmod> dates from sitemap-dfs.xml to preserve unchanged URLs."""
     dates = {}
     if os.path.exists(sitemap_path):
         try:
-            with open(sitemap_path, "r", encoding="utf-8") as f:
-                content = f.read()
+            with open(sitemap_path, "r", encoding="utf-8") as f: content = f.read()
             matches = re.findall(r'<url>\s*<loc>(.*?)</loc>\s*<lastmod>(.*?)</lastmod>', content, re.DOTALL)
-            for loc, lastmod in matches:
-                dates[loc.strip()] = lastmod.strip()
-        except Exception as e:
-            print(f"⚠️ Could not parse existing sitemap dates: {e}")
+            for loc, lastmod in matches: dates[loc.strip()] = lastmod.strip()
+        except Exception: pass
     return dates
 
 # =========================================================================
@@ -152,8 +136,7 @@ def get_team_data(game_node, side):
         full_name = team_info.get("name", "")
         team_id = team_info.get("id", 0)
         team_name = team_info.get("teamName")
-        if not team_name:
-            team_name = full_name.split(' ')[-1] if full_name else ("AWAY" if side == "away" else "HOME")
+        if not team_name: team_name = full_name.split(' ')[-1] if full_name else ("AWAY" if side == "away" else "HOME")
         if "Red Sox" in full_name: team_name = "Red Sox"
         elif "White Sox" in full_name: team_name = "White Sox"
         elif "Blue Jays" in full_name: team_name = "Blue Jays"
@@ -170,7 +153,6 @@ def calculate_vegas_nudge(itt):
 def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos="", order_status=""):
     raw_proj = float(player.get("dk_proj" if is_dk else "proj", 0.0))
     salary = int(player.get("dk_salary" if is_dk else "salary", 0))
-    
     if salary <= 0: return None
     
     slate_block = player.get("dk_slates" if is_dk else "fd_slates", {})
@@ -190,7 +172,6 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
     my_itt = home_itt if is_home else away_itt
 
     vegas_nudge = calculate_vegas_nudge(my_itt if not is_pitcher else opp_itt)
-    
     order_nudge = 0.0
     if not is_pitcher:
         order = int(player.get("order", 6))
@@ -233,21 +214,16 @@ def process_proprietary_projection(player, is_pitcher, team_name, team_id, opp_n
 
 def flatten_live_data(live_json):
     flat_map = {}
-    if not isinstance(live_json, dict):
-        return flat_map
-    
+    if not isinstance(live_json, dict): return flat_map
     for game_id, game_data in live_json.items():
-        if not isinstance(game_data, dict):
-            continue
+        if not isinstance(game_data, dict): continue
         players_node = game_data.get("players", {})
-        if not isinstance(players_node, dict):
-            continue
+        if not isinstance(players_node, dict): continue
         for side in ["AWAY", "HOME"]:
             side_players = players_node.get(side, {})
             if isinstance(side_players, dict):
                 for p_key, p_val in side_players.items():
-                    clean_id = str(p_key).replace("ID", "").strip()
-                    flat_map[clean_id] = p_val
+                    flat_map[str(p_key).replace("ID", "").strip()] = p_val
     return flat_map
 
 def process_live_leaderboard_player(base_player, flat_live_data, platform):
@@ -258,16 +234,12 @@ def process_live_leaderboard_player(base_player, flat_live_data, platform):
 
     if p_live:
         live_pts = float(p_live.get("dk_pts" if platform == "dk" else "fd_pts", 0.0))
-        
         if base_player["is_pitcher"]:
             pitching = p_live.get("pitching")
             if isinstance(pitching, dict):
                 stat_string = pitching.get("summary") or ""
                 if not stat_string:
-                    ip = pitching.get("inningsPitched", "0.0")
-                    k = pitching.get("strikeOuts", 0)
-                    er = pitching.get("earnedRuns", 0)
-                    bb = pitching.get("baseOnBalls", 0)
+                    ip, k, er, bb = pitching.get("inningsPitched", "0.0"), pitching.get("strikeOuts", 0), pitching.get("earnedRuns", 0), pitching.get("baseOnBalls", 0)
                     w = "W, " if pitching.get("wins", 0) > 0 else ""
                     stat_string = f"{w}{ip} IP, {k} K, {er} ER, {bb} BB"
         else:
@@ -275,13 +247,7 @@ def process_live_leaderboard_player(base_player, flat_live_data, platform):
             if isinstance(batting, dict):
                 stat_string = batting.get("summary") or ""
                 if not stat_string:
-                    h = batting.get("hits", 0)
-                    ab = batting.get("atBats", 0)
-                    hr = batting.get("homeRuns", 0)
-                    rbi = batting.get("rbi", 0)
-                    r = batting.get("runs", 0)
-                    sb = batting.get("stolenBases", 0)
-                    
+                    h, ab, hr, rbi, r, sb = batting.get("hits", 0), batting.get("atBats", 0), batting.get("homeRuns", 0), batting.get("rbi", 0), batting.get("runs", 0), batting.get("stolenBases", 0)
                     pieces = [f"{h}-{ab}"]
                     if hr > 0: pieces.append(f"{hr} HR")
                     if rbi > 0: pieces.append(f"{rbi} RBI")
@@ -297,18 +263,135 @@ def process_live_leaderboard_player(base_player, flat_live_data, platform):
     for s_id, s_data in original_slate_stats.items():
         s_salary = int(str(s_data["salary"]).replace('$', '').replace(',', ''))
         s_val = round(live_pts / (s_salary / 1000), 2) if s_salary > 0 else 0.0
-        slate_stats[s_id] = {
-            "salary": s_data["salary"],
-            "proj": f"{live_pts:.2f}", 
-            "value": f"{s_val:.2f}x"
-        }
+        slate_stats[s_id] = {"salary": s_data["salary"], "proj": f"{live_pts:.2f}", "value": f"{s_val:.2f}x"}
+
+    return {**base_player, "proj": round(live_pts, 2), "value": live_value, "slate_stats_json": json.dumps(slate_stats), "raw_live_stats": stat_string or "In Game"}
+
+def process_day_data(date_str):
+    """Processes games for a specific date and returns partitioned pools and slates."""
+    target_path = os.path.join(DAILY_FILES_DIR, f"games_{date_str}.json")
+    if not os.path.exists(target_path):
+        return {"has_dk": False, "has_fd": False, "dk_pools": {}, "fd_pools": {}, "dk_live": [], "fd_live": [], "dk_slates": {}, "fd_slates": {}}
+
+    with open(target_path, "r", encoding="utf-8") as f:
+        data_stream = json.load(f)
+
+    live_data_raw = {}
+    live_path_mlb = os.path.join(LIVE_FILES_DIR, f"live_mlb_{date_str}.json")
+    live_path_std = os.path.join(LIVE_FILES_DIR, f"live_{date_str}.json")
+    target_live_path = live_path_mlb if os.path.exists(live_path_mlb) else live_path_std
+
+    if os.path.exists(target_live_path):
+        try:
+            with open(target_live_path, "r", encoding="utf-8") as f: live_data_raw = json.load(f)
+        except Exception: pass
+
+    flat_live_data = flatten_live_data(live_data_raw)
+    games_list = data_stream.get("games", []) if isinstance(data_stream, dict) else data_stream
+    slates_dictionary = data_stream.get("slates", {"fanduel": [], "draftkings": []}) if isinstance(data_stream, dict) else {"fanduel": [], "draftkings": []}
+
+    dk_slate_map = {str(s["id"]).strip(): str(s["name"]) for s in slates_dictionary.get("draftkings", []) if "id" in s}
+    fd_slate_map = {str(s["id"]).strip(): str(s["name"]) for s in slates_dictionary.get("fanduel", []) if "id" in s}
+
+    has_dk_data, has_fd_data = False, False
+    for game in games_list:
+        game_raw = game.get("gameRaw", {})
+        game_status = game_raw.get("status", {}).get("abstractGameState", "")
+        detailed_status = game_raw.get("status", {}).get("detailedState", "")
+        status_code = game_raw.get("status", {}).get("statusCode", "")
+        if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C": continue
+
+        p_data = game.get("projectedLineups", {})
+        for side in ["away", "home"]:
+            batters = p_data.get(side, {}).get("battingOrder", [])
+            pitcher = p_data.get(side, {}).get("startingPitcher", {})
+            if any(b.get("dk_salary", 0) > 0 for b in batters) or pitcher.get("dk_salary", 0) > 0: has_dk_data = True
+            if any(b.get("salary", 0) > 0 for b in batters) or pitcher.get("salary", 0) > 0: has_fd_data = True
+
+    dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
+    fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
+    dk_live_pool, fd_live_pool = [], []
+
+    for game in games_list:
+        game_raw = game.get("gameRaw", {})
+        if "Postponed" in game_raw.get("status", {}).get("abstractGameState", "") or game_raw.get("status", {}).get("statusCode", "") == "C": continue
+
+        p_data = game.get("projectedLineups", {})
+        away_name, away_id = get_team_data(game, "away")
+        home_name, home_id = get_team_data(game, "home")
+
+        for side, team_name, team_id, opp_name, opp_id, is_home in [("away", away_name, away_id, home_name, home_id, False), ("home", home_name, home_id, away_name, away_id, True)]:
+            side_node = p_data.get(side, {})
+            official_players_raw = game_raw.get("lineups", {}).get(f"{side}Players", [])
+            is_official = len(official_players_raw) > 0
+            official_ids = [str(p.get("id")) for p in official_players_raw]
+            
+            pitcher = side_node.get("startingPitcher")
+            if pitcher:
+                pid = str(pitcher.get("id"))
+                prob_id = str(game_raw.get("teams", {}).get(side, {}).get("probablePitcher", {}).get("id", ""))
+                order_status = "official" if (is_official and (prob_id == pid or pid in official_ids)) else ("ns" if is_official else "projected")
+                
+                if has_dk_data:
+                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, True, "P", order_status)
+                    if p_res: 
+                        dk_pools["pitchers"].append(p_res)
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "dk")
+                        if l_res: dk_live_pool.append(l_res)
+
+                if has_fd_data:
+                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, False, "P", order_status)
+                    if p_res: 
+                        fd_pools["pitchers"].append(p_res)
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "fd")
+                        if l_res: fd_live_pool.append(l_res)
+
+            for batter in side_node.get("battingOrder", []):
+                bid = str(batter.get("id"))
+                lineup_pos = str(batter.get("order", ""))
+                order_status = "official" if (is_official and bid in official_ids) else ("ns" if is_official else "projected")
+
+                if has_dk_data:
+                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, True, lineup_pos, order_status)
+                    if p_res:
+                        dk_pools["util"].append(p_res)
+                        dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
+                        for raw_pos in dk_positions:
+                            if "P" in raw_pos: dk_pools["pitchers"].append(p_res)
+                            elif "C" == raw_pos: dk_pools["catchers"].append(p_res)
+                            elif "1B" == raw_pos: dk_pools["first-base"].append(p_res)
+                            elif "2B" == raw_pos: dk_pools["second-base"].append(p_res)
+                            elif "3B" == raw_pos: dk_pools["third-base"].append(p_res)
+                            elif "SS" == raw_pos: dk_pools["shortstops"].append(p_res)
+                            elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "dk")
+                        if l_res: dk_live_pool.append(l_res)
+
+                if has_fd_data:
+                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, False, lineup_pos, order_status)
+                    if p_res:
+                        fd_pools["util"].append(p_res)
+                        fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
+                        for raw_pos in fd_positions:
+                            if "P" in raw_pos: fd_pools["pitchers"].append(p_res)
+                            elif "C" in raw_pos or "1B" in raw_pos: fd_pools["catchers-first-base"].append(p_res)
+                            elif "2B" in raw_pos: fd_pools["second-base"].append(p_res)
+                            elif "3B" in raw_pos: fd_pools["third-base"].append(p_res)
+                            elif "SS" in raw_pos: fd_pools["shortstops"].append(p_res)
+                            elif "OF" in raw_pos: fd_pools["outfielders"].append(p_res)
+                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "fd")
+                        if l_res: fd_live_pool.append(l_res)
+
+    for key in dk_pools: dk_pools[key] = sorted(dk_pools[key], key=lambda x: x["value"], reverse=True)
+    for key in fd_pools: fd_pools[key] = sorted(fd_pools[key], key=lambda x: x["value"], reverse=True)
+    dk_live_pool = sorted(dk_live_pool, key=lambda x: x["proj"], reverse=True)
+    fd_live_pool = sorted(fd_live_pool, key=lambda x: x["proj"], reverse=True)
 
     return {
-        **base_player,
-        "proj": round(live_pts, 2), 
-        "value": live_value,
-        "slate_stats_json": json.dumps(slate_stats),
-        "raw_live_stats": stat_string or "In Game"
+        "has_dk": has_dk_data, "has_fd": has_fd_data,
+        "dk_pools": dk_pools, "fd_pools": fd_pools,
+        "dk_live": dk_live_pool, "fd_live": fd_live_pool,
+        "dk_slates": dk_slate_map, "fd_slates": fd_slate_map
     }
 
 # =========================================================================
@@ -376,9 +459,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <body>
 
 <nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
-    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div class="header-brand mb-0"><a href="/">MLB Starting <span>Nine</span></a></div>
-        <div><a href="/" class="btn btn-sm btn-outline-light font-weight-bold">← Back To Slate</a></div>
+        <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+            <button id="btn-yesterday" class="btn btn-sm btn-outline-light fw-bold" onclick="switchDay('yesterday')">◀ Yesterday</button>
+            <button id="btn-today" class="btn btn-sm btn-primary fw-bold d-none" onclick="switchDay('today')">Today</button>
+            <button id="btn-tomorrow" class="btn btn-sm btn-outline-light fw-bold" onclick="switchDay('tomorrow')">Tomorrow ▶</button>
+            <a href="/" class="btn btn-sm btn-outline-light font-weight-bold ms-2">← Back To Slate</a>
+        </div>
     </div>
 </nav>
 
@@ -392,20 +480,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-        {% if distinct_slates %}
-        <div class="d-flex align-items-center gap-2">
-            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold" id="slate-selector" onchange="filterSlate(this.value)">
-                <option value="all">All Games</option>
-                {% for s_id, s_name in distinct_slates.items() %}
-                <option value="{{ s_id }}">{{ s_name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
-        
         {% if current_pos != 'live-slate-leaderboard' %}
-        <div class="d-flex align-items-center gap-2 ms-md-3">
+        <div class="d-flex align-items-center gap-2 me-md-3">
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 {% for pos_key, pos_label in position_links.items() %}
@@ -416,129 +492,181 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         {% endif %}
     </div>
 
-    <div class="table-card shadow-sm mb-4 position-relative">
-        <div id="scroll-indicator" class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
-            &larr; Swipe
+    <!-- 3-Day Partitions -->
+    {% for day in ['yesterday', 'today', 'tomorrow'] %}
+    <div id="games-{{ day }}" class="dfs-partition {% if day != 'today' %}d-none{% endif %}">
+        
+        {% if not day_data[day].players %}
+        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
+            No DFS data available for this partition.
         </div>
+        {% else %}
+        
+        <!-- Day-Specific Slate Selector -->
+        {% if day_data[day].slates %}
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, '{{ day }}')">
+                <option value="all">All Games</option>
+                {% for s_id, s_name in day_data[day].slates.items() %}
+                <option value="{{ s_id }}">{{ s_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+        
+        <div class="table-card shadow-sm mb-4 position-relative">
+            <div class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3 scroll-indicator" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
+                &larr; Swipe
+            </div>
 
-        <div class="table-responsive" id="table-scroll-container">
-            <table class="table table-hover mb-0" id="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
-                        <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
-                        
-                        {% if current_pos == 'live-slate-leaderboard' %}
-                        <th class="text-end" onclick="sortTable(this, 2)">{{ score_col_name }} &#x21D5;</th>
-                        <th onclick="sortTable(this, 3)">Live Stats &#x21D5;</th>
-                        {% else %}
-                        <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
-                        <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
-                        <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
-                        <th class="text-end" onclick="sortTable(this, 6)">{{ score_col_name }} &#x21D5;</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for p in players %}
-                    <tr data-slates="{{ p.slates }}" 
-                        data-slate-stats='{{ p.slate_stats_json }}' 
-                        data-default-salary="${{ "{:,}".format(p.salary) }}" 
-                        data-default-proj="{{ p.proj }}" 
-                        data-default-value="{{ p.value }}x">
-                        
-                        <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">{{ loop.index }}</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <a href="/lineups/{{ p.team_slug }}/" class="text-decoration-none">
-                                    {% if p.order_status == 'official' %}
-                                        <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
-                                    {% elif p.order_status == 'projected' %}
-                                        <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
-                                    {% elif p.order_status == 'ns' %}
-                                        <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Not Starting">NS</span>
-                                    {% endif %}
-                                </a>
-                                
-                                <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                    <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+            <div class="table-responsive table-scroll-container">
+                <table class="table table-hover mb-0 leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
+                            <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                            
+                            {% if current_pos == 'live-slate-leaderboard' %}
+                            <th class="text-end" onclick="sortTable(this, 2)">{{ score_col_name }} &#x21D5;</th>
+                            <th onclick="sortTable(this, 3)">Live Stats &#x21D5;</th>
+                            {% else %}
+                            <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
+                            <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
+                            <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
+                            <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
+                            <th class="text-end" onclick="sortTable(this, 6)">{{ score_col_name }} &#x21D5;</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in day_data[day].players %}
+                        <tr data-slates="{{ p.slates }}" 
+                            data-slate-stats='{{ p.slate_stats_json }}' 
+                            data-default-salary="${{ "{:,}".format(p.salary) }}" 
+                            data-default-proj="{{ p.proj }}" 
+                            data-default-value="{{ p.value }}x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">{{ loop.index }}</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/{{ p.team_slug }}/" class="text-decoration-none">
+                                        {% if p.order_status == 'official' %}
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">{{ p.lineup_pos }}</span>
+                                        {% elif p.order_status == 'projected' %}
+                                            <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">{{ p.lineup_pos }}</span>
+                                        {% elif p.order_status == 'ns' %}
+                                            <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Not Starting">NS</span>
+                                        {% endif %}
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/{{ p.id }}/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/{{ p.team_id }}.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="{{ p.url }}" class="player-link text-nowrap">{{ p.name }}</a>
                                 </div>
-                                
-                                <a href="{{ p.url }}" class="player-link text-nowrap">{{ p.name }}</a>
-                            </div>
-                        </td>
-                        
-                        {% if current_pos == 'live-slate-leaderboard' %}
-                        <td class="text-end fw-bold col-proj fs-6">{{ p.proj }}</td>
-                        <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">{{ p.raw_live_stats }}</td>
-                        {% else %}
-                        <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
-                        <td>
-                            <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                {{ p.team }}
-                            </span>
-                        </td>
-                        <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                            <div class="d-flex align-items-center text-nowrap">
-                                {{ p.opp_indicator }} <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opp_name }} Icon" style="width: 18px; height: 18px; margin: 0 4px;"> {{ p.opp_name }}
-                            </div>
-                        </td>
-                        <td class="text-end fw-semibold col-salary">${{ "{:,}".format(p.salary) }}</td>
-                        <td class="text-end fw-bold col-proj">{{ p.proj }}</td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            
+                            {% if current_pos == 'live-slate-leaderboard' %}
+                            <td class="text-end fw-bold col-proj fs-6">{{ p.proj }}</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">{{ p.raw_live_stats }}</td>
+                            {% else %}
+                            <td class="text-end fw-bold text-success col-value">{{ p.value }}x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    {{ p.team }}
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    {{ p.opp_indicator }} <img src="https://www.mlbstatic.com/team-logos/{{ p.opp_id }}.svg" alt="{{ p.opp_name }} Icon" style="width: 18px; height: 18px; margin: 0 4px;"> {{ p.opp_name }}
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">${{ "{:,}".format(p.salary) }}</td>
+                            <td class="text-end fw-bold col-proj">{{ p.proj }}</td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+        {% endif %}
     </div>
+    {% endfor %}
+
     <div class="disclaimer-box p-3 mb-4 shadow-sm">
         <strong>Disclaimer Algorithm Note:</strong> The daily predictions displayed below are generated through the proprietary <code>mlbstartingnine.com</code> analytics system. Our engine alters baseline performance profiles by cross-checking real-time stadium indices, historical hitter platoon margins, and shifting Vegas bookmaker implied configurations to establish contextual DFS values.
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    const scrollContainer = document.getElementById('table-scroll-container');
-    const scrollIndicator = document.getElementById('scroll-indicator');
+let currentActiveDay = 'today';
+
+function switchDay(targetDay) {
+    currentActiveDay = targetDay;
     
-    if (scrollContainer && scrollIndicator) {
-        scrollContainer.addEventListener('scroll', () => {
-            if (scrollContainer.scrollLeft > 10) {
-                scrollIndicator.style.opacity = '0';
-            } else {
-                scrollIndicator.style.opacity = '0.85';
+    document.querySelectorAll('.dfs-partition').forEach(el => el.classList.add('d-none'));
+    const targetContainer = document.getElementById(`games-${targetDay}`);
+    if(targetContainer) targetContainer.classList.remove('d-none');
+    
+    const btnYest = document.getElementById('btn-yesterday');
+    const btnToday = document.getElementById('btn-today');
+    const btnTom = document.getElementById('btn-tomorrow');
+    
+    if (targetDay === 'today') {
+        btnYest.className = "btn btn-sm btn-outline-light fw-bold"; btnYest.classList.remove('d-none');
+        btnTom.className = "btn btn-sm btn-outline-light fw-bold"; btnTom.classList.remove('d-none');
+        btnToday.classList.add('d-none');
+    } else if (targetDay === 'yesterday') {
+        btnYest.classList.add('d-none'); btnTom.classList.add('d-none');
+        btnToday.className = "btn btn-sm btn-outline-light fw-bold"; btnToday.textContent = "Today ▶"; btnToday.classList.remove('d-none');
+    } else if (targetDay === 'tomorrow') {
+        btnYest.classList.add('d-none'); btnTom.classList.add('d-none');
+        btnToday.className = "btn btn-sm btn-outline-light fw-bold"; btnToday.textContent = "◀ Today"; btnToday.classList.remove('d-none');
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Add scroll listener for mobile swipe indicators
+    document.querySelectorAll('.table-scroll-container').forEach(container => {
+        container.addEventListener('scroll', (e) => {
+            const indicator = e.target.parentElement.querySelector('.scroll-indicator');
+            if (indicator) {
+                indicator.style.opacity = e.target.scrollLeft > 10 ? '0' : '0.85';
             }
         }, { passive: true });
-    }
+    });
 
     const urlParams = new URLSearchParams(window.location.search);
     const slateParam = urlParams.get('slate');
     if (slateParam) {
-        const slateSelector = document.getElementById('slate-selector');
-        if (slateSelector) {
-            const optionExists = Array.from(slateSelector.options).some(opt => opt.value === slateParam);
+        document.querySelectorAll('.slate-selector').forEach(selector => {
+            const optionExists = Array.from(selector.options).some(opt => opt.value === slateParam);
             if (optionExists) {
-                slateSelector.value = slateParam;
-                filterSlate(slateParam);
+                selector.value = slateParam;
+                filterSlate(slateParam, currentActiveDay);
             }
-        }
+        });
     }
 });
 
 function changePosition(base_url) {
-    const slateSelector = document.getElementById('slate-selector');
-    if (slateSelector && slateSelector.value !== 'all') {
-        window.location.href = base_url + '?slate=' + slateSelector.value;
+    const activeSelector = document.querySelector(`#games-${currentActiveDay} .slate-selector`);
+    if (activeSelector && activeSelector.value !== 'all') {
+        window.location.href = base_url + '?slate=' + activeSelector.value;
     } else {
         window.location.href = base_url;
     }
 }
 
-function filterSlate(slateId, preserveSort = false) {
-    const rows = document.querySelectorAll('#leaderboard-table tbody tr');
+function filterSlate(slateId, targetDay, preserveSort = false) {
+    const container = document.getElementById(`games-${targetDay}`);
+    if (!container) return;
+    
+    const rows = container.querySelectorAll('.leaderboard-table tbody tr');
     rows.forEach(row => {
         const rowSlates = row.getAttribute('data-slates').split(',');
         const statsRaw = row.getAttribute('data-slate-stats');
@@ -573,11 +701,12 @@ function filterSlate(slateId, preserveSort = false) {
     });
 
     let targetHeader, sortIndex, forceDesc = false;
+    const table = container.querySelector('.leaderboard-table');
 
     if (preserveSort) {
-        targetHeader = document.querySelector('#leaderboard-table th.asc, #leaderboard-table th.desc');
+        targetHeader = table.querySelector('th.asc, th.desc');
         if (targetHeader) {
-            const headers = Array.from(document.querySelectorAll('#leaderboard-table th'));
+            const headers = Array.from(table.querySelectorAll('th'));
             sortIndex = headers.indexOf(targetHeader);
             const isDesc = targetHeader.classList.contains('desc');
             
@@ -588,7 +717,7 @@ function filterSlate(slateId, preserveSort = false) {
 
     if (!targetHeader) {
         sortIndex = 2; // Column index 2 handles default sorting correctly for both Proj Value AND Live Pts
-        targetHeader = document.querySelectorAll('#leaderboard-table th')[sortIndex];
+        targetHeader = table.querySelectorAll('th')[sortIndex];
         forceDesc = true;
     }
 
@@ -642,29 +771,36 @@ setInterval(() => {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             
-            const newTbody = doc.querySelector('#leaderboard-table tbody');
-            const currentTbody = document.querySelector('#leaderboard-table tbody');
+            // For 3-day layouts, refresh each partition table
+            ['yesterday', 'today', 'tomorrow'].forEach(day => {
+                const currentContainer = document.getElementById(`games-${day}`);
+                const newContainer = doc.getElementById(`games-${day}`);
+                if (currentContainer && newContainer) {
+                    const currentTbody = currentContainer.querySelector('.leaderboard-table tbody');
+                    const newTbody = newContainer.querySelector('.leaderboard-table tbody');
+                    
+                    if (currentTbody && newTbody) {
+                        const scrollContainer = currentContainer.querySelector('.table-scroll-container');
+                        const scrollTop = scrollContainer.scrollTop;
+                        const scrollLeft = scrollContainer.scrollLeft;
+                        
+                        const slateSelector = currentContainer.querySelector('.slate-selector');
+                        const currentSlate = slateSelector ? slateSelector.value : 'all';
+
+                        currentTbody.innerHTML = newTbody.innerHTML;
+                        
+                        filterSlate(currentSlate, day, true);
+
+                        scrollContainer.scrollTop = scrollTop;
+                        scrollContainer.scrollLeft = scrollLeft;
+                    }
+                }
+            });
+            
             const newUpdatedText = doc.querySelector('#last-updated-text');
             const currentUpdatedText = document.querySelector('#last-updated-text');
-            
-            if (newTbody && currentTbody) {
-                const scrollContainer = document.getElementById('table-scroll-container');
-                const scrollTop = scrollContainer.scrollTop;
-                const scrollLeft = scrollContainer.scrollLeft;
-                
-                const slateSelector = document.getElementById('slate-selector');
-                const currentSlate = slateSelector ? slateSelector.value : 'all';
-
-                currentTbody.innerHTML = newTbody.innerHTML;
-                
-                if (newUpdatedText && currentUpdatedText) {
-                    currentUpdatedText.innerHTML = newUpdatedText.innerHTML;
-                }
-                
-                filterSlate(currentSlate, true);
-
-                scrollContainer.scrollTop = scrollTop;
-                scrollContainer.scrollLeft = scrollLeft;
+            if (newUpdatedText && currentUpdatedText) {
+                currentUpdatedText.innerHTML = newUpdatedText.innerHTML;
             }
         })
         .catch(error => console.error('Silent refresh failed:', error));
@@ -675,248 +811,121 @@ setInterval(() => {
 </html>
 """
 
+def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, platform_slug, current_pos, position_links, date_str, day_data, score_col_name="Proj"):
+    try:
+        from jinja2 import Template
+        t = Template(HTML_TEMPLATE)
+        return t.render(
+            seo_title=seo_title, seo_desc=seo_desc, page_url=page_url, page_heading=page_heading, 
+            platform_name=platform_name, platform_slug=platform_slug, current_pos=current_pos,
+            position_links=position_links, date_str=date_str, day_data=day_data, score_col_name=score_col_name
+        )
+    except ImportError:
+        return "Jinja2 dependency required."
+
 # =========================================================================
 # --- 6. EXECUTION LOOP ---
 # =========================================================================
-def get_target_slate_date():
-    now = datetime.now(ZoneInfo("America/New_York"))
-    if now.hour < 3: now = now - timedelta(days=1)
-    return now.strftime("%Y-%m-%d")
+def get_3day_dates():
+    """Generates UTC-adjusted YYYY-MM-DD strings matching the main site index script."""
+    est_tz = ZoneInfo('America/New_York')
+    now_est = datetime.now(timezone.utc).astimezone(est_tz)
+    adjusted_time = now_est - timedelta(hours=3)
+    today_date = adjusted_time.date()
+    yesterday_date = today_date - timedelta(days=1)
+    tomorrow_date = today_date + timedelta(days=1)
+    return yesterday_date.strftime('%Y-%m-%d'), today_date.strftime('%Y-%m-%d'), tomorrow_date.strftime('%Y-%m-%d')
 
 def queue_urls_for_indexnow(new_urls, queue_file=os.path.join(DATA_DIR, "updates_queue.json")):
-    """Appends newly updated URLs to the IndexNow JSON queue safely."""
-    if not new_urls:
-        return
-
+    if not new_urls: return
     if not os.path.exists(queue_file):
         os.makedirs(os.path.dirname(queue_file), exist_ok=True)
-        queue_data = {
-            "last_sent": "2000-01-01T00:00:00",
-            "urls": []
-        }
+        queue_data = {"last_sent": "2000-01-01T00:00:00", "urls": []}
     else:
         with open(queue_file, "r", encoding="utf-8") as f:
-            try:
-                queue_data = json.load(f)
-            except json.JSONDecodeError:
-                queue_data = {
-                    "last_sent": "2000-01-01T00:00:00",
-                    "urls": []
-                }
-
+            try: queue_data = json.load(f)
+            except json.JSONDecodeError: queue_data = {"last_sent": "2000-01-01T00:00:00", "urls": []}
     queue_data["urls"].extend(new_urls)
-
-    with open(queue_file, "w", encoding="utf-8") as f:
-        json.dump(queue_data, f, indent=2)
+    with open(queue_file, "w", encoding="utf-8") as f: json.dump(queue_data, f, indent=2)
 
 def main():
-    today_str = get_target_slate_date()
-    target_pattern = f"games_{today_str}.json"
-    target_path = os.path.join(DAILY_FILES_DIR, target_pattern)
+    yest_str, today_str, tom_str = get_3day_dates()
+    
+    # Process all three days to generate data bundles
+    data_yest = process_day_data(yest_str)
+    data_today = process_day_data(today_str)
+    data_tom = process_day_data(tom_str)
 
     now_est = datetime.now(ZoneInfo("America/New_York"))
     display_time = now_est.strftime("%Y-%m-%d %I:%M %p ET")
     w3c_today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-
-    if not os.path.exists(target_path):
-        import glob
-        all_json_files = glob.glob(os.path.join(DAILY_FILES_DIR, "games_*.json"))
-        if all_json_files:
-            all_json_files.sort(reverse=True)
-            target_path = all_json_files[0]
-            today_str = os.path.basename(target_path).replace("games_", "").replace(".json", "")
-        else:
-            return
-
-    with open(target_path, "r", encoding="utf-8") as f:
-        data_stream = json.load(f)
-
-    live_data_raw = {}
-    live_path_mlb = os.path.join(LIVE_FILES_DIR, f"live_mlb_{today_str}.json")
-    live_path_std = os.path.join(LIVE_FILES_DIR, f"live_{today_str}.json")
-    
-    target_live_path = live_path_mlb if os.path.exists(live_path_mlb) else live_path_std
-
-    if os.path.exists(target_live_path):
-        try:
-            with open(target_live_path, "r", encoding="utf-8") as f:
-                live_data_raw = json.load(f)
-        except Exception as e:
-            print(f"⚠️ Warning: Could not parse live file: {e}")
-
-    flat_live_data = flatten_live_data(live_data_raw)
-
-    games_list = data_stream.get("games", []) if isinstance(data_stream, dict) else data_stream
-    slates_dictionary = data_stream.get("slates", {"fanduel": [], "draftkings": []}) if isinstance(data_stream, dict) else {"fanduel": [], "draftkings": []}
-
-    dk_slate_map = {str(s["id"]).strip(): str(s["name"]) for s in slates_dictionary.get("draftkings", []) if "id" in s}
-    fd_slate_map = {str(s["id"]).strip(): str(s["name"]) for s in slates_dictionary.get("fanduel", []) if "id" in s}
-
-    has_dk_data = False
-    has_fd_data = False
-
-    for game in games_list:
-        game_raw = game.get("gameRaw", {})
-        game_status = game_raw.get("status", {}).get("abstractGameState", "")
-        detailed_status = game_raw.get("status", {}).get("detailedState", "")
-        status_code = game_raw.get("status", {}).get("statusCode", "")
-
-        if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C":
-            continue
-
-        p_data = game.get("projectedLineups", {})
-        for side in ["away", "home"]:
-            batters = p_data.get(side, {}).get("battingOrder", [])
-            pitcher = p_data.get(side, {}).get("startingPitcher", {})
-            if any(b.get("dk_salary", 0) > 0 for b in batters) or pitcher.get("dk_salary", 0) > 0: has_dk_data = True
-            if any(b.get("salary", 0) > 0 for b in batters) or pitcher.get("salary", 0) > 0: has_fd_data = True
-
-    dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
-    fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
-    dk_live_pool, fd_live_pool = [], []
-
-    for game in games_list:
-        game_raw = game.get("gameRaw", {})
-        game_status = game_raw.get("status", {}).get("abstractGameState", "")
-        detailed_status = game_raw.get("status", {}).get("detailedState", "")
-        status_code = game_raw.get("status", {}).get("statusCode", "")
-
-        if "Postponed" in game_status or "Postponed" in detailed_status or "PPD" in detailed_status or status_code == "C":
-            continue
-
-        p_data = game.get("projectedLineups", {})
-        away_name, away_id = get_team_data(game, "away")
-        home_name, home_id = get_team_data(game, "home")
-
-        for side, team_name, team_id, opp_name, opp_id, is_home in [
-            ("away", away_name, away_id, home_name, home_id, False), 
-            ("home", home_name, home_id, away_name, away_id, True)
-        ]:
-            side_node = p_data.get(side, {})
-            official_players_raw = game_raw.get("lineups", {}).get(f"{side}Players", [])
-            is_official = len(official_players_raw) > 0
-            official_ids = [str(p.get("id")) for p in official_players_raw]
-            
-            pitcher = side_node.get("startingPitcher")
-            if pitcher:
-                pid = str(pitcher.get("id"))
-                prob_id = str(game_raw.get("teams", {}).get(side, {}).get("probablePitcher", {}).get("id", ""))
-                lineup_pos = "P"
-                order_status = "official" if (is_official and (prob_id == pid or pid in official_ids)) else ("ns" if is_official else "projected")
-
-                if has_dk_data:
-                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
-                    if p_res: 
-                        dk_pools["pitchers"].append(p_res)
-                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "dk")
-                        if l_res: dk_live_pool.append(l_res)
-
-                if has_fd_data:
-                    p_res = process_proprietary_projection(pitcher, True, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
-                    if p_res: 
-                        fd_pools["pitchers"].append(p_res)
-                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "fd")
-                        if l_res: fd_live_pool.append(l_res)
-
-            for batter in side_node.get("battingOrder", []):
-                bid = str(batter.get("id"))
-                lineup_pos = str(batter.get("order", ""))
-                order_status = "official" if (is_official and bid in official_ids) else ("ns" if is_official else "projected")
-
-                if has_dk_data:
-                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=True, lineup_pos=lineup_pos, order_status=order_status)
-                    if p_res:
-                        dk_pools["util"].append(p_res)
-                        dk_positions = str(batter.get("dk_positions", "")).upper().split("/")
-                        for raw_pos in dk_positions:
-                            if "P" in raw_pos: dk_pools["pitchers"].append(p_res)
-                            elif "C" == raw_pos: dk_pools["catchers"].append(p_res)
-                            elif "1B" == raw_pos: dk_pools["first-base"].append(p_res)
-                            elif "2B" == raw_pos: dk_pools["second-base"].append(p_res)
-                            elif "3B" == raw_pos: dk_pools["third-base"].append(p_res)
-                            elif "SS" == raw_pos: dk_pools["shortstops"].append(p_res)
-                            elif "OF" in raw_pos: dk_pools["outfielders"].append(p_res)
-                            
-                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "dk")
-                        if l_res: dk_live_pool.append(l_res)
-
-                if has_fd_data:
-                    p_res = process_proprietary_projection(batter, False, team_name, team_id, opp_name, opp_id, is_home, game, is_dk=False, lineup_pos=lineup_pos, order_status=order_status)
-                    if p_res:
-                        fd_pools["util"].append(p_res)
-                        fd_positions = str(batter.get("fd_positions", "")).upper().split("/")
-                        for raw_pos in fd_positions:
-                            if "P" in raw_pos: fd_pools["pitchers"].append(p_res)
-                            elif "C" in raw_pos or "1B" in raw_pos: fd_pools["catchers-first-base"].append(p_res)
-                            elif "2B" in raw_pos: fd_pools["second-base"].append(p_res)
-                            elif "3B" in raw_pos: fd_pools["third-base"].append(p_res)
-                            elif "SS" in raw_pos: fd_pools["shortstops"].append(p_res)
-                            elif "OF" in raw_pos: fd_pools["outfielders"].append(p_res)
-
-                        l_res = process_live_leaderboard_player(p_res, flat_live_data, "fd")
-                        if l_res: fd_live_pool.append(l_res)
-
-    for key in dk_pools: dk_pools[key] = sorted(dk_pools[key], key=lambda x: x["value"], reverse=True)
-    for key in fd_pools: fd_pools[key] = sorted(fd_pools[key], key=lambda x: x["value"], reverse=True)
-    dk_live_pool = sorted(dk_live_pool, key=lambda x: x["proj"], reverse=True)
-    fd_live_pool = sorted(fd_live_pool, key=lambda x: x["proj"], reverse=True)
-
-    def render_static_html(seo_title, seo_desc, page_url, page_heading, platform_name, platform_slug, current_pos, position_links, date_str, players_list, distinct_slates, score_col_name="Proj"):
-        try:
-            from jinja2 import Template
-            t = Template(HTML_TEMPLATE)
-            return t.render(
-                seo_title=seo_title, seo_desc=seo_desc, page_url=page_url, page_heading=page_heading, 
-                platform_name=platform_name, platform_slug=platform_slug, current_pos=current_pos,
-                position_links=position_links, date_str=date_str, players=players_list, 
-                distinct_slates=distinct_slates, score_col_name=score_col_name
-            )
-        except ImportError:
-            return "Jinja2 dependency required."
 
     existing_dates = load_existing_sitemap_dates(SITEMAP_PATH)
     all_dfs_urls = {}
     changed_urls = []
     base_domain = "https://mlbstartingnine.com"
 
-    if has_dk_data:
-        for pos_slug, player_set in dk_pools.items():
+    has_any_dk = data_yest["has_dk"] or data_today["has_dk"] or data_tom["has_dk"]
+    has_any_fd = data_yest["has_fd"] or data_today["has_fd"] or data_tom["has_fd"]
+
+    if has_any_dk:
+        for pos_slug in SEO_METADATA["draftkings"]:
+            if pos_slug == "live-slate-leaderboard": continue
+            
+            day_data = {
+                "yesterday": {"players": data_yest["dk_pools"].get(pos_slug, []), "slates": data_yest["dk_slates"]},
+                "today": {"players": data_today["dk_pools"].get(pos_slug, []), "slates": data_today["dk_slates"]},
+                "tomorrow": {"players": data_tom["dk_pools"].get(pos_slug, []), "slates": data_tom["dk_slates"]}
+            }
+            
             folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", f"top-{pos_slug}")
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["draftkings"].get(pos_slug, {"title": f"DraftKings {pos_slug.title()}", "desc": "MLB Projections"})
             clean_title = "Utility (All Hitters)" if pos_slug == "util" else pos_slug.replace("-", " ").title()
             page_url = f"{base_domain}/dfs/draftkings/top-{pos_slug}/"
             
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected DraftKings {clean_title}", "DraftKings", "draftkings", pos_slug, POS_LABELS_DK, display_time, player_set, dk_slate_map)
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected DraftKings {clean_title}", "DraftKings", "draftkings", pos_slug, POS_LABELS_DK, display_time, day_data)
             file_path = os.path.join(folder_path, "index.html")
             
             if has_page_changed(file_path, html_output):
-                with open(file_path, "w", encoding="utf-8") as file: 
-                    file.write(html_output)
+                with open(file_path, "w", encoding="utf-8") as file: file.write(html_output)
                 changed_urls.append(page_url)
                 all_dfs_urls[page_url] = w3c_today
             else:
                 all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
-        if dk_live_pool:
+        # Handle Draftkings Live Leaderboard
+        day_data_live = {
+            "yesterday": {"players": data_yest["dk_live"], "slates": data_yest["dk_slates"]},
+            "today": {"players": data_today["dk_live"], "slates": data_today["dk_slates"]},
+            "tomorrow": {"players": data_tom["dk_live"], "slates": data_tom["dk_slates"]}
+        }
+        if any(d["players"] for d in day_data_live.values()):
             folder_path = os.path.join(OUTPUT_BASE_DIR, "draftkings", "live-slate-leaderboard")
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["draftkings"]["live-slate-leaderboard"]
             page_url = f"{base_domain}/dfs/draftkings/live-slate-leaderboard/"
             
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live DraftKings Slate Leaderboard", "DraftKings", "draftkings", "live-slate-leaderboard", POS_LABELS_DK, display_time, dk_live_pool, dk_slate_map, "Live Pts")
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live DraftKings Slate Leaderboard", "DraftKings", "draftkings", "live-slate-leaderboard", POS_LABELS_DK, display_time, day_data_live, "Live Pts")
             file_path = os.path.join(folder_path, "index.html")
             
             if has_page_changed(file_path, html_output):
-                with open(file_path, "w", encoding="utf-8") as file: 
-                    file.write(html_output)
+                with open(file_path, "w", encoding="utf-8") as file: file.write(html_output)
                 changed_urls.append(page_url)
                 all_dfs_urls[page_url] = w3c_today
             else:
                 all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
-    if has_fd_data:
-        for pos_slug, player_set in fd_pools.items():
+    if has_any_fd:
+        for pos_slug in SEO_METADATA["fanduel"]:
+            if pos_slug == "live-slate-leaderboard": continue
+            
+            day_data = {
+                "yesterday": {"players": data_yest["fd_pools"].get(pos_slug, []), "slates": data_yest["fd_slates"]},
+                "today": {"players": data_today["fd_pools"].get(pos_slug, []), "slates": data_today["fd_slates"]},
+                "tomorrow": {"players": data_tom["fd_pools"].get(pos_slug, []), "slates": data_tom["fd_slates"]}
+            }
+            
             folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", f"top-{pos_slug}")
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["fanduel"].get(pos_slug, {"title": f"FanDuel {pos_slug.title()}", "desc": "MLB Projections"})
@@ -924,29 +933,33 @@ def main():
             if "Catchers" in clean_title: clean_title = "C / 1B Split"
             page_url = f"{base_domain}/dfs/fanduel/top-{pos_slug}/"
             
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected FanDuel {clean_title}", "FanDuel", "fanduel", pos_slug, POS_LABELS_FD, display_time, player_set, fd_slate_map)
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, f"Top Projected FanDuel {clean_title}", "FanDuel", "fanduel", pos_slug, POS_LABELS_FD, display_time, day_data)
             file_path = os.path.join(folder_path, "index.html")
             
             if has_page_changed(file_path, html_output):
-                with open(file_path, "w", encoding="utf-8") as file: 
-                    file.write(html_output)
+                with open(file_path, "w", encoding="utf-8") as file: file.write(html_output)
                 changed_urls.append(page_url)
                 all_dfs_urls[page_url] = w3c_today
             else:
                 all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
-        if fd_live_pool:
+        # Handle FanDuel Live Leaderboard
+        day_data_live = {
+            "yesterday": {"players": data_yest["fd_live"], "slates": data_yest["fd_slates"]},
+            "today": {"players": data_today["fd_live"], "slates": data_today["fd_slates"]},
+            "tomorrow": {"players": data_tom["fd_live"], "slates": data_tom["fd_slates"]}
+        }
+        if any(d["players"] for d in day_data_live.values()):
             folder_path = os.path.join(OUTPUT_BASE_DIR, "fanduel", "live-slate-leaderboard")
             os.makedirs(folder_path, exist_ok=True)
             meta = SEO_METADATA["fanduel"]["live-slate-leaderboard"]
             page_url = f"{base_domain}/dfs/fanduel/live-slate-leaderboard/"
             
-            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live FanDuel Slate Leaderboard", "FanDuel", "fanduel", "live-slate-leaderboard", POS_LABELS_FD, display_time, fd_live_pool, fd_slate_map, "Live Pts")
+            html_output = render_static_html(meta["title"], meta["desc"], page_url, "Live FanDuel Slate Leaderboard", "FanDuel", "fanduel", "live-slate-leaderboard", POS_LABELS_FD, display_time, day_data_live, "Live Pts")
             file_path = os.path.join(folder_path, "index.html")
             
             if has_page_changed(file_path, html_output):
-                with open(file_path, "w", encoding="utf-8") as file: 
-                    file.write(html_output)
+                with open(file_path, "w", encoding="utf-8") as file: file.write(html_output)
                 changed_urls.append(page_url)
                 all_dfs_urls[page_url] = w3c_today
             else:
@@ -958,11 +971,7 @@ def main():
         for url, lastmod in all_dfs_urls.items():
             sitemap_xml += f"  <url>\n    <loc>{url}</loc>\n    <lastmod>{lastmod}</lastmod>\n  </url>\n"
         sitemap_xml += '</urlset>'
-        
-        with open(SITEMAP_PATH, "w", encoding="utf-8") as f: 
-            f.write(sitemap_xml)
-        
-        # Send dynamically changed URLs to the queue
+        with open(SITEMAP_PATH, "w", encoding="utf-8") as f: f.write(sitemap_xml)
         queue_urls_for_indexnow(changed_urls)
 
 if __name__ == "__main__":
