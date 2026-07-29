@@ -875,51 +875,7 @@ async def run_engines(memory):
     # FUTBOL ENGINE (Lineups Only)
     # ==========================================
     """
-    FUTBOL_LEAGUES = {
-        143: {"name": "COPA DEL REY 🇪🇸", "tag": "#CopaDelRey", "url_slug": "copa-del-rey", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},
-        140: {"name": "🇪🇸 LA LIGA", "tag": "#LaLiga", "url_slug": "la-liga", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},
-        137: {"name": "🇮🇹 COPPA ITALIA", "tag": "#CoppaItalia", "url_slug": "coppa-italia", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},
-        61:  {"name": "🇫🇷 LIGUE 1", "tag": "#Ligue1", "url_slug": "ligue-1", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},     
-        135: {"name": "SERIE A 🇮🇹", "tag": "#SerieA", "url_slug": "serie-a", "x_client": seriea_client, "v1_client": seriea_api_v1, "account_name": "SERIEA"},    
-        11:  {"name": "🌎 COPA SUDAMERICANA", "tag": "#Sudamericana #LaGranConquista", "url_slug": "copa-sudamericana", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},    
-        239: {"name": "🇨🇴 PRIMERA A", "tag": "#PrimeraA", "url_slug": "colombian-primera-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},    
-        13:  {"name": "🌎 COPA LIBERTADORES", "tag": "#Libertadores", "url_slug": "copa-libertadores", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
-        71:  {"name": "🇧🇷 BRASILEIRÃO", "tag": "#Brasileirao", "url_slug": "brasileirao-serie-a", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
-        128: {"name": "🇦🇷 LIGA PROFESIONAL", "tag": "#LigaProfesional", "url_slug": "argentine-liga-profesional", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
-        9:   {"name": "🌎 COPA AMERICA", "tag": "#CopaAmerica", "url_slug": "copa-america", "x_client": argbracol_client, "v1_client": argbracol_api_v1, "account_name": "ARGBRACOL"},
-        531: {"name": "🌎 CONCACAF NATIONS LEAGUE", "tag": "#CNL #Concacaf", "url_slug": "concacaf-nations-league", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},    
-        262: {"name": "🇲🇽 LIGA MX", "tag": "#LigaMX", "url_slug": "liga-mx", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},    
-        16:  {"name": "🏆 CHAMPIONS CUP", "tag": "#ChampionsCup", "url_slug": "concacaf-champions-cup", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},    
-        254: {"name": "🇺🇸 NWSL", "tag": "#NWSL", "url_slug": "nwsl", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},
-        253: {"name": "🇺🇸 MLS", "tag": "#MLS", "url_slug": "mls", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},
-        528: {"name": "🌎 LEAGUES CUP", "tag": "#LeaguesCup", "url_slug": "leagues-cup", "x_client": mls_client, "v1_client": mls_api_v1, "account_name": "MLS"},
-        179: {"name": "🏴󠁧󠁢󠁳󠁣󠁴󠁿 PREMIERSHIP", "tag": "#ScottishPremiership", "url_slug": "scottish-premiership", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},    
-        45:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 FA CUP", "tag": "#FACup", "url_slug": "fa-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},    
-        39:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 PREMIER LEAGUE", "tag": "#EPL", "url_slug": "english-premier-league", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},    
-        40:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 CHAMPIONSHIP", "tag": "#Championship", "url_slug": "efl-championship", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},
-        48:  {"name": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 EFL CUP", "tag": "#CarabaoCup", "url_slug": "efl-cup", "x_client": nwsl_client, "v1_client": nwsl_api_v1, "account_name": "NWSL"},
-        10:  {"name": "🌎 INTERNATIONAL Friendlies", "tag": "#Friendly", "url_slug": "international-friendlies", "account_name": "FUTBOL"},
-        1:   {"name": "🌎 World Cup", "tag": "#WorldCup", "url_slug": "fifa-world-cup", "account_name": "FUTBOL"},
-        2:   {"name": "🇪🇺 CHAMPIONS LEAGUE", "tag": "#UCL", "url_slug": "uefa-champions-league", "account_name": "FUTBOL"},
-        3:   {"name": "🇪🇺 EUROPA LEAGUE", "tag": "#EuropaLeague", "url_slug": "uefa-europa-league", "account_name": "FUTBOL"},
-        188: {"name": "🇦🇺 A-LEAGUE", "tag": "#ALeague", "url_slug": "a-league", "account_name": "FUTBOL"},
-        5:   {"name": "🇪🇺 UEFA NATIONS LEAGUE", "tag": "#NationsLeague #UNL", "url_slug": "uefa-nations-league", "account_name": "FUTBOL"},
-        848: {"name": "🇪🇺 CONFERENCE LEAGUE", "tag": "#UECL #ConferenceLeague", "url_slug": "uefa-conference-league", "account_name": "FUTBOL" },    
-        307: {"name": "🇸🇦 SAUDI PRO LEAGUE", "tag": "#SaudiProLeague #SPL", "url_slug": "saudi-pro-league", "account_name": "FUTBOL"},
-        78:  {"name": "🇩🇪 BUNDESLIGA", "tag": "#Bundesliga", "url_slug": "bundesliga", "account_name": "FUTBOL"},
-        88:  {"name": "🇳🇱 EREDIVISIE", "tag": "#Eredivisie", "url_slug": "eredivisie", "account_name": "FUTBOL"},
-        94:  {"name": "🇵🇹 PRIMEIRA LIGA", "tag": "#PrimeiraLiga", "url_slug": "primeira-liga", "account_name": "FUTBOL"},
-        203: {"name": "🇹🇷 SÜPER LIG", "tag": "#SuperLig", "url_slug": "super-lig", "account_name": "FUTBOL"},
-        144: {"name": "🇧🇪 PRO LEAGUE", "tag": "#JupilerProLeague", "url_slug": "belgian-pro-league", "account_name": "FUTBOL"},
-        119: {"name": "🇩🇰 SUPERLIGA", "tag": "#Superliga", "url_slug": "danish-superliga", "account_name": "FUTBOL"},
-        81:  {"name": "🇩🇪 DFB-POKAL", "tag": "#DFBPokal", "url_slug": "dfb-pokal", "account_name": "FUTBOL"},
-        4:   {"name": "🇪🇺 UEFA EURO", "tag": "#Euro", "url_slug": "uefa-euro", "account_name": "FUTBOL"},
-        292: {"name": "🇰🇷 K LEAGUE 1", "tag": "#KLeague #KLeague1", "url_slug": "k-league-1", "account_name": "FUTBOL"}
-    }
-    INTL_FLAGS = {
-        "England": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
-        "Northern Ireland": "🇬🇧", "Argentina": "🇦🇷", "Brazil": "🇧🇷", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹", "Mexico": "🇲🇽", "Netherlands": "🇳🇱", "Portugal": "🇵🇹", "Spain": "🇪🇸", "USA": "🇺🇸"
-    }
+    
     """
 
     # 1. Fetch daily_lineups.json using full public URL
