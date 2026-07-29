@@ -925,16 +925,18 @@ async def run_engines(memory):
         e = random.choice(EMOJIS)
 
         # --- Link-Free X (Twitter) Text ---
-        title = f"{e} STARTING XI: {team_name}\nprovided by futbolstartingeleven (see profile for link)"
-        match_info = f"vs {opponent_name} | {league_name}"
-        
-        tweet_text = f"{title}\n\n{match_info}\n\n{players_block}\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
+        tweet_text = (
+            f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\n"
+            f"Follow the action at futbolstartingeleven(link in profile)\n\n"
+            f"{players_block}\n\n"
+            f"{league_hashtag} #{team_hash} #{opponent_hash}"
+        )
 
         # --- Bluesky Rich Text ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{e} STARTING XI: {team_name}\n{match_info}\n\n{players_block}\n\nView tactical board & live stats:\n")
+        bsky_tb.text(f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\nFollow the action live:\n")
         bsky_tb.link(lineup_url, lineup_url)
-        bsky_tb.text(f"\n\n{league_hashtag} #{team_hash} #{opponent_hash}")
+        bsky_tb.text(f"\n\n{players_block}\n\n{league_hashtag} #{team_hash} #{opponent_hash}")
 
         upload_success = False
 
