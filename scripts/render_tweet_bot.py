@@ -1190,7 +1190,7 @@ async def run_engines(memory):
         away_hash = away_team.replace(' ', '').replace('-', '').replace('.', '')
 
         # --- Link-Free X (Twitter) Text ---
-        tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile)\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
+        tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
 
         # --- Bluesky Rich Text ---
         bsky_tb = client_utils.TextBuilder()
