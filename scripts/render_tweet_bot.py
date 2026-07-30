@@ -1778,11 +1778,48 @@ async def run_engines(memory):
             f"{league_hashtag} #{home_hash} #{away_hash}"
         )
 
-        # --- Bluesky Rich Text (Includes Link) ---
+        # --- Bluesky Rich Text (Raw URL & Progressive 4-Stage <290 Character Guard) ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{title}\n\n🏁 FT: {home_team} {home_score} - {away_score} {away_team} in {league_name} action\n\n{scorers_str}\n{red_card_str}\n{blurb}\n\nFull match stats & ratings:\n")
+        
+        bsky_header = f"{title}\n🏁 FT: {home_team} {home_score} - {away_score} {away_team}\n"
+        bsky_cta = "Match stats & ratings: "
+        bsky_details = f"{scorers_str}\n{red_card_str}\n{blurb}".strip()
+        bsky_hashtags = f"\n\n{league_hashtag} #{home_hash} #{away_hash}"
+        
+        total_chars = len(bsky_header) + len(bsky_cta) + len(match_url) + len(bsky_details) + len(bsky_hashtags) + 2
+        
+        # Stage 1: Drop secondary hashtags
+        if total_chars > 290:
+            bsky_hashtags = f"\n\n#{home_hash}"
+            total_chars = len(bsky_header) + len(bsky_cta) + len(match_url) + len(bsky_details) + len(bsky_hashtags) + 2
+            
+        # Stage 2: Drop all hashtags
+        if total_chars > 290:
+            bsky_hashtags = ""
+            total_chars = len(bsky_header) + len(bsky_cta) + len(match_url) + len(bsky_details) + 2
+            
+        # Stage 3: Drop flavor blurb
+        if total_chars > 290:
+            bsky_details = f"{scorers_str}\n{red_card_str}".strip()
+            total_chars = len(bsky_header) + len(bsky_cta) + len(match_url) + len(bsky_details) + 2
+            
+        # Stage 4: Compress goalscorers list if match was a high-scoring blowout
+        if total_chars > 290 and (home_scorers or away_scorers):
+            compressed_scorers = f"⚽ Goals: {len(home_scorers)} home, {len(away_scorers)} away"
+            bsky_details = f"{compressed_scorers}\n{red_card_str}".strip()
+            total_chars = len(bsky_header) + len(bsky_cta) + len(match_url) + len(bsky_details) + 2
+
+        # Ultra Fallback: If still over 290, keep only header + CTA link
+        if total_chars > 290:
+            bsky_details = ""
+
+        bsky_tb.text(bsky_header)
+        bsky_tb.text(bsky_cta)
         bsky_tb.link(match_url, match_url)
-        bsky_tb.text(f"\n\n{league_hashtag} #{home_hash} #{away_hash}")
+        if bsky_details:
+            bsky_tb.text(f"\n\n{bsky_details}")
+        if bsky_hashtags:
+            bsky_tb.text(bsky_hashtags)
 
         upload_success = False
 
