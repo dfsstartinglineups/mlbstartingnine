@@ -1,5 +1,5 @@
 {
-    "last_updated": "Jul 30, 12:20 AM ET",
+    "last_updated": "Jul 30, 12:22 AM ET",
     "slates": {
         "fanduel": [
             {
@@ -3051,13 +3051,15 @@
                             "runs": 0,
                             "hits": 5,
                             "errors": 0,
-                            "leftOnBase": 5
+                            "leftOnBase": 5,
+                            "isWinner": false
                         },
                         "away": {
                             "runs": 3,
                             "hits": 6,
                             "errors": 0,
-                            "leftOnBase": 4
+                            "leftOnBase": 4,
+                            "isWinner": true
                         }
                     },
                     "defense": {
@@ -35883,8 +35885,8 @@
                             "link": "/api/v1/teams/117"
                         }
                     },
-                    "balls": 0,
-                    "strikes": 0,
+                    "balls": 2,
+                    "strikes": 2,
                     "outs": 2
                 },
                 "venue": {
@@ -38084,10 +38086,11 @@
                 "officialDate": "2026-07-29",
                 "status": {
                     "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "codedGameState": "M",
+                    "detailedState": "Player challenge",
+                    "statusCode": "MJ",
                     "startTimeTBD": false,
+                    "reason": "Pitch Result",
                     "abstractGameCode": "L"
                 },
                 "teams": {
@@ -38345,7 +38348,7 @@
                             "num": 8,
                             "ordinalNum": "8th",
                             "home": {
-                                "hits": 0,
+                                "hits": 1,
                                 "errors": 0,
                                 "leftOnBase": 0
                             },
@@ -38360,7 +38363,7 @@
                     "teams": {
                         "home": {
                             "runs": 2,
-                            "hits": 6,
+                            "hits": 7,
                             "errors": 1,
                             "leftOnBase": 7
                         },
@@ -38485,55 +38488,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 641680,
-                            "fullName": "Jonah Heim",
-                            "link": "/api/v1/people/641680",
-                            "firstName": "Jonah",
-                            "lastName": "Heim",
-                            "primaryNumber": "15",
-                            "birthDate": "1995-06-27",
-                            "currentAge": 31,
-                            "birthCity": "Buffalo",
-                            "birthStateProvince": "NY",
-                            "birthCountry": "USA",
-                            "height": "6' 4\"",
-                            "weight": 220,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "2",
-                                "name": "Catcher",
-                                "type": "Catcher",
-                                "abbreviation": "C"
-                            },
-                            "useName": "Jonah",
-                            "useLastName": "Heim",
-                            "middleName": "Nathan",
-                            "boxscoreName": "Heim",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2013,
-                            "mlbDebutDate": "2020-08-25",
-                            "batSide": {
-                                "code": "S",
-                                "description": "Switch"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Jonah Heim",
-                            "nameSlug": "jonah-heim-641680",
-                            "firstLastName": "Jonah Heim",
-                            "lastFirstName": "Heim, Jonah",
-                            "lastInitName": "Heim, J",
-                            "initLastName": "J Heim",
-                            "fullFMLName": "Jonah Nathan Heim",
-                            "fullLFMName": "Heim, Jonah Nathan",
-                            "strikeZoneTop": 3.375,
-                            "strikeZoneBottom": 1.703
-                        },
-                        "onDeck": {
                             "id": 666126,
                             "fullName": "Carlos Cortes",
                             "link": "/api/v1/people/666126",
@@ -38582,7 +38536,7 @@
                             "strikeZoneTop": 2.99,
                             "strikeZoneBottom": 1.509
                         },
-                        "inHole": {
+                        "onDeck": {
                             "id": 703607,
                             "fullName": "Henry Bolte",
                             "link": "/api/v1/people/703607",
@@ -38630,6 +38584,104 @@
                             "fullLFMName": "Bolte, Henry",
                             "strikeZoneTop": 3.33,
                             "strikeZoneBottom": 1.68
+                        },
+                        "inHole": {
+                            "id": 671732,
+                            "fullName": "Lawrence Butler",
+                            "link": "/api/v1/people/671732",
+                            "firstName": "Lawrence",
+                            "lastName": "Butler",
+                            "primaryNumber": "4",
+                            "birthDate": "2000-07-10",
+                            "currentAge": 26,
+                            "birthCity": "Burlington",
+                            "birthStateProvince": "NJ",
+                            "birthCountry": "USA",
+                            "height": "6' 3\"",
+                            "weight": 210,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "9",
+                                "name": "Outfielder",
+                                "type": "Outfielder",
+                                "abbreviation": "RF"
+                            },
+                            "useName": "Lawrence",
+                            "useLastName": "Butler",
+                            "middleName": "Evan",
+                            "boxscoreName": "Butler, L",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2018,
+                            "mlbDebutDate": "2023-08-11",
+                            "batSide": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Lawrence Butler",
+                            "nameSlug": "lawrence-butler-671732",
+                            "firstLastName": "Lawrence Butler",
+                            "lastFirstName": "Butler, Lawrence",
+                            "lastInitName": "Butler, L",
+                            "initLastName": "L Butler",
+                            "fullFMLName": "Lawrence Evan Butler",
+                            "fullLFMName": "Butler, Lawrence Evan",
+                            "strikeZoneTop": 3.344,
+                            "strikeZoneBottom": 1.688
+                        },
+                        "first": {
+                            "id": 641680,
+                            "fullName": "Jonah Heim",
+                            "link": "/api/v1/people/641680",
+                            "firstName": "Jonah",
+                            "lastName": "Heim",
+                            "primaryNumber": "15",
+                            "birthDate": "1995-06-27",
+                            "currentAge": 31,
+                            "birthCity": "Buffalo",
+                            "birthStateProvince": "NY",
+                            "birthCountry": "USA",
+                            "height": "6' 4\"",
+                            "weight": 220,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "2",
+                                "name": "Catcher",
+                                "type": "Catcher",
+                                "abbreviation": "C"
+                            },
+                            "useName": "Jonah",
+                            "useLastName": "Heim",
+                            "middleName": "Nathan",
+                            "boxscoreName": "Heim",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2013,
+                            "mlbDebutDate": "2020-08-25",
+                            "batSide": {
+                                "code": "S",
+                                "description": "Switch"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Jonah Heim",
+                            "nameSlug": "jonah-heim-641680",
+                            "firstLastName": "Jonah Heim",
+                            "lastFirstName": "Heim, Jonah",
+                            "lastInitName": "Heim, J",
+                            "initLastName": "J Heim",
+                            "fullFMLName": "Jonah Nathan Heim",
+                            "fullLFMName": "Heim, Jonah Nathan",
+                            "strikeZoneTop": 3.375,
+                            "strikeZoneBottom": 1.703
                         },
                         "pitcher": {
                             "id": 669620,
@@ -38681,14 +38733,14 @@
                             "strikeZoneTop": 3.299,
                             "strikeZoneBottom": 1.665
                         },
-                        "battingOrder": 5,
+                        "battingOrder": 6,
                         "team": {
                             "id": 133,
                             "name": "Athletics",
                             "link": "/api/v1/teams/133"
                         }
                     },
-                    "balls": 0,
+                    "balls": 1,
                     "strikes": 2,
                     "outs": 1
                 },
@@ -41185,7 +41237,7 @@
                                 "leftOnBase": 0
                             },
                             "away": {
-                                "hits": 0,
+                                "hits": 1,
                                 "errors": 0,
                                 "leftOnBase": 0
                             }
@@ -41200,7 +41252,7 @@
                         },
                         "away": {
                             "runs": 0,
-                            "hits": 1,
+                            "hits": 2,
                             "errors": 0,
                             "leftOnBase": 3
                         }
@@ -41320,35 +41372,36 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 642215,
-                            "fullName": "Weston Wilson",
-                            "link": "/api/v1/people/642215",
-                            "firstName": "Weston",
-                            "lastName": "Wilson",
-                            "primaryNumber": "31",
-                            "birthDate": "1994-09-11",
-                            "currentAge": 31,
-                            "birthCity": "High Point",
-                            "birthStateProvince": "NC",
+                            "id": 641598,
+                            "fullName": "Mitch Garver",
+                            "link": "/api/v1/people/641598",
+                            "firstName": "Mitchell",
+                            "lastName": "Garver",
+                            "primaryNumber": "18",
+                            "birthDate": "1991-01-15",
+                            "currentAge": 35,
+                            "birthCity": "Albuquerque",
+                            "birthStateProvince": "NM",
                             "birthCountry": "USA",
-                            "height": "6' 3\"",
-                            "weight": 215,
+                            "height": "6' 1\"",
+                            "weight": 220,
                             "active": true,
                             "primaryPosition": {
-                                "code": "5",
-                                "name": "Third Base",
-                                "type": "Infielder",
-                                "abbreviation": "3B"
+                                "code": "2",
+                                "name": "Catcher",
+                                "type": "Catcher",
+                                "abbreviation": "C"
                             },
-                            "useName": "Weston",
-                            "useLastName": "Wilson",
-                            "middleName": "Graham",
-                            "boxscoreName": "Wilson, W",
+                            "useName": "Mitch",
+                            "useLastName": "Garver",
+                            "middleName": "Lynn",
+                            "boxscoreName": "Garver",
+                            "nickName": "Garv Sauce",
                             "gender": "M",
                             "isPlayer": true,
                             "isVerified": true,
-                            "draftYear": 2016,
-                            "mlbDebutDate": "2023-08-09",
+                            "draftYear": 2013,
+                            "mlbDebutDate": "2017-08-19",
                             "batSide": {
                                 "code": "R",
                                 "description": "Right"
@@ -41357,67 +41410,18 @@
                                 "code": "R",
                                 "description": "Right"
                             },
-                            "nameFirstLast": "Weston Wilson",
-                            "nameSlug": "weston-wilson-642215",
-                            "firstLastName": "Weston Wilson",
-                            "lastFirstName": "Wilson, Weston",
-                            "lastInitName": "Wilson, W",
-                            "initLastName": "W Wilson",
-                            "fullFMLName": "Weston Graham Wilson",
-                            "fullLFMName": "Wilson, Weston Graham",
-                            "strikeZoneTop": 3.343,
-                            "strikeZoneBottom": 1.687
+                            "nameFirstLast": "Mitch Garver",
+                            "nameSlug": "mitch-garver-641598",
+                            "firstLastName": "Mitch Garver",
+                            "lastFirstName": "Garver, Mitch",
+                            "lastInitName": "Garver, M",
+                            "initLastName": "M Garver",
+                            "fullFMLName": "Mitchell Lynn Garver",
+                            "fullLFMName": "Garver, Mitchell Lynn",
+                            "strikeZoneTop": 3.249,
+                            "strikeZoneBottom": 1.64
                         },
                         "onDeck": {
-                            "id": 806068,
-                            "fullName": "Colt Emerson",
-                            "link": "/api/v1/people/806068",
-                            "firstName": "Colt",
-                            "lastName": "Emerson",
-                            "primaryNumber": "4",
-                            "birthDate": "2005-07-20",
-                            "currentAge": 21,
-                            "birthCity": "Zanesville",
-                            "birthStateProvince": "OH",
-                            "birthCountry": "USA",
-                            "height": "6' 0\"",
-                            "weight": 195,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "6",
-                                "name": "Shortstop",
-                                "type": "Infielder",
-                                "abbreviation": "SS"
-                            },
-                            "useName": "Colt",
-                            "useLastName": "Emerson",
-                            "middleName": "Walker",
-                            "boxscoreName": "Emerson",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2023,
-                            "mlbDebutDate": "2026-05-17",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Colt Emerson",
-                            "nameSlug": "colt-emerson-806068",
-                            "firstLastName": "Colt Emerson",
-                            "lastFirstName": "Emerson, Colt",
-                            "lastInitName": "Emerson, C",
-                            "initLastName": "C Emerson",
-                            "fullFMLName": "Colt Walker Emerson",
-                            "fullLFMName": "Emerson, Colt Walker",
-                            "strikeZoneTop": 3.21,
-                            "strikeZoneBottom": 1.62
-                        },
-                        "inHole": {
                             "id": 702284,
                             "fullName": "Cole Young",
                             "link": "/api/v1/people/702284",
@@ -41465,6 +41469,103 @@
                             "fullLFMName": "Young, Cole Douglas",
                             "strikeZoneTop": 3.133,
                             "strikeZoneBottom": 1.581
+                        },
+                        "inHole": {
+                            "id": 668227,
+                            "fullName": "Randy Arozarena",
+                            "link": "/api/v1/people/668227",
+                            "firstName": "Randy",
+                            "lastName": "Arozarena",
+                            "primaryNumber": "56",
+                            "birthDate": "1995-02-28",
+                            "currentAge": 31,
+                            "birthCity": "Havana",
+                            "birthCountry": "Cuba",
+                            "height": "5' 10\"",
+                            "weight": 185,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "7",
+                                "name": "Outfielder",
+                                "type": "Outfielder",
+                                "abbreviation": "LF"
+                            },
+                            "useName": "Randy",
+                            "useLastName": "Arozarena",
+                            "boxscoreName": "Arozarena",
+                            "gender": "M",
+                            "nameMatrilineal": "Gonzalez",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "pronunciation": "ah-row-sah-RAY-nah",
+                            "mlbDebutDate": "2019-08-14",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Randy Arozarena",
+                            "nameSlug": "randy-arozarena-668227",
+                            "firstLastName": "Randy Arozarena",
+                            "lastFirstName": "Arozarena, Randy",
+                            "lastInitName": "Arozarena, R",
+                            "initLastName": "R Arozarena",
+                            "fullFMLName": "Randy Arozarena",
+                            "fullLFMName": "Arozarena, Randy",
+                            "strikeZoneTop": 3.128,
+                            "strikeZoneBottom": 1.579
+                        },
+                        "second": {
+                            "id": 642215,
+                            "fullName": "Weston Wilson",
+                            "link": "/api/v1/people/642215",
+                            "firstName": "Weston",
+                            "lastName": "Wilson",
+                            "primaryNumber": "31",
+                            "birthDate": "1994-09-11",
+                            "currentAge": 31,
+                            "birthCity": "High Point",
+                            "birthStateProvince": "NC",
+                            "birthCountry": "USA",
+                            "height": "6' 3\"",
+                            "weight": 215,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "5",
+                                "name": "Third Base",
+                                "type": "Infielder",
+                                "abbreviation": "3B"
+                            },
+                            "useName": "Weston",
+                            "useLastName": "Wilson",
+                            "middleName": "Graham",
+                            "boxscoreName": "Wilson, W",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2016,
+                            "mlbDebutDate": "2023-08-09",
+                            "batSide": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "pitchHand": {
+                                "code": "R",
+                                "description": "Right"
+                            },
+                            "nameFirstLast": "Weston Wilson",
+                            "nameSlug": "weston-wilson-642215",
+                            "firstLastName": "Weston Wilson",
+                            "lastFirstName": "Wilson, Weston",
+                            "lastInitName": "Wilson, W",
+                            "initLastName": "W Wilson",
+                            "fullFMLName": "Weston Graham Wilson",
+                            "fullLFMName": "Wilson, Weston Graham",
+                            "strikeZoneTop": 3.343,
+                            "strikeZoneBottom": 1.687
                         },
                         "pitcher": {
                             "id": 677961,
@@ -41515,7 +41616,7 @@
                             "strikeZoneTop": 3.433,
                             "strikeZoneBottom": 1.733
                         },
-                        "battingOrder": 8,
+                        "battingOrder": 9,
                         "team": {
                             "id": 136,
                             "name": "Seattle Mariners",
