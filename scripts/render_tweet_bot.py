@@ -1506,12 +1506,8 @@ async def run_engines(memory):
                 except Exception as e:
                     print(f"⚠️ Failed to update Firebase log: {e}")
 
-            futbol_tweets_this_loop += 1
-            if futbol_tweets_this_loop % 3 == 0:
-                print("⏳ Throttling API: Sent 3 tweets, resting for 5 seconds...")
-                await asyncio.sleep(5)
-            else:
-                await asyncio.sleep(1.5)
+            # Just a standard small sleep between Bluesky goal posts
+            await asyncio.sleep(2)
 
     # ==========================================
     # FUTBOL GAME SUMMARIES ENGINE
