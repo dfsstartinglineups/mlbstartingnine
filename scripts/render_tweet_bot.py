@@ -1009,9 +1009,9 @@ async def run_engines(memory):
             "titles": ["🚨⚽ BRACE ALERT!", "🚨⚽ ON A HAT-TRICK!", "🚨⚽ TWO FOR {player_name}!", "🚨⚽ DOUBLE TROUBLE!", "🚨⚽ SEEING DOUBLE!"],
             "blurbs": [
                 "{player_name} is putting on a masterclass! That is goal number two on the day for {scoring_team_name} against {conceding_team_name}.",
-                "He is on a hat-trick! {player_name} bags his second goal of the match to power {scoring_team_name} ahead of {conceding_team_name}.",
-                "Trouble for {conceding_team_name}! {player_name} finds the back of the net again for his second goal of the contest.",
-                "{scoring_team_name}'s star man is locked in! A brilliant brace for {player_name} puts {conceding_team_name} on the ropes."
+                "Hat Trick?!?!? {player_name} bags his second goal of the match to power {scoring_team_name} ahead of {conceding_team_name}.",
+                "Trouble for {conceding_team_name}! {player_name} finds the back of the net again for the second goal of the contest.",
+                "{scoring_team_name}'s star player is locked in! A brilliant brace for {player_name} puts {conceding_team_name} on the ropes."
             ],
             "ctas": ["Will we see a hat-trick? Follow live:", "Track the live match center and stats here:", "See the live pitch data and scores here:"]
         },
@@ -1524,9 +1524,9 @@ async def run_engines(memory):
                 "red_card": {
                     "titles": ["🚨🟥 RED CARD ALERT!", "🚨🟥 SENT OFF!", "🚨🟥 DRAMA! DOWN TO 10 MEN!", "🚨🟥 MAJOR DISCIPLINE ALERT!", "🚨🟥 GAME CHANGING RED CARD!"],
                     "blurbs": [
-                        "Massive momentum shift! {player_name} ({scoring_team_name}) is shown a red card! They will have to play the rest of this match against {conceding_team_name} with 10 men.",
-                        "Disaster for {scoring_team_name}! {player_name} is sent off by the referee. How will {conceding_team_name} exploit the man advantage?!",
-                        "The referee pulls out the red card! {player_name} is given his marching orders, leaving {scoring_team_name} short-handed against {conceding_team_name}.",
+                        "Massive momentum shift! {player_name} ({scoring_team_name}) is shown a red card! They will have to play the rest of this match against {conceding_team_name} with 10 on the field.",
+                        "Disaster for {scoring_team_name}! {player_name} is sent off by the referee. How will {conceding_team_name} exploit the advantage?!",
+                        "The referee pulls out the red card! {player_name} is given marching orders, leaving {scoring_team_name} short-handed against {conceding_team_name}.",
                         "We have major discipline drama! A red card for {player_name} forces {scoring_team_name} into a desperate defensive reshuffle against {conceding_team_name}."
                     ],
                     "ctas": ["How will the tactics change? Track live here:", "See the live match center and updated odds:", "Follow the 10-man battle live here:"]
