@@ -1445,26 +1445,36 @@ async def run_engines(memory):
         # --- Link-Free X (Twitter) Text ---
         tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
 
-        # --- Bluesky Rich Text (CTA & Raw URL near Top, <300 Character Guard) ---
+        # --- Bluesky Rich Text (CTA & Raw URL near Top, Bulletproof 3-Stage <290 Guard) ---
         bsky_tb = client_utils.TextBuilder()
         
-        # Place title, CTA, and raw link right at the top
+        # Isolate essential goal info (Scoreline & Scorer)
+        core_score_line = f"⚽ {display_minute}' GOAL - {scorer_str}\n{home_team} {home_score} - {away_score} {away_team}"
+        if "upset" in scenario and american_odds != "TBD":
+            core_score_line += f"\n📊 Pre-Match Line: {scoring_team} ({american_odds})"
+
         bsky_top = f"{title}\n{cta} "
-        bsky_body = f"\n\n{body_content}"
+        bsky_body = f"\n\n{core_score_line}\n\n{blurb}"
         bsky_hashtags = f"\n\n{league_hashtag} #{home_hash} #{away_hash}"
         
         total_chars = len(bsky_top) + len(match_url) + len(bsky_body) + len(bsky_hashtags)
         
-        # Auto-trim optional elements if total length exceeds 290 chars
+        # Stage 1: Shorten CTA and keep primary hashtag
         if total_chars > 290:
-            # Simplify CTA to save space
             bsky_top = f"{title}\nFollow live: "
             bsky_hashtags = f"\n\n#{home_hash}"
             total_chars = len(bsky_top) + len(match_url) + len(bsky_body) + len(bsky_hashtags)
             
+        # Stage 2: Drop all hashtags
         if total_chars > 290:
-            bsky_hashtags = ""  # Omit hashtags completely if still tight
+            bsky_hashtags = ""
+            total_chars = len(bsky_top) + len(match_url) + len(bsky_body)
             
+        # Stage 3: Drop flavor blurb if raw URL + title + scoreline is still tight
+        if total_chars > 290:
+            bsky_body = f"\n\n{core_score_line}"
+            total_chars = len(bsky_top) + len(match_url) + len(bsky_body)
+
         bsky_tb.text(bsky_top)
         bsky_tb.link(match_url, match_url)  # Raw URL displayed right at the top
         bsky_tb.text(f"{bsky_body}{bsky_hashtags}")
