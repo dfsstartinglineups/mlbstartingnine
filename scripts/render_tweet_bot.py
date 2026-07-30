@@ -89,9 +89,16 @@ LEAGUE_CONFIG = {
 }
 
 # --- CORE ACCOUNTS ---
+#mlb_client, mlb_api_v1 = get_dynamic_clients("mlb_x")
+#nba_client, nba_api_v1 = get_dynamic_clients("nba_x")
+#futbol_client, futbol_api_v1 = get_dynamic_clients("futbol_x")
+#friendly_client, friendly_api_v1 = get_dynamic_clients("friendly_x")
+
+# --- CORE ACCOUNTS ---
 mlb_client, mlb_api_v1 = get_dynamic_clients("mlb_x")
 nba_client, nba_api_v1 = get_dynamic_clients("nba_x")
-futbol_client, futbol_api_v1 = get_dynamic_clients("futbol_x")
+# Temporarily disable X.com to cool off spam filters, leave Bluesky active
+futbol_client, futbol_api_v1 = None, None 
 friendly_client, friendly_api_v1 = get_dynamic_clients("friendly_x")
 
 # --- SOCCER SUB-ACCOUNTS ---
