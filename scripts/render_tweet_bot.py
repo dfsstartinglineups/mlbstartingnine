@@ -995,142 +995,379 @@ async def run_engines(memory):
     MAX_GOAL_AGE_SECONDS = 300  # Skip goals older than 5 minutes
 
     PHRASES = {
+        "standard_goal": {
+            "titles": [
+                "⚽ BACK OF THE NET!", "🎯 CLINICAL FINISH!", "💥 WHAT A STRIKE!", 
+                "🥅 BEAUTIFUL GOAL!", "⚡ FANTASTIC FINISH!", "✨ MAGIC MOMENT!", "🥶 ICE COLD!", 
+                "☄️ BRILLIANT HIT!", "👏 TOP TIER PLAY!", "🚀 RIFLED HOME!"
+            ],
+            "blurbs": [
+                "A moment of pure quality! {player_name} finds the back of the net for {scoring_team_name} against {conceding_team_name}.",
+                "Clinical from {player_name}! {scoring_team_name} capitalizes on the opportunity with a fantastic finish.",
+                "A brilliant piece of play! {player_name} delivers a beautiful strike to punish {conceding_team_name}.",
+                "No mistake from {player_name}! {scoring_team_name} adds another highlight to this clash against {conceding_team_name}.",
+                "{scoring_team_name} strikes! A fantastic effort from {player_name} leaves the {conceding_team_name} defense with no answers.",
+                "Sublime finish! {player_name} strikes with precision, giving the {scoring_team_name} fans exactly what they wanted to see.",
+                "{player_name} makes no mistake! A beautifully worked sequence ends with {scoring_team_name} celebrating.",
+                "A fantastic strike from {player_name} keeps {scoring_team_name} rolling in this battle against {conceding_team_name}.",
+                "The fans erupt as {player_name} fires a sensational goal for {scoring_team_name} against {conceding_team_name}.",
+                "Right on target! {player_name} delivers the goods for {scoring_team_name}, leaving {conceding_team_name} frustrated."
+            ],
+            "ctas": ["Track the tactical shifts and live pitch data here:", "Follow the momentum, live scores, and player ratings here:", "Dive into the full match center and live lineups:"]
+        },
         "hat_trick": {
-            "titles": ["🚨🔥 HAT-TRICK ALERT!", "🚨🔥 UNSTOPPABLE!", "🚨🔥 THREE OF THE BEST!", "🚨🔥 MATCH BALL SECURED!", "🚨🔥 HAT-TRICK HERO!"],
+            "titles": [
+                "🎩✨ HAT-TRICK HERO!", "⚽⚽⚽ MATCH BALL SECURED!", "🌟 A PERFECT PERFORMANCE!", 
+                "🤯 FLAWLESS!", "👑 MAGNIFICENT THREE!", "🪄 PURE MAGIC!", "🔥 OUT OF THIS WORLD!", 
+                "🐐 MASTERCLASS!", "🏆 THREE OF THE BEST!", "💯 TRIPLE THREAT!"
+            ],
             "blurbs": [
                 "Absolute brilliance! {player_name} bags a sensational hat-trick for {scoring_team_name} to tear {conceding_team_name} apart!",
-                "Take a bow, {player_name}! That is three goals on the day for the {scoring_team_name} superstar against {conceding_team_name}.",
-                "Unplayable! {player_name} secures a magnificent hat-trick, putting {scoring_team_name} firmly in the driver's seat over {conceding_team_name}.",
-                "{conceding_team_name} simply has no answers! {player_name} completes a stunning hat-trick for {scoring_team_name}."
+                "Take a bow, {player_name}! An unforgettable hat-trick secures the match ball and tears {conceding_team_name} apart.",
+                "Pure perfection! {player_name} hits the magical milestone with a stunning third goal for {scoring_team_name}.",
+                "{conceding_team_name} simply has no answers! {player_name} completes a stunning hat-trick for {scoring_team_name}.",
+                "Three goals, one incredible performance! {player_name} achieves a glorious hat-trick for {scoring_team_name}.",
+                "{conceding_team_name} has been completely outclassed by {player_name}! A stunning hat-trick for the {scoring_team_name} talisman.",
+                "The hat-trick is complete! {player_name} is having a game to remember for {scoring_team_name} against a helpless {conceding_team_name}.",
+                "A trio of brilliant strikes! {player_name} writes their name in the headlines today for {scoring_team_name}.",
+                "Simply untamable! {player_name} bags goal number three to cap off an unbelievable individual display for {scoring_team_name}.",
+                "Give them the match ball! {player_name} clinches a spectacular hat-trick to put {scoring_team_name} out of sight against {conceding_team_name}."
             ],
             "ctas": ["Track the live match stats and pitch data here:", "Can they add a fourth? Follow the live action:", "See the full match center and player ratings here:"]
         },
         "brace": {
-            "titles": ["🚨⚽ BRACE ALERT!", "🚨⚽ ON A HAT-TRICK!", "🚨⚽ TWO FOR {player_name}!", "🚨⚽ DOUBLE TROUBLE!", "🚨⚽ SEEING DOUBLE!"],
+            "titles": [
+                "✌️ DOUBLE TROUBLE!", "🔥⚽ BRACE ALERT!", "👀 HUNTING THE MATCH BALL!", 
+                "☄️ ON FIRE!", "😤 UNSTOPPABLE TODAY!", "🎯 TWO GOOD!", "💥 DOUBLE STRIKE!", 
+                "🎭 SEEING DOUBLE!", "🌟 STAR PERFORMANCE!", "💣 BACK FOR MORE!"
+            ],
             "blurbs": [
-                "{player_name} is putting on a masterclass! That is goal number two on the day for {scoring_team_name} against {conceding_team_name}.",
-                "Hat Trick?!?!? {player_name} bags his second goal of the match to power {scoring_team_name} ahead of {conceding_team_name}.",
-                "Trouble for {conceding_team_name}! {player_name} finds the back of the net again for the second goal of the contest.",
-                "{scoring_team_name}'s star player is locked in! A brilliant brace for {player_name} puts {conceding_team_name} on the ropes."
+                "{player_name} is putting on an absolute clinic! That is a brilliant brace for the {scoring_team_name} star.",
+                "Hunting for the match ball! {player_name} grabs a second goal, leaving the {conceding_team_name} defense searching for answers.",
+                "You simply cannot give {player_name} that kind of space! A stunning second goal puts {scoring_team_name} firmly in the driver's seat.",
+                "Twice as nice for {scoring_team_name}! {player_name} hits the double to keep the pressure heavily on {conceding_team_name}.",
+                "Another one! {player_name} gets their second of the match to extend {scoring_team_name}'s advantage over {conceding_team_name}.",
+                "Two goals to their name! {player_name} is having a stellar game for {scoring_team_name}.",
+                "A beautiful brace! {player_name} strikes again, and {conceding_team_name} has no answer for the {scoring_team_name} attack.",
+                "They just cannot be stopped! {player_name} adds a second goal for {scoring_team_name} against a struggling {conceding_team_name} defense.",
+                "The double is complete! {player_name} shines brightest today, giving {scoring_team_name} the edge over {conceding_team_name}.",
+                "{scoring_team_name} relies on their star! {player_name} scores twice to put {conceding_team_name} firmly on the back foot."
             ],
             "ctas": ["Will we see a hat-trick? Follow live:", "Track the live match center and stats here:", "See the live pitch data and scores here:"]
         },
         "lightning_start": {
-            "titles": ["⚡🚨 LIGHTNING START!", "⚡🚨 FLASH GOAL!", "⚡🚨 EXPLOSIVE OPENING!", "⚡🚨 WHAT A START!", "⚡🚨 FAST OUT OF THE GATES!"],
+            "titles": [
+                "⚡ FAST OUT OF THE BLOCKS!", "🏃💨 CAUGHT SLEEPING!", "⏰ DREAM START!", 
+                "🧨 EARLY FIREWORKS!", "🌪️ BLITZ!", "🚀 ROCKET START!", "⏱️ INSTANT IMPACT!", 
+                "🤯 BLINK AND YOU'LL MISS IT!", "💥 EXPLOSIVE OPENING!", "🔥 RED HOT START!"
+            ],
             "blurbs": [
-                "Barely any time on the clock and {scoring_team_name} is already on the board! A dream start against {conceding_team_name}.",
-                "No time wasted! {scoring_team_name} comes flying out of the gates to catch {conceding_team_name} sleeping early!",
-                "What an opening! {scoring_team_name} lands a massive early punch against {conceding_team_name} in the opening minutes.",
-                "The fans have barely taken their seats and {scoring_team_name} has already broken the deadlock against {conceding_team_name}!"
+                "What an opening! {scoring_team_name} lands a massive early punch, catching {conceding_team_name} completely cold.",
+                "The fans have barely taken their seats! A dream start for {scoring_team_name} as {player_name} finds the net immediately.",
+                "No time wasted! {player_name} fires {scoring_team_name} ahead with incredible urgency.",
+                "Explosive! {scoring_team_name} tears down the pitch to strike in the blink of an eye.",
+                "An immediate breakthrough! {scoring_team_name} stuns {conceding_team_name} before they can even settle into the match.",
+                "Incredible urgency from {scoring_team_name}! {player_name} strikes early to leave {conceding_team_name} shellshocked.",
+                "A nightmare start for {conceding_team_name}! {scoring_team_name} attacks successfully just moments after the opening whistle.",
+                "Fast, clinical, and deadly! {scoring_team_name} takes a lightning-quick advantage over {conceding_team_name}.",
+                "The perfect opening script for {scoring_team_name}! {player_name} strikes inside the opening minutes against {conceding_team_name}.",
+                "{conceding_team_name} pays the price for a slow start! {scoring_team_name} capitalizes immediately."
             ],
             "ctas": ["Follow this fast-paced clash live here:", "Track the live match center and pitch data:", "Don't miss a minute. See live scores and odds here:"]
         },
         "tight_clash_goal": {
-            "titles": ["⚽🔥 MATCH GOAL!", "⚽🔥 THE TIE TIGHTENS!", "⚽🔥 GAME ON!", "⚽🔥 BACK AND FORTH WE GO!", "⚽🔥 CRUCIAL STRIKE!"],
+            "titles": [
+                "⚔️ THE TIE TIGHTENS!", "⚖️ GAME ON!", "🥊 BACK AND FORTH WE GO!", 
+                "🔥 CRUCIAL STRIKE!", "📈 MOMENTUM SWING!", "🎯 VITAL GOAL!", 
+                "💥 BREAKING THE TENSION!", "🥵 HEATING UP!", "🎢 ROLLERCOASTER MATCH!", "🛡️ HARD-FOUGHT GOAL!"
+            ],
             "blurbs": [
                 "A vital goal from {scoring_team_name}! This clash with {conceding_team_name} is turning into an absolute thriller.",
                 "{scoring_team_name} strikes to keep the pressure on {conceding_team_name}! Nothing separating these sides as the battle continues.",
                 "We have a massive fight on our hands! {scoring_team_name} finds the back of the net in a tightly contested clash with {conceding_team_name}.",
-                "Momentum swing! {scoring_team_name} delivers a crucial blow against {conceding_team_name} as the game remains wide open."
+                "Momentum swing! {scoring_team_name} delivers a crucial blow against {conceding_team_name} as the game remains wide open.",
+                "A massive turning point! {scoring_team_name} strikes to alter the complexion of this tight match against {conceding_team_name}.",
+                "In a game of fine margins, {scoring_team_name} finds the breakthrough against {conceding_team_name}!",
+                "The tension breaks! {player_name} delivers a crucial goal for {scoring_team_name} in this closely fought battle.",
+                "End-to-end action! {scoring_team_name} takes their chance, pulling ahead of {conceding_team_name}.",
+                "Neither side is backing down! {scoring_team_name} lands a heavy blow against {conceding_team_name} in this fierce contest.",
+                "A pivotal moment in the match! {scoring_team_name} gets the upper hand over {conceding_team_name} with a fantastic goal."
             ],
             "ctas": ["Track the live scores and match momentum here:", "Follow the tactical battle and live pitch data:", "See live stats, lineups, and odds here:"]
         },
         "late_equalizer": {
-            "titles": ["🚨 LATE EQUALIZER!", "🚨 DRAMATIC EQUALIZER!", "🚨 TIED UP LATE!", "🚨 CLOSING STAGES CHAOS!", "🚨 ALL SQUARE LATE!"],
+            "titles": [
+                "⏱️ LATE EQUALIZER!", "😱 DRAMATIC EQUALIZER!", "⏳ TIED UP LATE!", 
+                "🤯 CLOSING STAGES CHAOS!", "⚖️ ALL SQUARE LATE!", "🧨 LATE LIFELINE!", 
+                "😤 NEVER GIVE UP!", "🔄 RESETTING THE CLOCK!", "🛡️ SAVED!", "⏰ DOWN TO THE WIRE!"
+            ],
             "blurbs": [
                 "A massive goal from {scoring_team_name} to level the score, leaving {conceding_team_name} scrambling as time winds down!",
                 "{scoring_team_name} claws their way back to tie the match, ripping the momentum right out of {conceding_team_name}'s hands.",
                 "{scoring_team_name} refuses to go away quietly! We are all square as {conceding_team_name} tries to regain control.",
-                "A crucial tying goal for {scoring_team_name} stuns {conceding_team_name} and sets up a frantic finish!"
+                "A crucial tying goal for {scoring_team_name} stuns {conceding_team_name} and sets up a frantic finish!",
+                "They never stopped fighting! {scoring_team_name} gets their reward with a late equalizer against {conceding_team_name}.",
+                "{conceding_team_name} thought they had it won, but {scoring_team_name} snatches a late equalizer to balance the scales!",
+                "The late pressure pays off! {scoring_team_name} draws level, completely changing the dynamic against {conceding_team_name}.",
+                "A brilliantly timed strike from {scoring_team_name} ensures this match is dead even heading into the final moments.",
+                "Heartbreak for the {conceding_team_name} defense as {scoring_team_name} powers through to tie it up late.",
+                "We have a brand new ballgame! {scoring_team_name} equalizes late to put the pressure right back on {conceding_team_name}."
             ],
             "ctas": ["Track the final push for a game-winner here:", "See the live momentum shift and pitch data:", "Can someone find a late winner? Follow live:"]
         },
         "late_go_ahead": {
-            "titles": ["🚨 LATE GO-AHEAD GOAL!", "🚨 THE DEADLOCK IS BROKEN!", "🚨 CLUTCH MOMENT!", "🚨 HUGE LATE GOAL!", "🚨 TENSION IN THE FINAL 15!"],
+            "titles": [
+                "📈 LATE GO-AHEAD GOAL!", "🔓 THE DEADLOCK IS BROKEN!", "🥶 CLUTCH MOMENT!", 
+                "🔨 HUGE LATE GOAL!", "⏳ TENSION IN THE FINAL 15!", "🗡️ LATE DAGGER!", 
+                "🚀 TAKING CHARGE LATE!", "🎯 PRECISION WHEN IT MATTERS!", "🏁 RACING TO THE FINISH!", "💥 LATE HEARTBREAK AVERTED!"
+            ],
             "blurbs": [
                 "A game-changing strike from {scoring_team_name} forces {conceding_team_name} to chase the game late!",
                 "{scoring_team_name} snatches the advantage right when they needed it, leaving {conceding_team_name} stunned.",
                 "A massive momentum swing puts {scoring_team_name} in front, and now {conceding_team_name} is running out of time!",
-                "The defense finally cracks! {scoring_team_name} takes a crucial late lead over {conceding_team_name}."
+                "The defense finally cracks! {scoring_team_name} takes a crucial late lead over {conceding_team_name}.",
+                "Cometh the hour, cometh the player! {player_name} scores late to give {scoring_team_name} a priceless lead.",
+                "{scoring_team_name} steps up when the pressure is highest, pushing past {conceding_team_name} in the closing stages.",
+                "A devastating blow! {scoring_team_name} breaks through the {conceding_team_name} lines to claim a vital late lead.",
+                "The stadium erupts! {scoring_team_name} finds the magic touch late on to put {conceding_team_name} against the ropes.",
+                "Brilliant composure from {scoring_team_name} to secure a go-ahead goal while the clock ticks down on {conceding_team_name}.",
+                "They kept knocking, and the door finally opened! {scoring_team_name} takes a huge late advantage over {conceding_team_name}."
             ],
             "ctas": ["Can they hold on? Follow the final minutes live:", "Track the closing stages and live stats here:"]
         },
         "stoppage_equalizer": {
-            "titles": ["🚨 STOPPAGE TIME EQUALIZER!", "🚨 SAVED AT THE DEATH!", "🚨 LAST MINUTE LIFELINE!", "🚨 90TH MINUTE MADNESS!", "🚨 SCENES IN STOPPAGE TIME!"],
+            "titles": [
+                "🤯 SAVED AT THE DEATH!", "🆘 LAST MINUTE LIFELINE!", "⏱️ 90TH MINUTE MADNESS!", 
+                "🗣️ SCENES IN STOPPAGE TIME!", "😱 MIRACLE AT THE DEATH!", "🤯 UNBELIEVABLE SCENES!", 
+                "🎭 THE DRAMA!", "⏰ BEATING THE CLOCK!", "🚑 RESCUED!", "😵 CHAOS!"
+            ],
             "blurbs": [
                 "Absolute scenes! A miraculous stoppage-time equalizer for {scoring_team_name} throws {conceding_team_name} into chaos!",
                 "{scoring_team_name} climbs out of the grave to level the match. Is there still time for {conceding_team_name} to respond?!",
-                "You can't write a better script! {scoring_team_name} stuns {conceding_team_name} with a tying goal deep in stoppage time."
+                "You can't write a better script! {scoring_team_name} stuns {conceding_team_name} with a tying goal deep in stoppage time.",
+                "Just when it looked over! {scoring_team_name} pulls a rabbit out of the hat to equalize against {conceding_team_name}.",
+                "A gut punch for {conceding_team_name}! {scoring_team_name} scores in the dying seconds to level the playing field.",
+                "Pure pandemonium! {scoring_team_name} steals an equalizer at the death to break {conceding_team_name}'s hearts.",
+                "The definition of clutch! {scoring_team_name} rescues the match with a stoppage-time stunner against {conceding_team_name}.",
+                "{conceding_team_name} thought the whistle was coming, but {scoring_team_name} equalizes at the very last moment!",
+                "Unbelievable drama! {scoring_team_name} refuses to lose, burying a stoppage-time equalizer past {conceding_team_name}.",
+                "They simply never quit! {scoring_team_name} forces a dramatic draw with {conceding_team_name} in the final seconds."
             ],
             "ctas": ["Watch the frantic final moments unfold live:", "Track the live pitch data before the referee blows the whistle:"]
         },
         "stoppage_go_ahead": {
-            "titles": ["🚨 STOPPAGE TIME THRILLER!", "🚨 AT THE DEATH!", "🚨 LATE HEARTBREAK!", "🚨 STOPPAGE TIME DAGGER!", "🚨 90TH MINUTE MADNESS!"],
+            "titles": [
+                "🗡️ AT THE DEATH!", "💔 LATE HEARTBREAK!", "🔪 STOPPAGE TIME DAGGER!", 
+                "🤯 90TH MINUTE MADNESS!", "⏳ STOPPAGE TIME THRILLER!", "😱 WINNING IT LATE!", 
+                "🏁 BUZZER BEATER!", "🏆 CLUTCH GENE!", "🥶 ICE IN THE VEINS!", "🤯 THE STANDS ARE SHAKING!"
+            ],
             "blurbs": [
                 "Heartbreak for {conceding_team_name}! {scoring_team_name} pulls a rabbit out of the hat to take the lead in stoppage time.",
                 "A staggering late dagger! {scoring_team_name} snatches a crucial lead, leaving {conceding_team_name} with virtually no time to respond.",
-                "Absolute madness! {scoring_team_name} takes the lead at the death, forcing {conceding_team_name} into pure panic mode."
+                "Absolute madness! {scoring_team_name} takes the lead at the death, forcing {conceding_team_name} into pure panic mode.",
+                "What a finish! {scoring_team_name} wins it late, leaving {conceding_team_name} stunned on the pitch.",
+                "The ultimate heartbreaker! {scoring_team_name} scores in stoppage time to steal the victory from {conceding_team_name}.",
+                "{conceding_team_name} is in disbelief! {scoring_team_name} finds a miraculous go-ahead goal deep into added time.",
+                "An incredible climax! {scoring_team_name} takes all the glory with a stoppage-time strike against {conceding_team_name}.",
+                "Ice in their veins! {scoring_team_name} converts at the death to leave {conceding_team_name} empty-handed.",
+                "A grandstand finish! {scoring_team_name} powers ahead of {conceding_team_name} just before the final whistle.",
+                "The latest of late drama! {scoring_team_name} secures a massive go-ahead goal to sink {conceding_team_name}."
             ],
             "ctas": ["Can they survive the final whistle? Follow live:", "Don't miss the frantic ending. See live stats and pitch data here:"]
         },
         "takes_control": {
-            "titles": ["🚨 TWO GOAL CUSHION!", "🚨 BREATHING ROOM!", "🚨 IN FULL CONTROL!", "🚨 PULLING AWAY!"],
+            "titles": [
+                "🧱 TWO GOAL CUSHION!", "😮‍💨 BREATHING ROOM!", "🎮 IN FULL CONTROL!", 
+                "🏎️ PULLING AWAY!", "🔒 LOCKING IT DOWN!", "📈 EXTENDING THE LEAD!", 
+                "💼 TAKING CARE OF BUSINESS!", "🛡️ COMFORTABLE LEAD!", "🚦 GREEN LIGHT!", "🔨 HAMMERING IT HOME!"
+            ],
             "blurbs": [
                 "{scoring_team_name} doubles their advantage! They take a commanding two-goal lead over {conceding_team_name}.",
-                "A massive insurance goal for {scoring_team_name}! They are now in full control against {conceding_team_name}."
+                "A massive insurance goal for {scoring_team_name}! They are now in full control against {conceding_team_name}.",
+                "The gap widens! {scoring_team_name} extends their lead, giving {conceding_team_name} a mountain to climb.",
+                "{scoring_team_name} finds the breathing room they were looking for, pulling two goals clear of {conceding_team_name}.",
+                "Taking total charge! {scoring_team_name} secures a two-goal cushion to dictate the rest of the game against {conceding_team_name}.",
+                "It's getting difficult for {conceding_team_name} now. {scoring_team_name} doubles their lead and takes command.",
+                "A crucial second goal! {scoring_team_name} is now comfortably ahead of {conceding_team_name}.",
+                "{scoring_team_name} puts their foot on the gas! They stretch their advantage over {conceding_team_name}.",
+                "Solidifying their position! {scoring_team_name} gets a vital insurance goal against {conceding_team_name}.",
+                "The pressure pays off again! {scoring_team_name} takes a commanding two-goal lead over {conceding_team_name}."
             ],
             "ctas": ["Can the trailing side mount a comeback? Track live:", "Follow the live match center and pitch data here:"]
         },
         "blowout": {
-            "titles": ["🚨 THE ROUT IS ON!", "🚨 ABSOLUTE DOMINANCE!", "🚨 RUNNING RIOT!", "🚨 OUT OF REACH!"],
+            "titles": [
+                "🩸 THE ROUT IS ON!", "💪 ABSOLUTE DOMINANCE!", "🚂 RUNNING RIOT!", 
+                "🔭 OUT OF REACH!", "🌪️ A TOTAL STORM!", "🛑 STOP THE FIGHT!", 
+                "💥 TOTAL DESTRUCTION!", "🧨 BLOWING THEM AWAY!", "📉 NO MERCY!", "🎮 PLAYING ON ROOKIE MODE!"
+            ],
             "blurbs": [
                 "It is turning into a nightmare for {conceding_team_name}. {scoring_team_name} extends their massive lead!",
-                "{scoring_team_name} is running riot! They pour it on {conceding_team_name} to turn this match into an absolute blowout."
+                "{scoring_team_name} is running riot! They pour it on {conceding_team_name} to turn this match into an absolute blowout.",
+                "Complete dominance! {scoring_team_name} is tearing {conceding_team_name} apart with another goal.",
+                "The floodgates have opened! {scoring_team_name} is showing no mercy against a collapsing {conceding_team_name}.",
+                "A total mismatch today! {scoring_team_name} extends their lead, leaving {conceding_team_name} in the dust.",
+                "Stop the count! {scoring_team_name} adds another goal to thoroughly humiliate {conceding_team_name}.",
+                "A clinical dismantling! {scoring_team_name} runs up the score against a helpless {conceding_team_name} side.",
+                "{conceding_team_name} is falling apart! {scoring_team_name} continues their relentless scoring spree.",
+                "It's getting ugly! {scoring_team_name} makes it another one to completely blow out {conceding_team_name}.",
+                "An absolute masterclass in attack! {scoring_team_name} effortlessly puts another past {conceding_team_name}."
             ],
             "ctas": ["Track the rest of the blowout live here:", "Follow the live match stats and ratings here:"]
         },
         "consolation_goal": {
-            "titles": ["⚽ MATCH GOAL!", "⚽ ON THE BOARD!", "⚽ PULLING ONE BACK!"],
+            "titles": [
+                "📉 PULLING ONE BACK", "🤏 NARROWING THE DEFICIT", "🥅 CONSOLATION STRIKE", 
+                "🤏 A GLIMMER OF HOPE?", "🩹 SALVAGING PRIDE", "🛡️ A MINOR DENT", 
+                "⚽ JUST A STAT?", "⏱️ TOO LITTLE TOO LATE?", "🤷 SOMETHING TO CHEER FOR", "🔥 REFUSING TO QUIT!"
+            ],
             "blurbs": [
                 "{scoring_team_name} finds the back of the net to pull one back, but they still have a mountain to climb against {conceding_team_name}.",
                 "A goal for {scoring_team_name} gives the fans something to cheer about, but {conceding_team_name} remains in complete control of the match.",
-                "{scoring_team_name} gets on the board, but they still heavily trail {conceding_team_name} with the clock ticking down."
+                "{scoring_team_name} grabs a goal, but they still heavily trail {conceding_team_name} with the clock ticking down.",
+                "Too little, too late? {scoring_team_name} scores, but {conceding_team_name} still holds a massive advantage.",
+                "A minor consolation for {scoring_team_name}, who finally breach the {conceding_team_name} defense.",
+                "Salvaging some pride! {scoring_team_name} gets on the scoresheet against a dominant {conceding_team_name}.",
+                "{scoring_team_name} finally responds, but {conceding_team_name} continues to dictate the terms of this match.",
+                "A goal back for {scoring_team_name}! Is it the start of a miracle, or just a stat against {conceding_team_name}?",
+                "They refuse to be shut down completely! {scoring_team_name} strikes, though {conceding_team_name} is still cruising.",
+                "{scoring_team_name} narrows the gap slightly, but {conceding_team_name} remains firmly in the driver's seat."
             ],
             "ctas": ["See the live match center and stats here:", "Follow the rest of the action live here:"]
         },
         "standard_upset": {
-            "titles": ["⚠️ UPSET ALERT!", "⚠️ UNDERDOGS OUT IN FRONT!", "⚠️ SURPRISE BREWING!", "⚠️ UPSET IN PROGRESS!"],
+            "titles": [
+                "⚠️ THE SCRIPT IS FLIPPED!", "🤫 GIANT KILLERS?!", "👀 SHOCKER IN PROGRESS!", 
+                "📉 VEGAS IS SWEATING!", "🎰 UPSET ALERT!", "🧨 SPOILING THE PARTY!", 
+                "🔄 TABLES TURNED!", "🚨 SURPRISE LEAD!", "😱 DEFYING THE ODDS!", "🥊 PUNCHING UP!"
+            ],
             "blurbs": [
-                "The underdogs have taken the lead! {scoring_team_name} strikes against {conceding_team_name}.",
+                "Throw the odds out the window! Massive underdogs {scoring_team_name} take the game right to {conceding_team_name}.",
                 "A surprising turn of events puts {scoring_team_name} ahead of heavy favorites {conceding_team_name}.",
-                "The heavy favorites find themselves trailing as {scoring_team_name} takes the game right to {conceding_team_name}!"
+                "The heavy favorites find themselves trailing as {scoring_team_name} takes the game right to {conceding_team_name}!",
+                "Who saw this coming?! {scoring_team_name} takes a shock lead over the heavily favored {conceding_team_name}.",
+                "The underdogs bite first! {scoring_team_name} strikes to put all the pressure on {conceding_team_name}.",
+                "A fantastic moment for {scoring_team_name} as they go ahead against the much-fancied {conceding_team_name}.",
+                "Upset alert! {scoring_team_name} takes the lead, leaving {conceding_team_name} with a lot of work to do.",
+                "The script has been torn up! {scoring_team_name} punches above their weight to lead {conceding_team_name}.",
+                "{conceding_team_name} is stunned! {scoring_team_name} takes the lead in a massive surprise.",
+                "Vegas might be panicking! {scoring_team_name} takes an unexpected lead over {conceding_team_name}."
             ],
             "ctas": ["Can they hold on for the upset? Track live here:", "Follow the live match center and pitch data here:"]
         },
         "massive_upset": {
-            "titles": ["🚨🔥 MAJOR UPSET ALERT!", "🚨🔥 SHOCKER IN PROGRESS!", "🚨🔥 MASSIVE UPSET BREWING!", "🚨🔥 DAVID VS GOLIATH!"],
+            "titles": [
+                "🌋 MAJOR UPSET ALERT!", "🤯 SHOCKER IN PROGRESS!", "💥 MASSIVE UPSET BREWING!", 
+                "🪨 DAVID VS GOLIATH!", "🚨 HOLD THE PRESSES!", "😱 UNBELIEVABLE LEAD!", 
+                "📉 BRACKET BUSTER!", "🧨 THE UNTHINKABLE!", "🤯 EARTHQUAKE!", "🚨 SOUND THE ALARM!"
+            ],
             "blurbs": [
                 "A massive shocker is unfolding! {scoring_team_name} takes a stunning lead over {conceding_team_name}.",
                 "Nobody saw this coming! Massive underdogs {scoring_team_name} are out in front of {conceding_team_name}.",
-                "Stunning scenes! The heavy favorites are on the ropes as {scoring_team_name} goes up on {conceding_team_name}."
+                "Stunning scenes! The heavy favorites are on the ropes as {scoring_team_name} goes up on {conceding_team_name}.",
+                "We are on upset watch! {scoring_team_name} takes an unbelievable lead against {conceding_team_name}.",
+                "The unthinkable is happening! {scoring_team_name} stuns the football world by going ahead of {conceding_team_name}.",
+                "An absolute earthquake of a goal! {scoring_team_name} drops a bomb on {conceding_team_name}.",
+                "David is beating Goliath! {scoring_team_name} strikes to take a miracle lead over {conceding_team_name}.",
+                "Total disbelief! {scoring_team_name} has heavily favored {conceding_team_name} trailing in this match.",
+                "{conceding_team_name} is in serious danger of a historic defeat as {scoring_team_name} takes the lead!",
+                "Hold the presses! {scoring_team_name} just scored a mammoth goal against {conceding_team_name}."
             ],
             "ctas": ["Witness the upset attempt live:", "Don't miss this potential shocker. Live stats and odds:"]
         },
         "late_upset": {
-            "titles": ["🚨⚠️ LATE UPSET BREWING!", "🚨⚠️ LATE UNDERDOG ALERT!", "🚨⚠️ UPSET WATCH: CLOSING STAGES!", "🚨⚠️ VEGAS IS SWEATING!"],
+            "titles": [
+                "👀 LATE UPSET BREWING!", "🚨 LATE UNDERDOG ALERT!", "📉 UPSET WATCH: CLOSING STAGES!", 
+                "💦 VEGAS IS SWEATING!", "⏳ LATE SHOCKER!", "🧨 STEALING IT LATE!", 
+                "😱 LATE GIANT KILLING!", "⏱️ TICKING CLOCK FOR THE FAVORITES!", "🤯 A LATE STUNNER!", "🚨 NEARING A SHOCKER!"
+            ],
             "blurbs": [
                 "{scoring_team_name} snatches a crucial late lead, putting {conceding_team_name} in serious danger of a huge upset!",
-                "A massive late goal puts heavy favorites {conceding_team_name} on the brink of defeat against {scoring_team_name}."
+                "A massive late goal puts heavy favorites {conceding_team_name} on the brink of defeat against {scoring_team_name}.",
+                "The clock is ticking on {conceding_team_name} as {scoring_team_name} scores a brilliant late go-ahead goal!",
+                "An incredible late twist! Underdogs {scoring_team_name} take the lead, leaving {conceding_team_name} stunned.",
+                "Can they pull it off?! {scoring_team_name} finds a late goal to push {conceding_team_name} to the brink.",
+                "The giant killers strike late! {scoring_team_name} takes a shocking advantage over {conceding_team_name}.",
+                "Panic mode for {conceding_team_name}! {scoring_team_name} nets a late stunner to threaten a massive upset.",
+                "A dramatic late shift in power! {scoring_team_name} goes ahead of the highly favored {conceding_team_name}.",
+                "The upset is nearly complete! {scoring_team_name} scores late to pile the pressure on {conceding_team_name}.",
+                "{conceding_team_name} is running out of time as {scoring_team_name} secures a shocking late lead!"
             ],
             "ctas": ["Watch the frantic final push live here:", "Can the underdogs hold the line? Live stats:"]
         },
         "stoppage_upset": {
-            "titles": ["🚨🔥 STUNNER IN STOPPAGE TIME!", "🚨🔥 LATE UPSET THRILLER!", "🚨🔥 MADNESS AT THE DEATH!", "🚨🔥 THE ULTIMATE SHOCKER!"],
+            "titles": [
+                "🤯 STUNNER IN STOPPAGE TIME!", "😱 LATE UPSET THRILLER!", "💥 MADNESS AT THE DEATH!", 
+                "💀 THE ULTIMATE SHOCKER!", "🌋 STOPPAGE TIME UPSET!", "🧨 SHOCKING THE WORLD LATE!", 
+                "🚨 A MIRACLE UPSET!", "🤯 SCRIPT TORN APART!", "⏰ BEATING THE ODDS AT THE HORN!", "😱 UNREAL FINISH!"
+            ],
             "blurbs": [
                 "A staggering stoppage-time strike! {scoring_team_name} takes a shocking lead, forcing {conceding_team_name} into a desperate final push.",
-                "Parlays are in critical danger! {scoring_team_name} strikes in stoppage time to go ahead of {conceding_team_name}."
+                "Parlays are in critical danger! {scoring_team_name} strikes in stoppage time to go ahead of {conceding_team_name}.",
+                "A miracle at the death! {scoring_team_name} scores a stoppage-time stunner to completely rock {conceding_team_name}.",
+                "The ultimate giant killing! {scoring_team_name} finds a winner in stoppage time against {conceding_team_name}.",
+                "Unbelievable scenes! {scoring_team_name} shatters the odds with a stoppage-time goal against {conceding_team_name}.",
+                "{conceding_team_name} is left in absolute shock as {scoring_team_name} takes the lead deep into added time!",
+                "The most dramatic of upsets! {scoring_team_name} stuns {conceding_team_name} right before the final whistle.",
+                "A historic stoppage-time moment! {scoring_team_name} defies belief to go ahead of {conceding_team_name}.",
+                "The heavy favorites are collapsing! {scoring_team_name} scores a miracle goal at the death against {conceding_team_name}.",
+                "{scoring_team_name} just pulled off the impossible! A stoppage-time winner to sink {conceding_team_name}."
             ],
             "ctas": ["Witness the final frantic moments live:", "Don't miss the final whistle of this shocker. Live stats:"]
+        },
+        "agg_late_equalizer": {
+            "titles": ["🚨 AGGREGATE TIED LATE!", "🚨 THE TIE IS LEVEL!", "🚨 DRAMATIC AGGREGATE EQUALIZER!"],
+            "blurbs": [
+                "A massive goal from {scoring_team_name}! They have erased the deficit and the tournament tie is completely level as time winds down.",
+                "{scoring_team_name} refuses to go quietly! They tie things up on aggregate, setting up a frantic finish against {conceding_team_name}.",
+                "We are all square on aggregate! {scoring_team_name} claws their way back into the tie."
+            ],
+            "ctas": ["Who will find a winner? Follow the final push live:", "Track the closing minutes of this tie here:"]
+        },
+        "agg_late_go_ahead": {
+            "titles": ["🚨 LATE AGGREGATE LEAD!", "🚨 ADVANTAGE: {scoring_team_name}!", "🚨 CLUTCH TOURNAMENT GOAL!"],
+            "blurbs": [
+                "A game-changing strike! {scoring_team_name} snatches the aggregate lead late in the 2nd leg.",
+                "Heartbreak for {conceding_team_name} as {scoring_team_name} takes a crucial late lead in the tie!",
+                "{scoring_team_name} steps up when it matters most, taking the aggregate advantage over {conceding_team_name}."
+            ],
+            "ctas": ["Can they hold on to advance? Follow live:", "Track the final minutes of this 2nd leg here:"]
+        },
+        "agg_stoppage_equalizer": {
+            "titles": ["🚨 MIRACLE AT THE DEATH!", "🚨 STOPPAGE TIME AGGREGATE EQUALIZER!", "🚨 ABSOLUTE SCENES!"],
+            "blurbs": [
+                "You cannot write a better script! {scoring_team_name} scores deep in stoppage time to tie the aggregate score!",
+                "A devastating blown lead for {conceding_team_name}! {scoring_team_name} forces a dramatic tie in the dying moments.",
+                "Absolute madness! {scoring_team_name} climbs out of the grave to level the tie right at the end."
+            ],
+            "ctas": ["Are we heading to extra time? Follow live:", "Don't miss the post-goal chaos here:"]
+        },
+        "agg_stoppage_go_ahead": {
+            "titles": ["🚨 STOPPAGE TIME TOURNAMENT THRILLER!", "🚨 A DAGGER AT THE DEATH!", "🚨 LATE HEARTBREAK!"],
+            "blurbs": [
+                "Heartbreak for {conceding_team_name}! {scoring_team_name} takes the aggregate lead in stoppage time.",
+                "A staggering late dagger! {scoring_team_name} snatches the tie, leaving {conceding_team_name} with virtually no time to respond.",
+                "They have won it at the death! {scoring_team_name} stuns {conceding_team_name} to take the aggregate advantage."
+            ],
+            "ctas": ["Can they survive the final whistle? Follow live:", "Watch the desperate final seconds unfold here:"]
+        },
+        "agg_dagger": {
+            "titles": ["🚨 NAIL IN THE COFFIN!", "🚨 THE TIE IS SLIPPING AWAY!", "🚨 COMMANDING AGGREGATE LEAD!"],
+            "blurbs": [
+                "That might just do it! {scoring_team_name} extends their aggregate lead, putting the tie nearly out of reach for {conceding_team_name}.",
+                "A devastating blow for {conceding_team_name}. {scoring_team_name} takes a commanding multi-goal lead on aggregate.",
+                "{scoring_team_name} flexes their muscles, adding an insurance goal to all but secure their spot in the next round."
+            ],
+            "ctas": ["Track the remainder of the match live here:", "Follow the live pitch data and stats here:"]
+        },
+        "agg_consolation": {
+            "titles": ["⚽ MATCH GOAL", "⚽ CONSOLATION STRIKE", "⚽ LATE MATCH LEAD"],
+            "blurbs": [
+                "{scoring_team_name} finds the back of the net on the day, but they still have a mountain to climb against {conceding_team_name} on aggregate.",
+                "A goal for {scoring_team_name} rewards the live bettors, but {conceding_team_name} remains in complete control of the overall tie.",
+                "{scoring_team_name} gets on the board, but they still heavily trail {conceding_team_name} on aggregate with time running out."
+            ],
+            "ctas": ["See the live match center and stats here:", "Follow the closing stages of the tie here:"]
         }
     }
 
