@@ -933,11 +933,26 @@ async def run_engines(memory):
             f"{league_hashtag} #{team_hash} #{opponent_hash}"
         )
 
-        # --- Bluesky Rich Text ---
+        # --- Bluesky Rich Text (CTA & Raw URL near Top, <300 Character Guard) ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\nFollow the action live:\n")
-        bsky_tb.link(lineup_url, lineup_url)
-        bsky_tb.text(f"\n\n{players_block}\n\n{league_hashtag} #{team_hash} #{opponent_hash}")
+        
+        bsky_top = f"{e} {team_name} XI vs {opponent_name}\nFollow live: "
+        bsky_hashtags = f"\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
+        
+        total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + len(bsky_hashtags) + 2
+        
+        # Auto-trim optional elements if needed
+        if total_chars > 290:
+            bsky_top = f"{e} {team_name} XI vs {opponent_name}\n"  # Shorten CTA line if tight
+            bsky_hashtags = f"\n\n#{team_hash}"
+            total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + len(bsky_hashtags) + 2
+            
+        if total_chars > 290:
+            bsky_hashtags = ""  # Omit hashtags completely if still tight
+            
+        bsky_tb.text(bsky_top)
+        bsky_tb.link(lineup_url, lineup_url)  # Raw URL displayed right at the top
+        bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
         upload_success = False
 
@@ -1430,11 +1445,29 @@ async def run_engines(memory):
         # --- Link-Free X (Twitter) Text ---
         tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
 
-        # --- Bluesky Rich Text ---
+        # --- Bluesky Rich Text (CTA & Raw URL near Top, <300 Character Guard) ---
         bsky_tb = client_utils.TextBuilder()
-        bsky_tb.text(f"{title}\n\n{body_content}\n\n{cta}\n")
-        bsky_tb.link(match_url, match_url)
-        bsky_tb.text(f"\n\n{league_hashtag} #{home_hash} #{away_hash}")
+        
+        # Place title, CTA, and raw link right at the top
+        bsky_top = f"{title}\n{cta} "
+        bsky_body = f"\n\n{body_content}"
+        bsky_hashtags = f"\n\n{league_hashtag} #{home_hash} #{away_hash}"
+        
+        total_chars = len(bsky_top) + len(match_url) + len(bsky_body) + len(bsky_hashtags)
+        
+        # Auto-trim optional elements if total length exceeds 290 chars
+        if total_chars > 290:
+            # Simplify CTA to save space
+            bsky_top = f"{title}\nFollow live: "
+            bsky_hashtags = f"\n\n#{home_hash}"
+            total_chars = len(bsky_top) + len(match_url) + len(bsky_body) + len(bsky_hashtags)
+            
+        if total_chars > 290:
+            bsky_hashtags = ""  # Omit hashtags completely if still tight
+            
+        bsky_tb.text(bsky_top)
+        bsky_tb.link(match_url, match_url)  # Raw URL displayed right at the top
+        bsky_tb.text(f"{bsky_body}{bsky_hashtags}")
 
         upload_success = False
 
