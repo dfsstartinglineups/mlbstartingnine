@@ -84,7 +84,8 @@ def get_dynamic_clients(key):
 
 LEAGUE_CONFIG = {
     "mlb": {"league_name": "MLB ⚾", "bsky_client": setup_bsky_client("mlb_account")},
-    "nba": {"league_name": "NBA 🏀", "bsky_client": setup_bsky_client("nba_account")}
+    "nba": {"league_name": "NBA 🏀", "bsky_client": setup_bsky_client("nba_account")},
+    "futbol": {"league_name": "Futbol ⚽", "bsky_client": setup_bsky_client("futbol_account")}
 }
 
 # --- CORE ACCOUNTS ---
