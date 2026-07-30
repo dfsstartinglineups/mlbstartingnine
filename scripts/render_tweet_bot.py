@@ -93,12 +93,13 @@ LEAGUE_CONFIG = {
 #nba_client, nba_api_v1 = get_dynamic_clients("nba_x")
 #futbol_client, futbol_api_v1 = get_dynamic_clients("futbol_x")
 #friendly_client, friendly_api_v1 = get_dynamic_clients("friendly_x")
+#futbol_client, futbol_api_v1 = None, None 
 
 # --- CORE ACCOUNTS ---
 mlb_client, mlb_api_v1 = get_dynamic_clients("mlb_x")
 nba_client, nba_api_v1 = get_dynamic_clients("nba_x")
 # Temporarily disable X.com to cool off spam filters, leave Bluesky active
-futbol_client, futbol_api_v1 = None, None 
+futbol_client, futbol_api_v1 = get_dynamic_clients("futbol_x")
 friendly_client, friendly_api_v1 = get_dynamic_clients("friendly_x")
 
 # --- SOCCER SUB-ACCOUNTS ---
@@ -877,9 +878,9 @@ async def run_engines(memory):
                     new_tweets_sent = True
 
    # ==========================================
-    # FUTBOL ENGINE (Lineups Only)
+    # FUTBOL ENGINE (Lineups & Summaries)
     # ==========================================
-    futbol_tweets_this_loop = 0 # Track tweets to prevent X.com rate limits
+    x_futbol_posted_this_loop = False  # Cap X to max 1 tweet per ~60s loop cycle
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
@@ -891,8 +892,11 @@ async def run_engines(memory):
     EMOJIS = ["🚨", "⚽", "📋", "⚔️", "🏟️", "🔥", "📢", "✅", "🔒", "📝"]
 
     for entry_key, lineup_data in daily_lineups.items():
-        # Memory Check: Skip if this specific team key was already tweeted today
-        if entry_key in tweeted_recently or entry_key in memory.get(date_str, []):
+        x_key = f"X_{entry_key}"
+        bsky_key = f"BSKY_{entry_key}"
+
+        # Skip if both platforms have already posted this lineup
+        if (entry_key in tweeted_recently or x_key in tweeted_recently) and (entry_key in tweeted_recently or bsky_key in tweeted_recently):
             continue
 
         team_name = lineup_data.get('team_name', '')
@@ -906,35 +910,23 @@ async def run_engines(memory):
         if not team_name or not starting_xi:
             continue
 
-        # Extract player short names grouped by category (G, D, M, F)
         gk_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'G']
         def_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'D']
         mid_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'M']
         fwd_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'F']
 
-        # Assemble the formation and vertical category lines
         lineup_lines = []
-        if formation:
-            lineup_lines.append(f"Formation: {formation}")
-
-        if gk_players:
-            lineup_lines.append(f"🧤 GK: {', '.join(gk_players)}")
-        if def_players:
-            lineup_lines.append(f"🛡️ DEF: {', '.join(def_players)}")
-        if mid_players:
-            lineup_lines.append(f"⚙️ MID: {', '.join(mid_players)}")
-        if fwd_players:
-            lineup_lines.append(f"🎯 FWD: {', '.join(fwd_players)}")
+        if formation: lineup_lines.append(f"Formation: {formation}")
+        if gk_players: lineup_lines.append(f"🧤 GK: {', '.join(gk_players)}")
+        if def_players: lineup_lines.append(f"🛡️ DEF: {', '.join(def_players)}")
+        if mid_players: lineup_lines.append(f"⚙️ MID: {', '.join(mid_players)}")
+        if fwd_players: lineup_lines.append(f"🎯 FWD: {', '.join(fwd_players)}")
 
         players_block = "\n".join(lineup_lines)
-
-        # Clean team and opponent names into clean hashtags
         team_hash = team_name.replace(' ', '').replace('-', '').replace('.', '')
         opponent_hash = opponent_name.replace(' ', '').replace('-', '').replace('.', '')
-
         e = random.choice(EMOJIS)
 
-        # --- Link-Free X (Twitter) Text ---
         unique_hash = f"[{int(time.time())}]"
         tweet_text = (
             f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\n"
@@ -943,75 +935,64 @@ async def run_engines(memory):
             f"{league_hashtag} #{team_hash} #{opponent_hash}\n{unique_hash}"
         )
 
-        # --- Bluesky Rich Text (CTA & Raw URL near Top, <300 Character Guard) ---
         bsky_tb = client_utils.TextBuilder()
-        
         bsky_top = f"{e} {team_name} XI vs {opponent_name}\nFollow live: "
         bsky_hashtags = f"\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
-        
         total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + len(bsky_hashtags) + 2
         
-        # Auto-trim optional elements if needed
         if total_chars > 290:
-            bsky_top = f"{e} {team_name} XI vs {opponent_name}\n"  # Shorten CTA line if tight
+            bsky_top = f"{e} {team_name} XI vs {opponent_name}\n"
             bsky_hashtags = f"\n\n#{team_hash}"
             total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + len(bsky_hashtags) + 2
-            
         if total_chars > 290:
-            bsky_hashtags = ""  # Omit hashtags completely if still tight
+            bsky_hashtags = ""
             
         bsky_tb.text(bsky_top)
-        bsky_tb.link(lineup_url, lineup_url)  # Raw URL displayed right at the top
+        bsky_tb.link(lineup_url, lineup_url)
         bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
-        upload_success = False
-
-        if DRY_RUN:
-            upload_success = True
-            print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name}:\n{tweet_text}")
-        else:
-            twitter_success = False
-            bsky_success = False
-
-            # --- Post to X ---
-            try:
-                if futbol_client:
+        # --- Post to X (Only 1 per loop cycle) ---
+        if futbol_client and not x_futbol_posted_this_loop and entry_key not in tweeted_recently and x_key not in tweeted_recently:
+            if DRY_RUN:
+                print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name} on X")
+                log_today.append(x_key)
+                tweeted_recently.append(x_key)
+                x_futbol_posted_this_loop = True
+            else:
+                try:
                     futbol_client.create_tweet(text=tweet_text)
                     log_x_tweet_audit("FUTBOL", entry_key, date_str)
-                    twitter_success = True
-            except Exception as err:
-                print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
+                    log_today.append(x_key)
+                    tweeted_recently.append(x_key)
+                    x_futbol_posted_this_loop = True
+                    new_tweets_sent = True
+                    print(f"✅ Posted Lineup to X for {team_name} (X cap reached for this loop)")
+                except Exception as err:
+                    print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
 
-            # --- Post to Bluesky ---
+        # --- Post to Bluesky (Unrestricted) ---
+        if entry_key not in tweeted_recently and bsky_key not in tweeted_recently:
             config = LEAGUE_CONFIG.get("futbol")
             bsky_client_inst = config.get("bsky_client") if config else setup_bsky_client("futbol_account")
             if bsky_client_inst:
-                try:
-                    bsky_client_inst.send_post(bsky_tb)
-                    bsky_success = True
-                except Exception as err:
-                    print(f"⚠️ Failed to post Futbol lineup to Bluesky for {entry_key}: {err}")
+                if DRY_RUN:
+                    print(f"[SHADOW] 🛑 Mocking Futbol Lineup Post for {team_name} on Bluesky")
+                    log_today.append(bsky_key)
+                    tweeted_recently.append(bsky_key)
+                else:
+                    try:
+                        bsky_client_inst.send_post(bsky_tb)
+                        log_today.append(bsky_key)
+                        tweeted_recently.append(bsky_key)
+                        new_tweets_sent = True
+                        print(f"✅ Posted Lineup to Bluesky for {team_name}")
+                    except Exception as err:
+                        print(f"⚠️ Failed to post Futbol lineup to Bluesky for {entry_key}: {err}")
 
-            upload_success = twitter_success or bsky_success
-
-        if upload_success:
-            log_today.append(entry_key)
-            tweeted_recently.append(entry_key)
-            new_tweets_sent = True
-            memory[date_str] = log_today
-
-            if firebase_admin._apps:
-                try:
-                    db.reference('tweet_log').update({date_str: log_today})
-                except Exception as e:
-                    print(f"⚠️ Failed to update Firebase log: {e}")
-
-            futbol_tweets_this_loop += 1
-            if futbol_tweets_this_loop % 3 == 0:
-                print("⏳ Throttling API: Sent 3 tweets, resting for 5 seconds...")
-                await asyncio.sleep(5)
-            else:
-                await asyncio.sleep(1.5)
+        memory[date_str] = log_today
+        if firebase_admin._apps:
+            try: db.reference('tweet_log').update({date_str: log_today})
+            except: pass
 
     # ==========================================
     # FUTBOL GOALS ENGINE
@@ -1497,33 +1478,21 @@ async def run_engines(memory):
 
         upload_success = False
 
+        # Goals engine posts ONLY to Bluesky to keep X volume safe
+        config = LEAGUE_CONFIG.get("futbol")
+        bsky_client_inst = config.get("bsky_client") if config else setup_bsky_client("futbol_account")
+        
         if DRY_RUN:
             upload_success = True
-            print(f"\n[SHADOW] 🛑 Mocking Futbol Goal Tweet ({scenario}):\n{tweet_text}")
+            print(f"\n[SHADOW] 🛑 Mocking Futbol Goal Post ({scenario}) for Bluesky ONLY")
         else:
-            twitter_success = False
-            bsky_success = False
-
-            # --- Post to X ---
-            try:
-                if futbol_client:
-                    futbol_client.create_tweet(text=tweet_text)
-                    log_x_tweet_audit("FUTBOL", goal_key, date_str)
-                    twitter_success = True
-            except Exception as err:
-                print(f"⚠️ Failed to post Futbol goal to X for {goal_key}: {err}")
-
-            # --- Post to Bluesky ---
-            config = LEAGUE_CONFIG.get("futbol")
-            bsky_client_inst = config.get("bsky_client") if config else setup_bsky_client("futbol_account")
+            upload_success = False
             if bsky_client_inst:
                 try:
                     bsky_client_inst.send_post(bsky_tb)
-                    bsky_success = True
+                    upload_success = True
                 except Exception as err:
                     print(f"⚠️ Failed to post Futbol goal to Bluesky for {goal_key}: {err}")
-
-            upload_success = twitter_success or bsky_success
 
         if upload_success:
             log_today.append(goal_key)
@@ -1845,52 +1814,55 @@ async def run_engines(memory):
 
         upload_success = False
 
-        if DRY_RUN:
-            upload_success = True
-            print(f"\n[SHADOW] 🛑 Mocking Futbol FT Summary Tweet ({scenario}):\n{tweet_text}")
-        else:
-            twitter_success = False
-            bsky_success = False
+        x_ft_key = f"X_{ft_key}"
+        bsky_ft_key = f"BSKY_{ft_key}"
 
-            # --- Post to X ---
-            try:
-                if futbol_client:
+        # Skip if both platforms have already posted this summary
+        if (ft_key in tweeted_recently or x_ft_key in tweeted_recently) and (ft_key in tweeted_recently or bsky_ft_key in tweeted_recently):
+            continue
+
+        # --- Post to X (Only 1 per loop cycle, if cap not reached) ---
+        if futbol_client and not x_futbol_posted_this_loop and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
+            if DRY_RUN:
+                print(f"\n[SHADOW] 🛑 Mocking Futbol FT Summary Tweet ({scenario}) on X")
+                log_today.append(x_ft_key)
+                tweeted_recently.append(x_ft_key)
+                x_futbol_posted_this_loop = True
+            else:
+                try:
                     futbol_client.create_tweet(text=tweet_text)
                     log_x_tweet_audit("FUTBOL", ft_key, date_str)
-                    twitter_success = True
-            except Exception as err:
-                print(f"⚠️ Failed to post Futbol summary to X for {ft_key}: {err}")
+                    log_today.append(x_ft_key)
+                    tweeted_recently.append(x_ft_key)
+                    x_futbol_posted_this_loop = True
+                    new_tweets_sent = True
+                    print(f"✅ Posted FT Summary to X for {home_team} vs {away_team} (X cap reached for this loop)")
+                except Exception as err:
+                    print(f"⚠️ Failed to post Futbol summary to X for {ft_key}: {err}")
 
-            # --- Post to Bluesky ---
+        # --- Post to Bluesky (Unrestricted) ---
+        if ft_key not in tweeted_recently and bsky_ft_key not in tweeted_recently:
             config = LEAGUE_CONFIG.get("futbol")
             bsky_client_inst = config.get("bsky_client") if config else setup_bsky_client("futbol_account")
             if bsky_client_inst:
-                try:
-                    bsky_client_inst.send_post(bsky_tb)
-                    bsky_success = True
-                except Exception as err:
-                    print(f"⚠️ Failed to post Futbol summary to Bluesky for {ft_key}: {err}")
+                if DRY_RUN:
+                    print(f"[SHADOW] 🛑 Mocking Futbol FT Summary Post ({scenario}) on Bluesky")
+                    log_today.append(bsky_ft_key)
+                    tweeted_recently.append(bsky_ft_key)
+                else:
+                    try:
+                        bsky_client_inst.send_post(bsky_tb)
+                        log_today.append(bsky_ft_key)
+                        tweeted_recently.append(bsky_ft_key)
+                        new_tweets_sent = True
+                        print(f"✅ Posted FT Summary to Bluesky for {home_team} vs {away_team}")
+                    except Exception as err:
+                        print(f"⚠️ Failed to post Futbol summary to Bluesky for {ft_key}: {err}")
 
-            upload_success = twitter_success or bsky_success
-
-        if upload_success:
-            log_today.append(ft_key)
-            tweeted_recently.append(ft_key)
-            new_tweets_sent = True
-            memory[date_str] = log_today
-
-            if firebase_admin._apps:
-                try:
-                    db.reference('tweet_log').update({date_str: log_today})
-                except Exception as e:
-                    print(f"⚠️ Failed to update Firebase log: {e}")
-
-            futbol_tweets_this_loop += 1
-            if futbol_tweets_this_loop % 3 == 0:
-                print("⏳ Throttling API: Sent 3 tweets, resting for 5 seconds...")
-                await asyncio.sleep(5)
-            else:
-                await asyncio.sleep(1.5)
+        memory[date_str] = log_today
+        if firebase_admin._apps:
+            try: db.reference('tweet_log').update({date_str: log_today})
+            except: pass
 
     # ==========================================
     # CLOSING BROWSER CLEANUP
