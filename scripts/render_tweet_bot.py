@@ -927,12 +927,13 @@ async def run_engines(memory):
 
         e = random.choice(EMOJIS)
 
-        # --- Link-Free X (Twitter) Text ---/
+        # --- Link-Free X (Twitter) Text ---
+        unique_hash = f"[{int(time.time())}]"
         tweet_text = (
             f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\n"
             f"Follow the action at futbolstartingeleven(link in profile)\n\n"
             f"{players_block}\n\n"
-            f"{league_hashtag} #{team_hash} #{opponent_hash}"
+            f"{league_hashtag} #{team_hash} #{opponent_hash}\n{unique_hash}"
         )
 
         # --- Bluesky Rich Text (CTA & Raw URL near Top, <300 Character Guard) ---
@@ -1450,7 +1451,8 @@ async def run_engines(memory):
         away_hash = away_team.replace(' ', '').replace('-', '').replace('.', '')
 
         # --- Link-Free X (Twitter) Text ---
-        tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
+        unique_hash = f"[{int(time.time())}]"
+        tweet_text = f"{title}\nupdate by futbolstartingeleven(link in profile):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}\n{unique_hash}"
 
         # --- Bluesky Rich Text (CTA & Raw URL near Top, Bulletproof 3-Stage <290 Guard) ---
         bsky_tb = client_utils.TextBuilder()
@@ -1780,6 +1782,7 @@ async def run_engines(memory):
         away_hash = away_team.replace(' ', '').replace('-', '').replace('.', '')
 
         # --- Link-Free X (Twitter) Text ---
+        unique_hash = f"[{int(time.time())}]"
         tweet_text = (
             f"{title}\n"
             f"summary by futbolstartingeleven(link in profile)\n\n"
@@ -1787,7 +1790,7 @@ async def run_engines(memory):
             f"{scorers_str}\n"
             f"{red_card_str}\n"
             f"{blurb}\n\n"
-            f"{league_hashtag} #{home_hash} #{away_hash}"
+            f"{league_hashtag} #{home_hash} #{away_hash}\n{unique_hash}"
         )
 
         # --- Bluesky Rich Text (Raw URL & Progressive 4-Stage <290 Character Guard) ---
