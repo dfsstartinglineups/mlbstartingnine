@@ -869,9 +869,11 @@ async def run_engines(memory):
                     tweeted_recently.append(full_key)
                     new_tweets_sent = True
 
-    # ==========================================
+   # ==========================================
     # FUTBOL ENGINE (Lineups Only)
     # ==========================================
+    futbol_tweets_this_loop = 0 # Track tweets to prevent X.com rate limits
+
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
         daily_lineups = requests.get(daily_lineups_url, timeout=10).json()
@@ -996,7 +998,12 @@ async def run_engines(memory):
                 except Exception as e:
                     print(f"⚠️ Failed to update Firebase log: {e}")
 
-            time.sleep(2)
+            futbol_tweets_this_loop += 1
+            if futbol_tweets_this_loop % 3 == 0:
+                print("⏳ Throttling API: Sent 3 tweets, resting for 5 seconds...")
+                await asyncio.sleep(5)
+            else:
+                await asyncio.sleep(1.5)
 
     # ==========================================
     # FUTBOL GOALS ENGINE
@@ -1521,7 +1528,12 @@ async def run_engines(memory):
                 except Exception as e:
                     print(f"⚠️ Failed to update Firebase log: {e}")
 
-            time.sleep(2)
+            futbol_tweets_this_loop += 1
+            if futbol_tweets_this_loop % 3 == 0:
+                print("⏳ Throttling API: Sent 3 tweets, resting for 5 seconds...")
+                await asyncio.sleep(5)
+            else:
+                await asyncio.sleep(1.5)
 
     # ==========================================
     # FUTBOL GAME SUMMARIES ENGINE
@@ -1863,7 +1875,12 @@ async def run_engines(memory):
                 except Exception as e:
                     print(f"⚠️ Failed to update Firebase log: {e}")
 
-            time.sleep(2)
+            futbol_tweets_this_loop += 1
+            if futbol_tweets_this_loop % 3 == 0:
+                print("⏳ Throttling API: Sent 3 tweets, resting for 5 seconds...")
+                await asyncio.sleep(5)
+            else:
+                await asyncio.sleep(1.5)
 
     # ==========================================
     # CLOSING BROWSER CLEANUP
