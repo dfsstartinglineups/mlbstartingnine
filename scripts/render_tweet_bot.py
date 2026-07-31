@@ -1741,8 +1741,17 @@ async def run_engines(memory):
             scorers_block.append(f"⚽ {away_team}:")
             for scorer in away_scorers:
                 scorers_block.append(f"• {scorer}")
-        
-        scorers_str = "\n".join(scorers_block) if scorers_block else "🚫 No goals scored."
+
+        # Check total goals scored on the scoreboard
+        total_goals = home_score + away_score
+
+        if scorers_block:
+            scorers_str = "\n".join(scorers_block) + "\n"
+        elif total_goals == 0:
+            scorers_str = "🚫 No goals scored.\n"
+        else:
+            # Score > 0, but event data missing: Suppress false "No goals" message
+            scorers_str = ""
 
         # Build individual line-by-line Red Card entries
         stats = summary.get("stats", {})
