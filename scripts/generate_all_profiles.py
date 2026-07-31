@@ -721,7 +721,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
     hr_predictor_html = ""
     bvp_cards_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
     news_blurb_html = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data)
-    
+    p_deep_stats = {}
     if my_game and team_side:
         p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
         p_proj_node = None
