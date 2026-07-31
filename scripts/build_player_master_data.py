@@ -1,8 +1,16 @@
 import os
 import json
 import time
+import re
 import requests
 from datetime import datetime, timedelta
+
+# --- SUMMARY CLEANING HELPER ---
+def fix_er_summary(summary):
+    """Replaces isolated 'ER' (where 1 ER was given up) with '1 ER'."""
+    if not summary or not isinstance(summary, str):
+        return summary
+    return re.sub(r'(?<!\d\s)(?<!\d)\bER\b', '1 ER', summary)
 
 # --- SLUGIFICATION HELPERS ---
 def base_slugify(text):
@@ -183,6 +191,13 @@ def main():
     if os.path.exists(MASTER_STATS_FILE):
         with open(MASTER_STATS_FILE, 'r') as f:
             master_registry = json.load(f)
+            
+        # --- FIX PAST RECORDS ---
+        # Sweep all pre-existing player game logs and correct "ER" to "1 ER"
+        for p_data in master_registry.values():
+            for log in p_data.get("game_log", []):
+                if "summary" in log and log["summary"]:
+                    log["summary"] = fix_er_summary(log["summary"])
     else:
         master_registry = {}
 
@@ -207,9 +222,11 @@ def main():
                 stats_block = player_data.get("pitching") if is_pitcher else player_data.get("batting")
                 
                 if stats_block and stats_block.get("summary"):
+                    # Apply summary fix to new incoming entries
+                    raw_summary = fix_er_summary(stats_block.get("summary"))
                     yesterday_performances[pid] = {
                         "name": player_data.get("name", "Unknown"),
-                        "summary": stats_block.get("summary"),
+                        "summary": raw_summary,
                         "dk_pts": player_data.get("dk_pts", 0.0),
                         "fd_pts": player_data.get("fd_pts", 0.0),
                         "is_pitcher": is_pitcher
@@ -218,10 +235,10 @@ def main():
         print(f"⚠️ Live log target '{live_file_name}' not found. Skipping fantasy points logging.")
 
     # 2. Grab the full league roster
-    roster_players = fetch_all_active_rosters(session) #
+    roster_players = fetch_all_active_rosters(session)
 
     # 3. Combine roster players and anyone who played yesterday (in case they were just sent down)
-    all_target_ids = set(roster_players.keys()).union(set(yesterday_performances.keys())) #
+    all_target_ids = set(roster_players.keys()).union(set(yesterday_performances.keys()))
 
     # --- PRE-LOAD EXISTING SLUGS TO PROTECT SEO ---
     seen_slugs = {}
@@ -229,53 +246,53 @@ def main():
         if "slug" in p_data:
             seen_slugs[p_data["slug"]] = p_data["player_id"]
 
-    print(f"🔄 Commencing deep-stat updates for {len(all_target_ids)} total players...") #
-    updated_players_count = 0 #[cite: 10]
+    print(f"🔄 Commencing deep-stat updates for {len(all_target_ids)} total players...")
+    updated_players_count = 0
 
-    for player_id in all_target_ids: #[cite: 10]
-        api_id_key = f"ID{player_id}" #[cite: 10]
+    for player_id in all_target_ids:
+        api_id_key = f"ID{player_id}"
         
-        # Determine player meta context safely[cite: 10]
-        if player_id in roster_players: #[cite: 10]
-            meta = roster_players[player_id] #[cite: 10]
-        else: #[cite: 10]
-            # Fallback for players who played yesterday but are no longer on a 40-man roster today[cite: 10]
-            meta = { #[cite: 10]
-                "name": yesterday_performances[player_id]["name"], #[cite: 10]
-                "team_id": master_registry.get(api_id_key, {}).get("team_id"), #[cite: 10]
-                "team_name": master_registry.get(api_id_key, {}).get("team_name", "Free Agent/Minors"), #[cite: 10]
-                "position": master_registry.get(api_id_key, {}).get("position", "Unknown"), #[cite: 10]
-                "is_pitcher": yesterday_performances[player_id]["is_pitcher"] #[cite: 10]
-            } #[cite: 10]
+        # Determine player meta context safely
+        if player_id in roster_players:
+            meta = roster_players[player_id]
+        else:
+            # Fallback for players who played yesterday but are no longer on a 40-man roster today
+            meta = {
+                "name": yesterday_performances[player_id]["name"],
+                "team_id": master_registry.get(api_id_key, {}).get("team_id"),
+                "team_name": master_registry.get(api_id_key, {}).get("team_name", "Free Agent/Minors"),
+                "position": master_registry.get(api_id_key, {}).get("position", "Unknown"),
+                "is_pitcher": yesterday_performances[player_id]["is_pitcher"]
+            }
 
         # Calculate the unique slug using the registry
         assigned_slug = calculate_unique_slug(player_id, meta["name"], seen_slugs)
 
-        # Initialize missing players[cite: 10]
-        if api_id_key not in master_registry: #[cite: 10]
-            master_registry[api_id_key] = { #[cite: 10]
-                "player_id": player_id, #[cite: 10]
-                "name": meta["name"], #[cite: 10]
-                "slug": assigned_slug, # <-- INJECT SLUG HERE
-                "team_id": meta["team_id"], #[cite: 10]
-                "team_name": meta["team_name"], #[cite: 10]
-                "position": meta["position"], #[cite: 10]
-                "is_pitcher": meta["is_pitcher"], #[cite: 10]
-                "season": {}, #[cite: 10]
-                "split_vL": {}, #[cite: 10]
-                "split_vR": {}, #[cite: 10]
-                "game_log": [] #[cite: 10]
-            } #[cite: 10]
-        else: #[cite: 10]
+        # Initialize missing players
+        if api_id_key not in master_registry:
+            master_registry[api_id_key] = {
+                "player_id": player_id,
+                "name": meta["name"],
+                "slug": assigned_slug,
+                "team_id": meta["team_id"],
+                "team_name": meta["team_name"],
+                "position": meta["position"],
+                "is_pitcher": meta["is_pitcher"],
+                "season": {},
+                "split_vL": {},
+                "split_vR": {},
+                "game_log": []
+            }
+        else:
             # Ensure even old players get a slug mapped if they don't have one yet
             master_registry[api_id_key]["slug"] = assigned_slug
             
-            # Update meta in case of mid-season trades or position changes[cite: 10]
-            if meta.get("team_id"): #[cite: 10]
-                master_registry[api_id_key]["team_id"] = meta["team_id"] #[cite: 10]
-                master_registry[api_id_key]["team_name"] = meta["team_name"] #[cite: 10]
-            if meta.get("position"): #[cite: 10]
-                master_registry[api_id_key]["position"] = meta["position"] #[cite: 10]
+            # Update meta in case of mid-season trades or position changes
+            if meta.get("team_id"):
+                master_registry[api_id_key]["team_id"] = meta["team_id"]
+                master_registry[api_id_key]["team_name"] = meta["team_name"]
+            if meta.get("position"):
+                master_registry[api_id_key]["position"] = meta["position"]
 
         # 4. Check if they played yesterday and need a log update
         if player_id in yesterday_performances:
