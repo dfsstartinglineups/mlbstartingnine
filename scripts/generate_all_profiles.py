@@ -720,7 +720,6 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
     live_console_html = '<div class="p-3 border-bottom" style="background-color: #edf4f8;"><span class="badge bg-secondary text-uppercase me-2" style="font-size:0.65rem;">Off Slate</span><span class="text-dark fw-semibold" style="font-size: 0.85rem;">No schedules match this player today.</span></div>'
     hr_predictor_html = ""
     bvp_cards_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
-    news_blurb_html = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data)
     p_deep_stats = {}
     if my_game and team_side:
         p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
@@ -746,7 +745,9 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher) 
         
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
-
+        
+    news_blurb_html = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data)
+    
     if is_pitcher:
         title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
         desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
