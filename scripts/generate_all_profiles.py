@@ -272,12 +272,12 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         
         console_html = f"""
         <div class="p-3 border-bottom" style="background-color: #edf4f8;">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <div>
+            <div class="d-flex justify-content-center justify-content-sm-between align-items-center flex-wrap gap-2">
+                <div class="text-center text-sm-start">
                     <span class="badge bg-primary text-uppercase me-2" style="font-size:0.65rem;">Box Score</span>
                     <strong class="text-dark" style="font-size: 0.9rem;">{summary if summary else "Active in Game"}</strong>
                 </div>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center justify-content-center gap-2 mx-auto mx-sm-0">
                     <a href="{dk_leaderboard_url}" class="bg-white border rounded px-3 py-1 shadow-sm text-center text-decoration-none" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="transition: transform 0.15s ease-in-out; display: block;">
                         <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DraftKings</span>
                         <div class="d-flex align-items-baseline justify-content-center gap-1">
@@ -333,10 +333,10 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
                 name_html = f'<span class="text-dark fw-bold text-nowrap" style="font-size: 0.95rem;">{opp_pitcher_name}</span>'
 
             pitcher_display = f'''
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center justify-content-center justify-content-xl-start flex-wrap gap-2">
                 <img src="{opp_team_logo}" style="width: 28px; height: 28px; object-fit: contain;" alt="Team">
                 {image_html}
-                <div class="d-flex align-items-center flex-wrap gap-2 ms-1">
+                <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 ms-1">
                     {name_html}
                     <div class="d-flex align-items-center gap-2 text-muted border-start ps-2" style="font-size: 0.8rem;">
                         <span class="text-nowrap"><strong class="text-dark">{opp_w}-{opp_l}</strong> REC</span>
@@ -347,21 +347,21 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
             </div>
             '''
         else:
-            pitcher_display = f'<span class="text-dark fw-semibold" style="font-size: 0.95rem;">vs. {opp_pitcher_name}</span>'
+            pitcher_display = f'<span class="text-dark fw-semibold text-center text-xl-start w-100" style="font-size: 0.95rem;">vs. {opp_pitcher_name}</span>'
 
         console_html = f"""
         <div class="p-3 border-bottom overflow-hidden" style="background-color: #edf4f8;">
-            <div class="d-flex justify-content-between align-items-center flex-wrap flex-xl-nowrap gap-2 w-100">
+            <div class="d-flex justify-content-center justify-content-xl-between align-items-center flex-wrap flex-xl-nowrap gap-2 w-100 text-center text-xl-start">
                 
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 mx-auto mx-xl-0">
                     <span class="badge bg-secondary text-uppercase shadow-sm" style="font-size:0.7rem; padding: 6px 10px;">Upcoming Matchup</span>
                 </div>
                 
-                <div class="flex-grow-1 d-flex justify-content-start px-xl-2 my-2 my-xl-0" style="min-width: 0;">
+                <div class="flex-grow-1 d-flex justify-content-center justify-content-xl-start px-xl-2 my-2 my-xl-0" style="min-width: 0;">
                     {pitcher_display}
                 </div>
                 
-                <div class="d-flex align-items-center gap-2 flex-shrink-0 ms-auto">
+                <div class="d-flex align-items-center justify-content-center gap-2 flex-shrink-0 mx-auto ms-xl-auto">
                     <a href="{dk_leaderboard_url}" class="bg-white border rounded px-3 py-1 shadow-sm text-center text-decoration-none" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'" style="transition: transform 0.15s ease-in-out; display: block;">
                         <span class="text-muted d-block" style="font-size: 0.55rem; font-weight:700; text-transform:uppercase;">DK Proj</span>
                         <span class="text-dark fw-bold" style="font-size: 1rem;">{dk_val}</span>
