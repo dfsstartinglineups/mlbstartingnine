@@ -840,11 +840,13 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
                     </div>
                 </div>
 
-                <div id="live-consoles-container">{live_console_html}</div>
-
                 <div class="p-3 pb-0">
                     {news_blurb_html}
                 </div>
+
+                <div id="live-consoles-container">{live_console_html}</div>
+
+                
 
                 <div class="card-body p-3">
                     <h5 class="fw-bold mb-3 text-dark border-bottom pb-2" style="font-size: 1rem;">📈 Split Analytics & Matchup Matrix</h5>
