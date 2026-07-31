@@ -559,13 +559,14 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
     """
     Generates a dynamic narrative blurb and Matchup Outlook card based on pure baseball stats.
     Handles Off-slate, Scratched/Injured, Confirmed/Projected batters, and Pitchers.
+    Returns: tuple (card_html, raw_blurb_text)
     """
     if not my_game or not team_side:
         if is_pitcher:
             blurb = f"<strong>{p_name}</strong> is not scheduled to pitch on today's active MLB slate."
         else:
             blurb = f"<strong>{p_name}</strong> is not on today's active MLB slate."
-        return render_blurb_card("Off-Slate", "bg-secondary", "#6c757d", blurb)
+        return render_blurb_card("Off-Slate", "bg-secondary", "#6c757d", blurb), blurb
 
     game_raw = my_game.get("gameRaw", {})
     opp_side = "home" if team_side == "away" else "away"
@@ -578,7 +579,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
     detailed_state = game_raw.get("status", {}).get("detailedState", "")
     if "Postponed" in abstract_state or "Postponed" in detailed_state or game_raw.get("status", {}).get("statusCode") == "C":
         blurb = f"Today's matchup between the <strong>{team_name}</strong> and <strong>{opp_team_name}</strong> has been <strong>postponed</strong>."
-        return render_blurb_card("Postponed", "bg-danger", "#dc3545", blurb)
+        return render_blurb_card("Postponed", "bg-danger", "#dc3545", blurb), blurb
 
     # ----------------------------------------------------
     # PITCHER NARRATIVE BRANCH
@@ -691,7 +692,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             grade, badge_bg, border_hex = "Poor", "bg-danger", "#dc3545"
 
         blurb = f"<strong>{p_name}</strong> is scheduled to start today for the <strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary}{recent_summary}{bvp_note}"
-        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb)
+        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb), blurb
 
     # ----------------------------------------------------
     # BATTER NARRATIVE BRANCH
@@ -717,13 +718,13 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         if (is_confirmed and slot_index == -1) or (slot_index == -1 and injury_indicator in ['IL', 'O', 'OUT', 'DTD']):
             if injury_indicator in ['IL', 'O', 'OUT']:
                 blurb = f"<strong>INJURY ALERT:</strong> <strong>{p_name}</strong> is <strong>out of today's starting lineup</strong> for the {team_name} against the {opp_team_name} due to an injury designation ({injury_indicator})."
-                return render_blurb_card("Lineup: Out (Injury)", "bg-danger", "#dc3545", blurb)
+                return render_blurb_card("Lineup: Out (Injury)", "bg-danger", "#dc3545", blurb), blurb
             elif injury_indicator in ['DTD', 'DAY-TO-DAY']:
                 blurb = f"<strong>INJURY ALERT:</strong> <strong>{p_name}</strong> is <strong>out of today's starting lineup</strong> for the {team_name}. He is listed as day-to-day; monitor team reports prior to pitch."
-                return render_blurb_card("Lineup: Day-to-Day", "bg-warning text-dark", "#ffc107", blurb)
+                return render_blurb_card("Lineup: Day-to-Day", "bg-warning text-dark", "#ffc107", blurb), blurb
             else:
                 blurb = f"<strong>LINEUP ALERT:</strong> <strong>{p_name}</strong> is <strong>not in today's starting lineup</strong> for the {team_name} as they take on the {opp_team_name}. Lineups are confirmed; monitor team updates prior to first pitch."
-                return render_blurb_card("Lineup: Out Today", "bg-danger", "#dc3545", blurb)
+                return render_blurb_card("Lineup: Out Today", "bg-danger", "#dc3545", blurb), blurb
 
         # CASE B: In Lineup (Confirmed or Projected)
         grade, badge_bg, border_hex = "Average", "bg-primary", "#0d6efd"
@@ -796,7 +797,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             f"He draws a matchup against {hand_label} starter <strong>{opp_pitcher_name}</strong>. "
             f"In his last {ab_split} ABs vs {hand_abbr}, he is hitting <strong>{avg_split}</strong> with a <strong>{ops_split} OPS</strong>.{bvp_text}"
         )
-        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb)
+        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb), blurb
 
 # ==========================================
 # 4. PRIMARY HTML LAYOUT BUILDER
@@ -844,10 +845,13 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
         
-    news_blurb_html = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data)
+    # Generate blurb card and extract raw blurb text for schema
+    news_blurb_html, raw_blurb_text = generate_news_blurb(
+        player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data
+    )
     
-    # Clean HTML blurb for Schema description
-    clean_blurb_desc = clean_text_for_json(news_blurb_html)
+    # Clean only the raw blurb text (strips HTML tags without capturing header/badge titles)
+    clean_blurb_desc = clean_text_for_json(raw_blurb_text)
     player_url = f"{DOMAIN}/players/{slug}/"
     headshot_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current"
 
