@@ -16,6 +16,13 @@ DOMAIN = "https://mlbstartingnine.com"
 # ==========================================
 # 1. CORE UTILITIES & SLUGIFICATION
 # ==========================================
+def clean_text_for_json(text):
+    """Strips HTML tags and normalizes whitespace for clean JSON-LD string injection."""
+    if not text:
+        return ""
+    clean = re.sub(r'<[^>]+>', '', text)
+    return re.sub(r'\s+', ' ', clean).strip()
+
 def safe_float(val, default=None):
     try:
         return float(val)
@@ -839,6 +846,30 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
     news_blurb_html = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data)
     
+    # Clean HTML blurb for Schema description
+    clean_blurb_desc = clean_text_for_json(news_blurb_html)
+    player_url = f"{DOMAIN}/players/{slug}/"
+    headshot_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current"
+
+    # ----------------------------------------------------
+    # ATHLETE JSON-LD SCHEMA GENERATION
+    # ----------------------------------------------------
+    athlete_schema = {
+        "@context": "https://schema.org",
+        "@type": "Athlete",
+        "name": p_name,
+        "url": player_url,
+        "image": headshot_url,
+        "jobTitle": position,
+        "memberOf": {
+            "@type": "SportsTeam",
+            "name": team_name
+        },
+        "description": clean_blurb_desc
+    }
+    
+    schema_script_html = f'<script type="application/ld+json">\n{json.dumps(athlete_schema, indent=2)}\n    </script>'
+    
     if is_pitcher:
         title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
         desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
@@ -878,6 +909,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
     <meta name="description" content="{desc}">
     <link rel="canonical" href="{player_url}" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {schema_script_html}
     <style>
         body {{ background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }}
         .header-brand {{ font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }}
