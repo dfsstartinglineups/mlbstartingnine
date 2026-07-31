@@ -22,11 +22,14 @@ def slugify(text):
     text = re.sub(r"[^\w\s-]", "", text)
     return re.sub(r"[\s-]+", "-", text).strip("-")
 
-def get_target_slate_date():
+def get_target_slate_datetime():
     now = datetime.now(ZoneInfo("America/New_York"))
     if now.hour < 3:
         now = now - timedelta(days=1)
-    return now.strftime("%Y-%m-%d")
+    return now
+
+def get_target_slate_date():
+    return get_target_slate_datetime().strftime("%Y-%m-%d")
 
 def get_slug_from_team_id(team_id):
     slug_map = {
@@ -517,11 +520,14 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
 # DAILY OUTLOOK & MATCHUP BRIEFING GENERATOR
 # ==========================================
 def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text):
+    slate_dt = get_target_slate_datetime()
+    date_str = f"{slate_dt.strftime('%A')}({slate_dt.month}/{slate_dt.day}/{slate_dt.year})"
+
     return f"""
     <div class="card shadow-sm border-0 mb-3" style="border-left: 4px solid {border_hex} !important;">
         <div class="card-body p-3 bg-white rounded-end">
             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                <span class="fw-bold text-dark" style="font-size: 0.85rem;">📰 Daily Outlook</span>
+                <span class="fw-bold text-dark" style="font-size: 0.85rem;">📰 Daily Outlook for {date_str}</span>
                 <span class="badge {badge_bg} text-uppercase shadow-sm" style="font-size: 0.65rem;">{badge_text}</span>
             </div>
             <p class="mb-0 text-dark" style="font-size: 0.9rem; line-height: 1.5;">
