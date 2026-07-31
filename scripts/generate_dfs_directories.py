@@ -479,17 +479,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">{{ platform_name }}</span>
     </div>
 
-    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-        {% if current_pos != 'live-slate-leaderboard' %}
-        <div class="d-flex align-items-center gap-2 me-md-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap w-100 gap-2">
+        <div class="d-flex align-items-center gap-2">
+            {% if current_pos != 'live-slate-leaderboard' %}
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 {% for pos_key, pos_label in position_links.items() %}
                 <option value="/dfs/{{ platform_slug }}/{% if pos_key == 'live-slate-leaderboard' %}{{ pos_key }}{% else %}top-{{ pos_key }}{% endif %}/" {% if pos_key == current_pos %}selected{% endif %}>{{ pos_label }}</option>
                 {% endfor %}
             </select>
+            {% endif %}
         </div>
-        {% endif %}
+        
+        <!-- NEW SEARCH BAR -->
+        <div class="ms-auto" style="min-width: 220px;">
+            <input type="text" id="player-search" class="form-control form-control-sm border-secondary shadow-sm" placeholder="🔍 Search players..." onkeyup="triggerSearch()">
+        </div>
     </div>
 
     <!-- 3-Day Partitions -->
@@ -670,19 +675,34 @@ function changePosition(base_url) {
     window.location.href = targetUrl;
 }
 
+function triggerSearch() {
+    const activeContainer = document.getElementById(`games-${currentActiveDay}`);
+    if (!activeContainer) return;
+    
+    const slateSelector = activeContainer.querySelector('.slate-selector');
+    const currentSlate = slateSelector ? slateSelector.value : 'all';
+    
+    filterSlate(currentSlate, currentActiveDay, true);
+}
+
 function filterSlate(slateId, targetDay, preserveSort = false) {
     const container = document.getElementById(`games-${targetDay}`);
     if (!container) return;
+    
+    // Grab the current search query
+    const searchQuery = (document.getElementById('player-search')?.value || '').toLowerCase();
     
     const rows = container.querySelectorAll('.leaderboard-table tbody tr');
     rows.forEach(row => {
         const rowSlates = row.getAttribute('data-slates').split(',');
         const statsRaw = row.getAttribute('data-slate-stats');
         const stats = statsRaw ? JSON.parse(statsRaw) : {};
+        const playerName = (row.querySelector('.player-link')?.textContent || '').toLowerCase();
+        
+        let matchesSlate = false;
 
         if (slateId === 'all') {
-            row.style.display = '';
-            
+            matchesSlate = true;
             const salCol = row.querySelector('.col-salary');
             const projCol = row.querySelector('.col-proj');
             const valCol = row.querySelector('.col-value');
@@ -690,21 +710,26 @@ function filterSlate(slateId, targetDay, preserveSort = false) {
             if (salCol) salCol.textContent = row.getAttribute('data-default-salary');
             if (projCol) projCol.textContent = row.getAttribute('data-default-proj');
             if (valCol) valCol.textContent = row.getAttribute('data-default-value');
-        } else {
-            if (rowSlates.includes(slateId)) {
-                row.style.display = '';
-                if (stats[slateId]) {
-                    const salCol = row.querySelector('.col-salary');
-                    const projCol = row.querySelector('.col-proj');
-                    const valCol = row.querySelector('.col-value');
+        } else if (rowSlates.includes(slateId)) {
+            matchesSlate = true;
+            if (stats[slateId]) {
+                const salCol = row.querySelector('.col-salary');
+                const projCol = row.querySelector('.col-proj');
+                const valCol = row.querySelector('.col-value');
 
-                    if (salCol) salCol.textContent = stats[slateId].salary;
-                    if (projCol) projCol.textContent = stats[slateId].proj;
-                    if (valCol) valCol.textContent = stats[slateId].value;
-                }
-            } else {
-                row.style.display = 'none';
+                if (salCol) salCol.textContent = stats[slateId].salary;
+                if (projCol) projCol.textContent = stats[slateId].proj;
+                if (valCol) valCol.textContent = stats[slateId].value;
             }
+        }
+        
+        // Ensure player matches the text input
+        const matchesSearch = playerName.includes(searchQuery);
+
+        if (matchesSlate && matchesSearch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
         }
     });
 
@@ -724,7 +749,7 @@ function filterSlate(slateId, targetDay, preserveSort = false) {
     }
 
     if (!targetHeader) {
-        sortIndex = 2; // Column index 2 handles default sorting correctly for both Proj Value AND Live Pts
+        sortIndex = 2; // Column index 2 handles default sorting correctly
         targetHeader = table.querySelectorAll('th')[sortIndex];
         forceDesc = true;
     }
