@@ -568,7 +568,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         wins, losses, era = profile.get("season", {}).get("w", 0), profile.get("season", {}).get("l", 0), profile.get("season", {}).get("era", "-")
         season_summary = f"He carries a <strong>{wins}-{losses}</strong> record with a <strong>{era} ERA</strong> on the season."
 
-        # Aggregate stats over last 2-3 starts from game_log
+        # Aggregate stats over last 2-3 starts from game_log (supporting both keys & summary strings)
         game_log = profile.get("game_log", [])[:3]
         recent_summary = ""
         if game_log:
@@ -576,87 +576,51 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             total_outs = 0
             total_er = 0
             total_k = 0
-            valid_logs = False
+            valid_logs_count = 0
 
             for g in game_log:
-                ip_val = str(g.get("ip", ""))
-                er_val = g.get("er", None)
-                k_val = g.get("so", g.get("k", g.get("so_count", None)))
+                summary_str = str(g.get("summary", ""))
+                
+                # 1. Extract IP
+                ip_str = str(g.get("ip", ""))
+                if not ip_str and summary_str:
+                    m_ip = re.search(r'(\d+(?:\.\d+)?)\s*IP', summary_str, re.IGNORECASE)
+                    if m_ip: ip_str = m_ip.group(1)
 
-                if ip_val and er_val is not None:
-                    valid_logs = True
+                # 2. Extract ER
+                er_val = g.get("er", None)
+                if er_val is None and summary_str:
+                    m_er = re.search(r'(\d+)\s*ER', summary_str, re.IGNORECASE)
+                    if m_er: er_val = m_er.group(1)
+
+                # 3. Extract Strikeouts (K / SO)
+                k_val = g.get("so", g.get("k", g.get("so_count", None)))
+                if k_val is None and summary_str:
+                    m_k = re.search(r'(\d+)\s*(?:K|SO)', summary_str, re.IGNORECASE)
+                    if m_k: k_val = m_k.group(1)
+
+                # Process extracted stats
+                if ip_str and er_val is not None:
                     try:
-                        if "." in ip_val:
-                            parts = ip_val.split(".")
+                        if "." in ip_str:
+                            parts = ip_str.split(".")
                             outs = int(parts[0]) * 3 + int(parts[1])
                         else:
-                            outs = int(float(ip_val)) * 3
+                            outs = int(float(ip_str)) * 3
                         total_outs += outs
-                    except: pass
-                    
-                    try: total_er += int(er_val)
-                    except: pass
-                    
-                    try: total_k += int(k_val) if k_val is not None else 0
-                    except: pass
+                        total_er += int(er_val)
+                        if k_val is not None:
+                            total_k += int(k_val)
+                        valid_logs_count += 1
+                    except Exception:
+                        pass
 
-            if valid_logs and total_outs > 0:
+            if valid_logs_count > 0 and total_outs > 0:
                 full_ip = total_outs // 3
                 rem_outs = total_outs % 3
                 ip_display = f"{full_ip}.{rem_outs}" if rem_outs > 0 else f"{full_ip}.0"
                 recent_era = (total_er * 9.0) / (total_outs / 3.0)
-                recent_summary = f" Over his last {num_starts} starts, he has posted a <strong>{recent_era:.2f} ERA</strong> across <strong>{ip_display} IP</strong> with <strong>{total_k} Ks</strong>."
-
-        order_list = my_game.get("lineupTracking", {}).get(opp_side, {}).get("hash", "").split('-') if my_game.get("lineupTracking", {}).get(opp_side, {}).get("hash") else []
-        if not order_list:
-            order_list = [str(p.get("id")) for p in my_game.get("projectedLineups", {}).get(opp_side, {}).get("battingOrder", [])]
-        
-        bvp_matches = []
-        for b_id in order_list:
-            if not b_id: continue
-            b_stats = my_game.get("deepStats", {}).get(b_id, {})
-            bvp = b_stats.get("bvp", {})
-            if bvp and float(bvp.get("ab", 0)) >= 5:
-                b_name = b_stats.get("name") or "Batter"
-                bvp_matches.append((b_name, int(bvp['ab']), int(bvp['hits']), float(bvp.get('ops', 0.0)), int(bvp.get('hr', 0))))
-
-        bvp_note = ""
-        pitcher_score = 70 
-        
-        if bvp_matches:
-            bvp_matches.sort(key=lambda x: x[3], reverse=True) 
-            worst_threat = bvp_matches[0]
-            best_matchup = bvp_matches[-1]
-            
-            if worst_threat[3] >= 0.900:
-                bvp_note = f" His primary matchup threat is <strong>{worst_threat[0]}</strong>, who holds a lifetime <strong>{worst_threat[3]:.3f} OPS</strong> with <strong>{worst_threat[4]} HR</strong> in {worst_threat[1]} ABs against him."
-                pitcher_score -= 15
-            elif best_matchup[3] <= 0.550:
-                bvp_note = f" He has dominated <strong>{best_matchup[0]}</strong> head-to-head, holding him to a <strong>{best_matchup[3]:.3f} OPS</strong> in {best_matchup[1]} ABs."
-                pitcher_score += 15
-            else:
-                bvp_note = f" He faces an opposing order with balanced career stats against him."
-        else:
-            bvp_note = " He faces an opposing lineup with minimal career head-to-head history."
-
-        try:
-            era_val = float(profile.get("season", {}).get("era", 4.00))
-            if era_val < 3.20: pitcher_score += 15
-            elif era_val > 4.80: pitcher_score -= 15
-        except: pass
-
-        if pitcher_score >= 80:
-            grade, badge_bg, border_hex = "Great", "bg-success", "#198754"
-        elif pitcher_score >= 65:
-            grade, badge_bg, border_hex = "Good", "bg-success", "#20c997"
-        elif pitcher_score >= 45:
-            grade, badge_bg, border_hex = "Average", "bg-primary", "#0d6efd"
-        elif pitcher_score >= 30:
-            grade, badge_bg, border_hex = "Below Average", "bg-warning text-dark", "#ffc107"
-        else:
-            grade, badge_bg, border_hex = "Poor", "bg-danger", "#dc3545"
-
-        blurb = f"<strong>{p_name}</strong> is scheduled to start today for the <strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary}{recent_summary}{bvp_note}"
+                recent_summary = f" Over his last {valid_logs_count} starts, he has posted a <strong>{recent_era:.2f} ERA</strong> across <strong>{ip_display} IP</strong> with <strong>{total_k} Ks</strong>."
         return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb)
 
     # ----------------------------------------------------
