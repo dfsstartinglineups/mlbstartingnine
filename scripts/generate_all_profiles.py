@@ -648,7 +648,17 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
 
         # CASE B: In Lineup (Confirmed or Projected)
         lineup_prefix = "confirmed" if is_confirmed else "projected"
-        slot_str = f"batting #{slot_index + 1}" if slot_index != -1 else "in the starting lineup"
+        
+        if slot_index != -1:
+            spot = slot_index + 1
+            spot_names = {
+                1: "leadoff", 2: "2nd", 3: "3rd", 4: "cleanup", 
+                5: "5th", 6: "6th", 7: "7th", 8: "8th", 9: "9th"
+            }
+            spot_name = spot_names.get(spot, f"{spot}th")
+            slot_str = f"batting {spot_name}"
+        else:
+            slot_str = "in the starting lineup"
 
         opp_hand = my_game.get("lineupHandedness", {}).get(opp_pitcher_id, "R")
         hand_label = "right-handed" if opp_hand == 'R' else "left-handed"
