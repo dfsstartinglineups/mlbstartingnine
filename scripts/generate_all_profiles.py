@@ -652,25 +652,33 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
 
         opp_hand = my_game.get("lineupHandedness", {}).get(opp_pitcher_id, "R")
         hand_label = "right-handed" if opp_hand == 'R' else "left-handed"
-        hand_abbr = "vs. RHP" if opp_hand == 'R' else "vs. LHP"
+        
+        # Determine RHP or LHP for the split narrative
+        hand_abbr = "RHP" if opp_hand == 'R' else "LHP"
 
         split_r = p_deep_stats.get("split_vR", {}) or profile.get("split_vR", {})
         split_l = p_deep_stats.get("split_vL", {}) or profile.get("split_vL", {})
         active_split = split_r if opp_hand == 'R' else split_l
 
+        ab_split = active_split.get("ab", profile.get("season", {}).get("ab", "0"))
         avg_split = active_split.get("avg", profile.get("season", {}).get("avg", ".250"))
         ops_split = active_split.get("ops", profile.get("season", {}).get("ops", ".750"))
 
         bvp = p_deep_stats.get("bvp", {})
         bvp_text = ""
         bvp_ops_val = None
+        
+        # New BvP phrasing
         if bvp and float(bvp.get("ab", 0)) > 0:
-            bvp_ab = bvp['ab']
+            bvp_ab = bvp.get('ab', 0)
+            bvp_hits = bvp.get('hits', 0)
+            bvp_hr = bvp.get('hr', 0)
             bvp_avg = bvp.get('avg', '-')
             bvp_ops = bvp.get('ops', '-')
             try: bvp_ops_val = float(bvp_ops)
             except: pass
-            bvp_text = f" Lifetime against {opp_pitcher_name}, he carries a <strong>{bvp_avg} AVG</strong> ({bvp_ops} OPS) over {bvp_ab} at-bats."
+            
+            bvp_text = f" Lifetime against {opp_pitcher_name}, he has gone <strong>{bvp_hits}-for-{bvp_ab}</strong> for a <strong>{bvp_avg} AVG</strong> and <strong>{bvp_ops} OPS</strong> with {bvp_hr} home runs."
         else:
             bvp_text = f" He has no prior career plate appearances against starting pitcher {opp_pitcher_name}."
 
@@ -697,11 +705,12 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         else:
             grade, badge_bg, border_hex = "Poor", "bg-danger", "#dc3545"
 
+        # Constructing the final blurb with the new phrasing
         blurb = (
             f"<strong>{p_name}</strong> is {lineup_prefix} to be {slot_str} for the "
             f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. "
             f"He draws a matchup against {hand_label} starter <strong>{opp_pitcher_name}</strong>. "
-            f"On the season, he is hitting <strong>{avg_split}</strong> with a <strong>{ops_split} OPS</strong> {hand_abbr}.{bvp_text}"
+            f"In his last {ab_split} ABs vs {hand_abbr}, he is hitting <strong>{avg_split}</strong> with a <strong>{ops_split} OPS</strong>.{bvp_text}"
         )
         return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb)
 
