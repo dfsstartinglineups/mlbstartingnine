@@ -940,12 +940,21 @@ async def run_engines(memory):
         bsky_hashtags = f"\n\n{league_hashtag} #{team_hash} #{opponent_hash}"
         total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + len(bsky_hashtags) + 2
         
+        # Stage 1: Shorten CTA and drop secondary hashtags
         if total_chars > 290:
             bsky_top = f"{e} {team_name} XI vs {opponent_name}\n"
             bsky_hashtags = f"\n\n#{team_hash}"
             total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + len(bsky_hashtags) + 2
+            
+        # Stage 2: Drop all hashtags
         if total_chars > 290:
             bsky_hashtags = ""
+            total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + 2
+            
+        # Stage 3: Compress the player block (The safety net for super long names)
+        if total_chars > 290:
+            players_block = f"Formation: {formation}\nFull starting XI & tactical map available via the match center."
+            total_chars = len(bsky_top) + len(lineup_url) + len(players_block) + 2
             
         bsky_tb.text(bsky_top)
         bsky_tb.link(lineup_url, lineup_url)
