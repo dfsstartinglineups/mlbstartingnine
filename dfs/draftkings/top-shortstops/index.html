@@ -75,14 +75,14 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected DraftKings Shortstops</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-07-30 09:57 PM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-07-30 09:59 PM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
 
-    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-        
-        <div class="d-flex align-items-center gap-2 me-md-3">
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap w-100 gap-2">
+        <div class="d-flex align-items-center gap-2">
+            
             <span class="fw-bold text-secondary small text-uppercase">Position:</span>
             <select class="form-select form-select-sm w-auto fw-bold" id="position-selector" onchange="changePosition(this.value)">
                 
@@ -105,8 +105,13 @@
                 <option value="/dfs/draftkings/live-slate-leaderboard/" >🔴 Live Leaderboard</option>
                 
             </select>
+            
         </div>
         
+        <!-- NEW SEARCH BAR -->
+        <div class="ms-auto" style="min-width: 220px;">
+            <input type="text" id="player-search" class="form-control form-control-sm border-secondary shadow-sm" placeholder="🔍 Search players..." onkeyup="triggerSearch()">
+        </div>
     </div>
 
     <!-- 3-Day Partitions -->
@@ -1905,8 +1910,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F88,24F83" 
-                            data-slate-stats='{"24F88": {"salary": "$3,300", "proj": "7.31", "value": "2.22x"}, "24F83": {"salary": "$3,300", "proj": "7.31", "value": "2.22x"}}' 
+                        <tr data-slates="24F83,24F88" 
+                            data-slate-stats='{"24F83": {"salary": "$3,300", "proj": "7.31", "value": "2.22x"}, "24F88": {"salary": "$3,300", "proj": "7.31", "value": "2.22x"}}' 
                             data-default-salary="$3,300" 
                             data-default-proj="7.31" 
                             data-default-value="2.22x">
@@ -1987,8 +1992,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F88,24F83" 
-                            data-slate-stats='{"24F88": {"salary": "$4,200", "proj": "9.03", "value": "2.15x"}, "24F83": {"salary": "$4,200", "proj": "9.03", "value": "2.15x"}}' 
+                        <tr data-slates="24F83,24F88" 
+                            data-slate-stats='{"24F83": {"salary": "$4,200", "proj": "9.03", "value": "2.15x"}, "24F88": {"salary": "$4,200", "proj": "9.03", "value": "2.15x"}}' 
                             data-default-salary="$4,200" 
                             data-default-proj="9.03" 
                             data-default-value="2.15x">
@@ -2151,8 +2156,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F82,24F7E" 
-                            data-slate-stats='{"24F82": {"salary": "$5,400", "proj": "6.21", "value": "1.15x"}, "24F7E": {"salary": "$3,200", "proj": "6.21", "value": "1.94x"}}' 
+                        <tr data-slates="24F7E,24F82" 
+                            data-slate-stats='{"24F7E": {"salary": "$3,200", "proj": "6.21", "value": "1.94x"}, "24F82": {"salary": "$5,400", "proj": "6.21", "value": "1.15x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="6.21" 
                             data-default-value="1.94x">
@@ -2315,8 +2320,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F88,24F83" 
-                            data-slate-stats='{"24F88": {"salary": "$3,700", "proj": "6.79", "value": "1.84x"}, "24F83": {"salary": "$3,700", "proj": "6.79", "value": "1.84x"}}' 
+                        <tr data-slates="24F83,24F88" 
+                            data-slate-stats='{"24F83": {"salary": "$3,700", "proj": "6.79", "value": "1.84x"}, "24F88": {"salary": "$3,700", "proj": "6.79", "value": "1.84x"}}' 
                             data-default-salary="$3,700" 
                             data-default-proj="6.79" 
                             data-default-value="1.84x">
@@ -2356,8 +2361,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F88,24F83,24F8A" 
-                            data-slate-stats='{"24F88": {"salary": "$2,800", "proj": "5.04", "value": "1.80x"}, "24F83": {"salary": "$2,800", "proj": "5.04", "value": "1.80x"}, "24F8A": {"salary": "$4,200", "proj": "5.04", "value": "1.20x"}}' 
+                        <tr data-slates="24F83,24F8A,24F88" 
+                            data-slate-stats='{"24F83": {"salary": "$2,800", "proj": "5.04", "value": "1.80x"}, "24F8A": {"salary": "$4,200", "proj": "5.04", "value": "1.20x"}, "24F88": {"salary": "$2,800", "proj": "5.04", "value": "1.80x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="5.04" 
                             data-default-value="1.8x">
@@ -2479,8 +2484,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F88,24F83" 
-                            data-slate-stats='{"24F88": {"salary": "$3,900", "proj": "6.69", "value": "1.72x"}, "24F83": {"salary": "$3,900", "proj": "6.69", "value": "1.72x"}}' 
+                        <tr data-slates="24F83,24F88" 
+                            data-slate-stats='{"24F83": {"salary": "$3,900", "proj": "6.69", "value": "1.72x"}, "24F88": {"salary": "$3,900", "proj": "6.69", "value": "1.72x"}}' 
                             data-default-salary="$3,900" 
                             data-default-proj="6.69" 
                             data-default-value="1.72x">
@@ -2725,8 +2730,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F88,24F83,24F8A" 
-                            data-slate-stats='{"24F88": {"salary": "$4,800", "proj": "7.55", "value": "1.57x"}, "24F83": {"salary": "$4,800", "proj": "7.55", "value": "1.57x"}, "24F8A": {"salary": "$8,000", "proj": "7.55", "value": "0.94x"}}' 
+                        <tr data-slates="24F83,24F8A,24F88" 
+                            data-slate-stats='{"24F83": {"salary": "$4,800", "proj": "7.55", "value": "1.57x"}, "24F8A": {"salary": "$8,000", "proj": "7.55", "value": "0.94x"}, "24F88": {"salary": "$4,800", "proj": "7.55", "value": "1.57x"}}' 
                             data-default-salary="$4,800" 
                             data-default-proj="7.55" 
                             data-default-value="1.57x">
@@ -2766,8 +2771,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="24F82,24F7E" 
-                            data-slate-stats='{"24F82": {"salary": "$7,200", "proj": "6.02", "value": "0.84x"}, "24F7E": {"salary": "$4,200", "proj": "6.02", "value": "1.43x"}}' 
+                        <tr data-slates="24F7E,24F82" 
+                            data-slate-stats='{"24F7E": {"salary": "$4,200", "proj": "6.02", "value": "1.43x"}, "24F82": {"salary": "$7,200", "proj": "6.02", "value": "0.84x"}}' 
                             data-default-salary="$4,200" 
                             data-default-proj="6.02" 
                             data-default-value="1.43x">
@@ -2897,19 +2902,34 @@ function changePosition(base_url) {
     window.location.href = targetUrl;
 }
 
+function triggerSearch() {
+    const activeContainer = document.getElementById(`games-${currentActiveDay}`);
+    if (!activeContainer) return;
+    
+    const slateSelector = activeContainer.querySelector('.slate-selector');
+    const currentSlate = slateSelector ? slateSelector.value : 'all';
+    
+    filterSlate(currentSlate, currentActiveDay, true);
+}
+
 function filterSlate(slateId, targetDay, preserveSort = false) {
     const container = document.getElementById(`games-${targetDay}`);
     if (!container) return;
+    
+    // Grab the current search query
+    const searchQuery = (document.getElementById('player-search')?.value || '').toLowerCase();
     
     const rows = container.querySelectorAll('.leaderboard-table tbody tr');
     rows.forEach(row => {
         const rowSlates = row.getAttribute('data-slates').split(',');
         const statsRaw = row.getAttribute('data-slate-stats');
         const stats = statsRaw ? JSON.parse(statsRaw) : {};
+        const playerName = (row.querySelector('.player-link')?.textContent || '').toLowerCase();
+        
+        let matchesSlate = false;
 
         if (slateId === 'all') {
-            row.style.display = '';
-            
+            matchesSlate = true;
             const salCol = row.querySelector('.col-salary');
             const projCol = row.querySelector('.col-proj');
             const valCol = row.querySelector('.col-value');
@@ -2917,21 +2937,26 @@ function filterSlate(slateId, targetDay, preserveSort = false) {
             if (salCol) salCol.textContent = row.getAttribute('data-default-salary');
             if (projCol) projCol.textContent = row.getAttribute('data-default-proj');
             if (valCol) valCol.textContent = row.getAttribute('data-default-value');
-        } else {
-            if (rowSlates.includes(slateId)) {
-                row.style.display = '';
-                if (stats[slateId]) {
-                    const salCol = row.querySelector('.col-salary');
-                    const projCol = row.querySelector('.col-proj');
-                    const valCol = row.querySelector('.col-value');
+        } else if (rowSlates.includes(slateId)) {
+            matchesSlate = true;
+            if (stats[slateId]) {
+                const salCol = row.querySelector('.col-salary');
+                const projCol = row.querySelector('.col-proj');
+                const valCol = row.querySelector('.col-value');
 
-                    if (salCol) salCol.textContent = stats[slateId].salary;
-                    if (projCol) projCol.textContent = stats[slateId].proj;
-                    if (valCol) valCol.textContent = stats[slateId].value;
-                }
-            } else {
-                row.style.display = 'none';
+                if (salCol) salCol.textContent = stats[slateId].salary;
+                if (projCol) projCol.textContent = stats[slateId].proj;
+                if (valCol) valCol.textContent = stats[slateId].value;
             }
+        }
+        
+        // Ensure player matches the text input
+        const matchesSearch = playerName.includes(searchQuery);
+
+        if (matchesSlate && matchesSearch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
         }
     });
 
@@ -2951,7 +2976,7 @@ function filterSlate(slateId, targetDay, preserveSort = false) {
     }
 
     if (!targetHeader) {
-        sortIndex = 2; // Column index 2 handles default sorting correctly for both Proj Value AND Live Pts
+        sortIndex = 2; // Column index 2 handles default sorting correctly
         targetHeader = table.querySelectorAll('th')[sortIndex];
         forceDesc = true;
     }
