@@ -566,7 +566,46 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
     # ----------------------------------------------------
     if is_pitcher:
         wins, losses, era = profile.get("season", {}).get("w", 0), profile.get("season", {}).get("l", 0), profile.get("season", {}).get("era", "-")
-        recent_summary = f"He carries a <strong>{wins}-{losses}</strong> record with a <strong>{era} ERA</strong> on the season."
+        season_summary = f"He carries a <strong>{wins}-{losses}</strong> record with a <strong>{era} ERA</strong> on the season."
+
+        # Aggregate stats over last 2-3 starts from game_log
+        game_log = profile.get("game_log", [])[:3]
+        recent_summary = ""
+        if game_log:
+            num_starts = len(game_log)
+            total_outs = 0
+            total_er = 0
+            total_k = 0
+            valid_logs = False
+
+            for g in game_log:
+                ip_val = str(g.get("ip", ""))
+                er_val = g.get("er", None)
+                k_val = g.get("so", g.get("k", g.get("so_count", None)))
+
+                if ip_val and er_val is not None:
+                    valid_logs = True
+                    try:
+                        if "." in ip_val:
+                            parts = ip_val.split(".")
+                            outs = int(parts[0]) * 3 + int(parts[1])
+                        else:
+                            outs = int(float(ip_val)) * 3
+                        total_outs += outs
+                    except: pass
+                    
+                    try: total_er += int(er_val)
+                    except: pass
+                    
+                    try: total_k += int(k_val) if k_val is not None else 0
+                    except: pass
+
+            if valid_logs and total_outs > 0:
+                full_ip = total_outs // 3
+                rem_outs = total_outs % 3
+                ip_display = f"{full_ip}.{rem_outs}" if rem_outs > 0 else f"{full_ip}.0"
+                recent_era = (total_er * 9.0) / (total_outs / 3.0)
+                recent_summary = f" Over his last {num_starts} starts, he has posted a <strong>{recent_era:.2f} ERA</strong> across <strong>{ip_display} IP</strong> with <strong>{total_k} Ks</strong>."
 
         order_list = my_game.get("lineupTracking", {}).get(opp_side, {}).get("hash", "").split('-') if my_game.get("lineupTracking", {}).get(opp_side, {}).get("hash") else []
         if not order_list:
@@ -617,7 +656,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         else:
             grade, badge_bg, border_hex = "Poor", "bg-danger", "#dc3545"
 
-        blurb = f"<strong>{p_name}</strong> is scheduled to start today for the <strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {recent_summary}{bvp_note}"
+        blurb = f"<strong>{p_name}</strong> is scheduled to start today for the <strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary}{recent_summary}{bvp_note}"
         return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb)
 
     # ----------------------------------------------------
