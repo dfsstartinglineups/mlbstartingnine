@@ -697,7 +697,12 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         else:
             grade, badge_bg, border_hex = "Poor", "bg-danger", "#dc3545"
 
-        blurb = f"<strong>{p_name}</strong> is {lineup_prefix} to be {slot_str} for the <strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. He draws a matchup against {hand_label} starter <strong>{opp_pitcher_name}</strong>, against whom he is hitting <strong>{avg_split}</strong> with a <strong>{ops_split} OPS</strong> {hand_abbr} this season.{bvp_text}"
+        blurb = (
+            f"<strong>{p_name}</strong> is {lineup_prefix} to be {slot_str} for the "
+            f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. "
+            f"He draws a matchup against {hand_label} starter <strong>{opp_pitcher_name}</strong>. "
+            f"On the season, he is hitting <strong>{avg_split}</strong> with a <strong>{ops_split} OPS</strong> {hand_abbr}.{bvp_text}"
+        )
         return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb)
 
 # ==========================================
