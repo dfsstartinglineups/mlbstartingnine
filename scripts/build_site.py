@@ -2,7 +2,7 @@ import os
 import json
 import html
 import xml.etree.ElementTree as ET
-from xml.dom import minidom
+from xml.dom import minidomv_default = f"""<div class="d-flex align-items-center w-100">
 from datetime import datetime, timedelta
 import pytz
 
@@ -722,12 +722,7 @@ def build_lineup_html(players, opposing_pitcher_hand, game_data, player_db):
             {name_link_def}
         </div>"""
 
-        v_default = f"""<div class="d-flex align-items-center w-100">
-            <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">{prefix_text}</span>
-            <img src="{photo_url}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">
-            {hand_text}
-            <a href="/players/{slug}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.70rem;" title="{html.escape(player_name)}" data-shortname="{html.escape(abbr_name)}">{html.escape(player_name)}</a>
-        </div>"""
+        
 
         s_stats = deep_stats.get(pid_str, {}).get('season', {'avg': '-', 'ops': '-', 'hr': 0})
         v_season = f"{top_line}<div class='text-muted text-truncate w-100' style='font-size: 0.60rem;'>{s_stats.get('avg','-')} • {s_stats.get('ops','-')} OPS • {s_stats.get('hr',0)} HR</div>"
