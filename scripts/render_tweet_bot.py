@@ -910,10 +910,53 @@ async def run_engines(memory):
         if not team_name or not starting_xi:
             continue
 
-        gk_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'G']
-        def_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'D']
-        mid_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'M']
-        fwd_players = [p.get('short_name', p.get('name')) for p in starting_xi if p.get('category') == 'F']
+        def get_y_weight(pos_str, cat_str):
+            pos = str(pos_str).upper()
+            cat = str(cat_str).upper()
+            if cat == 'G': return 0
+            # 1. Defenders / Wing-Backs
+            if cat == 'D' or 'B' in pos or 'CD' in pos: return 10
+            # 2. Defensive Mids
+            if 'DM' in pos: return 20
+            # 3. Standard Mids
+            if cat == 'M' and 'AM' not in pos: return 30
+            # 4. Attacking Mids / Wingers
+            if 'AM' in pos or 'W' in pos: return 40
+            # 5. Strikers / Forwards
+            if cat == 'F' or 'F' in pos or 'ST' in pos: return 50
+            return 30
+            
+        def get_x_weight(pos_str):
+            pos = str(pos_str).upper()
+            if pos.startswith('L') and '-' not in pos: return -2
+            if pos.endswith('-L'): return -1
+            if pos.endswith('-R'): return 1
+            if pos.startswith('R') and '-' not in pos: return 2
+            return 0
+            
+        gk_objs, def_objs, mid_objs, fwd_objs = [], [], [], []
+        
+        # Sort players into their correct vertical rows based on our overriding logic
+        for p in starting_xi:
+            y_w = get_y_weight(p.get('pos', ''), p.get('category', 'M'))
+            if y_w == 0:
+                gk_objs.append(p)
+            elif y_w == 10:
+                def_objs.append(p)
+            elif y_w in [20, 30]:
+                mid_objs.append(p)
+            else:
+                fwd_objs.append(p)
+                
+        # Sort each row horizontally from Left to Right
+        def_objs.sort(key=lambda x: get_x_weight(x.get('pos', '')))
+        mid_objs.sort(key=lambda x: get_x_weight(x.get('pos', '')))
+        fwd_objs.sort(key=lambda x: get_x_weight(x.get('pos', '')))
+
+        gk_players = [p.get('short_name', p.get('name')) for p in gk_objs]
+        def_players = [p.get('short_name', p.get('name')) for p in def_objs]
+        mid_players = [p.get('short_name', p.get('name')) for p in mid_objs]
+        fwd_players = [p.get('short_name', p.get('name')) for p in fwd_objs]
 
         lineup_lines = []
         if formation: lineup_lines.append(f"Formation: {formation}")
