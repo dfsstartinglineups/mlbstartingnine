@@ -1580,7 +1580,7 @@ async def run_engines(memory):
         print(f"⚠️ Could not fetch game_summary.json: {e}")
         game_summaries_data = {}
 
-    MAX_SUMMARY_AGE_SECONDS = 300  # Skip summaries older than 5 minutes
+    MAX_SUMMARY_AGE_SECONDS = 750  # Skip summaries older than 5 minutes
     current_time_epoch = time.time()
 
     SUMMARY_PHRASES = {
