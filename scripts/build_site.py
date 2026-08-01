@@ -2,7 +2,7 @@ import os
 import json
 import html
 import xml.etree.ElementTree as ET
-from xml.dom import minidomv_default = f"""<div class="d-flex align-items-center w-100">
+from xml.dom import minidom
 from datetime import datetime, timedelta
 import pytz
 
