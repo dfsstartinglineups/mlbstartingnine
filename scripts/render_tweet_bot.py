@@ -910,19 +910,13 @@ async def run_engines(memory):
         if not team_name or not starting_xi:
             continue
 
-        def get_y_weight(pos_str, cat_str):
-            pos = str(pos_str).upper()
-            cat = str(cat_str).upper()
-            if cat == 'G': return 0
-            # 1. Defenders / Wing-Backs
+        def get_y_weight(player):
+            pos = str(player.get('pos', '')).upper()
+            cat = str(player.get('category', 'M')).upper()
             if cat == 'D' or 'B' in pos or 'CD' in pos: return 10
-            # 2. Defensive Mids
             if 'DM' in pos: return 20
-            # 3. Standard Mids
             if cat == 'M' and 'AM' not in pos: return 30
-            # 4. Attacking Mids / Wingers
             if 'AM' in pos or 'W' in pos: return 40
-            # 5. Strikers / Forwards
             if cat == 'F' or 'F' in pos or 'ST' in pos: return 50
             return 30
             
@@ -933,37 +927,52 @@ async def run_engines(memory):
             if pos.endswith('-R'): return 1
             if pos.startswith('R') and '-' not in pos: return 2
             return 0
-            
-        gk_objs, def_objs, mid_objs, fwd_objs = [], [], [], []
-        
-        # Sort players into their correct vertical rows based on our overriding logic
-        for p in starting_xi:
-            y_w = get_y_weight(p.get('pos', ''), p.get('category', 'M'))
-            if y_w == 0:
-                gk_objs.append(p)
-            elif y_w == 10:
-                def_objs.append(p)
-            elif y_w in [20, 30]:
-                mid_objs.append(p)
-            else:
-                fwd_objs.append(p)
-                
-        # Sort each row horizontally from Left to Right
-        def_objs.sort(key=lambda x: get_x_weight(x.get('pos', '')))
-        mid_objs.sort(key=lambda x: get_x_weight(x.get('pos', '')))
-        fwd_objs.sort(key=lambda x: get_x_weight(x.get('pos', '')))
 
-        gk_players = [p.get('short_name', p.get('name')) for p in gk_objs]
-        def_players = [p.get('short_name', p.get('name')) for p in def_objs]
-        mid_players = [p.get('short_name', p.get('name')) for p in mid_objs]
-        fwd_players = [p.get('short_name', p.get('name')) for p in fwd_objs]
+        # 1. Separate GK from outfield players
+        gk_players = []
+        field_players = []
+        for p in starting_xi:
+            if str(p.get('category', '')).upper() == 'G':
+                gk_players.append(p)
+            else:
+                field_players.append(p)
+
+        # 2. Pre-sort vertically (back to front) to fix ESPN's scrambling
+        field_players.sort(key=get_y_weight)
+
+        # 3. Parse formation
+        try:
+            rows = [int(x) for x in formation.split('-')]
+            if sum(rows) != 10: rows = [4, 4, 2]
+        except:
+            rows = [4, 4, 2]
 
         lineup_lines = []
         if formation: lineup_lines.append(f"Formation: {formation}")
-        if gk_players: lineup_lines.append(f"🧤 GK: {', '.join(gk_players)}")
-        if def_players: lineup_lines.append(f"🛡️ DEF: {', '.join(def_players)}")
-        if mid_players: lineup_lines.append(f"⚙️ MID: {', '.join(mid_players)}")
-        if fwd_players: lineup_lines.append(f"🎯 FWD: {', '.join(fwd_players)}")
+        
+        gk_names = [p.get('short_name', p.get('name')) for p in gk_players]
+        if gk_names: lineup_lines.append(f"🧤 GK: {', '.join(gk_names)}")
+
+        # 4. Build each outfield line dynamically
+        player_idx = 0
+        for r_idx, count in enumerate(rows):
+            row_players = []
+            for _ in range(count):
+                if player_idx < len(field_players):
+                    row_players.append(field_players[player_idx])
+                    player_idx += 1
+            
+            # Sort horizontally Left-to-Right
+            row_players.sort(key=lambda p: get_x_weight(p.get('pos', '')))
+            row_names = [p.get('short_name', p.get('name')) for p in row_players]
+            
+            if row_names:
+                # Add appropriate emojis based on the line's position
+                if r_idx == 0: prefix = "🛡️ DEF:"
+                elif r_idx == len(rows) - 1: prefix = "🎯 FWD:"
+                else: prefix = "⚙️ MID:"
+                
+                lineup_lines.append(f"{prefix} {', '.join(row_names)}")
 
         players_block = "\n".join(lineup_lines)
         team_hash = team_name.replace(' ', '').replace('-', '').replace('.', '')
