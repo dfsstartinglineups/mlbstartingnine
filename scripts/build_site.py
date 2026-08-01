@@ -590,13 +590,13 @@ def slugify(text):
     text = re.sub(r'[^\w\s-]', '', text)
     return re.sub(r'[\s-]+', '-', text).strip()
 
-def get_player_slug(player_id, default_name, player_db):
+def get_player_slug(player_id, player_db):
     if player_id and player_db:
         db_key = f"ID{player_id}"
         if db_key in player_db and 'slug' in player_db[db_key]:
             return player_db[db_key]['slug']
-    return slugify(default_name)
-
+    return None  # We return None so the builders know the profile doesn't exist
+    
 def get_status_weight(game):
     status = game.get('status', {}).get('abstractGameState', '')
     detailed = game.get('status', {}).get('detailedState', '')
@@ -653,7 +653,14 @@ def build_pitcher_header(pitcher_obj, ml_odds, p_hand, deep_stats, player_db):
     
     photo_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{pid_str}/headshot/67/current"
     hand_text = f'<span class="text-muted fw-bold me-1" style="font-size:0.65rem;">({p_hand})</span>' if p_hand else ""
-    slug = get_player_slug(pid_str, player_name, player_db)
+    
+    # Check if we have a valid slug
+    slug = get_player_slug(pid_str, player_db)
+    
+    if slug:
+        name_html = f'<a href="/players/{slug}/" class="fw-bold text-dark text-truncate text-decoration-none" style="font-size: 0.75rem;" title="{html.escape(player_name)}">{html.escape(abbr_name)}</a>'
+    else:
+        name_html = f'<span class="fw-bold text-dark text-truncate" style="font-size: 0.75rem;" title="{html.escape(player_name)}">{html.escape(abbr_name)}</span>'
 
     return f"""
     <div class="d-flex align-items-center bg-light rounded p-1 border w-100" style="min-height: 44px;">
@@ -664,7 +671,7 @@ def build_pitcher_header(pitcher_obj, ml_odds, p_hand, deep_stats, player_db):
         <div class="d-flex flex-column justify-content-center text-truncate w-100">
             <div class="d-flex align-items-center text-truncate w-100">
                 {hand_text}
-                <a href="/players/{slug}/" class="fw-bold text-dark text-truncate text-decoration-none" style="font-size: 0.75rem;" title="{html.escape(player_name)}">{html.escape(abbr_name)}</a>
+                {name_html}
             </div>
             <span class="text-muted" style="font-size: 0.65rem; margin-top: 1px;">{p_stats.get('w', 0)}-{p_stats.get('l', 0)} • {p_stats.get('era', '-')} • {p_stats.get('k', 0)}K</span>
         </div>
@@ -691,12 +698,28 @@ def build_lineup_html(players, opposing_pitcher_hand, game_data, player_db):
         prefix_text = game_pos if game_pos else f"{p.get('order', index)}."
         
         photo_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{pid_str}/headshot/67/current"
-        slug = get_player_slug(pid_str, player_name, player_db)
+        
+        # Check if we have a valid slug
+        slug = get_player_slug(pid_str, player_db)
+
+        if slug:
+            name_link_top = f'<a href="/players/{slug}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.65rem;" title="{html.escape(player_name)}" data-shortname="{html.escape(abbr_name)}">{html.escape(player_name)}</a>'
+            name_link_def = f'<a href="/players/{slug}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.70rem;" title="{html.escape(player_name)}" data-shortname="{html.escape(abbr_name)}">{html.escape(player_name)}</a>'
+        else:
+            name_link_top = f'<span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.65rem;" title="{html.escape(player_name)}" data-shortname="{html.escape(abbr_name)}">{html.escape(player_name)}</span>'
+            name_link_def = f'<span class="batter-name fw-bold text-dark text-truncate ms-1" style="font-size: 0.70rem;" title="{html.escape(player_name)}" data-shortname="{html.escape(abbr_name)}">{html.escape(player_name)}</span>'
 
         top_line = f"""<div class="d-flex align-items-center text-truncate w-100" style="padding-bottom: 2px;">
             <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">{prefix_text}</span>
             {hand_text}
-            <a href="/players/{slug}/" class="batter-name fw-bold text-dark text-truncate ms-1 text-decoration-none" style="font-size: 0.65rem;" title="{html.escape(player_name)}" data-shortname="{html.escape(abbr_name)}">{html.escape(player_name)}</a>
+            {name_link_top}
+        </div>"""
+
+        v_default = f"""<div class="d-flex align-items-center w-100">
+            <span class="text-muted fw-bold text-center flex-shrink-0" style="font-size: 0.65rem; width: 22px; margin-right: 4px;">{prefix_text}</span>
+            <img src="{photo_url}" style="width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #dee2e6; background: #fff; margin-right: 6px;" onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI2FkYjViZCI+PHBhdGggZD0iTTEyIDJDMi42NCAyIDIgNi42NCAyIDEyeiIvPjwvc3ZnPg==';">
+            {hand_text}
+            {name_link_def}
         </div>"""
 
         v_default = f"""<div class="d-flex align-items-center w-100">
