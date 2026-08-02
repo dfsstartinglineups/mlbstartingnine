@@ -572,6 +572,83 @@ def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text):
         </div>
     </div>"""
 
+def format_batter_narrative(batting_node):
+    """Converts box score batting dictionary into natural prose narrative."""
+    if not batting_node:
+        return ""
+
+    ab = safe_int(batting_node.get("atBats", 0))
+    hits = safe_int(batting_node.get("hits", 0))
+    hrs = safe_int(batting_node.get("homeRuns", 0))
+    doubles = safe_int(batting_node.get("doubles", 0))
+    triples = safe_int(batting_node.get("triples", 0))
+    rbis = safe_int(batting_node.get("rbi", 0))
+    runs = safe_int(batting_node.get("runs", 0))
+    bbs = safe_int(batting_node.get("baseOnBalls", 0))
+    ks = safe_int(batting_node.get("strikeOuts", 0))
+    sbs = safe_int(batting_node.get("stolenBases", 0))
+    hbp = safe_int(batting_node.get("hitByPitch", 0))
+
+    if hits == 0:
+        base_phrase = "did not record an official at-bat" if ab == 0 else (f"went hitless in 1 at-bat" if ab == 1 else f"went hitless in {ab} at-bats")
+    else:
+        base_phrase = f"went {hits}-for-{ab}"
+
+    details = []
+    if hrs > 0: details.append("a home run" if hrs == 1 else f"{hrs} home runs")
+    if triples > 0: details.append("a triple" if triples == 1 else f"{triples} triples")
+    if doubles > 0: details.append("a double" if doubles == 1 else f"{doubles} doubles")
+    if rbis > 0: details.append(f"{rbis} RBI" if rbis == 1 else f"{rbis} RBIs")
+    if runs > 0: details.append("a run scored" if runs == 1 else f"{runs} runs scored")
+    if bbs > 0: details.append("a walk" if bbs == 1 else f"{bbs} walks")
+    if hbp > 0: details.append("a hit-by-pitch" if hbp == 1 else f"{hbp} hit-by-pitches")
+    if sbs > 0: details.append("a stolen base" if sbs == 1 else f"{sbs} stolen bases")
+    if ks > 0: details.append("a strikeout" if ks == 1 else f"{ks} strikeouts")
+
+    if not details:
+        return base_phrase
+
+    if len(details) == 1:
+        return f"{base_phrase} with {details[0]}"
+    elif len(details) == 2:
+        return f"{base_phrase} with {details[0]} and {details[1]}"
+    else:
+        return f"{base_phrase} with {', '.join(details[:-1])}, and {details[-1]}"
+
+
+def format_pitcher_narrative(pitching_node):
+    """Converts box score pitching dictionary into natural prose narrative."""
+    if not pitching_node:
+        return ""
+
+    ip = pitching_node.get("inningsPitched", "0.0")
+    er = safe_int(pitching_node.get("earnedRuns", 0))
+    so = safe_int(pitching_node.get("strikeOuts", 0))
+    bb = safe_int(pitching_node.get("baseOnBalls", 0))
+    hits = safe_int(pitching_node.get("hits", 0))
+    note = pitching_node.get("note", "")
+    is_starter = pitching_node.get("gamesStarted", 0) == 1
+
+    # Format role and decision phrase naturally
+    if is_starter:
+        if "(W" in note: action_phrase = "started and earned the win, tossing"
+        elif "(L" in note: action_phrase = "started and took the loss, tossing"
+        else: action_phrase = "started and tossed"
+    else:
+        if "(S" in note: action_phrase = "pitched in relief and recorded the save, tossing"
+        elif "(H" in note: action_phrase = "pitched in relief and picked up a hold, tossing"
+        elif "(W" in note: action_phrase = "pitched in relief and earned the win, tossing"
+        elif "(L" in note: action_phrase = "pitched in relief and took the loss, tossing"
+        else: action_phrase = "pitched in relief, tossing"
+
+    # Singular / Plural formatting
+    er_str = "0 earned runs" if er == 0 else ("1 earned run" if er == 1 else f"{er} earned runs")
+    hits_str = "1 hit" if hits == 1 else f"{hits} hits"
+    so_str = "1 strikeout" if so == 1 else f"{so} strikeouts"
+    bb_str = "1 walk" if bb == 1 else f"{bb} walks"
+
+    return f"{action_phrase} <strong>{ip} innings</strong>, allowing <strong>{er_str}</strong> on {hits_str} with {so_str} and {bb_str}"
+
 def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data=None):
     if not my_game or not team_side:
         blurb = f"<strong>{p_name}</strong> is not scheduled to pitch on today's active MLB slate." if is_pitcher else f"<strong>{p_name}</strong> is not on today's active MLB slate."
@@ -608,8 +685,13 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         
         my_score = away_score if team_side == "away" else home_score
         opp_score = home_score if team_side == "away" else away_score
-        score_str = f"{my_score}-{opp_score}"
-        outcome_word = "victory over" if my_score > opp_score else ("defeat against" if my_score < opp_score else "tie with")
+        
+        # Always list the higher score first (American sports standard)
+        high_score = max(my_score, opp_score)
+        low_score = min(my_score, opp_score)
+        score_str = f"{high_score}-{low_score}"
+        
+        outcome_word = "victory over" if my_score > opp_score else ("defeat against" if my_score < opp_score else "draw with")
 
         # Locate player in live box score
         side_upper = team_side.upper()
@@ -621,29 +703,12 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
 
         batting_node = player_box.get("batting")
         pitching_node = player_box.get("pitching")
-        dk_pts = player_box.get("dk_pts", 0.0)
 
         # 1. Pitcher Post-Game Recap
         if is_pitcher or pitching_node:
             if pitching_node:
-                ip = pitching_node.get("inningsPitched", "0.0")
-                er = pitching_node.get("earnedRuns", 0)
-                so = pitching_node.get("strikeOuts", 0)
-                bb = pitching_node.get("baseOnBalls", 0)
-                hits = pitching_node.get("hits", 0)
-                note = pitching_node.get("note", "")
-                is_starter = pitching_node.get("gamesStarted", 0) == 1
-
-                dec_str = ""
-                if "(W" in note: dec_str = " earned the win and"
-                elif "(L" in note: dec_str = " took the loss and"
-                elif "(S" in note: dec_str = " recorded the save and"
-                elif "(H" in note: dec_str = " picked up a hold and"
-
-                er_str = "0 earned runs" if er == 0 else (f"1 earned run" if er == 1 else f"{er} earned runs")
-                role_str = "started and" if is_starter else "pitched in relief,"
-
-                blurb = f"<strong>{p_name}</strong> {role_str}{dec_str} tossed <strong>{ip} IP</strong>, allowing <strong>{er_str}</strong> on {hits} hits with <strong>{so} Ks</strong> and {bb} BBs in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}. He finished with {dk_pts:.1f} DraftKings points."
+                pitcher_stat_prose = format_pitcher_narrative(pitching_node)
+                blurb = f"<strong>{p_name}</strong> {pitcher_stat_prose} in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
             else:
                 blurb = f"<strong>{p_name}</strong> did not pitch in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
 
@@ -652,24 +717,20 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         # 2. Batter Post-Game Recap
         else:
             if batting_node:
-                summary = batting_node.get("summary", "")
-                ab = batting_node.get("atBats", 0)
-                hits = batting_node.get("hits", 0)
+                narrative_stat = format_batter_narrative(batting_node)
                 note = batting_node.get("note", "")
 
                 if note:  # Came off bench / Pinch hitter
-                    blurb = f"<strong>{p_name}</strong> made an appearance off the bench in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}, finishing <strong>{summary}</strong> ({dk_pts:.1f} DK pts)."
-                elif ab > 0 or summary:
-                    blurb = f"<strong>{p_name}</strong> went <strong>{summary}</strong> in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}, recording {dk_pts:.1f} DraftKings points."
+                    blurb = f"<strong>{p_name}</strong> made an appearance off the bench in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}, going {narrative_stat}."
                 else:
-                    blurb = f"<strong>{p_name}</strong> entered as a replacement in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
+                    blurb = f"<strong>{p_name}</strong> {narrative_stat} in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
             else:
                 blurb = f"<strong>{p_name}</strong> did not see the field in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
 
             return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb), blurb
 
     # ----------------------------------------------------
-    # PITCHER NARRATIVE BRANCH
+    # PITCHER NARRATIVE BRANCH (PRE-GAME)
     # ----------------------------------------------------
     if is_pitcher:
         my_team = teams.get(team_side) or {}
@@ -776,7 +837,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb), blurb
 
     # ----------------------------------------------------
-    # BATTER NARRATIVE BRANCH
+    # BATTER NARRATIVE BRANCH (PRE-GAME)
     # ----------------------------------------------------
     else:
         tracking_node = (my_game.get("lineupTracking") or {}).get(team_side) or {}
@@ -867,7 +928,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         )
         return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb), blurb
 
-    # Universal fallback just in case all logic conditions miss
+    # Universal fallback
     return render_blurb_card("Data Unavailable", "bg-secondary", "#6c757d", f"Matchup data for {p_name} is currently unavailable."), ""
 
 # ==========================================
