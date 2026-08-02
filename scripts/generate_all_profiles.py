@@ -251,6 +251,46 @@ def render_badge_zone(player_id, team_side, my_game):
     
     return f'<div class="mb-3">{badge_html}{link_html}</div>'
 
+def build_custom_boxscore(profile, is_pitcher):
+    """Builds a custom box score string directly from raw integer stats."""
+    if not profile:
+        return ""
+        
+    if is_pitcher:
+        ip = profile.get("inningsPitched", "0.0")
+        er = safe_int(profile.get("earnedRuns", 0))
+        k = safe_int(profile.get("strikeOuts", 0))
+        bb = safe_int(profile.get("baseOnBalls", 0))
+        return f"{ip} IP, {er} ER, {k} K, {bb} BB"
+    else:
+        ab = safe_int(profile.get("atBats", 0))
+        h = safe_int(profile.get("hits", 0))
+        d = safe_int(profile.get("doubles", 0))
+        t = safe_int(profile.get("triples", 0))
+        hr = safe_int(profile.get("homeRuns", 0))
+        rbi = safe_int(profile.get("rbi", 0))
+        r = safe_int(profile.get("runs", 0))
+        bb = safe_int(profile.get("baseOnBalls", 0))
+        k = safe_int(profile.get("strikeOuts", 0))
+        sb = safe_int(profile.get("stolenBases", 0))
+        hbp = safe_int(profile.get("hitByPitch", 0))
+        
+        parts = []
+        if d > 0: parts.append(f"{d} 2B" if d > 1 else "2B")
+        if t > 0: parts.append(f"{t} 3B" if t > 1 else "3B")
+        if hr > 0: parts.append(f"{hr} HR" if hr > 1 else "HR")
+        if rbi > 0: parts.append(f"{rbi} RBI" if rbi > 1 else "RBI")
+        if r > 0: parts.append(f"{r} R" if r > 1 else "R")
+        if bb > 0: parts.append(f"{bb} BB" if bb > 1 else "BB")
+        if hbp > 0: parts.append(f"{hbp} HBP" if hbp > 1 else "HBP")
+        if sb > 0: parts.append(f"{sb} SB" if sb > 1 else "SB")
+        if k > 0: parts.append(f"{k} K" if k > 1 else "K")
+        
+        line = f"{h}-{ab}"
+        if parts:
+            line += " | " + ", ".join(parts)
+        return line
+
 def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val, master_data, is_pitcher):
     game_raw = my_game.get("gameRaw", {})
     game_pk = str(game_raw.get("gamePk", ""))
@@ -281,9 +321,15 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         
         side_upper = team_side.upper()
         player_box = active_live.get("players", {}).get(side_upper, {}).get(f"ID{player_id}", {})
-        profile = player_box.get("batting", {}) or player_box.get("pitching", {})
         
-        summary = profile.get("summary", "")
+        # Route to the correct custom formatter based on player position
+        if is_pitcher and player_box.get("pitching"):
+            summary = build_custom_boxscore(player_box.get("pitching"), is_pitcher=True)
+        elif player_box.get("batting"):
+            summary = build_custom_boxscore(player_box.get("batting"), is_pitcher=False)
+        else:
+            summary = ""
+            
         dk_pts = player_box.get("dk_pts", 0.0)
         fd_pts = player_box.get("fd_pts", 0.0)
         
