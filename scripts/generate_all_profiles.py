@@ -223,15 +223,15 @@ def render_badge_zone(player_id, team_side, my_game):
         is_confirmed = tracking_node.get("status") in ["OFFICIAL", "UPDATED", "MODIFIED", "CONFIRMED"] or has_live_lineup
         
         slot_index = -1
+        
+        # STRICT HIERARCHY: Trust live lineup first. Do NOT fallback if a live lineup exists.
         if has_live_lineup:
             slot_index = next((i for i, p in enumerate(actual_lineup) if str(p.get("id")) == str(player_id)), -1)
-        
-        if slot_index == -1 and tracking_node.get("hash"):
+        elif tracking_node.get("hash"):
             hash_list = tracking_node.get("hash").split('-')
             if str(player_id) in hash_list:
                 slot_index = hash_list.index(str(player_id))
-                
-        if slot_index == -1:
+        else:
             proj_order = proj_team.get("battingOrder", [])
             slot_index = next((i for i, p in enumerate(proj_order) if str(p.get("id")) == str(player_id)), -1)
             
@@ -712,13 +712,15 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         is_confirmed = tracking_node.get("status") in ["OFFICIAL", "UPDATED", "MODIFIED", "CONFIRMED"] or has_live_lineup
         
         slot_index = -1
+        
+        # STRICT HIERARCHY: Trust live lineup first. Do NOT fallback if a live lineup exists.
         if has_live_lineup:
             slot_index = next((i for i, p in enumerate(actual_lineup) if str(p.get("id")) == str(player_id)), -1)
-        if slot_index == -1 and tracking_node.get("hash"):
+        elif tracking_node.get("hash"):
             hash_list = tracking_node.get("hash").split('-')
             if str(player_id) in hash_list:
                 slot_index = hash_list.index(str(player_id))
-        if slot_index == -1:
+        else:
             proj_team = (my_game.get("projectedLineups") or {}).get(team_side) or {}
             proj_order = proj_team.get("battingOrder", [])
             slot_index = next((i for i, p in enumerate(proj_order) if str(p.get("id")) == str(player_id)), -1)
