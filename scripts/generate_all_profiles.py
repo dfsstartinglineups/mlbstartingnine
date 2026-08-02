@@ -572,7 +572,7 @@ def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text):
         </div>
     </div>"""
 
-def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data):
+def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data=None):
     if not my_game or not team_side:
         blurb = f"<strong>{p_name}</strong> is not scheduled to pitch on today's active MLB slate." if is_pitcher else f"<strong>{p_name}</strong> is not on today's active MLB slate."
         return render_blurb_card("Off-Slate", "bg-secondary", "#6c757d", blurb), blurb
@@ -594,6 +594,79 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
     if "Postponed" in abstract_state or "Postponed" in detailed_state or (game_raw.get("status") or {}).get("statusCode") == "C":
         blurb = f"Today's matchup between the <strong>{team_name}</strong> and <strong>{opp_team_name}</strong> has been <strong>postponed</strong>."
         return render_blurb_card("Postponed", "bg-danger", "#dc3545", blurb), blurb
+
+    # ----------------------------------------------------
+    # 🏆 POST-GAME RECAP INTERCEPTION (GAMES ARE FINAL)
+    # ----------------------------------------------------
+    game_pk = str(game_raw.get("gamePk", ""))
+    active_live = live_data.get(game_pk) if live_data else None
+    live_status = active_live.get("status", "") if active_live else ""
+
+    if live_status in ["Final", "Completed"] or abstract_state == "Final":
+        away_score = active_live.get("away_score", 0) if active_live else 0
+        home_score = active_live.get("home_score", 0) if active_live else 0
+        
+        my_score = away_score if team_side == "away" else home_score
+        opp_score = home_score if team_side == "away" else away_score
+        score_str = f"{my_score}-{opp_score}"
+        outcome_word = "victory over" if my_score > opp_score else ("defeat against" if my_score < opp_score else "tie with")
+
+        # Locate player in live box score
+        side_upper = team_side.upper()
+        player_box = active_live.get("players", {}).get(side_upper, {}).get(f"ID{player_id}", {}) if active_live else {}
+        if not player_box and active_live:
+            # Fallback search both teams
+            all_players = {**active_live.get("players", {}).get("AWAY", {}), **active_live.get("players", {}).get("HOME", {})}
+            player_box = all_players.get(f"ID{player_id}", {})
+
+        batting_node = player_box.get("batting")
+        pitching_node = player_box.get("pitching")
+        dk_pts = player_box.get("dk_pts", 0.0)
+
+        # 1. Pitcher Post-Game Recap
+        if is_pitcher or pitching_node:
+            if pitching_node:
+                ip = pitching_node.get("inningsPitched", "0.0")
+                er = pitching_node.get("earnedRuns", 0)
+                so = pitching_node.get("strikeOuts", 0)
+                bb = pitching_node.get("baseOnBalls", 0)
+                hits = pitching_node.get("hits", 0)
+                note = pitching_node.get("note", "")
+                is_starter = pitching_node.get("gamesStarted", 0) == 1
+
+                dec_str = ""
+                if "(W" in note: dec_str = " earned the win and"
+                elif "(L" in note: dec_str = " took the loss and"
+                elif "(S" in note: dec_str = " recorded the save and"
+                elif "(H" in note: dec_str = " picked up a hold and"
+
+                er_str = "0 earned runs" if er == 0 else (f"1 earned run" if er == 1 else f"{er} earned runs")
+                role_str = "started and" if is_starter else "pitched in relief,"
+
+                blurb = f"<strong>{p_name}</strong> {role_str}{dec_str} tossed <strong>{ip} IP</strong>, allowing <strong>{er_str}</strong> on {hits} hits with <strong>{so} Ks</strong> and {bb} BBs in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}. He finished with {dk_pts:.1f} DraftKings points."
+            else:
+                blurb = f"<strong>{p_name}</strong> did not pitch in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
+
+            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb), blurb
+
+        # 2. Batter Post-Game Recap
+        else:
+            if batting_node:
+                summary = batting_node.get("summary", "")
+                ab = batting_node.get("atBats", 0)
+                hits = batting_node.get("hits", 0)
+                note = batting_node.get("note", "")
+
+                if note:  # Came off bench / Pinch hitter
+                    blurb = f"<strong>{p_name}</strong> made an appearance off the bench in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}, finishing <strong>{summary}</strong> ({dk_pts:.1f} DK pts)."
+                elif ab > 0 or summary:
+                    blurb = f"<strong>{p_name}</strong> went <strong>{summary}</strong> in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}, recording {dk_pts:.1f} DraftKings points."
+                else:
+                    blurb = f"<strong>{p_name}</strong> entered as a replacement in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
+            else:
+                blurb = f"<strong>{p_name}</strong> did not see the field in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
+
+            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb), blurb
 
     # ----------------------------------------------------
     # PITCHER NARRATIVE BRANCH
@@ -843,15 +916,20 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
         
-    # Generate blurb card and extract raw blurb text for schema
+    # Generate blurb card and extract raw blurb text for schema (pass live_data)
     news_blurb_html, raw_blurb_text = generate_news_blurb(
-        player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data
+        player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data
     )
     
     # Clean only the raw blurb text (strips HTML tags without capturing header/badge titles)
     clean_blurb_desc = clean_text_for_json(raw_blurb_text)
     player_url = f"{DOMAIN}/players/{slug}/"
     headshot_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current"
+
+    # Check if game is Final to swap Meta Tags
+    game_pk = str((my_game.get("gameRaw") or {}).get("gamePk", "")) if my_game else ""
+    active_live = live_data.get(game_pk) if live_data else None
+    is_game_final = (active_live.get("status") in ["Final", "Completed"]) if active_live else False
 
     # ----------------------------------------------------
     # ATHLETE JSON-LD SCHEMA GENERATION
@@ -873,20 +951,30 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
     schema_script_html = f'<script type="application/ld+json">\n{json.dumps(athlete_schema, indent=2)}\n    </script>'
     
     if is_pitcher:
-        title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
-        desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
         wins, losses, era = profile.get("season", {}).get("w", 0), profile.get("season", {}).get("l", 0), profile.get("season", {}).get("era", "-")
         season_string = f"{position} • {team_name} • {wins}-{losses} • {era} ERA"
         split_vl_header = '<span class="badge bg-secondary me-1">LHB</span> vs. Left-Handed Batters'
         split_vr_header = '<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters'
         split_vol_label, split_hr_label = "Batters Faced:", "HR Allowed:"
+        
+        if is_game_final:
+            title = f"{p_name} Stats Tonight: Post-Game Recap vs {opp_team_name}"
+            desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
+        else:
+            title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
+            desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
     else:
-        title = f"Is {p_name} Playing Today? Lineup Status, BvP & Matchup Stats"
-        desc = f"Find out if {p_name} is in today's starting lineup. View real-time lineup status, lifetime matchup analytics, daily HR probability scores, and live box scores."
         avg, hr = profile.get("season", {}).get("avg", "-"), profile.get("season", {}).get("hr", 0)
         season_string = f"{position} • {team_name} • {avg} AVG • {hr} HR"
         split_vl_header, split_vr_header = 'Splits VS Left-Handed', 'Splits VS Right-Handed'
         split_vol_label, split_hr_label = "ABs:", "Homeruns:"
+        
+        if is_game_final:
+            title = f"{p_name} Stats Tonight: Post-Game Recap vs {opp_team_name}"
+            desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
+        else:
+            title = f"Is {p_name} Playing Today? Lineup Status, BvP & Matchup Stats"
+            desc = f"Find out if {p_name} is in today's starting lineup. View real-time lineup status, lifetime matchup analytics, daily HR probability scores, and live box scores."
 
     vl, vr = profile.get("split_vL", {}), profile.get("split_vR", {})
     historical_table_rows = "".join([f"<tr><td class='text-start ps-3 fw-bold'>{log.get('date','')}</td><td>{log.get('summary','')}</td><td class='dk-accent'>{log.get('dk_pts',0.0):.2f}</td><td class='fd-accent'>{log.get('fd_pts',0.0):.1f}</td></tr>" for log in profile.get("game_log", [])])
