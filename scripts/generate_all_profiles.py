@@ -1069,7 +1069,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         split_vol_label, split_hr_label = "Batters Faced:", "HR Allowed:"
         
         if is_game_final:
-            title = f"{p_name} Stats Tonight: Post-Game Recap vs {opp_team_name}"
+            title = f"Is {p_name} Pitching Today? Rotation Status & Latest Stats vs {opp_team_name}"
             desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
         else:
             title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
@@ -1081,7 +1081,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         split_vol_label, split_hr_label = "ABs:", "Homeruns:"
         
         if is_game_final:
-            title = f"{p_name} Stats Tonight: Post-Game Recap vs {opp_team_name}"
+            title = f"Is {p_name} Playing Today? Lineup Status & Latest Stats vs {opp_team_name}"
             desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
         else:
             title = f"Is {p_name} Playing Today? Lineup Status, BvP & Matchup Stats"
