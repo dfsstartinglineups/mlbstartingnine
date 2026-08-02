@@ -916,7 +916,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
         
-    # Generate blurb card and extract raw blurb text for schema (pass live_data)
+    # Generate blurb card and extract raw blurb text for schema (Pass live_data)
     news_blurb_html, raw_blurb_text = generate_news_blurb(
         player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data
     )
@@ -925,6 +925,10 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
     clean_blurb_desc = clean_text_for_json(raw_blurb_text)
     player_url = f"{DOMAIN}/players/{slug}/"
     headshot_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current"
+
+    # Derive Opponent Team Name for Meta Tags
+    opp_side = "home" if team_side == "away" else "away"
+    opp_team_name = (my_game.get("gameRaw", {}).get("teams", {}).get(opp_side, {}).get("team") or {}).get("name", "Opponent") if my_game else "Opponent"
 
     # Check if game is Final to swap Meta Tags
     game_pk = str((my_game.get("gameRaw") or {}).get("gamePk", "")) if my_game else ""
