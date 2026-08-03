@@ -22,6 +22,7 @@ DATA_DIR = 'data'
 DAILY_FILES_DIR = os.path.join(DATA_DIR, 'daily_files')
 UMPIRES_FILE = os.path.join(DATA_DIR, 'umpires.json')
 PARKS_FILE = os.path.join(DATA_DIR, 'parks.json')
+PLAYER_MASTER_FILE = os.path.join(DATA_DIR, 'player_master_data.json')
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(DAILY_FILES_DIR, exist_ok=True)
@@ -102,6 +103,61 @@ def get_active_sport_ids():
     if wbc_start <= current_date <= wbc_end:
         return "1,51"
     return "1"
+
+def build_waterfall_lineup(team_abbr, dff_projections, bbm_fallback, starting_pitcher, reverse_lookup):
+    pitcher_obj = None
+    if starting_pitcher:
+        pitcher_obj = {
+            "id": int(starting_pitcher.get('id', 0)),
+            "name": starting_pitcher.get('fullName', ''),
+            "verified": False
+        }
+    elif bbm_fallback and bbm_fallback.get("startingPitcher"):
+        pitcher_obj = bbm_fallback["startingPitcher"]
+
+    dff_batters = [
+        p for p in dff_projections.values()
+        if p.get('team') == team_abbr and p.get('dff_starting') and not p.get('is_pitcher') and p.get('dff_order') is not None
+    ]
+    dff_batters.sort(key=lambda x: x.get('dff_order', 99))
+
+    has_9_batters = len(dff_batters) == 9
+    orders_are_perfect = [b.get('dff_order') for b in dff_batters] == [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    if has_9_batters and orders_are_perfect:
+        dff_lineup_obj = {"startingPitcher": pitcher_obj, "battingOrder": []}
+        id_mapping_failed = False
+        
+        for batter in dff_batters:
+            b_clean = clean_player_name(batter.get('name', ''))
+            b_id = reverse_lookup.get(b_clean)
+            
+            if not b_id:
+                id_mapping_failed = True
+                break
+            else:
+                player_obj = {
+                    "id": b_id,
+                    "name": batter.get('name', ''),
+                    "verified": False,
+                    "order": batter.get('dff_order'),
+                    "salary": batter.get('salary', 0),
+                    "proj": batter.get('proj', 0),
+                    "value": batter.get('value', 0),
+                    "dk_salary": batter.get('dk_salary', 0),
+                    "dk_proj": batter.get('dk_proj', 0),
+                    "dk_value": batter.get('dk_value', 0),
+                    "fd_slates": batter.get('fd_slates', {}),
+                    "dk_slates": batter.get('dk_slates', {}),
+                    "fd_positions": batter.get('fd_positions', ''),
+                    "dk_positions": batter.get('dk_positions', '')
+                }
+                dff_lineup_obj["battingOrder"].append(player_obj)
+        
+        if not id_mapping_failed:
+            return dff_lineup_obj
+
+    return bbm_fallback
 
 # ==========================================
 # --- DATA FETCHERS ---
@@ -249,31 +305,43 @@ def scrape_dff_projections(target_date_str):
                 except:
                     sal, proj, val = 0, 0, 0
                     
-                # 1. GRAB POSITIONS FIRST
                 pos = row.get('data-pos', '').strip()
                 pos_alt = row.get('data-pos_alt', '').strip()
                 combined_pos = f"{pos}/{pos_alt}" if pos_alt else pos
                 
-                # 2. DEFINE THE KEY WITH THE _P OR _B SUFFIX
                 is_pitcher = 'P' in combined_pos.split('/')
                 p_key = f"{team}_{clean_name}_{'P' if is_pitcher else 'B'}"
                 
-                # 3. INITIALIZE THE DICTIONARY USING THE CORRECT SUFFIXED KEY
+                # --- EXTRACT STATUS AND ORDER ---
+                cells = row.find_all(['td', 'th'])
+                is_starting = False
+                batting_order = None
+                if len(cells) >= 15:
+                    raw_status = cells[4].get_text(strip=True).upper()
+                    is_starting = True if 'EXP' in raw_status or '✓' in raw_status else False
+                    raw_order = cells[7].get_text(strip=True)
+                    if raw_order.isdigit():
+                        batting_order = int(raw_order)
+                
                 if p_key not in dff_data:
                     dff_data[p_key] = {
+                        "name": raw_name, "team": team, "is_pitcher": is_pitcher,
+                        "dff_starting": is_starting, "dff_order": batting_order,
                         "salary": 0, "proj": 0.0, "value": 0.0,
                         "dk_salary": 0, "dk_proj": 0.0, "dk_value": 0.0,
                         "fd_slates": {}, "dk_slates": {},
                         "fd_positions": "", "dk_positions": ""
                     }
+                else:
+                    if is_starting: dff_data[p_key]["dff_starting"] = True
+                    if batting_order: dff_data[p_key]["dff_order"] = batting_order
                 
-                # 4. SAVE THE DATA
                 if plt == 'fanduel' and sal > 0:
-                    dff_data[p_key]["fd_positions"] = combined_pos # Save the FD string
+                    dff_data[p_key]["fd_positions"] = combined_pos 
                     if sid:
                         dff_data[p_key]["fd_slates"][sid] = {"salary": int(sal), "proj": round(proj, 1), "value": round(val, 2)}
                 elif plt == 'draftkings' and sal > 0:
-                    dff_data[p_key]["dk_positions"] = combined_pos # Save the DK string
+                    dff_data[p_key]["dk_positions"] = combined_pos 
                     if sid:
                         dff_data[p_key]["dk_slates"][sid] = {"salary": int(sal), "proj": round(proj, 1), "value": round(val, 2)}
 
@@ -518,6 +586,13 @@ def main():
     ump_cache = load_json(UMPIRES_FILE, {}).get('umpires', {})
     park_cache = load_json(PARKS_FILE, {}).get('parks', {})
     
+    master_data_raw = load_json(PLAYER_MASTER_FILE, {})
+    reverse_lookup = {}
+    for key, player in master_data_raw.items():
+        cleaned_name = clean_player_name(player.get("name", ""))
+        if cleaned_name and "player_id" in player:
+            reverse_lookup[cleaned_name] = int(player.get("player_id"))
+            
     API_CALL_TRACKER["odds"] += 1
     try: odds_data = requests.get("https://weathermlb.com/data/odds.json", timeout=10).json().get('odds', [])
     except Exception: odds_data = []
@@ -914,10 +989,19 @@ def main():
                 except Exception: pass
                 
             if needs_bbm_fetch:
+                bbm_away = bbm_projections_for_date.get(f"{away_team_id}_{game_num}") or {}
+                bbm_home = bbm_projections_for_date.get(f"{home_team_id}_{game_num}") or {}
+                
+                away_abbr = get_dff_team_abbr(away_team_name)
+                home_abbr = get_dff_team_abbr(home_team_name)
+
+                final_away = build_waterfall_lineup(away_abbr, dff_projections, bbm_away, away_starter, reverse_lookup) if has_valid_dfs else bbm_away
+                final_home = build_waterfall_lineup(home_abbr, dff_projections, bbm_home, home_starter, reverse_lookup) if has_valid_dfs else bbm_home
+
                 game_projected_lineups = {
                     "lastUpdated": current_est_time.timestamp(),
-                    "away": bbm_projections_for_date.get(f"{away_team_id}_{game_num}") or {},
-                    "home": bbm_projections_for_date.get(f"{home_team_id}_{game_num}") or {}
+                    "away": final_away,
+                    "home": final_home
                 }
             else:
                 game_projected_lineups = existing_game_state.get('projectedLineups', {})
