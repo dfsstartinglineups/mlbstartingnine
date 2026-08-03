@@ -151,40 +151,67 @@ def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
 # 2. MATCHUP ENGINE
 # ==========================================
 def resolve_active_matchup(player_id, team_name, daily_data):
-    id_matches = []
-    team_matches = []
     p_id_str = str(player_id)
     
+    official_id_matches = []
+    proj_id_team_matches = []
+    proj_id_matches = []
+    team_name_matches = []
+
     for game in daily_data.get("games", []):
         game_raw = game.get("gameRaw", {})
         teams = game_raw.get("teams", {})
+        
         home_team_name = teams.get("home", {}).get("team", {}).get("name", "")
         away_team_name = teams.get("away", {}).get("team", {}).get("name", "")
-        
-        home_p = str(teams.get("home", {}).get("probablePitcher", {}).get("id", "") or game.get("projectedLineups", {}).get("home", {}).get("startingPitcher", {}).get("id", ""))
-        away_p = str(teams.get("away", {}).get("probablePitcher", {}).get("id", "") or game.get("projectedLineups", {}).get("away", {}).get("startingPitcher", {}).get("id", ""))
-        
-        # 1. STRICT ID MATCHING (Highest Priority)
-        has_id_home = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("homePlayers", [])] or 
-                       p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])] or 
-                       home_p == p_id_str)
-                       
-        has_id_away = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("awayPlayers", [])] or 
-                       p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("away", {}).get("battingOrder", [])] or 
-                       away_p == p_id_str)
 
-        if has_id_home: id_matches.append({"game": game, "teamSide": "home"})
-        if has_id_away: id_matches.append({"game": game, "teamSide": "away"})
+        # Extract IDs from Official Live Lineups
+        home_official_players = [str(p.get("id")) for p in game_raw.get("lineups", {}).get("homePlayers", [])]
+        away_official_players = [str(p.get("id")) for p in game_raw.get("lineups", {}).get("awayPlayers", [])]
+        
+        home_probable_p = str(teams.get("home", {}).get("probablePitcher", {}).get("id", ""))
+        away_probable_p = str(teams.get("away", {}).get("probablePitcher", {}).get("id", ""))
 
-        # 2. LOOSE TEAM NAME MATCHING (Fallback Only)
-        if not has_id_home and home_team_name and home_team_name in team_name:
-            team_matches.append({"game": game, "teamSide": "home"})
-        if not has_id_away and away_team_name and away_team_name in team_name:
-            team_matches.append({"game": game, "teamSide": "away"})
-            
-    # CRITICAL: Always use ID matches if they exist!
-    matching_games = id_matches if id_matches else team_matches
-    if not matching_games: return None, None
+        # Extract IDs from Projected Lineups
+        home_proj_players = [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])]
+        away_proj_players = [str(p.get("id")) for p in game.get("projectedLineups", {}).get("away", {}).get("battingOrder", [])]
+
+        # ----------------------------------------------------
+        # TIER 1: OFFICIAL / LIVE LINEUP MATCH (Highest Priority)
+        # ----------------------------------------------------
+        if p_id_str in home_official_players or (home_probable_p and home_probable_p == p_id_str):
+            official_id_matches.append({"game": game, "teamSide": "home"})
+        elif p_id_str in away_official_players or (away_probable_p and away_probable_p == p_id_str):
+            official_id_matches.append({"game": game, "teamSide": "away"})
+
+        # ----------------------------------------------------
+        # TIER 2: PROJECTED ID + TEAM NAME MATCH
+        # ----------------------------------------------------
+        elif p_id_str in home_proj_players and (home_team_name and home_team_name in team_name):
+            proj_id_team_matches.append({"game": game, "teamSide": "home"})
+        elif p_id_str in away_proj_players and (away_team_name and away_team_name in team_name):
+            proj_id_team_matches.append({"game": game, "teamSide": "away"})
+
+        # ----------------------------------------------------
+        # TIER 3: PROJECTED ID MATCH (Cross-team / Stale)
+        # ----------------------------------------------------
+        elif p_id_str in home_proj_players:
+            proj_id_matches.append({"game": game, "teamSide": "home"})
+        elif p_id_str in away_proj_players:
+            proj_id_matches.append({"game": game, "teamSide": "away"})
+
+        # ----------------------------------------------------
+        # TIER 4: LOOSE TEAM NAME FALLBACK
+        # ----------------------------------------------------
+        elif home_team_name and home_team_name in team_name:
+            team_name_matches.append({"game": game, "teamSide": "home"})
+        elif away_team_name and away_team_name in team_name:
+            team_name_matches.append({"game": game, "teamSide": "away"})
+
+    # Always select the highest tier bucket that contains matches
+    matching_games = official_id_matches or proj_id_team_matches or proj_id_matches or team_name_matches
+    if not matching_games: 
+        return None, None
         
     if len(matching_games) > 1:
         live_match = next((m for m in matching_games if m["game"].get("gameRaw", {}).get("status", {}).get("abstractGameState") in ["Live", "In Progress"]), None)
