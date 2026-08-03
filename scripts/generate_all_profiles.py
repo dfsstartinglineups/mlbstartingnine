@@ -151,7 +151,8 @@ def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
 # 2. MATCHUP ENGINE
 # ==========================================
 def resolve_active_matchup(player_id, team_name, daily_data):
-    matching_games = []
+    id_matches = []
+    team_matches = []
     p_id_str = str(player_id)
     
     for game in daily_data.get("games", []):
@@ -163,17 +164,26 @@ def resolve_active_matchup(player_id, team_name, daily_data):
         home_p = str(teams.get("home", {}).get("probablePitcher", {}).get("id", "") or game.get("projectedLineups", {}).get("home", {}).get("startingPitcher", {}).get("id", ""))
         away_p = str(teams.get("away", {}).get("probablePitcher", {}).get("id", "") or game.get("projectedLineups", {}).get("away", {}).get("startingPitcher", {}).get("id", ""))
         
-        in_home = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("homePlayers", [])] or 
-                   p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])] or 
-                   home_p == p_id_str or (home_team_name and home_team_name in team_name))
-                   
-        in_away = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("awayPlayers", [])] or 
-                   p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("away", {}).get("battingOrder", [])] or 
-                   away_p == p_id_str or (away_team_name and away_team_name in team_name))
-                   
-        if in_home: matching_games.append({"game": game, "teamSide": "home"})
-        if in_away: matching_games.append({"game": game, "teamSide": "away"})
+        # 1. Check for EXPLICIT Player ID matches
+        has_id_home = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("homePlayers", [])] or 
+                       p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])] or 
+                       home_p == p_id_str)
+                       
+        has_id_away = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("awayPlayers", [])] or 
+                       p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("away", {}).get("battingOrder", [])] or 
+                       away_p == p_id_str)
+
+        if has_id_home: id_matches.append({"game": game, "teamSide": "home"})
+        if has_id_away: id_matches.append({"game": game, "teamSide": "away"})
+
+        # 2. Check for loose Team Name matches ONLY as a secondary fallback
+        if not has_id_home and home_team_name and home_team_name in team_name:
+            team_matches.append({"game": game, "teamSide": "home"})
+        if not has_id_away and away_team_name and away_team_name in team_name:
+            team_matches.append({"game": game, "teamSide": "away"})
             
+    # ALWAYS favor explicit ID matches over team name fallbacks!
+    matching_games = id_matches if id_matches else team_matches
     if not matching_games: return None, None
         
     if len(matching_games) > 1:
