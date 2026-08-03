@@ -928,6 +928,21 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         spot_names = {1: "leadoff", 2: "2nd", 3: "3rd", 4: "cleanup", 5: "5th", 6: "6th", 7: "7th", 8: "8th", 9: "9th"}
         slot_str = f"batting {spot_names.get(slot_index + 1, f'{slot_index + 1}th')}" if slot_index != -1 else "in the starting lineup"
 
+        # Check if the opposing starting pitcher is TBD
+        is_tbd_pitcher = not opp_pitcher_id or opp_pitcher_name.strip().upper() in ["TBD", "TO BE DETERMINED", ""]
+
+        # ----------------------------------------------------
+        # 🎯 TBD PITCHER BRANCH (Lineup Spot Only)
+        # ----------------------------------------------------
+        if is_tbd_pitcher:
+            blurb = (
+                f"<strong>{p_name}</strong> is {lineup_prefix} to be {slot_str} for the "
+                f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>."
+            )
+            badge_title = f"Lineup: {'Confirmed' if is_confirmed else 'Projected'}"
+            return render_blurb_card(badge_title, "bg-primary", "#0d6efd", blurb), blurb
+
+        # Standard Pitcher Branch (RHP / LHP / Splits / BvP)
         opp_hand = (my_game.get("lineupHandedness") or {}).get(opp_pitcher_id, "R")
         hand_label = "right-handed" if opp_hand == 'R' else "left-handed"
         hand_abbr = "RHP" if opp_hand == 'R' else "LHP"
