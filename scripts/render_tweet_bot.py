@@ -982,7 +982,7 @@ async def run_engines(memory):
         
         tweet_text = (
             f"{e} The STARTING XI for {team_name} vs {opponent_name} in {league_name} action has been released.\n"
-            f"Follow the action at futbolstartingeleven(see @dailystartingxi for link)\n\n"
+            f"Follow the action at futbolstartingeleven(see @DailyStartingXI for link)\n\n"
             f"{players_block}\n\n"
             f"{league_hashtag} #{team_hash} #{opponent_hash}"
         )
@@ -1501,7 +1501,7 @@ async def run_engines(memory):
 
         # --- Link-Free X (Twitter) Text ---
         
-        tweet_text = f"{title}\nupdate by futbolstartingeleven(see @dailystartingeleven for link):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
+        tweet_text = f"{title}\nupdate by futbolstartingeleven(see @DailyStartingXI for link):\n\n{body_content}\n{league_hashtag} #{home_hash} #{away_hash}"
 
         # --- Bluesky Rich Text (CTA & Raw URL near Top, Bulletproof 3-Stage <290 Guard) ---
         bsky_tb = client_utils.TextBuilder()
@@ -1827,7 +1827,7 @@ async def run_engines(memory):
         
         tweet_text = (
             f"{title}\n"
-            f"summary by futbolstartingeleven(see @dailystartingxi for link)\n\n"
+            f"summary by futbolstartingeleven(see @DailyStartingXI for link)\n\n"
             f"🏁 FT: {home_team} {home_score} - {away_score} {away_team} in {league_name} action\n\n"
             f"{scorers_str}\n"
             f"{red_card_str}\n"
