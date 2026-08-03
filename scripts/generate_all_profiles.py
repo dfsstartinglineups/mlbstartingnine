@@ -164,7 +164,7 @@ def resolve_active_matchup(player_id, team_name, daily_data):
         home_p = str(teams.get("home", {}).get("probablePitcher", {}).get("id", "") or game.get("projectedLineups", {}).get("home", {}).get("startingPitcher", {}).get("id", ""))
         away_p = str(teams.get("away", {}).get("probablePitcher", {}).get("id", "") or game.get("projectedLineups", {}).get("away", {}).get("startingPitcher", {}).get("id", ""))
         
-        # 1. Check for EXPLICIT Player ID matches
+        # 1. STRICT ID MATCHING (Highest Priority)
         has_id_home = (p_id_str in [str(p.get("id")) for p in game_raw.get("lineups", {}).get("homePlayers", [])] or 
                        p_id_str in [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])] or 
                        home_p == p_id_str)
@@ -176,13 +176,13 @@ def resolve_active_matchup(player_id, team_name, daily_data):
         if has_id_home: id_matches.append({"game": game, "teamSide": "home"})
         if has_id_away: id_matches.append({"game": game, "teamSide": "away"})
 
-        # 2. Check for loose Team Name matches ONLY as a secondary fallback
+        # 2. LOOSE TEAM NAME MATCHING (Fallback Only)
         if not has_id_home and home_team_name and home_team_name in team_name:
             team_matches.append({"game": game, "teamSide": "home"})
         if not has_id_away and away_team_name and away_team_name in team_name:
             team_matches.append({"game": game, "teamSide": "away"})
             
-    # ALWAYS favor explicit ID matches over team name fallbacks!
+    # CRITICAL: Always use ID matches if they exist!
     matching_games = id_matches if id_matches else team_matches
     if not matching_games: return None, None
         
