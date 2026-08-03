@@ -601,15 +601,20 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
 # ==========================================
 # DAILY OUTLOOK & MATCHUP BRIEFING GENERATOR
 # ==========================================
-def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text):
+def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text, card_title=None):
     slate_dt = get_target_slate_datetime()
     date_str = f"{slate_dt.strftime('%A')}({slate_dt.month}/{slate_dt.day}/{slate_dt.year})"
+
+    if card_title:
+        title_text = f"{card_title} for {date_str}"
+    else:
+        title_text = f"📰 Daily Outlook for {date_str}"
 
     return f"""
     <div class="card shadow-sm border-0 mb-3" style="border-left: 4px solid {border_hex} !important;">
         <div class="card-body p-3 bg-white rounded-end">
             <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                <span class="fw-bold text-dark" style="font-size: 0.85rem;">📰 Daily Outlook for {date_str}</span>
+                <span class="fw-bold text-dark" style="font-size: 0.85rem;">{title_text}</span>
                 <span class="badge {badge_bg} text-uppercase shadow-sm" style="font-size: 0.65rem;">{badge_text}</span>
             </div>
             <p class="mb-0 text-dark" style="font-size: 0.9rem; line-height: 1.5;">
@@ -758,7 +763,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             else:
                 blurb = f"<strong>{p_name}</strong> did not pitch in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
 
-            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb), blurb
+            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb, card_title="📰 Post-Game Recap"), blurb
 
         # 2. Batter Post-Game Recap
         else:
@@ -773,8 +778,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             else:
                 blurb = f"<strong>{p_name}</strong> did not see the field in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
 
-            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb), blurb
-
+            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb, card_title="📰 Post-Game Recap"), blurb
     # ----------------------------------------------------
     # PITCHER NARRATIVE BRANCH (PRE-GAME)
     # ----------------------------------------------------
