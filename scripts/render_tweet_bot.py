@@ -1754,6 +1754,26 @@ async def run_engines(memory):
         away_team = summary.get("away_team", "")
         home_score = summary.get("home_score", 0)
         away_score = summary.get("away_score", 0)
+        
+        # Pull stats early to check for signs of life
+        stats = summary.get("stats", {})
+        h_reds = stats.get("home_red_cards", 0)
+        a_reds = stats.get("away_red_cards", 0)
+
+        # 🚨 THE GHOST GAME FILTER 🚨
+        # Unplayed/PST games default to 0 shots and exactly 50/50 possession.
+        home_shots = stats.get("home_total_shots", 0)
+        away_shots = stats.get("away_total_shots", 0)
+        home_poss = stats.get("home_possession", 50)
+        away_poss = stats.get("away_possession", 50)
+        
+        if (home_score == 0 and away_score == 0 and 
+            home_shots == 0 and away_shots == 0 and 
+            home_poss == 50 and away_poss == 50 and 
+            h_reds == 0 and a_reds == 0):
+            print(f"⏩ Skipping {home_team} vs {away_team}: Ghost 0-0 game (0 shots, 50/50 possession).")
+            continue
+
         scenario = summary.get("scenario", "standard_draw")
         
         if scenario not in SUMMARY_PHRASES:
@@ -1806,9 +1826,6 @@ async def run_engines(memory):
             scorers_str = ""
 
         # Build individual line-by-line Red Card entries
-        stats = summary.get("stats", {})
-        h_reds = stats.get("home_red_cards", 0)
-        a_reds = stats.get("away_red_cards", 0)
         red_cards_block = []
         if h_reds > 0:
             red_cards_block.append(f"🟥 {home_team}: {h_reds} Red Card{'s' if h_reds > 1 else ''}")
