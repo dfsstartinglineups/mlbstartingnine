@@ -4,7 +4,38 @@
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "scripts/**",
+      ".github/**",
+      "requirements.txt",
+      "*.py",
+      "*.sh"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": true,
+    "headers": [
+      {
+        "source": "**/*.html",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(json|xml)",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          },
+          {
+            "key": "Cache-Control",
+            "value": "max-age=60"
+          }
+        ]
+      }
     ]
   }
 }
