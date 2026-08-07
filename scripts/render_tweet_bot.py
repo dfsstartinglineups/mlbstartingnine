@@ -880,7 +880,7 @@ async def run_engines(memory):
    # ==========================================
     # FUTBOL ENGINE (Lineups & Summaries)
     # ==========================================
-    x_futbol_posted_this_loop = False  # Cap X to max 1 tweet per ~60s loop cycle
+    x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
@@ -1012,22 +1012,22 @@ async def run_engines(memory):
         bsky_tb.link(lineup_url, lineup_url)
         bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
-        # --- Post to X (Only 1 per loop cycle) ---
-        if futbol_client and not x_futbol_posted_this_loop and entry_key not in tweeted_recently and x_key not in tweeted_recently:
+        # --- Post to X (Max 2 per loop cycle) ---
+        if futbol_client and x_futbol_posts_count < 2 and entry_key not in tweeted_recently and x_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name} on X")
                 log_today.append(x_key)
                 tweeted_recently.append(x_key)
-                x_futbol_posted_this_loop = True
+                x_futbol_posts_count += 1
             else:
                 try:
                     futbol_client.create_tweet(text=tweet_text)
                     log_x_tweet_audit("FUTBOL", entry_key, date_str)
                     log_today.append(x_key)
                     tweeted_recently.append(x_key)
-                    x_futbol_posted_this_loop = True
+                    x_futbol_posts_count += 1
                     new_tweets_sent = True
-                    print(f"✅ Posted Lineup to X for {team_name} (X cap reached for this loop)")
+                    print(f"✅ Posted Lineup to X for {team_name} (X post {x_futbol_posts_count}/2 for this loop)")
                 except Exception as err:
                     print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
 
@@ -1904,22 +1904,22 @@ async def run_engines(memory):
         if (ft_key in tweeted_recently or x_ft_key in tweeted_recently) and (ft_key in tweeted_recently or bsky_ft_key in tweeted_recently):
             continue
 
-        # --- Post to X (Only 1 per loop cycle, if cap not reached) ---
-        if futbol_client and not x_futbol_posted_this_loop and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
+        # --- Post to X (Max 2 per loop cycle, if cap not reached) ---
+        if futbol_client and x_futbol_posts_count < 2 and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol FT Summary Tweet ({scenario}) on X")
                 log_today.append(x_ft_key)
                 tweeted_recently.append(x_ft_key)
-                x_futbol_posted_this_loop = True
+                x_futbol_posts_count += 1
             else:
                 try:
                     futbol_client.create_tweet(text=tweet_text)
                     log_x_tweet_audit("FUTBOL", ft_key, date_str)
                     log_today.append(x_ft_key)
                     tweeted_recently.append(x_ft_key)
-                    x_futbol_posted_this_loop = True
+                    x_futbol_posts_count += 1
                     new_tweets_sent = True
-                    print(f"✅ Posted FT Summary to X for {home_team} vs {away_team} (X cap reached for this loop)")
+                    print(f"✅ Posted FT Summary to X for {home_team} vs {away_team} (X post {x_futbol_posts_count}/2 for this loop)")
                 except Exception as err:
                     print(f"⚠️ Failed to post Futbol summary to X for {ft_key}: {err}")
 
@@ -1961,7 +1961,7 @@ async def run_engines(memory):
             print("\n💾 In-Memory State Synced to Firebase.")
         except Exception as e: pass
     
-    return 60, memory 
+    return 30, memory 
 
 # ==========================================
 # 6. THE PERSISTENT RENDER WRAPPER
