@@ -39,13 +39,23 @@ jobs:
       - name: Generate Player Profiles
         run: python scripts/generate_all_profiles.py
 
-      # 🚀 NEW STEP: Build the main 3-Day Index Landing Page
+      # 🚀 Build the main 3-Day Index Landing Page
       - name: Generate Main Index Page
         run: python scripts/build_site.py
 
-      # 🚀 NEW STEP: Execute the IndexNow & Google ping logic
+      # 🚀 Execute the IndexNow & Google ping logic
       - name: Ping Search Engines
         run: python scripts/ping_indexnow.py
+
+      # 🚀 NEW STEP: Install Firebase CLI
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      # 🚀 NEW STEP: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: firebase deploy --only hosting --token $FIREBASE_TOKEN
 
       - name: Commit and Push Changes
         run: |
