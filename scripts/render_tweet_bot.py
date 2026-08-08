@@ -113,6 +113,8 @@ laliga_client, laliga_api_v1 = get_dynamic_clients("laliga_x")
 epl_client, epl_api_v1 = get_dynamic_clients("epl_x")
 argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 
+FUTBOL_X_COOLDOWN_UNTIL = 0 
+
 # ==========================================
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
 # ==========================================
@@ -884,7 +886,7 @@ async def run_engines(memory):
     x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
     x_futbol_posts_max = 1   
     # Cooldown timestamp for Futbol X.com rate limit / 403 errors
-    FUTBOL_X_COOLDOWN_UNTIL = 0    
+       
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
