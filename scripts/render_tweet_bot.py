@@ -114,6 +114,7 @@ epl_client, epl_api_v1 = get_dynamic_clients("epl_x")
 argbracol_client, argbracol_api_v1 = get_dynamic_clients("argbracol_x")
 
 FUTBOL_X_COOLDOWN_UNTIL = 0 
+FUTBOL_X_COOLDOWN_DURATION = 1800  # Base timeout of 30 minutes
 
 # ==========================================
 # 3. PLAYWRIGHT & HELPER FUNCTIONS
@@ -882,7 +883,7 @@ async def run_engines(memory):
    # ==========================================
     # FUTBOL ENGINE (Lineups & Summaries)
     # ==========================================
-    global FUTBOL_X_COOLDOWN_UNTIL
+    global FUTBOL_X_COOLDOWN_UNTIL, FUTBOL_X_COOLDOWN_DURATION
     x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
     x_futbol_posts_max = 1   
     # Cooldown timestamp for Futbol X.com rate limit / 403 errors
@@ -1037,8 +1038,15 @@ async def run_engines(memory):
                 except Exception as err:
                     err_str = str(err)
                     if any(code in err_str for code in ["403", "Forbidden", "not permitted"]):
-                        FUTBOL_X_COOLDOWN_UNTIL = time.time() + 1800
-                        print(f"🛑 403 Forbidden on Futbol X.com! Pausing Futbol X posts for 30 minutes.")
+                        # If it failed again within 30 mins of waking up, double the timeout
+                        if FUTBOL_X_COOLDOWN_UNTIL > 0 and (time.time() - FUTBOL_X_COOLDOWN_UNTIL) <= 1800:
+                            FUTBOL_X_COOLDOWN_DURATION *= 2
+                        else:
+                            # Reset to 30 minutes if it was behaving nicely for over 30 mins
+                            FUTBOL_X_COOLDOWN_DURATION = 1800
+                            
+                        FUTBOL_X_COOLDOWN_UNTIL = time.time() + FUTBOL_X_COOLDOWN_DURATION
+                        print(f"🛑 403 Forbidden on Futbol X.com! Pausing Futbol X posts for {int(FUTBOL_X_COOLDOWN_DURATION / 60)} minutes.")
                     print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
 
         # --- Post to Bluesky (Unrestricted) ---
@@ -1944,8 +1952,15 @@ async def run_engines(memory):
                 except Exception as err:
                     err_str = str(err)
                     if any(code in err_str for code in ["403", "Forbidden", "not permitted"]):
-                        FUTBOL_X_COOLDOWN_UNTIL = time.time() + 1800
-                        print(f"🛑 403 Forbidden on Futbol X.com! Pausing Futbol X posts for 30 minutes.")
+                        # If it failed again within 30 mins of waking up, double the timeout
+                        if FUTBOL_X_COOLDOWN_UNTIL > 0 and (time.time() - FUTBOL_X_COOLDOWN_UNTIL) <= 1800:
+                            FUTBOL_X_COOLDOWN_DURATION *= 2
+                        else:
+                            # Reset to 30 minutes if it was behaving nicely for over 30 mins
+                            FUTBOL_X_COOLDOWN_DURATION = 1800
+                            
+                        FUTBOL_X_COOLDOWN_UNTIL = time.time() + FUTBOL_X_COOLDOWN_DURATION
+                        print(f"🛑 403 Forbidden on Futbol X.com! Pausing Futbol X posts for {int(FUTBOL_X_COOLDOWN_DURATION / 60)} minutes.")
                     print(f"⚠️ Failed to post Futbol summary to X for {ft_key}: {err}")
 
         # --- Post to Bluesky (Unrestricted) ---
