@@ -1986,7 +1986,7 @@ async def run_engines(memory):
             print("\n💾 In-Memory State Synced to Firebase.")
         except Exception as e: pass
     
-    return 30, memory 
+    return 60, memory 
 
 # ==========================================
 # 6. THE PERSISTENT RENDER WRAPPER
