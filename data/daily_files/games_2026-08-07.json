@@ -1,5 +1,5 @@
 {
-    "last_updated": "Aug 08, 12:40 AM ET",
+    "last_updated": "Aug 08, 12:42 AM ET",
     "slates": {
         "fanduel": [
             {
@@ -33135,9 +33135,9 @@
                 "officialDate": "2026-08-07",
                 "status": {
                     "abstractGameState": "Final",
-                    "codedGameState": "O",
-                    "detailedState": "Game Over",
-                    "statusCode": "O",
+                    "codedGameState": "F",
+                    "detailedState": "Final",
+                    "statusCode": "F",
                     "startTimeTBD": false,
                     "abstractGameCode": "F"
                 },
@@ -38822,12 +38822,12 @@
                 "gameDate": "2026-08-08T02:15:00Z",
                 "officialDate": "2026-08-07",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -38838,11 +38838,12 @@
                         },
                         "leagueRecord": {
                             "wins": 56,
-                            "losses": 59,
+                            "losses": 60,
                             "ties": 0,
-                            "pct": ".487"
+                            "pct": ".483"
                         },
                         "score": 2,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 672456,
                             "fullName": "Keider Montero",
@@ -38902,12 +38903,13 @@
                             "link": "/api/v1/teams/137"
                         },
                         "leagueRecord": {
-                            "wins": 48,
+                            "wins": 49,
                             "losses": 67,
                             "ties": 0,
-                            "pct": ".417"
+                            "pct": ".422"
                         },
                         "score": 5,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 664141,
                             "fullName": "JT Brubaker",
@@ -39107,9 +39109,10 @@
                                 "leftOnBase": 0
                             },
                             "away": {
+                                "runs": 0,
                                 "hits": 0,
                                 "errors": 0,
-                                "leftOnBase": 0
+                                "leftOnBase": 1
                             }
                         }
                     ],
@@ -39124,7 +39127,7 @@
                             "runs": 2,
                             "hits": 11,
                             "errors": 1,
-                            "leftOnBase": 11
+                            "leftOnBase": 12
                         }
                     },
                     "defense": {
@@ -39386,55 +39389,6 @@
                             "strikeZoneTop": 3.18,
                             "strikeZoneBottom": 1.61
                         },
-                        "first": {
-                            "id": 682985,
-                            "fullName": "Riley Greene",
-                            "link": "/api/v1/people/682985",
-                            "firstName": "Riley",
-                            "lastName": "Greene",
-                            "primaryNumber": "31",
-                            "birthDate": "2000-09-28",
-                            "currentAge": 25,
-                            "birthCity": "Orlando",
-                            "birthStateProvince": "FL",
-                            "birthCountry": "USA",
-                            "height": "6' 2\"",
-                            "weight": 200,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "7",
-                                "name": "Outfielder",
-                                "type": "Outfielder",
-                                "abbreviation": "LF"
-                            },
-                            "useName": "Riley",
-                            "useLastName": "Greene",
-                            "middleName": "Alan",
-                            "boxscoreName": "Greene, R",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2019,
-                            "mlbDebutDate": "2022-06-18",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "nameFirstLast": "Riley Greene",
-                            "nameSlug": "riley-greene-682985",
-                            "firstLastName": "Riley Greene",
-                            "lastFirstName": "Greene, Riley",
-                            "lastInitName": "Greene, R",
-                            "initLastName": "R Greene",
-                            "fullFMLName": "Riley Alan Greene",
-                            "fullLFMName": "Greene, Riley Alan",
-                            "strikeZoneTop": 3.3,
-                            "strikeZoneBottom": 1.67
-                        },
                         "pitcher": {
                             "id": 646241,
                             "fullName": "Enmanuel De Jesus",
@@ -39490,9 +39444,9 @@
                             "link": "/api/v1/teams/116"
                         }
                     },
-                    "balls": 0,
-                    "strikes": 0,
-                    "outs": 2
+                    "balls": 1,
+                    "strikes": 1,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 2395,
@@ -39502,6 +39456,7 @@
                 "content": {
                     "link": "/api/v1/game/823191/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
