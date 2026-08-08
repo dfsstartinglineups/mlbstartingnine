@@ -1013,7 +1013,7 @@ async def run_engines(memory):
         bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
         # --- Post to X (Max 2 per loop cycle) ---
-        if futbol_client and x_futbol_posts_count < 2 and entry_key not in tweeted_recently and x_key not in tweeted_recently:
+        if futbol_client and x_futbol_posts_count < 0 and entry_key not in tweeted_recently and x_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name} on X")
                 log_today.append(x_key)
