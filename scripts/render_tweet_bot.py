@@ -881,6 +881,7 @@ async def run_engines(memory):
     # FUTBOL ENGINE (Lineups & Summaries)
     # ==========================================
     x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
+    x_futbol_posts_max = 0    
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
@@ -1013,7 +1014,7 @@ async def run_engines(memory):
         bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
         # --- Post to X (Max 2 per loop cycle) ---
-        if futbol_client and x_futbol_posts_count < 0 and entry_key not in tweeted_recently and x_key not in tweeted_recently:
+        if futbol_client and x_futbol_posts_count < x_futbol_posts_max and entry_key not in tweeted_recently and x_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name} on X")
                 log_today.append(x_key)
@@ -1905,7 +1906,7 @@ async def run_engines(memory):
             continue
 
         # --- Post to X (Max 2 per loop cycle, if cap not reached) ---
-        if futbol_client and x_futbol_posts_count < 0 and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
+        if futbol_client and x_futbol_posts_count < x_futbol_posts_max and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol FT Summary Tweet ({scenario}) on X")
                 log_today.append(x_ft_key)
