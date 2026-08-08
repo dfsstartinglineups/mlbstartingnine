@@ -881,7 +881,7 @@ async def run_engines(memory):
     # FUTBOL ENGINE (Lineups & Summaries)
     # ==========================================
     x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
-    x_futbol_posts_max = 0    
+    x_futbol_posts_max = 1    
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
