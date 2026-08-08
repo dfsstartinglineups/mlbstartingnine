@@ -880,8 +880,11 @@ async def run_engines(memory):
    # ==========================================
     # FUTBOL ENGINE (Lineups & Summaries)
     # ==========================================
+    global FUTBOL_X_COOLDOWN_UNTIL
     x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
-    x_futbol_posts_max = 1    
+    x_futbol_posts_max = 1   
+    # Cooldown timestamp for Futbol X.com rate limit / 403 errors
+    FUTBOL_X_COOLDOWN_UNTIL = 0    
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
@@ -1014,7 +1017,7 @@ async def run_engines(memory):
         bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
         # --- Post to X (Max 2 per loop cycle) ---
-        if futbol_client and x_futbol_posts_count < x_futbol_posts_max and entry_key not in tweeted_recently and x_key not in tweeted_recently:
+        if futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and entry_key not in tweeted_recently and x_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name} on X")
                 log_today.append(x_key)
@@ -1030,6 +1033,10 @@ async def run_engines(memory):
                     new_tweets_sent = True
                     print(f"✅ Posted Lineup to X for {team_name} (X post {x_futbol_posts_count}/2 for this loop)")
                 except Exception as err:
+                    err_str = str(err)
+                    if any(code in err_str for code in ["403", "Forbidden", "not permitted"]):
+                        FUTBOL_X_COOLDOWN_UNTIL = time.time() + 1800
+                        print(f"🛑 403 Forbidden on Futbol X.com! Pausing Futbol X posts for 30 minutes.")
                     print(f"⚠️ Failed to post Futbol lineup to X for {entry_key}: {err}")
 
         # --- Post to Bluesky (Unrestricted) ---
@@ -1906,7 +1913,7 @@ async def run_engines(memory):
             continue
 
         # --- Post to X (Max 2 per loop cycle, if cap not reached) ---
-        if futbol_client and x_futbol_posts_count < x_futbol_posts_max and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
+        if futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol FT Summary Tweet ({scenario}) on X")
                 log_today.append(x_ft_key)
@@ -1922,6 +1929,10 @@ async def run_engines(memory):
                     new_tweets_sent = True
                     print(f"✅ Posted FT Summary to X for {home_team} vs {away_team} (X post {x_futbol_posts_count}/2 for this loop)")
                 except Exception as err:
+                    err_str = str(err)
+                    if any(code in err_str for code in ["403", "Forbidden", "not permitted"]):
+                        FUTBOL_X_COOLDOWN_UNTIL = time.time() + 1800
+                        print(f"🛑 403 Forbidden on Futbol X.com! Pausing Futbol X posts for 30 minutes.")
                     print(f"⚠️ Failed to post Futbol summary to X for {ft_key}: {err}")
 
         # --- Post to Bluesky (Unrestricted) ---
