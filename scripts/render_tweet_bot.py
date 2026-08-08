@@ -1781,7 +1781,18 @@ async def run_engines(memory):
             home_shots == 0 and away_shots == 0 and 
             home_poss == 50 and away_poss == 50 and 
             h_reds == 0 and a_reds == 0):
-            print(f"⏩ Skipping {home_team} vs {away_team}: Ghost 0-0 game (0 shots, 50/50 possession).")
+            print(f"⏩ Skipping {home_team} vs {away_team}: Ghost 0-0 game (0 shots, 50/50 possession). Logging to prevent re-processing.")
+            
+            # Log the key to memory to bypass this check on future loops
+            log_today.append(ft_key)
+            tweeted_recently.append(ft_key)
+            memory[date_str] = log_today
+            
+            if firebase_admin._apps:
+                try: 
+                    db.reference('tweet_log').update({date_str: log_today})
+                except Exception as e: 
+                    pass
             continue
 
         scenario = summary.get("scenario", "standard_draw")
