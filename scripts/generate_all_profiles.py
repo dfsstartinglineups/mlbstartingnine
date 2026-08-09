@@ -876,7 +876,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             if valid_logs_count > 0 and total_outs > 0:
                 ip_display = f"{total_outs // 3}.{total_outs % 3}" if total_outs % 3 > 0 else f"{total_outs // 3}.0"
                 recent_era = (total_er * 9.0) / (total_outs / 3.0)
-                recent_summary = f" Over his last {valid_logs_count} starts, he has posted a <strong>{recent_era:.2f} ERA</strong> across <strong>{ip_display} IP</strong> with <strong>{total_k} Ks</strong>."
+                recent_summary = f" Over his last {valid_logs_count} appearances, he has posted a <strong>{recent_era:.2f} ERA</strong> across <strong>{ip_display} IP</strong> with <strong>{total_k} Ks</strong>."
 
         tracking = (my_game.get("lineupTracking") or {}).get(opp_side) or {}
         order_list = tracking.get("hash", "").split('-') if tracking.get("hash") else []
