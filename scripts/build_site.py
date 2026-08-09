@@ -741,16 +741,16 @@ def build_lineup_html(players, opposing_pitcher_hand, game_data, player_db):
         fd_sal_str = f"${fd_sal/1000:.1f}K".replace('.0', '') if fd_sal > 0 else '-'
         v_fd = f"""{top_line}<div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
             <span>{fd_sal_str}</span>
-            <span class="text-primary fw-bold">Proj: {f"{float(p.get('proj', 0)):.1f}" if p.get('proj') else '-'}</span>
-            <span class="text-success fw-bold">Value: {f"{float(p.get('value', 0)):.1f}x" if p.get('value') else '-'}</span>
+            <span class="text-primary fw-bold">Proj: {f"{float(p.get('proj', 0)):.1f}" if 'proj' in p else '-'}</span>
+            <span class="text-success fw-bold">Value: {f"{float(p.get('value', 0)):.1f}x" if 'value' in p else '-'}</span>
         </div>"""
 
         dk_sal = p.get('dk_salary', 0)
         dk_sal_str = f"${dk_sal/1000:.1f}K".replace('.0', '') if dk_sal > 0 else '-'
         v_dk = f"""{top_line}<div class="d-flex gap-2 text-muted text-truncate w-100" style="font-size: 0.60rem;">
             <span>{dk_sal_str}</span>
-            <span class="text-primary fw-bold">Proj: {f"{float(p.get('dk_proj', 0)):.1f}" if p.get('dk_proj') else '-'}</span>
-            <span class="text-success fw-bold">Value: {f"{float(p.get('dk_value', 0)):.1f}x" if p.get('dk_value') else '-'}</span>
+            <span class="text-primary fw-bold">Proj: {f"{float(p.get('dk_proj', 0)):.1f}" if 'dk_proj' in p else '-'}</span>
+            <span class="text-success fw-bold">Value: {f"{float(p.get('dk_value', 0)):.1f}x" if 'dk_value' in p else '-'}</span>
         </div>"""
 
         list_items.append(f"""
