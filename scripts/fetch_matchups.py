@@ -1026,6 +1026,30 @@ def main():
                     inject_dfs(batter, away_abbr, is_pitcher_slot=False)
                 for batter in game.get('lineups', {}).get('homePlayers', []):
                     inject_dfs(batter, home_abbr, is_pitcher_slot=False)
+            else:
+                # 🛡️ THE MEMORY PRESERVATION SHIELD 🛡️
+                # We already loaded the preserved data into game_projected_lineups on line 499.
+                # Now we just map those preserved numbers directly onto the raw MLB arrays.
+                for side in ['away', 'home']:
+                    fresh_mlb_players = game.get('lineups', {}).get(f'{side}Players', [])
+                    preserved_batters = game_projected_lineups.get(side, {}).get('battingOrder', [])
+                    preserved_pitcher = game_projected_lineups.get(side, {}).get('startingPitcher', {})
+                    
+                    # Create a lookup map from the preserved projected lineups
+                    proj_map = {str(p.get('id')): p for p in preserved_batters}
+                    if preserved_pitcher and preserved_pitcher.get('id'):
+                        proj_map[str(preserved_pitcher['id'])] = preserved_pitcher
+                        
+                    # Stamp the DFS fields onto the raw MLB players
+                    for p in fresh_mlb_players:
+                        pid = str(p.get('id'))
+                        if pid in proj_map:
+                            p['salary'] = proj_map[pid].get('salary', 0)
+                            p['proj'] = proj_map[pid].get('proj', 0)
+                            p['value'] = proj_map[pid].get('value', 0)
+                            p['dk_salary'] = proj_map[pid].get('dk_salary', 0)
+                            p['dk_proj'] = proj_map[pid].get('dk_proj', 0)
+                            p['dk_value'] = proj_map[pid].get('dk_value', 0)
 
             master_dates[date_str].append({
                 "gameRaw": game,
