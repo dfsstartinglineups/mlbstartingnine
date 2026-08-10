@@ -460,7 +460,8 @@ def update_homepage_sitemap_date(target_url="https://mlbstartingnine.com/"):
         tree = ET.parse(sitemap_path)
         root = tree.getroot()
         
-        today_str = datetime.now(pytz.utc).strftime("%Y-%m-%d")
+        # Update to use full ISO 8601 format with time for the sitemap
+        today_str = datetime.now(pytz.utc).isoformat(timespec='seconds')
         updated = False
         
         for url_node in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}url"):
