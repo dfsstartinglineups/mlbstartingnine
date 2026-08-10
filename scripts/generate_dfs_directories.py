@@ -891,7 +891,9 @@ def main():
 
     now_est = datetime.now(ZoneInfo("America/New_York"))
     display_time = now_est.strftime("%Y-%m-%d %I:%M %p ET")
-    w3c_today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Update to use full ISO 8601 format with time for the sitemap
+    w3c_today = datetime.now(timezone.utc).isoformat(timespec='seconds')
 
     existing_dates = load_existing_sitemap_dates(SITEMAP_PATH)
     all_dfs_urls = {}
