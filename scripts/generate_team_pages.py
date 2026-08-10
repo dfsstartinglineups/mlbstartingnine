@@ -214,7 +214,8 @@ def update_lineup_sitemap_dates(updated_urls, sitemap_path="sitemap.xml"):
         tree = ET.parse(sitemap_path)
         root = tree.getroot()
         
-        today_str = datetime.now(ZoneInfo("UTC")).strftime("%Y-%m-%d")
+        # Update to use full ISO 8601 format with time for the sitemap
+        today_str = datetime.now(ZoneInfo("UTC")).isoformat(timespec='seconds')
         changed = False
         
         for target_url in updated_urls:
