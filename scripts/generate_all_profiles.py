@@ -98,7 +98,9 @@ def update_sitemap(all_player_urls, updated_urls):
     
     # Merge newly generated URLs with any pre-existing URLs (like /lineups/) that share this sitemap
     final_urls = sorted(list(all_urls_set.union(existing_data.keys())))
-    today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Update to use full ISO 8601 format with time (e.g., 2026-08-09T20:37:57+00:00)
+    today_str = datetime.now(timezone.utc).isoformat(timespec='seconds')
 
     xml_root = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
     
