@@ -941,6 +941,8 @@ def generate_games_html(date_str, player_db):
             # Use the original raw values (like '20.8%') for the visual display strings
             ump_str += f'<span class="text-muted fw-normal" style="margin-left: 4px;">(G: <span class="text-dark fw-bold">{ump_stats.get("games", "-")}</span>•K: <span class="{kc} fw-bold">{raw_k}</span>•BB: <span class="{bbc} fw-bold">{raw_bb}</span>•Runs: <span class="{rc} fw-bold">{raw_r}</span>)</span>'
 
+        home_weather_slug = slugify(home_name_full)
+        
         cards_html.append(f"""
         <div class="col-md-6 col-lg-6 col-xl-4 px-1 mb-3">
             <div class="lineup-card shadow-sm border rounded bg-white overflow-hidden h-100" style="border-color: #dee2e6 !important;" id="game-{game_pk}">
@@ -1003,7 +1005,7 @@ def generate_games_html(date_str, player_db):
                     <span class="text-muted fw-bold text-uppercase">HP:</span> {ump_str}
                 </div>
                 <div class="p-2 text-center bg-white">
-                    <a href="https://weathermlb.com/#game-{game_pk}" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
+                    <a href="https://weathermlb.com/team_pages/{home_weather_slug}/" target="_blank" class="btn btn-sm w-100 promo-btn" style="background-color: #f8f9fa; border: 1px solid #dee2e6; color: #0d6efd;">
                         🌧️ View Weather & Wind Impact
                     </a>
                 </div>
