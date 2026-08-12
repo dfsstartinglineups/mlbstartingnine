@@ -1606,7 +1606,7 @@ async def run_engines(memory):
             "titles": [
                 "⏱️ DOWN TO THE WIRE!", 
                 "⚔️ NARROW WIN!", 
-                "🔒 THREE POINTS SECURED!", 
+                "🔒 THE WIN IS SECURED!", 
                 "🍿 EDGE-OF-YOUR-SEAT FINISH!", 
                 "🔥 SQUEAKING THROUGH!", 
                 "🛡️ HELD THE LINE!", 
@@ -1615,7 +1615,7 @@ async def run_engines(memory):
             ],
             "blurbs": [
                 "A tight battle until the final whistle, but {winner_name} holds on to secure a huge victory over {loser_name}!",
-                "{winner_name} edges out {loser_name} in a razor-thin contest to take all three points!",
+                "{winner_name} edges out {loser_name} in a razor-thin contest to collect the win!", 
                 "Fine margins make the difference as {winner_name} claims a hard-earned victory over {loser_name}!",
                 "What a battle! {winner_name} digs deep to secure a vital win against {loser_name}.",
                 "Neither side gave an inch, but {winner_name} finds the decisive moment to push past {loser_name}!"
@@ -1625,7 +1625,7 @@ async def run_engines(memory):
             "titles": [
                 "💼 SOLID PERFORMANCE!", 
                 "✅ TAKING CARE OF BUSINESS!", 
-                "🎒 THREE POINTS IN THE BAG!", 
+                "🎒 VICTORY IN THE BAG!", 
                 "🎮 CONTROLLED VICTORY!", 
                 "📈 CRUISING TO VICTORY!", 
                 "🟢 PROFESSIONAL DISPLAY!", 
@@ -1635,7 +1635,7 @@ async def run_engines(memory):
             "blurbs": [
                 "{winner_name} puts in a disciplined performance to claim a convincing win against {loser_name}.",
                 "{winner_name} stays in control to pull away with a solid victory over {loser_name}!",
-                "A professional display from {winner_name} ensures all three points against {loser_name}.",
+                "A professional display from {winner_name} ensures the win against {loser_name}.", 
                 "{winner_name} dictates the tempo from start to finish to hand {loser_name} a clear defeat.",
                 "No surprises here as {winner_name} handles business and cruises past {loser_name}."
             ]
@@ -1729,7 +1729,7 @@ async def run_engines(memory):
             ],
             "blurbs": [
                 "{winner_name} defies the odds and pulls off a massive upset victory over {loser_name}!",
-                "Underdogs {winner_name} shock {loser_name} with a memorable performance to claim all three points!",
+                "Underdogs {winner_name} shock {loser_name} with a memorable performance to claim a massive win!", 
                 "The odds meant nothing today! {winner_name} stuns {loser_name} to secure a remarkable win.",
                 "A massive shocker as {winner_name} tears up the script to take down {loser_name}!",
                 "{loser_name} caught sleeping as {winner_name} delivers a statement upset win!"
