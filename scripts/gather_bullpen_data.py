@@ -149,16 +149,39 @@ def evaluate_reliever(player_id, past_dates, scheduled_probables):
         games_started = int(season_stats.get('gamesStarted', 0))
         ip_total = convert_ip(season_stats.get('inningsPitched', '0.0'))
         
-        # 1. The Rookie Exception
-        if games_played == 0:
-            if player_id in scheduled_probables:
-                return None  # Spot starter, filter out
+        # Check if any recent outing was an actual START with a high pitch count (>= 60 pitches)
+        has_recent_starter_outing = False
+        for log in game_log:
+            g_stat = log.get('stat', {})
+            was_start = int(g_stat.get('gamesStarted', 0)) == 1
+            pitches = int(g_stat.get('numberOfPitches', 0))
             
-        # 2. The True Starter Filter (Avg IP > 4.0)
-        elif games_started > 0:
+            if was_start and pitches >= 60:
+                has_recent_starter_outing = True
+                break
+
+        # 1. Low Sample Size Filter (3 or fewer appearances)
+        if games_played <= 3:
+            # If they STARTED a game and threw 60+ pitches, they are a rotation starter
+            if has_recent_starter_outing:
+                return None
+                
+            # If they haven't pitched yet, check if they are an announced probable starter
+            if games_played == 0 and player_id in scheduled_probables:
+                return None
+                
+            # If majority of their 1-3 appearances are starts averaging 3.0+ IP
+            elif games_started > 0 and (games_started / games_played) >= 0.5 and (ip_total / games_played) >= 3.0:
+                return None
+
+        # 2. Established Pitchers (> 3 appearances)
+        else:
             avg_ip = ip_total / games_played if games_played > 0 else 0
-            if avg_ip >= 4.0:
-                return None  # Traditional starter, filter out
+            start_ratio = games_started / games_played if games_played > 0 else 0
+            
+            # Filter out traditional starters (majority starts with 3.5+ IP avg) or recent heavy starter outings
+            if (start_ratio >= 0.5 and avg_ip >= 3.5) or has_recent_starter_outing:
+                return None
 
         # --- FATIGUE CALCULATION ---
         pitches_by_day = {d: 0 for d in past_dates}
