@@ -1094,9 +1094,6 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
     reliever_info = reliever_map.get(str(player_id)) if reliever_map else None
     
     if my_game and team_side:
-    bvp_cards_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
-    p_deep_stats = {}
-    if my_game and team_side:
         p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
         p_proj_node = None
         if my_game.get("projectedLineups", {}).get(team_side):
