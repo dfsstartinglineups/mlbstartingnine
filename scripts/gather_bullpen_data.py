@@ -221,8 +221,10 @@ def evaluate_reliever(player_id, past_dates, scheduled_probables):
             "name": person.get('fullName'),
             "player_id": player_id,
             "status": status,
+            "era": season_stats.get('era', '-'),
+            "whip": season_stats.get('whip', '-'),
             "recent_appearances": recent_appearances,
-            "pitches_last_5": [pitches_by_day[d] for d in past_dates] # [Yesterday, 2 Days Ago, ...]
+            "pitches_last_5": [pitches_by_day[d] for d in past_dates]
         }
 
     except Exception as e:
