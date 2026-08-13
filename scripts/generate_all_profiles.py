@@ -848,33 +848,6 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         wins, losses, era = season.get("w", 0), season.get("l", 0), season.get("era", "-")
         season_summary = f"He carries a <strong>{wins}-{losses}</strong> record with a <strong>{era} ERA</strong> on the season."
 
-        if not is_starting_pitcher:
-            if reliever_info:
-                rel_status = reliever_info.get("status", "Available")
-                recent_apps = reliever_info.get("recent_appearances", 0)
-                pitches_5 = reliever_info.get("pitches_last_5", [0, 0, 0, 0, 0])
-                total_pitches = sum(pitches_5)
-                yest_pitches = pitches_5[0] if len(pitches_5) > 0 else 0
-
-                pitch_desc = f"thrown <strong>{total_pitches} pitches</strong>" if total_pitches > 0 else "not thrown a pitch"
-                yest_desc = f" ({yest_pitches} pitches yesterday)" if yest_pitches > 0 else ""
-
-                rel_blurb = (
-                    f"<strong>{p_name}</strong> is <strong>{rel_status.lower()}</strong> out of the bullpen today for the "
-                    f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary} "
-                    f"Over his last {recent_apps} appearances in the past 5 days, he has {pitch_desc}{yest_desc}.{recent_summary}"
-                )
-
-                if rel_status == "Available":
-                    return render_blurb_card("Bullpen: Available", "bg-success", "#198754", rel_blurb), rel_blurb
-                elif rel_status == "Tired":
-                    return render_blurb_card("Bullpen: Tired", "bg-warning text-dark", "#ffc107", rel_blurb), rel_blurb
-                else:
-                    return render_blurb_card("Bullpen: Unavailable", "bg-danger", "#dc3545", rel_blurb), rel_blurb
-
-            blurb = f"<strong>{p_name}</strong> is not listed as the starting pitcher for the <strong>{team_name}</strong> in today's matchup against the <strong>{opp_team_name}</strong>. {season_summary}"
-            return render_blurb_card("Not Starting", "bg-secondary", "#6c757d", blurb), blurb
-
         grade, badge_bg, border_hex = "Average", "bg-primary", "#0d6efd"
         
         game_log = profile.get("game_log", [])[:3]
@@ -911,6 +884,33 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
                 ip_display = f"{total_outs // 3}.{total_outs % 3}" if total_outs % 3 > 0 else f"{total_outs // 3}.0"
                 recent_era = (total_er * 9.0) / (total_outs / 3.0)
                 recent_summary = f" Over his last {valid_logs_count} appearances, he has posted a <strong>{recent_era:.2f} ERA</strong> across <strong>{ip_display} IP</strong> with <strong>{total_k} Ks</strong>."
+
+        if not is_starting_pitcher:
+            if reliever_info:
+                rel_status = reliever_info.get("status", "Available")
+                recent_apps = reliever_info.get("recent_appearances", 0)
+                pitches_5 = reliever_info.get("pitches_last_5", [0, 0, 0, 0, 0])
+                total_pitches = sum(pitches_5)
+                yest_pitches = pitches_5[0] if len(pitches_5) > 0 else 0
+
+                pitch_desc = f"thrown <strong>{total_pitches} pitches</strong>" if total_pitches > 0 else "not thrown a pitch"
+                yest_desc = f" ({yest_pitches} pitches yesterday)" if yest_pitches > 0 else ""
+
+                rel_blurb = (
+                    f"<strong>{p_name}</strong> is <strong>{rel_status.lower()}</strong> out of the bullpen today for the "
+                    f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary} "
+                    f"Over his last {recent_apps} appearances in the past 5 days, he has {pitch_desc}{yest_desc}.{recent_summary}"
+                )
+
+                if rel_status == "Available":
+                    return render_blurb_card("Bullpen: Available", "bg-success", "#198754", rel_blurb), rel_blurb
+                elif rel_status == "Tired":
+                    return render_blurb_card("Bullpen: Tired", "bg-warning text-dark", "#ffc107", rel_blurb), rel_blurb
+                else:
+                    return render_blurb_card("Bullpen: Unavailable", "bg-danger", "#dc3545", rel_blurb), rel_blurb
+
+            blurb = f"<strong>{p_name}</strong> is not listed as the starting pitcher for the <strong>{team_name}</strong> in today's matchup against the <strong>{opp_team_name}</strong>. {season_summary}"
+            return render_blurb_card("Not Starting", "bg-secondary", "#6c757d", blurb), blurb
 
         tracking = (my_game.get("lineupTracking") or {}).get(opp_side) or {}
         order_list = tracking.get("hash", "").split('-') if tracking.get("hash") else []
