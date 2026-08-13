@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 # 1. CONFIGURATION & FILE PATHS
 # ==========================================
 DOMAIN = "https://mlbstartingnine.com"
-SITEMAP_OUTPUT_PATH = "sitemap.xml"
+SITEMAP_OUTPUT_PATH = "sitemap-bullpen.xml"
 QUEUE_FILE = "data/updates_queue.json"
 BULLPEN_DATA_PATH = "data/bullpen_data.json"
 MASTER_DATA_PATH = "data/player_master_data.json"
