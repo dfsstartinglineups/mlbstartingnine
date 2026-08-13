@@ -174,6 +174,8 @@ def generate_team_bullpen_html(team_slug, data, player_db):
         pid = str(r.get("player_id", ""))
         name = r.get("name", "Unknown")
         status = r.get("status", "Available")
+        era = r.get("era", "-")
+        whip = r.get("whip", "-")
         appearances = r.get("recent_appearances", 0)
         pitches = r.get("pitches_last_5", [0,0,0,0,0])
         
@@ -195,6 +197,8 @@ def generate_team_bullpen_html(team_slug, data, player_db):
                     {name_html}
                 </div>
             </td>
+            <td class="align-middle fw-bold text-dark">{era}</td>
+            <td class="align-middle fw-bold text-dark">{whip}</td>
             <td class="align-middle">{get_status_badge(status)}</td>
             <td class="align-middle fw-bold text-muted">{appearances}</td>
             {get_pitch_cell(pitches[0])}
@@ -285,10 +289,12 @@ def generate_team_bullpen_html(team_slug, data, player_db):
             <h5 class="fw-bold mb-3 text-dark border-bottom pb-2 mt-2" style="font-size: 1rem;">🔥 5-Day Pitch Count Heat Map</h5>
             <div class="card shadow-sm border rounded bg-white overflow-hidden mb-4">
                 <div class="table-responsive">
-                    <table class="table table-bordered text-center align-middle mb-0" style="font-size:0.8rem; min-width: 650px;">
+                    <table class="table table-bordered text-center align-middle mb-0" style="font-size:0.8rem; min-width: 750px;">
                         <thead class="table-dark text-white fw-bold">
                             <tr>
                                 <th class="text-start ps-3">Pitcher</th>
+                                <th>ERA</th>
+                                <th>WHIP</th>
                                 <th style="min-width: 100px;">Status</th>
                                 <th style="font-size:0.7rem;">Appearances<br>(Last 5)</th>
                                 <th>Yest</th>
