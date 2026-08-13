@@ -1,0 +1,52 @@
+name: Bullpen Data & Pages Pipeline
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-bullpen-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pytz
+
+      - name: Gather Bullpen Data
+        run: |
+          python scripts/gather_bullpen_data.py
+
+      - name: Build Bullpen HTML Pages
+        run: |
+          python scripts/build_bullpen_pages.py
+
+      - name: Commit and Push All Updates
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Stage the JSON data payload
+          git add data/bullpen_data.json || true
+          
+          # Stage the generated HTML directories
+          git add teams/ || true
+          
+          # Stage the SEO and indexing files (fail silently if they haven't been modified)
+          git add sitemap.xml || true
+          git add data/updates_queue.json || true
+          
+          # Commit and push if there are changes
+          git diff-index --quiet HEAD || git commit -m "Automated update: Refreshed bullpen data and rebuilt HTML pages"
+          git push
