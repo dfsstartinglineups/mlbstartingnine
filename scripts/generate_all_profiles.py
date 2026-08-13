@@ -1091,6 +1091,11 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
     hr_predictor_html = ""
     bvp_cards_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
     p_deep_stats = {}
+    reliever_info = reliever_map.get(str(player_id)) if reliever_map else None
+    
+    if my_game and team_side:
+    bvp_cards_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
+    p_deep_stats = {}
     if my_game and team_side:
         p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
         p_proj_node = None
@@ -1110,10 +1115,9 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
         fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
         
-        reliever_info = reliever_map.get(str(player_id)) if reliever_map else None
         badge_matrix_html = render_badge_zone(player_id, team_side, my_game, reliever_info)
         
-        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher) 
+        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher)
         
         hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
         
