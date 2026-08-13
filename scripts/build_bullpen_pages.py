@@ -356,13 +356,12 @@ def main():
             updated_urls.append(page_url)
             print(f"   ✅ Built: {team_slug}")
 
-    # TEMPORARILY DISABLED: Indexing and Sitemap updates turned off until launch
-    # update_sitemap(all_urls, updated_urls)
-    # if updated_urls:
-    #     queue_urls_for_indexnow(updated_urls)
-    #     print(f"🚀 Queued {len(updated_urls)} updated URLs for IndexNow.")
+    update_sitemap(all_urls, updated_urls)
+    if updated_urls:
+        queue_urls_for_indexnow(updated_urls)
+        print(f"🚀 Queued {len(updated_urls)} updated URLs for IndexNow.")
         
-    print("🏁 Build Complete! (Sitemap and IndexNow updates bypassed)")
+    print("🏁 Build Complete!")
 
 if __name__ == "__main__":
     main()
