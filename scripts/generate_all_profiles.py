@@ -1162,12 +1162,20 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         split_vr_header = '<span class="badge bg-dark me-1">RHB</span> vs. Right-Handed Batters'
         split_vol_label, split_hr_label = "Batters Faced:", "HR Allowed:"
         
-        if is_game_final:
-            title = f"Is {p_name} Pitching Today? Rotation Status & Latest Stats vs {opp_team_name}"
-            desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
+        if reliever_info:
+            if is_game_final:
+                title = f"Is {p_name} available out of the bullpen today? Post-Game Recap vs {opp_team_name}"
+                desc = f"Is {p_name} available out of the bullpen today? Post-game stats and box score recap vs the {opp_team_name}. {clean_blurb_desc}"
+            else:
+                title = f"Is {p_name} available out of the bullpen today?"
+                desc = f"Is {p_name} available out of the bullpen today? View real-time fatigue status, pitch counts, split analytics, and matchup stats."
         else:
-            title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
-            desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
+            if is_game_final:
+                title = f"Is {p_name} Pitching Today? Rotation Status & Latest Stats vs {opp_team_name}"
+                desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
+            else:
+                title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
+                desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
     else:
         avg, hr = profile.get("season", {}).get("avg", "-"), profile.get("season", {}).get("hr", 0)
         season_string = f"{position} • {team_name} • {avg} AVG • {hr} HR"
