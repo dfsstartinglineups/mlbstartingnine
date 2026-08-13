@@ -231,7 +231,7 @@ def generate_team_bullpen_html(team_slug, data, player_db):
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{team_name} Bullpen Usage, Rest Report & Rankings</title>
+    <title>Today's {team_name} Bullpen Usage, Rest Report & Rankings</title>
     <meta name="description" content="Get today's {team_name} bullpen pitch counts, fatigue status, season-long reliever performance rankings, and daily relief pitcher availability.">
     <link rel="canonical" href="{page_url}" />
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -241,7 +241,7 @@ def generate_team_bullpen_html(team_slug, data, player_db):
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{page_url}">
-    <meta property="og:title" content="{team_name} Bullpen Usage, Rest Report & Rankings">
+    <meta property="og:title" content="Today's {team_name} Bullpen Usage, Rest Report & Rankings">
     <meta property="og:description" content="Get today's {team_name} bullpen pitch counts, fatigue status, season-long reliever performance rankings, and daily relief pitcher availability.">
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -268,7 +268,7 @@ def generate_team_bullpen_html(team_slug, data, player_db):
             <div class="d-flex align-items-center mb-4 gap-3">
                 <img src="{team_logo_url}" style="width: 65px; height: 65px; object-fit: contain;">
                 <div>
-                    <h1 class="h3 fw-bold text-dark mb-0">{team_name} Bullpen Report</h1>
+                    <h1 class="h3 fw-bold text-dark mb-0">Today's {team_name} Bullpen Report</h1>
                     <p class="text-muted mb-0 fw-semibold" style="font-size: 0.9rem;">Reliever Fatigue, Pitch Counts & Season Rankings</p>
                 </div>
             </div>
