@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 # Path Configurations
 MASTER_DATA_PATH = "data/player_master_data.json"
+BULLPEN_DATA_PATH = "data/bullpen_data.json"
 OUTPUT_PLAYERS_DIR = "players"
 SITEMAP_OUTPUT_PATH = "sitemap.xml"
 DOMAIN = "https://mlbstartingnine.com"
@@ -227,7 +228,7 @@ def resolve_active_matchup(player_id, team_name, daily_data):
 # ==========================================
 # 3. HTML SUB-RENDERERS
 # ==========================================
-def render_badge_zone(player_id, team_side, my_game):
+def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
     game_raw = my_game.get("gameRaw") or {}
     teams = game_raw.get("teams") or {}
     my_team = teams.get(team_side) or {}
@@ -255,6 +256,14 @@ def render_badge_zone(player_id, team_side, my_game):
                        
     if is_starting_pitcher:
         badge_html = '<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Starting Pitcher</div>'
+    elif reliever_info:
+        rel_status = reliever_info.get("status", "Available")
+        if rel_status == "Available":
+            badge_html = '<div class="badge bg-success p-2 w-100 shadow-sm text-uppercase fw-bold text-white">BULLPEN: AVAILABLE</div>'
+        elif rel_status == "Tired":
+            badge_html = '<div class="badge bg-warning text-dark p-2 w-100 shadow-sm text-uppercase fw-bold">BULLPEN: TIRED</div>'
+        else:
+            badge_html = '<div class="badge bg-danger p-2 w-100 shadow-sm text-uppercase fw-bold text-white">BULLPEN: UNAVAILABLE</div>'
     else:
         lineups = game_raw.get("lineups") or {}
         actual_lineup = lineups.get(f"{team_side}Players", [])
@@ -739,7 +748,7 @@ def format_pitcher_narrative(pitching_node):
 
     return f"{action_phrase} <strong>{ip} innings</strong>, allowing <strong>{er_str}</strong> on {hits_str} with {so_str} and {bb_str}"
 
-def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data=None):
+def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data=None, reliever_info=None):
     if not my_game or not team_side:
         blurb = f"<strong>{p_name}</strong> is not scheduled to pitch on today's active MLB slate." if is_pitcher else f"<strong>{p_name}</strong> is not on today's active MLB slate."
         return render_blurb_card("Off-Slate", "bg-secondary", "#6c757d", blurb), blurb
@@ -840,6 +849,29 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         season_summary = f"He carries a <strong>{wins}-{losses}</strong> record with a <strong>{era} ERA</strong> on the season."
 
         if not is_starting_pitcher:
+            if reliever_info:
+                rel_status = reliever_info.get("status", "Available")
+                recent_apps = reliever_info.get("recent_appearances", 0)
+                pitches_5 = reliever_info.get("pitches_last_5", [0, 0, 0, 0, 0])
+                total_pitches = sum(pitches_5)
+                yest_pitches = pitches_5[0] if len(pitches_5) > 0 else 0
+
+                pitch_desc = f"thrown <strong>{total_pitches} pitches</strong>" if total_pitches > 0 else "not thrown a pitch"
+                yest_desc = f" ({yest_pitches} pitches yesterday)" if yest_pitches > 0 else ""
+
+                rel_blurb = (
+                    f"<strong>{p_name}</strong> is <strong>{rel_status.lower()}</strong> out of the bullpen today for the "
+                    f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary} "
+                    f"Over his last {recent_apps} appearances in the past 5 days, he has {pitch_desc}{yest_desc}.{recent_summary}"
+                )
+
+                if rel_status == "Available":
+                    return render_blurb_card("Bullpen: Available", "bg-success", "#198754", rel_blurb), rel_blurb
+                elif rel_status == "Tired":
+                    return render_blurb_card("Bullpen: Tired", "bg-warning text-dark", "#ffc107", rel_blurb), rel_blurb
+                else:
+                    return render_blurb_card("Bullpen: Unavailable", "bg-danger", "#dc3545", rel_blurb), rel_blurb
+
             blurb = f"<strong>{p_name}</strong> is not listed as the starting pitcher for the <strong>{team_name}</strong> in today's matchup against the <strong>{opp_team_name}</strong>. {season_summary}"
             return render_blurb_card("Not Starting", "bg-secondary", "#6c757d", blurb), blurb
 
@@ -1041,7 +1073,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
 # ==========================================
 # 4. PRIMARY HTML LAYOUT BUILDER
 # ==========================================
-def generate_player_html(profile, slug, daily_data, live_data, master_data):
+def generate_player_html(profile, slug, daily_data, live_data, master_data, reliever_map=None):
     player_id = profile.get("player_id", "")
     team_id = profile.get("team_id", "")
     team_logo_url = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{team_id}.svg" if team_id else "https://www.mlbstatic.com/team-logos/team-cap-on-light/blank.svg"
@@ -1078,7 +1110,8 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
         fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
         
-        badge_matrix_html = render_badge_zone(player_id, team_side, my_game)
+        reliever_info = reliever_map.get(str(player_id)) if reliever_map else None
+        badge_matrix_html = render_badge_zone(player_id, team_side, my_game, reliever_info)
         
         game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher) 
         
@@ -1086,7 +1119,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data):
         
     # Generate blurb card and extract raw blurb text for schema (Pass live_data)
     news_blurb_html, raw_blurb_text = generate_news_blurb(
-        player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data
+        player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data, reliever_info
     )
     
     # Clean only the raw blurb text (strips HTML tags without capturing header/badge titles)
@@ -1283,6 +1316,15 @@ def main():
     
     daily_data = load_json_safe(f"data/daily_files/games_{target_date_str}.json")
     live_data = load_json_safe(f"data/LIVE/live_mlb_{target_date_str}.json")
+    bullpen_data = load_json_safe(BULLPEN_DATA_PATH)
+
+    # Build a fast lookup map for relievers by player_id
+    reliever_map = {}
+    for team_slug, team_info in bullpen_data.items():
+        for r in team_info.get("active_relievers", []):
+            pid = str(r.get("player_id", ""))
+            if pid:
+                reliever_map[pid] = r
 
     all_player_urls = []
     updated_urls = [] 
@@ -1298,7 +1340,7 @@ def main():
         
         all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-        new_html_content = generate_player_html(profile, player_slug, daily_data, live_data, master_data)
+        new_html_content = generate_player_html(profile, player_slug, daily_data, live_data, master_data, reliever_map)
         
         existing_html = ""
         if os.path.exists(index_file_path):
