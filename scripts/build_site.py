@@ -330,16 +330,7 @@ function adjustOverflowingNames() {
 document.addEventListener('DOMContentLoaded', adjustOverflowingNames);
 window.addEventListener('resize', adjustOverflowingNames);
 
-document.addEventListener('click', (e) => {
-    if (e.target.closest('.card-toggle-btn')) {
-        const btn = e.target.closest('.card-toggle-btn');
-        const card = btn.closest('.lineup-card');
-        const isExp = btn.textContent.includes('+');
-        card.querySelectorAll('.stats-collapse').forEach(d => isExp ? d.classList.remove('d-none') : d.classList.add('d-none'));
-        btn.textContent = isExp ? '[-] Collapse Matchups' : '[+] Expand Matchups';
-    }
-    // Global toggle event block completely stripped out from here
-});
+
 
 // ========================================================
 // 4. DEEP LINK SCROLLING & GLOW EFFECT
@@ -799,6 +790,9 @@ def generate_games_html(date_str, player_db):
         away_name_full = away_team.get('team', {}).get('name', '')
         home_name_full = home_team.get('team', {}).get('name', '')
         
+        away_slug = slugify(away_name_full)
+        home_slug = slugify(home_name_full)
+        
         away_name = away_team.get('team', {}).get('teamName', away_name_full.split(' ')[-1])
         home_name = home_team.get('team', {}).get('teamName', home_name_full.split(' ')[-1])
         if 'Red Sox' in away_name_full: away_name = 'Red Sox'
@@ -997,9 +991,14 @@ def generate_games_html(date_str, player_db):
                     </div>
                 </div>
                 
-                <!-- Added Expand/Collapse Support for Stats -->
-                <div class="px-2 py-1 text-center bg-white border-top">
-                    <button class="btn btn-link btn-sm card-toggle-btn text-muted fw-bold p-0 text-decoration-none" style="font-size: 0.70rem;">[-] Collapse Matchups</button>
+                <!-- Bullpen Report Links for Both Teams -->
+                <div class="row g-0 border-top bg-white text-center py-1">
+                    <div class="col-6 border-end">
+                        <a href="/teams/{away_slug}/bullpen/" class="btn btn-link btn-sm text-primary fw-bold p-0 text-decoration-none" style="font-size: 0.70rem;">🔥 {away_name} Bullpen Report</a>
+                    </div>
+                    <div class="col-6">
+                        <a href="/teams/{home_slug}/bullpen/" class="btn btn-link btn-sm text-primary fw-bold p-0 text-decoration-none" style="font-size: 0.70rem;">🔥 {home_name} Bullpen Report</a>
+                    </div>
                 </div>
                 
                 <div class="px-2 py-1 border-top border-bottom text-center text-truncate" style="background-color: #f8f9fa; font-size: 0.70rem; letter-spacing: 0.5px;">
