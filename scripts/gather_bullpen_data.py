@@ -149,28 +149,29 @@ def evaluate_reliever(player_id, past_dates, scheduled_probables):
         games_started = int(season_stats.get('gamesStarted', 0))
         ip_total = convert_ip(season_stats.get('inningsPitched', '0.0'))
         
-        # Check if any recent outing was an actual START with a high pitch count (>= 60 pitches)
-        has_recent_starter_outing = False
-        for log in game_log:
+        # Sort game log chronologically to check recent usage
+        sorted_log = sorted(game_log, key=lambda x: x.get('date', ''))
+        
+        # Did he start his most recent game?
+        last_appearance_was_start = False
+        if sorted_log:
+            last_stat = sorted_log[-1].get('stat', {})
+            last_appearance_was_start = int(last_stat.get('gamesStarted', 0)) == 1
+
+        # Check if he threw a heavy start (>=60 pitches) in the last 10 days
+        ten_days_ago = (datetime.strptime(past_dates[0], '%Y-%m-%d') - timedelta(days=9)).strftime('%Y-%m-%d')
+        has_recent_heavy_start = False
+        for log in sorted_log:
+            g_date = log.get('date', '')
             g_stat = log.get('stat', {})
-            was_start = int(g_stat.get('gamesStarted', 0)) == 1
-            pitches = int(g_stat.get('numberOfPitches', 0))
-            
-            if was_start and pitches >= 60:
-                has_recent_starter_outing = True
+            if int(g_stat.get('gamesStarted', 0)) == 1 and int(g_stat.get('numberOfPitches', 0)) >= 60 and g_date >= ten_days_ago:
+                has_recent_heavy_start = True
                 break
 
         # 1. Low Sample Size Filter (3 or fewer appearances)
         if games_played <= 3:
-            # If they STARTED a game and threw 60+ pitches, they are a rotation starter
-            if has_recent_starter_outing:
+            if has_recent_heavy_start or (games_played == 0 and player_id in scheduled_probables):
                 return None
-                
-            # If they haven't pitched yet, check if they are an announced probable starter
-            if games_played == 0 and player_id in scheduled_probables:
-                return None
-                
-            # If majority of their 1-3 appearances are starts averaging 3.0+ IP
             elif games_started > 0 and (games_started / games_played) >= 0.5 and (ip_total / games_played) >= 3.0:
                 return None
 
@@ -179,8 +180,12 @@ def evaluate_reliever(player_id, past_dates, scheduled_probables):
             avg_ip = ip_total / games_played if games_played > 0 else 0
             start_ratio = games_started / games_played if games_played > 0 else 0
             
-            # Filter out traditional starters (majority starts with 3.5+ IP avg) or recent heavy starter outings
-            if (start_ratio >= 0.5 and avg_ip >= 3.5) or has_recent_starter_outing:
+            # If he is a traditional starter (majority starts), BUT his last appearance was in relief, 
+            # and he hasn't thrown a heavy start in the last 10 days, he has transitioned to the bullpen.
+            is_converted_reliever = (start_ratio >= 0.5) and not last_appearance_was_start and not has_recent_heavy_start
+
+            # Filter out traditional starters unless they just converted to the bullpen
+            if (start_ratio >= 0.5 and avg_ip >= 3.5 and not is_converted_reliever) or has_recent_heavy_start:
                 return None
 
         # --- FATIGUE CALCULATION ---
