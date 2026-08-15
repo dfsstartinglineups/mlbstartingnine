@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <title>MLB9 Lineup Alerts | DFS Scratches & Starting 9 Push Notifications</title>
+    <meta name="description" content="Get instant push notifications when your daily fantasy baseball players are scratched. Upload your DraftKings or FanDuel lineups and never take a zero again.">
+    <meta name="keywords" content="MLB lineup alerts, daily fantasy baseball alerts, DFS scratches, DraftKings lineup tools, FanDuel lineup tools">
+    <link rel="canonical" href="https://mlbstartingnine.com/tools/alerts/">
+    
+    <meta property="og:site_name" content="MLB Starting Nine">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mlbstartingnine.com/tools/alerts/">
+    <meta property="og:title" content="MLB9 Lineup Alerts | Instant DFS Scratch Notifications">
+    <meta property="og:description" content="Upload your DFS lineups and get instant browser push notifications if your players are missing from the official starting nine.">
+    <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- PapaParse for in-browser CSV reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        body { background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .header-brand a { color: inherit; text-decoration: none; }
+        .header-brand span { background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-right: 2px; display: inline-block; }
+        
+        .alert-card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        /* Drag and Drop Zone */
+        .drop-zone { border: 2px dashed #adb5bd; border-radius: 8px; padding: 30px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.2s; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: #0d6efd; background-color: #e9ecef; }
+        
+        /* Autocomplete Search */
+        .search-container { position: relative; }
+        #search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: white; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .search-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f3f5; display: flex; align-items: center; }
+        .search-item:hover { background-color: #f8f9fa; }
+        .search-item:last-child { border-bottom: none; }
+        
+        /* Player Chips */
+        .player-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .player-chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef; margin-right: 8px; }
+        .player-chip .remove-btn { margin-left: 10px; color: #dc3545; cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; text-decoration: none; }
+        .player-chip .remove-btn:hover { color: #a52834; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="header-brand mb-2 mb-md-0">
+            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="/" class="btn btn-sm btn-outline-light fw-bold">◀ Back to Lineups</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="text-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-2">Welcome to MLB9 Lineup Alerts 🔔</h1>
+        <p class="text-muted">Never take a zero again. Get instant push notifications when your players are scratched.</p>
+    </div>
+
+    <!-- How it works Accordion -->
+    <div class="accordion mb-4 shadow-sm" id="howItWorksAccordion">
+        <div class="accordion-item border-0 rounded alert-card overflow-hidden">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background-color: #fcfcfc;">
+                    How It Works (Click to Expand)
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#howItWorksAccordion">
+                <div class="accordion-body text-muted" style="font-size: 0.9rem;">
+                    <ol class="mb-0 ps-3">
+                        <li class="mb-2"><strong>Add Your Players:</strong> Search for specific players using the search bar, or drag and drop your DraftKings/FanDuel CSV file to automatically import your entire player pool.</li>
+                        <li class="mb-2"><strong>Set Your Rules:</strong> Choose if you only want an alert when disaster strikes (a player is scratched), or if you want a full roll-call of who is IN and OUT.</li>
+                        <li><strong>Get Notified:</strong> The exact second MLB teams release their official 9-man starting lineups, we cross-reference your list and send a push notification straight to your device.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Manual Search -->
+        <div class="col-md-6">
+            <div class="alert-card p-4 h-100">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;">🔍 Search & Add Players</h5>
+                <div class="search-container">
+                    <input type="text" id="player-search" class="form-control form-control-lg" placeholder="Type a player name..." autocomplete="off">
+                    <div id="search-results"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CSV Upload -->
+        <div class="col-md-6">
+            <div class="alert-card p-4 h-100">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;">📁 DFS Lineup Upload</h5>
+                <div class="drop-zone" id="drop-zone">
+                    <div class="mb-2" style="font-size: 2rem;">📥</div>
+                    <div class="fw-bold text-dark">Drag & Drop CSV Here</div>
+                    <div class="text-muted small mb-2">DraftKings or FanDuel files supported</div>
+                    <input type="file" id="file-input" class="d-none" accept=".csv">
+                    <button class="btn btn-sm btn-outline-primary fw-bold" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Watchlist -->
+    <div class="alert-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+            <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">My Monitored Players</h5>
+            <span class="badge bg-primary rounded-pill" id="player-count">0</span>
+        </div>
+        
+        <div id="empty-state" class="text-center py-4 text-muted fst-italic" style="font-size: 0.9rem;">
+            No players selected yet. Search above or upload a CSV to build your watchlist.
+        </div>
+        
+        <div id="player-grid" class="d-flex flex-wrap gap-2">
+            <!-- Chips injected here via JS -->
+        </div>
+        
+        <!-- Unmatched CSV Errors -->
+        <div id="unmatched-alert" class="alert alert-warning mt-3 d-none p-2" style="font-size: 0.85rem;">
+            <strong>⚠️ Unmatched CSV Names:</strong> <span id="unmatched-list"></span>
+        </div>
+    </div>
+
+    <!-- Toggles and Arming -->
+    <div class="alert-card p-4 text-center" style="background-color: #f8f9fa;">
+        <h5 class="fw-bold mb-3" style="font-size: 1rem;">Alert Preferences</h5>
+        
+        <div class="btn-group shadow-sm mb-4" role="group">
+            <input type="radio" class="btn-check" name="alertPref" id="pref-critical" value="critical_only" checked>
+            <label class="btn btn-outline-danger fw-bold px-4" for="pref-critical">🚨 Scratches Only</label>
+            
+            <input type="radio" class="btn-check" name="alertPref" id="pref-full" value="full_coverage">
+            <label class="btn btn-outline-success fw-bold px-4" for="pref-full">✅ Full Coverage (In & Out)</label>
+        </div>
+        
+        <div class="d-block">
+            <button id="arm-alerts-btn" class="btn btn-lg btn-primary fw-bold px-5 py-3 shadow w-100" style="max-width: 400px; border-radius: 30px;">
+                Confirm & Arm Alerts 🛡️
+            </button>
+        </div>
+        <div id="status-message" class="mt-3 fw-bold d-none" style="font-size: 0.9rem;"></div>
+    </div>
+</div>
+
+<script>
+    // Configuration
+    const FIREBASE_DB_URL = "YOUR_FIREBASE_URL_HERE"; 
+    
+    // State Management
+    let masterPlayerList = [];
+    let playerLookupByName = {};
+    let activeWatchlist = new Map(); // Keyed by MLB player_id
+
+    // DOM Elements
+    const searchInput = document.getElementById('player-search');
+    const searchResults = document.getElementById('search-results');
+    const playerGrid = document.getElementById('player-grid');
+    const emptyState = document.getElementById('empty-state');
+    const playerCount = document.getElementById('player-count');
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const armBtn = document.getElementById('arm-alerts-btn');
+
+    // 1. Load Master Data
+    fetch('../../data/player_master_data.json')
+        .then(res => res.json())
+        .then(data => {
+            masterPlayerList = Object.values(data).filter(p => !p.is_pitcher); // Assuming DFS hitters are priority, remove filter if tracking SPs too
+            masterPlayerList.forEach(p => {
+                // Normalize names for fuzzy mapping
+                const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                playerLookupByName[cleanName] = p;
+            });
+        });
+
+    // 2. Search Autocomplete
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        searchResults.innerHTML = '';
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
+
+        const matches = masterPlayerList.filter(p => p.name.toLowerCase().includes(query)).slice(0, 8);
+        
+        if (matches.length > 0) {
+            searchResults.style.display = 'block';
+            matches.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'search-item';
+                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
+                div.innerHTML = `
+                    <img src="${headshot}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:10px;">
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}</span>
+                        <span class="text-muted" style="font-size:0.65rem;">${p.team_name} • ${p.position}</span>
+                    </div>
+                `;
+                div.onclick = () => {
+                    addPlayerToWatchlist(p);
+                    searchInput.value = '';
+                    searchResults.style.display = 'none';
+                };
+                searchResults.appendChild(div);
+            });
+        } else {
+            searchResults.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+
+    // 3. UI Rendering
+    function addPlayerToWatchlist(player) {
+        if (!activeWatchlist.has(player.player_id)) {
+            activeWatchlist.set(player.player_id, player);
+            renderGrid();
+        }
+    }
+
+    function removePlayer(playerId) {
+        activeWatchlist.delete(playerId);
+        renderGrid();
+    }
+
+    function renderGrid() {
+        playerGrid.innerHTML = '';
+        const count = activeWatchlist.size;
+        playerCount.innerText = count;
+        
+        if (count === 0) {
+            emptyState.style.display = 'block';
+        } else {
+            emptyState.style.display = 'none';
+            activeWatchlist.forEach((p, id) => {
+                const chip = document.createElement('div');
+                chip.className = 'player-chip';
+                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
+                chip.innerHTML = `
+                    <img src="${headshot}">
+                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name} <span class="text-muted fw-normal">(${p.team_name.split(' ').pop()})</span></span>
+                    <a href="javascript:void(0)" class="remove-btn" onclick="removePlayer('${id}')">&times;</a>
+                `;
+                playerGrid.appendChild(chip);
+            });
+        }
+    }
+
+    // 4. CSV Parsing (Drag & Drop)
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) processCSV(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) processCSV(e.target.files[0]);
+    });
+
+    function processCSV(file) {
+        Papa.parse(file, {
+            complete: function(results) {
+                const textDump = results.data.flat().join(' ').toLowerCase();
+                const unmatched = [];
+                let addedCount = 0;
+
+                // Aggressive mapping: We flatten the entire CSV into text and look for our master names inside it.
+                // This bypasses DK vs FD column header differences entirely.
+                masterPlayerList.forEach(p => {
+                    const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    if (textDump.includes(cleanName) && !activeWatchlist.has(p.player_id)) {
+                        addPlayerToWatchlist(p);
+                        addedCount++;
+                    }
+                });
+
+                alert(`Successfully extracted and mapped ${addedCount} unique players from your CSV!`);
+            }
+        });
+    }
+
+    // 5. Firebase & Service Worker Push Registration
+    function generateUserId() {
+        let uid = localStorage.getItem('mlb9_alerts_uid');
+        if (!uid) {
+            uid = 'anon_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('mlb9_alerts_uid', uid);
+        }
+        return uid;
+    }
+
+    armBtn.addEventListener('click', async () => {
+        if (activeWatchlist.size === 0) {
+            alert("Please add at least one player to your watchlist.");
+            return;
+        }
+
+        const msgBox = document.getElementById('status-message');
+        const pref = document.querySelector('input[name="alertPref"]:checked').value;
+        const playerIds = Array.from(activeWatchlist.keys());
+        const userId = generateUserId();
+
+        armBtn.innerHTML = "Requesting Permissions...";
+        armBtn.disabled = true;
+
+        try {
+            // Ask for Notification permission natively
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                throw new Error("Push permissions denied.");
+            }
+
+            // In a full implementation, you would register your ServiceWorker here
+            // const registration = await navigator.serviceWorker.register('/sw.js');
+            // const subscription = await registration.pushManager.subscribe({ ... });
+            // const pushToken = JSON.stringify(subscription);
+            const dummyPushToken = "example_browser_token_generated_by_service_worker"; 
+
+            const payload = {
+                push_token: dummyPushToken,
+                preference: pref,
+                watchlist: playerIds
+            };
+
+            // Write to Firebase
+            const dbUrl = `${FIREBASE_DB_URL}/watchlist/${userId}.json`;
+            const response = await fetch(dbUrl, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                msgBox.className = "mt-3 fw-bold text-success";
+                msgBox.innerText = "✅ Success! Your alerts are armed and monitoring.";
+                armBtn.innerHTML = "Alerts Armed 🛡️";
+            } else {
+                throw new Error("Firebase write failed.");
+            }
+
+        } catch (error) {
+            console.error(error);
+            msgBox.className = "mt-3 fw-bold text-danger";
+            msgBox.innerText = "⚠️ Error: " + error.message;
+            armBtn.innerHTML = "Confirm & Arm Alerts 🛡️";
+            armBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
