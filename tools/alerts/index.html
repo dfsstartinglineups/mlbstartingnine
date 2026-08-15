@@ -163,25 +163,34 @@
     </div>
 </div>
 
-<script>
-    // Configuration
-    const FIREBASE_DB_URL = "https://nbastartingfive-8b420-default-rtdb.firebaseio.com"; 
-    
-    // State Management
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1siO6niUMzrm_RXpcDxFDiLQ8xjSAAkw",
+      authDomain: "nbastartingfive-8b420.firebaseapp.com",
+      databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com",
+      projectId: "nbastartingfive-8b420",
+      storageBucket: "nbastartingfive-8b420.firebasestorage.app",
+      messagingSenderId: "348101109842",
+      appId: "1:348101109842:web:8713e5ba9b0bc9691ed78b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    const PUBLIC_VAPID_KEY = "BFeKk22n0ZPJtjfhu_rzyVT6fGDOLKL2pw3McTgQhelPNzfcFGfOjIYTD4QvZ7F1VIeF1XMDWDFikD19PeuGUG4";
+
     let masterPlayerList = [];
     let playerLookupByName = {};
-    let activeWatchlist = new Map(); // Keyed by MLB player_id
+    let activeWatchlist = new Map();
 
-    // 1. Load Master Data (Includes Pitchers & Position Players)
     fetch('../../data/player_master_data.json')
         .then(res => res.json())
         .then(data => {
-            // Keep all players including pitchers
             masterPlayerList = Object.values(data);
-            
             masterPlayerList.forEach(p => {
                 if(p.name) {
-                    // Normalize names for fuzzy mapping
                     const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                     playerLookupByName[cleanName] = p;
                 }
@@ -189,7 +198,6 @@
         })
         .catch(err => console.error("Failed to load master player data:", err));
 
-    // DOM Elements
     const searchInput = document.getElementById('player-search');
     const searchResults = document.getElementById('search-results');
     const playerGrid = document.getElementById('player-grid');
@@ -199,15 +207,11 @@
     const fileInput = document.getElementById('file-input');
     const armBtn = document.getElementById('arm-alerts-btn');
 
-    // 2. Search Autocomplete
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
         searchResults.innerHTML = '';
         
-        if (query.length < 2) {
-            searchResults.style.display = 'none';
-            return;
-        }
+        if (query.length < 2) { searchResults.style.display = 'none'; return; }
 
         const matches = masterPlayerList.filter(p => (p.name || "").toLowerCase().includes(query)).slice(0, 8);
         
@@ -218,8 +222,6 @@
                 div.className = 'search-item';
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
                 const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
-                
-                // Pull the team logo for the dropdown badge
                 const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -3px; right: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; object-fit: contain;" alt="Team Logo">` : '';
                 
                 div.innerHTML = `
@@ -232,35 +234,23 @@
                         <span class="text-muted mt-1" style="font-size:0.65rem;">${displayPos}</span>
                     </div>
                 `;
-                div.onclick = () => {
-                    addPlayerToWatchlist(p);
-                    searchInput.value = '';
-                    searchResults.style.display = 'none';
-                };
+                div.onclick = () => { addPlayerToWatchlist(p); searchInput.value = ''; searchResults.style.display = 'none'; };
                 searchResults.appendChild(div);
             });
-        } else {
-            searchResults.style.display = 'none';
-        }
+        } else { searchResults.style.display = 'none'; }
     });
 
     document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-            searchResults.style.display = 'none';
-        }
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.style.display = 'none';
     });
 
-    // 3. UI Rendering
-    function addPlayerToWatchlist(player) {
-        if (!activeWatchlist.has(player.player_id)) {
-            activeWatchlist.set(player.player_id, player);
-            renderGrid();
-        }
-    }
-
-    function removePlayer(playerId) {
+    window.removePlayer = function(playerId) {
         activeWatchlist.delete(playerId);
         renderGrid();
+    }
+
+    function addPlayerToWatchlist(player) {
+        if (!activeWatchlist.has(player.player_id)) { activeWatchlist.set(player.player_id, player); renderGrid(); }
     }
 
     function renderGrid() {
@@ -276,8 +266,6 @@
                 const chip = document.createElement('div');
                 chip.className = 'player-chip';
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
-                
-                // Pull the official MLB SVG logo for the chip badge
                 const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; margin: 0 !important; object-fit: contain;" alt="Team Logo">` : '';
                 
                 chip.innerHTML = `
@@ -293,31 +281,14 @@
         }
     }
 
-    // 4. CSV Parsing (Drag & Drop)
+    const teamAbbrMap = {
+        "ARI": ["arizona", "diamondbacks"], "ATL": ["atlanta", "braves"], "BAL": ["baltimore", "orioles"], "BOS": ["boston", "red sox"], "CHC": ["cubs"], "CHW": ["white sox"], "CWS": ["white sox"], "CIN": ["cincinnati", "reds"], "CLE": ["cleveland", "guardians"], "COL": ["colorado", "rockies"], "DET": ["detroit", "tigers"], "HOU": ["houston", "astros"], "KC":  ["kansas city", "royals"], "LAA": ["angels"], "LAD": ["dodgers"], "MIA": ["miami", "marlins"], "MIL": ["milwaukee", "brewers"], "MIN": ["minnesota", "twins"], "NYM": ["mets"], "NYY": ["yankees"], "OAK": ["athletics"], "ATH": ["athletics"], "PHI": ["philadelphia", "phillies"], "PIT": ["pittsburgh", "pirates"], "SD":  ["san diego", "padres"], "SF":  ["san francisco", "giants"], "SEA": ["seattle", "mariners"], "STL": ["st. louis", "cardinals"], "TB":  ["tampa bay", "rays"], "TEX": ["texas", "rangers"], "TOR": ["toronto", "blue jays"], "WSH": ["washington", "nationals"]
+    };
+
     dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('dragover');
-        if (e.dataTransfer.files.length) processCSV(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length) processCSV(e.target.files[0]);
-    });
-
-    // Mapping DFS Team Abbreviations to Master Data Team Names
-    const teamAbbrMap = {
-        "ARI": ["arizona", "diamondbacks"], "ATL": ["atlanta", "braves"], "BAL": ["baltimore", "orioles"],
-        "BOS": ["boston", "red sox"], "CHC": ["cubs"], "CHW": ["white sox"], "CWS": ["white sox"],
-        "CIN": ["cincinnati", "reds"], "CLE": ["cleveland", "guardians"], "COL": ["colorado", "rockies"],
-        "DET": ["detroit", "tigers"], "HOU": ["houston", "astros"], "KC":  ["kansas city", "royals"],
-        "LAA": ["angels"], "LAD": ["dodgers"], "MIA": ["miami", "marlins"], "MIL": ["milwaukee", "brewers"],
-        "MIN": ["minnesota", "twins"], "NYM": ["mets"], "NYY": ["yankees"], "OAK": ["athletics"],
-        "ATH": ["athletics"], "PHI": ["philadelphia", "phillies"], "PIT": ["pittsburgh", "pirates"],
-        "SD":  ["san diego", "padres"], "SF":  ["san francisco", "giants"], "SEA": ["seattle", "mariners"],
-        "STL": ["st. louis", "cardinals"], "TB":  ["tampa bay", "rays"], "TEX": ["texas", "rangers"],
-        "TOR": ["toronto", "blue jays"], "WSH": ["washington", "nationals"]
-    };
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) processCSV(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length) processCSV(e.target.files[0]); });
 
     function processCSV(file) {
         Papa.parse(file, {
@@ -330,12 +301,9 @@
                 let isFanDuel = false;
                 let fdIdToPlayer = {};
 
-                // 1. Build FanDuel ID map
                 data.forEach(row => {
                     if (row.length > 24) {
-                        const id = row[15];
-                        const name = row[18];
-                        const team = row[24];
+                        const id = row[15], name = row[18], team = row[24];
                         if (id && id.includes('-') && name && name !== "Nickname") {
                             isFanDuel = true;
                             fdIdToPlayer[id] = { name: name, team: team ? team.toUpperCase() : null };
@@ -343,10 +311,7 @@
                     }
                 });
 
-                // 2. Locate lineup columns
-                let headerRowIndex = -1;
-                let lineupColStart = -1;
-                let lineupColEnd = -1;
+                let headerRowIndex = -1, lineupColStart = -1, lineupColEnd = -1;
                 const positions = ["p", "sp", "rp", "pitcher", "c", "1b", "2b", "3b", "ss", "of", "c/1b", "util"];
 
                 for (let i = 0; i < Math.min(10, data.length); i++) {
@@ -358,70 +323,48 @@
                             if (positions.includes(colName)) {
                                 if (lineupColStart === -1) lineupColStart = j;
                                 lineupColEnd = j;
-                            } else if (lineupColStart !== -1 && data[i][j] === "") {
-                                break;
-                            }
+                            } else if (lineupColStart !== -1 && data[i][j] === "") break;
                         }
                         break;
                     }
                 }
 
-                if (headerRowIndex === -1 || lineupColStart === -1) {
-                    alert("Could not detect lineup columns. Ensure you uploaded a valid DraftKings or FanDuel file.");
-                    return;
-                }
+                if (headerRowIndex === -1 || lineupColStart === -1) { alert("Could not detect lineup columns."); return; }
 
-                // 3. Extract unique player cells
                 const uniquePlayerValues = new Set();
                 for (let i = headerRowIndex + 1; i < data.length; i++) {
                     const row = data[i];
                     if (!row[0]) continue; 
-                    
                     for (let col = lineupColStart; col <= lineupColEnd; col++) {
                         const cellVal = row[col];
-                        if (cellVal && cellVal.trim() !== "") {
-                            uniquePlayerValues.add(cellVal.trim());
-                        }
+                        if (cellVal && cellVal.trim() !== "") uniquePlayerValues.add(cellVal.trim());
                     }
                 }
 
-                // 4. Map DFS values to Master MLB Player List
                 let addedCount = 0;
                 const unmatched = [];
 
                 uniquePlayerValues.forEach(val => {
-                    let playerName = val;
-                    let playerTeam = null;
+                    let playerName = val, playerTeam = null;
 
                     if (isFanDuel) {
-                        if (fdIdToPlayer[val]) {
-                            playerName = fdIdToPlayer[val].name;
-                            playerTeam = fdIdToPlayer[val].team;
-                        } else if (val.includes(':')) {
-                            playerName = val.split(':')[1].trim();
-                        }
+                        if (fdIdToPlayer[val]) { playerName = fdIdToPlayer[val].name; playerTeam = fdIdToPlayer[val].team; }
+                        else if (val.includes(':')) playerName = val.split(':')[1].trim();
                     } else {
-                        // DraftKings Format
-                        if (val.includes('(')) {
-                            playerName = val.split('(')[0].trim();
-                        }
+                        if (val.includes('(')) playerName = val.split('(')[0].trim();
                     }
 
                     if(!playerName) return;
 
                     const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
-                    
                     const matchedPlayers = masterPlayerList.filter(p => {
                         const masterCleanName = (p.name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                         return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
                     });
 
                     let matchedPlayer = null;
-
-                    if (matchedPlayers.length === 1) {
-                        matchedPlayer = matchedPlayers[0];
-                    } else if (matchedPlayers.length > 1) {
-                        // Tiebreaker: Match via Team Abbreviation
+                    if (matchedPlayers.length === 1) matchedPlayer = matchedPlayers[0];
+                    else if (matchedPlayers.length > 1) {
                         if (playerTeam) {
                             matchedPlayer = matchedPlayers.find(p => {
                                 const masterTeam = (p.team_name || "").toLowerCase();
@@ -429,52 +372,31 @@
                                 return possibleNames.some(t => masterTeam.includes(t)) || masterTeam.includes(playerTeam.toLowerCase());
                             });
                         }
-                        if (!matchedPlayer) {
-                            matchedPlayer = matchedPlayers[0]; // Fallback to first found
-                        }
+                        if (!matchedPlayer) matchedPlayer = matchedPlayers[0];
                     }
 
                     if (matchedPlayer) {
-                        if (!activeWatchlist.has(matchedPlayer.player_id)) {
-                            addPlayerToWatchlist(matchedPlayer);
-                            addedCount++;
-                        }
-                    } else {
-                        unmatched.push(playerName);
-                    }
+                        if (!activeWatchlist.has(matchedPlayer.player_id)) { addPlayerToWatchlist(matchedPlayer); addedCount++; }
+                    } else unmatched.push(playerName);
                 });
 
-                // 5. Update UI
                 if (addedCount > 0) {
                     const alertDiv = document.getElementById('unmatched-alert');
-                    if (unmatched.length > 0) {
-                        alertDiv.classList.remove('d-none');
-                        document.getElementById('unmatched-list').innerText = unmatched.join(', ');
-                    } else {
-                        alertDiv.classList.add('d-none');
-                    }
-                } else {
-                    alert("No valid players could be matched from your CSV.");
-                }
+                    if (unmatched.length > 0) { alertDiv.classList.remove('d-none'); document.getElementById('unmatched-list').innerText = unmatched.join(', '); }
+                    else alertDiv.classList.add('d-none');
+                } else alert("No valid players could be matched from your CSV.");
             }
         });
     }
 
-    // 5. Firebase & Service Worker Push Registration
     function generateUserId() {
         let uid = localStorage.getItem('mlb9_alerts_uid');
-        if (!uid) {
-            uid = 'anon_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('mlb9_alerts_uid', uid);
-        }
+        if (!uid) { uid = 'anon_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('mlb9_alerts_uid', uid); }
         return uid;
     }
 
     armBtn.addEventListener('click', async () => {
-        if (activeWatchlist.size === 0) {
-            alert("Please add at least one player to your watchlist.");
-            return;
-        }
+        if (activeWatchlist.size === 0) { alert("Please add at least one player to your watchlist."); return; }
 
         const msgBox = document.getElementById('status-message');
         const pref = document.querySelector('input[name="alertPref"]:checked').value;
@@ -486,19 +408,26 @@
 
         try {
             const permission = await Notification.requestPermission();
-            if (permission !== 'granted') {
-                throw new Error("Push permissions denied.");
-            }
+            if (permission !== 'granted') { throw new Error("Push permissions denied by user."); }
 
-            const dummyPushToken = "example_browser_token_generated_by_service_worker"; 
+            armBtn.innerHTML = "Generating Secure Token...";
+
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            
+            const actualPushToken = await getToken(messaging, {
+                vapidKey: PUBLIC_VAPID_KEY,
+                serviceWorkerRegistration: registration
+            });
+
+            if (!actualPushToken) throw new Error("Failed to retrieve push token.");
 
             const payload = {
-                push_token: dummyPushToken,
+                push_token: actualPushToken,
                 preference: pref,
                 watchlist: playerIds
             };
 
-            const dbUrl = `${FIREBASE_DB_URL}/watchlist/${userId}.json`;
+            const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
             const response = await fetch(dbUrl, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -510,7 +439,7 @@
                 msgBox.innerText = "✅ Success! Your alerts are armed and monitoring.";
                 armBtn.innerHTML = "Alerts Armed 🛡️";
             } else {
-                throw new Error("Firebase write failed.");
+                throw new Error("Failed to save to database.");
             }
 
         } catch (error) {
