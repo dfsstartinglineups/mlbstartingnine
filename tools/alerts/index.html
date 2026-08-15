@@ -218,11 +218,14 @@
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
                 const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
                 
+                // Pull the team logo for the dropdown
+                const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="width: 14px; height: 14px; border: none; border-radius: 0; margin-right: 4px; object-fit: contain;">` : '';
+                
                 div.innerHTML = `
                     <img src="${headshot}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:10px;">
                     <div class="d-flex flex-column">
                         <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}</span>
-                        <span class="text-muted" style="font-size:0.65rem;">${p.team_name} • ${displayPos}</span>
+                        <span class="text-muted d-flex align-items-center mt-1" style="font-size:0.65rem;">${teamLogo} ${displayPos}</span>
                     </div>
                 `;
                 div.onclick = () => {
@@ -269,10 +272,13 @@
                 const chip = document.createElement('div');
                 chip.className = 'player-chip';
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
-                const teamAbbr = p.team_name ? p.team_name.split(' ').pop() : '';
+                
+                // Pull the official MLB SVG logo using the team_id
+                const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="width: 18px; height: 18px; border: none; border-radius: 0; margin-left: 6px; margin-right: 0; object-fit: contain;">` : '';
+                
                 chip.innerHTML = `
                     <img src="${headshot}">
-                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name} <span class="text-muted fw-normal">(${teamAbbr})</span></span>
+                    <span class="fw-bold d-flex align-items-center" style="font-size: 0.8rem;">${p.name} ${teamLogo}</span>
                     <a href="javascript:void(0)" class="remove-btn" onclick="removePlayer('${id}')">&times;</a>
                 `;
                 playerGrid.appendChild(chip);
