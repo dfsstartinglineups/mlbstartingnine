@@ -195,6 +195,43 @@
                     playerLookupByName[cleanName] = p;
                 }
             });
+
+            // NOW THAT MASTER DATA IS LOADED, CHECK FIREBASE FOR SAVED PLAYERS
+            const userId = generateUserId();
+            const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+            const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
+
+            fetch(dbUrl)
+                .then(res => res.json())
+                .then(savedData => {
+                    // Only load the saved players if they are from today
+                    if (savedData && savedData.watchlist && savedData.date === todayDate) {
+                        savedData.watchlist.forEach(id => {
+                            // Find the player in master list
+                            const player = masterPlayerList.find(p => p.player_id == id);
+                            if (player) {
+                                activeWatchlist.set(player.player_id, player);
+                            }
+                        });
+                        
+                        // Set the radio button preference if it was saved
+                        if (savedData.preference) {
+                            const radio = document.querySelector(`input[name="alertPref"][value="${savedData.preference}"]`);
+                            if (radio) radio.checked = true;
+                        }
+
+                        // Re-render the UI and update the button
+                        renderGrid();
+                        if (activeWatchlist.size > 0) {
+                            const msgBox = document.getElementById('status-message');
+                            const armBtn = document.getElementById('arm-alerts-btn');
+                            msgBox.className = "mt-3 fw-bold text-success";
+                            msgBox.innerText = "✅ Your alerts for today are active.";
+                            armBtn.innerHTML = "Update Alerts 🛡️";
+                        }
+                    }
+                })
+                .catch(err => console.log("No saved watchlist found or error fetching.", err));
         })
         .catch(err => console.error("Failed to load master player data:", err));
 
@@ -434,10 +471,14 @@
 
             if (!actualPushToken) throw new Error("Failed to retrieve push token.");
 
+            // Generate today's date string (e.g., "2026-08-15")
+            const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+
             const payload = {
                 push_token: actualPushToken,
                 preference: pref,
-                watchlist: playerIds
+                watchlist: playerIds,
+                date: todayDate // Tag the payload with today's date
             };
 
             const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
