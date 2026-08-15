@@ -80,7 +80,7 @@ def extract_official_lineups(daily_data):
     return official_teams, active_starters
 
 def process_notifications(active_users, official_teams, active_starters):
-    """Evaluate watchlists and send push notifications based on user preferences."""
+    """Evaluate watchlists, group alerts to prevent spam, and send push notifications."""
     master_data_path = os.path.join(REPO_ROOT, 'data', 'player_master_data.json')
     try:
         with open(master_data_path, 'r') as f:
@@ -97,6 +97,13 @@ def process_notifications(active_users, official_teams, active_starters):
         if not push_token or not watchlist:
             continue
 
+        # Temporary storage for this user's alerts during this pipeline run
+        user_updates = {}
+        scratches = []
+        confirmed = []
+        late_scratches = []
+        late_adds = []
+
         for player_id, team_id in watchlist.items():
             team_id = str(team_id)
             
@@ -108,52 +115,78 @@ def process_notifications(active_users, official_teams, active_starters):
             current_state = notified_state.get(player_id)
             player_name = master_data.get(player_id, {}).get('name', 'Your player')
 
-            title = ""
-            body = ""
             new_state = ""
 
             # Scenario 1: Player is IN the official lineup
             if is_starting and current_state != 'confirmed':
-                if pref == 'full_coverage' or current_state == 'scratched':
-                    title = "✅ Lineup Confirmed"
-                    body = f"{player_name} is IN the starting lineup."
-                    
-                    # Late Addition Edge Case
-                    if current_state == 'scratched':
-                        title = "✅ LATE ADDITION"
-                        body = f"Alert: {player_name} was added back to the starting nine!"
+                if current_state == 'scratched':
+                    late_adds.append(player_name)
+                elif pref == 'full_coverage':
+                    confirmed.append(player_name)
                 
                 new_state = 'confirmed'
 
             # Scenario 2: Player is NOT in the official lineup (Scratched)
             elif not is_starting and current_state != 'scratched':
-                title = "🚨 DFS Alert: Scratch!"
-                body = f"{player_name} is NOT in the starting lineup."
-                
-                # Late Scratch Edge Case
                 if current_state == 'confirmed':
-                    title = "🚨 LATE SCRATCH!"
-                    body = f"Disaster: {player_name} was just removed from the lineup!"
+                    late_scratches.append(player_name)
+                else:
+                    scratches.append(player_name)
                 
                 new_state = 'scratched'
 
-            # Fire the notification and update the state receipt
+            # Track the state change to update Firebase later
             if new_state and new_state != current_state:
-                message = messaging.Message(
-                    notification=messaging.Notification(title=title, body=body),
-                    token=push_token,
-                    data={"url": "https://mlbstartingnine.com/"}
-                )
-                try:
-                    # Send FCM Push
-                    if title and body:
-                        messaging.send(message)
-                        print(f"Sent alert to {uid} for {player_name} ({title})")
-                    
-                    # Update database receipt to prevent spam
-                    db.reference(f'watchlist/{uid}/notified_state/{player_id}').set(new_state)
-                except Exception as e:
-                    print(f"Failed to send to {uid}: {e}")
+                user_updates[player_id] = new_state
+
+        # If nothing changed for this user, move to the next user
+        if not user_updates:
+            continue
+
+        # Build the grouped notification body strings
+        body_lines = []
+        if late_scratches:
+            body_lines.append("🚨 LATE SCRATCH: " + ", ".join(late_scratches))
+        if scratches:
+            body_lines.append("🚨 OUT: " + ", ".join(scratches))
+        if late_adds:
+            body_lines.append("✅ LATE ADD: " + ", ".join(late_adds))
+        if confirmed:
+            body_lines.append("✅ IN: " + ", ".join(confirmed))
+
+        # Batch the lines so we don't exceed mobile lock screen limits (~200 chars)
+        batched_messages = []
+        current_batch = ""
+
+        for line in body_lines:
+            if len(current_batch) + len(line) > 200:
+                batched_messages.append(current_batch.strip())
+                current_batch = line + "\n"
+            else:
+                current_batch += line + "\n"
+        
+        if current_batch:
+            batched_messages.append(current_batch.strip())
+
+        # Fire the grouped notifications
+        for i, body_text in enumerate(batched_messages):
+            # If multiple batches, number the titles (e.g., 1/2)
+            title = "MLB Lineup Alert" if len(batched_messages) == 1 else f"MLB Lineup Alert ({i+1}/{len(batched_messages)})"
+            
+            message = messaging.Message(
+                notification=messaging.Notification(title=title, body=body_text),
+                token=push_token,
+                data={"url": "https://mlbstartingnine.com/"}
+            )
+            try:
+                messaging.send(message)
+                print(f"Sent batched alert {i+1} to {uid}")
+            except Exception as e:
+                print(f"Failed to send batched alert to {uid}: {e}")
+
+        # Finally, update the database receipts for all processed players
+        for pid, state in user_updates.items():
+            db.reference(f'watchlist/{uid}/notified_state/{pid}').set(state)
 
 if __name__ == "__main__":
     print("Starting MLB Lineup Notification Worker...")
