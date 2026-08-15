@@ -1,3 +1,9 @@
+// ========================================================
+// VERSION: 1.0.0
+// ========================================================
+
+
+
 // 1. NATIVE PUSH LISTENER (Bypasses Firebase's foreground/background rules)
 self.addEventListener('push', function(event) {
   // Parse the raw push event from the browser
