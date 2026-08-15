@@ -407,8 +407,21 @@
         armBtn.disabled = true;
 
         try {
+            // 1. Feature Detection: Does the browser even support Push?
+            if (!('Notification' in window)) {
+                throw new Error("Your browser does not support push notifications. If you are on an iPhone, you must tap 'Share' -> 'Add to Home Screen' first, and be on iOS 16.4+.");
+            }
+
+            // 2. Feature Detection: Does the browser support background workers?
+            if (!('serviceWorker' in navigator)) {
+                throw new Error("Your browser does not support background alerts. Please try Chrome, Firefox, or a supported browser.");
+            }
+
+            // 3. Now we can safely ask for permission
             const permission = await Notification.requestPermission();
-            if (permission !== 'granted') { throw new Error("Push permissions denied by user."); }
+            if (permission !== 'granted') { 
+                throw new Error("Push permissions were denied. Please enable notifications in your browser settings."); 
+            }
 
             armBtn.innerHTML = "Generating Secure Token...";
 
