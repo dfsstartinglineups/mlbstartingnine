@@ -53,7 +53,7 @@ def load_daily_json(today_date):
         raise FileNotFoundError(f"Critical Error: {file_path} is missing. Halting execution.")
 
 def extract_official_lineups(daily_data):
-    """Parse the daily JSON to find official lineups and postponed games."""
+    """Parse the daily JSON to find official lineups, pitchers, and postponed games."""
     official_teams = set()
     active_starters = set()
     postponed_teams = set()
@@ -64,6 +64,9 @@ def extract_official_lineups(daily_data):
         lineups = game_raw.get('lineups', {})
         tracking = game.get('lineupTracking', {})
         status = game_raw.get('status', {})
+        
+        # Pull the projectedLineups node to access the starting pitchers
+        projected_lineups = game.get('projectedLineups', {})
 
         away_team_id = str(teams.get('away', {}).get('team', {}).get('id', ''))
         home_team_id = str(teams.get('home', {}).get('team', {}).get('id', ''))
@@ -79,14 +82,28 @@ def extract_official_lineups(daily_data):
         # Process Away Team
         if tracking.get('away', {}).get('status') == 'OFFICIAL':
             official_teams.add(away_team_id)
+            
+            # Add the 9 starting batters
             for player in lineups.get('awayPlayers', []):
                 active_starters.add(str(player.get('id')))
+                
+            # Add the Starting Pitcher
+            away_sp = projected_lineups.get('away', {}).get('startingPitcher', {})
+            if away_sp and away_sp.get('id'):
+                active_starters.add(str(away_sp.get('id')))
 
         # Process Home Team
         if tracking.get('home', {}).get('status') == 'OFFICIAL':
             official_teams.add(home_team_id)
+            
+            # Add the 9 starting batters
             for player in lineups.get('homePlayers', []):
                 active_starters.add(str(player.get('id')))
+                
+            # Add the Starting Pitcher
+            home_sp = projected_lineups.get('home', {}).get('startingPitcher', {})
+            if home_sp and home_sp.get('id'):
+                active_starters.add(str(home_sp.get('id')))
 
     return official_teams, active_starters, postponed_teams
 
