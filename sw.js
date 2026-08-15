@@ -10,7 +10,8 @@ self.addEventListener('push', function(event) {
       body: payload.data.body,
       icon: '/apple-touch-icon.png', 
       badge: '/favicon.ico',
-      data: { url: payload.data.url } 
+      data: { url: payload.data.url },
+      requireInteraction: true // Forces the notification to stay on screen until clicked/closed
     };
 
     // Force the browser to show the notification
