@@ -497,7 +497,7 @@
 
             const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
             const response = await fetch(dbUrl, {
-                method: "PUT",
+                method: "PATCH",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
