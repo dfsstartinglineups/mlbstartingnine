@@ -15,45 +15,26 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
     
-    <title>MLB9 Lineup Alerts | DFS Scratches & Starting 9 Push Notifications</title>
-    <meta name="description" content="Get instant push notifications when your daily fantasy baseball players are scratched. Upload your DraftKings or FanDuel lineups and never take a zero again.">
+    <title>MLB9 Lineup Alerts Hub | Instant DFS Scratches & Push Notifications</title>
+    <meta name="description" content="Access MLB Starting Nine's live notification tools. Get instant push notifications when your daily fantasy baseball players are scratched.">
     <meta name="keywords" content="MLB lineup alerts, daily fantasy baseball alerts, DFS scratches, DraftKings lineup tools, FanDuel lineup tools">
-    <link rel="canonical" href="https://mlbstartingnine.com/tools/alerts/players/">
+    <link rel="canonical" href="https://mlbstartingnine.com/tools/alerts/">
     
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mlbstartingnine.com/tools/alerts/players/">
-    <meta property="og:title" content="MLB9 Lineup Alerts | Instant DFS Scratch Notifications">
+    <meta property="og:url" content="https://mlbstartingnine.com/tools/alerts/">
+    <meta property="og:title" content="MLB9 Lineup Alerts Hub | Instant DFS Scratch Notifications">
     <meta property="og:description" content="Upload your DFS lineups and get instant browser push notifications if your players are missing from the official starting nine.">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- PapaParse for in-browser CSV reading -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <style>
         body { background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .header-brand a { color: inherit; text-decoration: none; }
         .header-brand span { background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-right: 2px; display: inline-block; }
-        
         .alert-card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        
-        /* Drag and Drop Zone */
-        .drop-zone { border: 2px dashed #adb5bd; border-radius: 8px; padding: 30px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.2s; }
-        .drop-zone:hover, .drop-zone.dragover { border-color: #0d6efd; background-color: #e9ecef; }
-        
-        /* Autocomplete Search */
-        .search-container { position: relative; }
-        #search-results { position: absolute; top: 100%; left: 0; right: 0; z-index: 1000; background: white; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .search-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #f1f3f5; display: flex; align-items: center; }
-        .search-item:hover { background-color: #f8f9fa; }
-        .search-item:last-child { border-bottom: none; }
-        
-        /* Player Chips */
-        .player-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .player-chip .remove-btn { margin-left: 10px; color: #dc3545; cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; text-decoration: none; }
-        .player-chip .remove-btn:hover { color: #a52834; }
     </style>
 </head>
 <body>
@@ -69,501 +50,35 @@
     </div>
 </nav>
 
-<div class="container pb-5">
-    <div class="text-center mb-4">
-        <h1 class="h3 fw-bold text-dark mb-2">Welcome to MLB9 Lineup Alerts 🔔</h1>
-        <p class="text-muted">Never take a zero again. Get instant push notifications when your players are scratched.</p>
+<div class="container pb-5" style="max-width: 800px;">
+    <div class="text-center mb-5">
+        <h1 class="h2 fw-bold text-dark mb-2">MLB9 Lineup Alerts Hub 🔔</h1>
+        <p class="text-muted">Never take a zero again. Choose an alert service below to stay ahead of starting lineups and late scratches.</p>
     </div>
 
-    <!-- How it works Accordion -->
-    <div class="accordion mb-4 shadow-sm" id="howItWorksAccordion">
-        <div class="accordion-item border-0 rounded alert-card overflow-hidden">
-            <h2 class="accordion-header">
-                <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background-color: #fcfcfc;">
-                    How It Works (Click to Expand)
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#howItWorksAccordion">
-                <div class="accordion-body text-muted" style="font-size: 0.9rem;">
-                    <ol class="mb-0 ps-3">
-                        <li class="mb-3">
-                            <strong>Build Your Watchlist:</strong> Search for specific players using the search bar, or drag and drop your active DraftKings or FanDuel entries CSV file. We will automatically extract your entire player pool and map them to our live database so you never take a zero.
-                            
-                            <!-- Nested DFS Download Instructions Accordion -->
-                            <div class="accordion accordion-flush mt-2 border rounded" id="downloadInstructionsAccordion">
-                                
-                                <!-- FanDuel Instructions -->
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingFanDuel">
-                                        <button class="accordion-button collapsed py-2" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFanDuel" aria-expanded="false" aria-controls="collapseFanDuel" style="font-size: 0.85rem; font-weight: 600; background-color: #f8f9fa;">
-                                            How to download your FanDuel lineups
-                                        </button>
-                                    </h2>
-                                    <div id="collapseFanDuel" class="accordion-collapse collapse" aria-labelledby="headingFanDuel" data-bs-parent="#downloadInstructionsAccordion">
-                                        <div class="accordion-body" style="font-size: 0.85rem;">
-                                            <ol class="mb-0 ps-3">
-                                                <li class="mb-1">Log into <strong>FanDuel.com</strong> on a desktop or laptop.</li>
-                                                <li class="mb-1">Navigate to the <strong>Upcoming</strong> tab to view your entries.</li>
-                                                <li class="mb-1">Click the <strong>CSV Edit</strong> button located on the right side of the page.</li>
-                                                <li class="mb-1">Select your slate and click <strong>Download CSV template</strong>.</li>
-                                                <li>Drag and drop that downloaded file into our tool below!</li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- DraftKings Instructions -->
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingDraftKings">
-                                        <button class="accordion-button collapsed py-2 border-top" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDraftKings" aria-expanded="false" aria-controls="collapseDraftKings" style="font-size: 0.85rem; font-weight: 600; background-color: #f8f9fa;">
-                                            How to download your DraftKings lineups
-                                        </button>
-                                    </h2>
-                                    <div id="collapseDraftKings" class="accordion-collapse collapse" aria-labelledby="headingDraftKings" data-bs-parent="#downloadInstructionsAccordion">
-                                        <div class="accordion-body" style="font-size: 0.85rem;">
-                                            <ol class="mb-0 ps-3">
-                                                <li class="mb-1">Log into <strong>DraftKings.com</strong> on a desktop or laptop.</li>
-                                                <li class="mb-1">Click on the <strong>Lineups</strong> tab in the top navigation menu.</li>
-                                                <li class="mb-1">Click the <strong>Edit Entries</strong> button near the top right.</li>
-                                                <li class="mb-1">Filter for your specific Sport and Game Set (slate).</li>
-                                                <li>Click <strong>Download</strong> to save your `.csv` file and drag it into our tool below!</li>
-                                            </ol>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                        </li>
-                        <li class="mb-3">
-                            <strong>Choose Your Alert Level:</strong> 
-                            <ul class="mt-1 mb-0 ps-3">
-                                <li><strong>Scratches Only:</strong> We will only bother you if disaster strikes. You get a push notification the exact second one of your players is officially left out of the starting nine.</li>
-                                <li><strong>Full Coverage:</strong> Get a complete roll-call. We will ping you when your players are confirmed in the lineup, <em>and</em> alert you if they are scratched or removed late.</li>
-                            </ul>
-                        </li>
-                        <li class="mb-1">
-                            <strong>Arm Your Alerts:</strong> To ensure MLB starting lineups reach your screen instantly, you must grant push notification permissions. The process varies slightly by device:
-                            <ul class="mt-2 mb-0 ps-3 list-unstyled">
-                                <li class="mb-2">🍎 <strong>iPhone & iPad (iOS 16.4+):</strong> You must add this page to your home screen. Tap the <strong>Share</strong> icon (square with an up arrow)—located at the bottom center in <strong>Safari</strong>, or the top right address bar in <strong>Chrome</strong>. Scroll down and select <strong>"Add to Home Screen"</strong>. Open the new MLB9 icon from your home screen, then tap "Confirm & Arm Alerts".</li>
-                                <li class="mb-2">💻 <strong>Mac (Safari):</strong> Click "Confirm & Arm Alerts" and select <strong>"Allow"</strong> when the Safari permission prompt drops down from the top of the window.</li>
-                                <li class="mb-2">🖥️ <strong>Desktop (Chrome, Edge, Firefox):</strong> Click the arm button and select <strong>"Allow"</strong> on the browser popup near the address bar. <em>(Note: Keep your browser open in the background to receive live alerts.)</em></li>
-                                <li>📱 <strong>Android (Chrome):</strong> Tap the arm button and select <strong>"Allow"</strong> on the permission prompt that appears on your screen.</li>
-                            </ul>
-                        </li>
-                    </ol>
+    <div class="row g-4 justify-content-center">
+        <!-- Player Watchlist & DFS Scratches Card -->
+        <div class="col-md-10">
+            <div class="alert-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="fs-2 me-3">⭐</span>
+                        <h3 class="h4 fw-bold mb-0">Player Watchlist & DFS Scratches</h3>
+                    </div>
+                    <p class="text-muted mb-4">
+                        Upload your active DraftKings or FanDuel lineup CSV file or search manually to build your daily player pool. We track official starting nines in real-time and push instant lock-screen notifications the second one of your players is left out or scratched late.
+                    </p>
+                </div>
+                <div>
+                    <a href="/tools/alerts/players/" class="btn btn-primary fw-bold py-2 px-4 shadow-sm w-100" style="border-radius: 30px;">
+                        Launch Player Alerts Tool 🚀
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-        <!-- Manual Search -->
-        <div class="col-md-6">
-            <div class="alert-card p-4 h-100">
-                <h5 class="fw-bold mb-3" style="font-size: 1rem;">🔍 Search & Add Players</h5>
-                <div class="search-container">
-                    <input type="text" id="player-search" class="form-control form-control-lg" placeholder="Type a player name..." autocomplete="off">
-                    <div id="search-results"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- CSV Upload -->
-        <div class="col-md-6">
-            <div class="alert-card p-4 h-100">
-                <h5 class="fw-bold mb-3" style="font-size: 1rem;">📁 DFS Lineup Upload</h5>
-                <div class="drop-zone" id="drop-zone">
-                    <div class="mb-2" style="font-size: 2rem;">📥</div>
-                    <div class="fw-bold text-dark">Drag & Drop CSV Here</div>
-                    <div class="text-muted small mb-2">DraftKings or FanDuel files supported</div>
-                    <input type="file" id="file-input" class="d-none" accept=".csv">
-                    <button class="btn btn-sm btn-outline-primary fw-bold" onclick="document.getElementById('file-input').click()">Browse Files</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Active Watchlist -->
-    <div class="alert-card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-            <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">My Monitored Players</h5>
-            <span class="badge bg-primary rounded-pill" id="player-count">0</span>
-        </div>
-        
-        <div id="empty-state" class="text-center py-4 text-muted fst-italic" style="font-size: 0.9rem;">
-            No players selected yet. Search above or upload a CSV to build your watchlist.
-        </div>
-        
-        <div id="player-grid" class="d-flex flex-wrap gap-2">
-            <!-- Chips injected here via JS -->
-        </div>
-        
-        <!-- Unmatched CSV Errors -->
-        <div id="unmatched-alert" class="alert alert-warning mt-3 d-none p-2" style="font-size: 0.85rem;">
-            <strong>⚠️ Unmatched CSV Names:</strong> <span id="unmatched-list"></span>
-        </div>
-    </div>
-
-    <!-- Toggles and Arming -->
-    <div class="alert-card p-4 text-center" style="background-color: #f8f9fa;">
-        <h5 class="fw-bold mb-3" style="font-size: 1rem;">Alert Preferences</h5>
-        
-        <div class="btn-group shadow-sm mb-4" role="group">
-            <input type="radio" class="btn-check" name="alertPref" id="pref-critical" value="critical_only" checked>
-            <label class="btn btn-outline-danger fw-bold px-4" for="pref-critical">🚨 Scratches Only</label>
-            
-            <input type="radio" class="btn-check" name="alertPref" id="pref-full" value="full_coverage">
-            <label class="btn btn-outline-success fw-bold px-4" for="pref-full">✅ Full Coverage (In & Out)</label>
-        </div>
-        
-        <div class="d-block">
-            <button id="arm-alerts-btn" class="btn btn-lg btn-primary fw-bold px-5 py-3 shadow w-100" style="max-width: 400px; border-radius: 30px;">
-                Confirm & Arm Alerts 🛡️
-            </button>
-        </div>
-        <div id="status-message" class="mt-3 fw-bold d-none" style="font-size: 0.9rem;"></div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC1siO6niUMzrm_RXpcDxFDiLQ8xjSAAkw",
-      authDomain: "nbastartingfive-8b420.firebaseapp.com",
-      databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com",
-      projectId: "nbastartingfive-8b420",
-      storageBucket: "nbastartingfive-8b420.firebasestorage.app",
-      messagingSenderId: "348101109842",
-      appId: "1:348101109842:web:8713e5ba9b0bc9691ed78b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const messaging = getMessaging(app);
-    const PUBLIC_VAPID_KEY = "BFeKk22n0ZPJtjfhu_rzyVT6fGDOLKL2pw3McTgQhelPNzfcFGfOjIYTD4QvZ7F1VIeF1XMDWDFikD19PeuGUG4";
-
-    let masterPlayerList = [];
-    let playerLookupByName = {};
-    let activeWatchlist = new Map();
-
-    fetch('../../../data/player_master_data.json')
-        .then(res => res.json())
-        .then(data => {
-            masterPlayerList = Object.values(data);
-            masterPlayerList.forEach(p => {
-                if(p.name) {
-                    const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                    playerLookupByName[cleanName] = p;
-                }
-            });
-
-            // CHECK FIREBASE FOR TODAY'S SAVED PLAYERS
-            const userId = generateUserId();
-            const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
-            const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
-
-            fetch(dbUrl)
-                .then(res => res.json())
-                .then(savedData => {
-                    // Only load the saved players if the payload is tagged with today's date
-                    if (savedData && savedData.watchlist && savedData.date === todayDate) {
-                        
-                        // savedData.watchlist is now an object: { "571970": "119" }
-                        Object.keys(savedData.watchlist).forEach(id => {
-                            const player = masterPlayerList.find(p => p.player_id == id);
-                            if (player) {
-                                activeWatchlist.set(player.player_id, player);
-                            }
-                        });
-                        
-                        if (savedData.preference) {
-                            const radio = document.querySelector(`input[name="alertPref"][value="${savedData.preference}"]`);
-                            if (radio) radio.checked = true;
-                        }
-
-                        renderGrid();
-                        if (activeWatchlist.size > 0) {
-                            const msgBox = document.getElementById('status-message');
-                            const armBtn = document.getElementById('arm-alerts-btn');
-                            msgBox.className = "mt-3 fw-bold text-success";
-                            msgBox.innerText = "✅ Your alerts for today are active.";
-                            armBtn.innerHTML = "Update Alerts 🛡️";
-                        }
-                    }
-                })
-                .catch(err => console.log("No saved watchlist found or error fetching.", err));
-        })
-        .catch(err => console.error("Failed to load master player data:", err));
-
-    const searchInput = document.getElementById('player-search');
-    const searchResults = document.getElementById('search-results');
-    const playerGrid = document.getElementById('player-grid');
-    const emptyState = document.getElementById('empty-state');
-    const playerCount = document.getElementById('player-count');
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const armBtn = document.getElementById('arm-alerts-btn');
-
-    searchInput.addEventListener('input', function() {
-        const query = this.value.toLowerCase().trim();
-        searchResults.innerHTML = '';
-        
-        if (query.length < 2) { searchResults.style.display = 'none'; return; }
-
-        const matches = masterPlayerList.filter(p => (p.name || "").toLowerCase().includes(query)).slice(0, 8);
-        
-        if (matches.length > 0) {
-            searchResults.style.display = 'block';
-            matches.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'search-item';
-                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
-                const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
-                const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -3px; right: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; object-fit: contain;" alt="Team Logo">` : '';
-                
-                div.innerHTML = `
-                    <div class="position-relative flex-shrink-0" style="width: 24px; height: 24px; margin-right: 10px;">
-                        <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
-                        ${teamLogo}
-                    </div>
-                    <div class="d-flex flex-column justify-content-center">
-                        <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}</span>
-                        <span class="text-muted mt-1" style="font-size:0.65rem;">${displayPos}</span>
-                    </div>
-                `;
-                div.onclick = () => { addPlayerToWatchlist(p); searchInput.value = ''; searchResults.style.display = 'none'; };
-                searchResults.appendChild(div);
-            });
-        } else { searchResults.style.display = 'none'; }
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.style.display = 'none';
-    });
-
-    window.removePlayer = function(playerId) {
-        activeWatchlist.delete(playerId);
-        renderGrid();
-    }
-
-    function addPlayerToWatchlist(player) {
-        if (!activeWatchlist.has(player.player_id)) { activeWatchlist.set(player.player_id, player); renderGrid(); }
-    }
-
-    function renderGrid() {
-        playerGrid.innerHTML = '';
-        const count = activeWatchlist.size;
-        playerCount.innerText = count;
-        
-        if (count === 0) {
-            emptyState.style.display = 'block';
-        } else {
-            emptyState.style.display = 'none';
-            activeWatchlist.forEach((p, id) => {
-                const chip = document.createElement('div');
-                chip.className = 'player-chip';
-                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
-                const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; margin: 0 !important; object-fit: contain;" alt="Team Logo">` : '';
-                
-                chip.innerHTML = `
-                    <div class="position-relative d-inline-block flex-shrink-0" style="width: 28px; height: 28px; margin-right: 8px;">
-                        <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef; margin: 0 !important;">
-                        ${teamLogo}
-                    </div>
-                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name}</span>
-                    <a href="javascript:void(0)" class="remove-btn" onclick="removePlayer('${id}')">&times;</a>
-                `;
-                playerGrid.appendChild(chip);
-            });
-        }
-    }
-
-    const teamAbbrMap = {
-        "ARI": ["arizona", "diamondbacks"], "ATL": ["atlanta", "braves"], "BAL": ["baltimore", "orioles"], "BOS": ["boston", "red sox"], "CHC": ["cubs"], "CHW": ["white sox"], "CWS": ["white sox"], "CIN": ["cincinnati", "reds"], "CLE": ["cleveland", "guardians"], "COL": ["colorado", "rockies"], "DET": ["detroit", "tigers"], "HOU": ["houston", "astros"], "KC":  ["kansas city", "royals"], "LAA": ["angels"], "LAD": ["dodgers"], "MIA": ["miami", "marlins"], "MIL": ["milwaukee", "brewers"], "MIN": ["minnesota", "twins"], "NYM": ["mets"], "NYY": ["yankees"], "OAK": ["athletics"], "ATH": ["athletics"], "PHI": ["philadelphia", "phillies"], "PIT": ["pittsburgh", "pirates"], "SD":  ["san diego", "padres"], "SF":  ["san francisco", "giants"], "SEA": ["seattle", "mariners"], "STL": ["st. louis", "cardinals"], "TB":  ["tampa bay", "rays"], "TEX": ["texas", "rangers"], "TOR": ["toronto", "blue jays"], "WSH": ["washington", "nationals"]
-    };
-
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) processCSV(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change', (e) => { if (e.target.files.length) processCSV(e.target.files[0]); });
-
-    function processCSV(file) {
-        Papa.parse(file, {
-            header: false,
-            skipEmptyLines: true,
-            complete: function(results) {
-                const data = results.data;
-                if (data.length < 2) return;
-
-                let isFanDuel = false;
-                let fdIdToPlayer = {};
-
-                data.forEach(row => {
-                    if (row.length > 24) {
-                        const id = row[15], name = row[18], team = row[24];
-                        if (id && id.includes('-') && name && name !== "Nickname") {
-                            isFanDuel = true;
-                            fdIdToPlayer[id] = { name: name, team: team ? team.toUpperCase() : null };
-                        }
-                    }
-                });
-
-                let headerRowIndex = -1, lineupColStart = -1, lineupColEnd = -1;
-                const positions = ["p", "sp", "rp", "pitcher", "c", "1b", "2b", "3b", "ss", "of", "c/1b", "util"];
-
-                for (let i = 0; i < Math.min(10, data.length); i++) {
-                    const firstCell = (data[i][0] || "").toLowerCase().trim();
-                    if (firstCell === "entry id" || firstCell === "entry_id") {
-                        headerRowIndex = i;
-                        for (let j = 0; j < data[i].length; j++) {
-                            const colName = (data[i][j] || "").toLowerCase().trim();
-                            if (positions.includes(colName)) {
-                                if (lineupColStart === -1) lineupColStart = j;
-                                lineupColEnd = j;
-                            } else if (lineupColStart !== -1 && data[i][j] === "") break;
-                        }
-                        break;
-                    }
-                }
-
-                if (headerRowIndex === -1 || lineupColStart === -1) { alert("Could not detect lineup columns."); return; }
-
-                const uniquePlayerValues = new Set();
-                for (let i = headerRowIndex + 1; i < data.length; i++) {
-                    const row = data[i];
-                    if (!row[0]) continue; 
-                    for (let col = lineupColStart; col <= lineupColEnd; col++) {
-                        const cellVal = row[col];
-                        if (cellVal && cellVal.trim() !== "") uniquePlayerValues.add(cellVal.trim());
-                    }
-                }
-
-                let addedCount = 0;
-                const unmatched = [];
-
-                uniquePlayerValues.forEach(val => {
-                    let playerName = val, playerTeam = null;
-
-                    if (isFanDuel) {
-                        if (fdIdToPlayer[val]) { playerName = fdIdToPlayer[val].name; playerTeam = fdIdToPlayer[val].team; }
-                        else if (val.includes(':')) playerName = val.split(':')[1].trim();
-                    } else {
-                        if (val.includes('(')) playerName = val.split('(')[0].trim();
-                    }
-
-                    if(!playerName) return;
-
-                    const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
-                    const matchedPlayers = masterPlayerList.filter(p => {
-                        const masterCleanName = (p.name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
-                        return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
-                    });
-
-                    let matchedPlayer = null;
-                    if (matchedPlayers.length === 1) matchedPlayer = matchedPlayers[0];
-                    else if (matchedPlayers.length > 1) {
-                        if (playerTeam) {
-                            matchedPlayer = matchedPlayers.find(p => {
-                                const masterTeam = (p.team_name || "").toLowerCase();
-                                const possibleNames = teamAbbrMap[playerTeam] || [];
-                                return possibleNames.some(t => masterTeam.includes(t)) || masterTeam.includes(playerTeam.toLowerCase());
-                            });
-                        }
-                        if (!matchedPlayer) matchedPlayer = matchedPlayers[0];
-                    }
-
-                    if (matchedPlayer) {
-                        if (!activeWatchlist.has(matchedPlayer.player_id)) { addPlayerToWatchlist(matchedPlayer); addedCount++; }
-                    } else unmatched.push(playerName);
-                });
-
-                if (addedCount > 0) {
-                    const alertDiv = document.getElementById('unmatched-alert');
-                    if (unmatched.length > 0) { alertDiv.classList.remove('d-none'); document.getElementById('unmatched-list').innerText = unmatched.join(', '); }
-                    else alertDiv.classList.add('d-none');
-                } else alert("No valid players could be matched from your CSV.");
-            }
-        });
-    }
-
-    function generateUserId() {
-        let uid = localStorage.getItem('mlb9_alerts_uid');
-        if (!uid) { uid = 'anon_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('mlb9_alerts_uid', uid); }
-        return uid;
-    }
-
-    armBtn.addEventListener('click', async () => {
-        if (activeWatchlist.size === 0) { alert("Please add at least one player to your watchlist."); return; }
-
-        const msgBox = document.getElementById('status-message');
-        const pref = document.querySelector('input[name="alertPref"]:checked').value;
-        const userId = generateUserId();
-
-        armBtn.innerHTML = "Requesting Permissions...";
-        armBtn.disabled = true;
-
-        try {
-            // 1. Feature Detection
-            if (!('Notification' in window)) {
-                throw new Error("Apple requires you to add this app to your home screen to receive alerts. Tap the Share icon (bottom center in Safari, top right in Chrome), scroll down, and select 'Add to Home Screen'. Then open the new MLB9 icon from your home screen to arm your alerts! (Requires iOS 16.4+)");
-            }
-            if (!('serviceWorker' in navigator)) {
-                throw new Error("Your browser does not support background alerts. Please try Chrome, Firefox, or a supported browser.");
-            }
-
-            const permission = await Notification.requestPermission();
-            if (permission !== 'granted') { throw new Error("Push permissions denied by user."); }
-
-            armBtn.innerHTML = "Generating Secure Token...";
-
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            const actualPushToken = await getToken(messaging, {
-                vapidKey: PUBLIC_VAPID_KEY,
-                serviceWorkerRegistration: registration
-            });
-
-            if (!actualPushToken) throw new Error("Failed to retrieve push token.");
-
-            // Build the object mapping player_id to team_id
-            const watchlistPayload = {};
-            activeWatchlist.forEach((player, id) => {
-                watchlistPayload[id] = player.team_id || "unknown";
-            });
-
-            const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
-
-            const payload = {
-                push_token: actualPushToken,
-                preference: pref,
-                watchlist: watchlistPayload,
-                date: todayDate
-            };
-
-            const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
-            const response = await fetch(dbUrl, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (response.ok) {
-                msgBox.className = "mt-3 fw-bold text-success";
-                msgBox.innerText = "✅ Success! Your alerts are armed and monitoring.";
-                armBtn.innerHTML = "Alerts Armed 🛡️";
-            } else {
-                throw new Error("Failed to save to database.");
-            }
-
-        } catch (error) {
-            console.error(error);
-            msgBox.className = "mt-3 fw-bold text-danger";
-            msgBox.innerText = "⚠️ Error: " + error.message;
-            armBtn.innerHTML = "Confirm & Arm Alerts 🛡️";
-            armBtn.disabled = false;
-        }
-    });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>    
 </body>
 </html>
