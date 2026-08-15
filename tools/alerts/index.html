@@ -18,11 +18,11 @@
     <title>MLB9 Lineup Alerts | DFS Scratches & Starting 9 Push Notifications</title>
     <meta name="description" content="Get instant push notifications when your daily fantasy baseball players are scratched. Upload your DraftKings or FanDuel lineups and never take a zero again.">
     <meta name="keywords" content="MLB lineup alerts, daily fantasy baseball alerts, DFS scratches, DraftKings lineup tools, FanDuel lineup tools">
-    <link rel="canonical" href="https://mlbstartingnine.com/tools/alerts/">
+    <link rel="canonical" href="https://mlbstartingnine.com/tools/alerts/players/">
     
     <meta property="og:site_name" content="MLB Starting Nine">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mlbstartingnine.com/tools/alerts/">
+    <meta property="og:url" content="https://mlbstartingnine.com/tools/alerts/players/">
     <meta property="og:title" content="MLB9 Lineup Alerts | Instant DFS Scratch Notifications">
     <meta property="og:description" content="Upload your DFS lineups and get instant browser push notifications if your players are missing from the official starting nine.">
     <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
@@ -247,7 +247,7 @@
     let playerLookupByName = {};
     let activeWatchlist = new Map();
 
-    fetch('../../data/player_master_data.json')
+    fetch('../../../data/player_master_data.json')
         .then(res => res.json())
         .then(data => {
             masterPlayerList = Object.values(data);
