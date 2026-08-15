@@ -288,22 +288,128 @@
 
     function processCSV(file) {
         Papa.parse(file, {
+            header: false, // Read as array of arrays to handle the complex layout
+            skipEmptyLines: true,
             complete: function(results) {
-                const textDump = results.data.flat().join(' ').toLowerCase();
-                const unmatched = [];
-                let addedCount = 0;
+                const data = results.data;
+                if (data.length < 2) return;
 
-                // Aggressive mapping: We flatten the entire CSV into text and look for our master names inside it.
-                // This bypasses DK vs FD column header differences entirely.
-                masterPlayerList.forEach(p => {
-                    const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                    if (textDump.includes(cleanName) && !activeWatchlist.has(p.player_id)) {
-                        addPlayerToWatchlist(p);
-                        addedCount++;
+                let isFanDuel = false;
+                let fdIdToName = {};
+
+                // 1. Build the FanDuel ID-to-Name Dictionary
+                // FanDuel stores the player pool on the right side of the file.
+                // Column 15 is the ID (e.g. "133297-197981") and Column 18 is the Name.
+                data.forEach(row => {
+                    if (row.length > 18) {
+                        const id = row[15];
+                        const name = row[18];
+                        // Validate it looks like a FanDuel ID
+                        if (id && id.includes('-') && name && name !== "Nickname") {
+                            isFanDuel = true;
+                            fdIdToName[id] = name;
+                        }
                     }
                 });
 
-                alert(`Successfully extracted and mapped ${addedCount} unique players from your CSV!`);
+                // 2. Identify the columns containing the actual lineups
+                let headerRowIndex = -1;
+                let lineupColStart = -1;
+                let lineupColEnd = -1;
+
+                for (let i = 0; i < Math.min(10, data.length); i++) {
+                    const firstCell = (data[i][0] || "").toLowerCase();
+                    if (firstCell === "entry id" || firstCell === "entry_id") {
+                        headerRowIndex = i;
+                        const positions = ["p", "c", "1b", "2b", "3b", "ss", "of", "c/1b", "util"];
+                        
+                        // Find where the positions start and end
+                        for (let j = 0; j < data[i].length; j++) {
+                            const colName = (data[i][j] || "").toLowerCase();
+                            if (positions.includes(colName)) {
+                                if (lineupColStart === -1) lineupColStart = j;
+                                lineupColEnd = j;
+                            } else if (lineupColStart !== -1 && data[i][j] === "") {
+                                break; // Stop when hitting the blank spacer columns
+                            }
+                        }
+                        break;
+                    }
+                }
+
+                if (headerRowIndex === -1 || lineupColStart === -1) {
+                    alert("Could not detect lineup columns. Ensure you uploaded a valid DraftKings or FanDuel file.");
+                    return;
+                }
+
+                // 3. Extract unique values from the user's entries
+                const uniquePlayerValues = new Set();
+                for (let i = headerRowIndex + 1; i < data.length; i++) {
+                    const row = data[i];
+                    // Skip if not a valid entry row
+                    if (!row[0]) continue; 
+                    
+                    for (let col = lineupColStart; col <= lineupColEnd; col++) {
+                        const cellVal = row[col];
+                        if (cellVal && cellVal.trim() !== "") {
+                            uniquePlayerValues.add(cellVal.trim());
+                        }
+                    }
+                }
+
+                // 4. Map the DFS values to your Master MLB Player List
+                let addedCount = 0;
+                const unmatched = [];
+
+                uniquePlayerValues.forEach(val => {
+                    let playerName = val;
+
+                    if (isFanDuel) {
+                        // Look up the name from the FanDuel ID
+                        if (fdIdToName[val]) {
+                            playerName = fdIdToName[val];
+                        } else if (val.includes(':')) {
+                            // Edge case: sometimes FD puts "ID:Name"
+                            playerName = val.split(':')[1].trim();
+                        }
+                    } else {
+                        // DraftKings format: "Jacob Misiorowski (123456)"
+                        if (val.includes('(')) {
+                            playerName = val.split('(')[0].trim();
+                        }
+                    }
+
+                    // Clean the name (remove accents, suffixes) for a fuzzy match
+                    const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
+                    
+                    // Match against your database
+                    const matchedPlayer = masterPlayerList.find(p => {
+                        const masterCleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
+                        return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
+                    });
+
+                    if (matchedPlayer) {
+                        if (!activeWatchlist.has(matchedPlayer.player_id)) {
+                            addPlayerToWatchlist(matchedPlayer);
+                            addedCount++;
+                        }
+                    } else {
+                        unmatched.push(playerName);
+                    }
+                });
+
+                // 5. Audit UI Update
+                if (addedCount > 0) {
+                    const alertDiv = document.getElementById('unmatched-alert');
+                    if (unmatched.length > 0) {
+                        alertDiv.classList.remove('d-none');
+                        document.getElementById('unmatched-list').innerText = unmatched.join(', ');
+                    } else {
+                        alertDiv.classList.add('d-none');
+                    }
+                } else {
+                    alert("No valid players could be matched from your CSV.");
+                }
             }
         });
     }
