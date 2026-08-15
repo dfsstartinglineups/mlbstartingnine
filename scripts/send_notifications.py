@@ -122,7 +122,7 @@ def process_notifications(active_users, official_teams, active_starters, postpon
             team_id = str(team_id)
             current_state = notified_state.get(player_id)
             
-            # THE FIX: Prepend 'ID' to the player_id for the lookup
+            # Prepend 'ID' to the player_id for the lookup
             lookup_key = f"ID{player_id}"
             player_name = master_data.get(lookup_key, {}).get('name', 'Your player')
             
@@ -192,10 +192,14 @@ def process_notifications(active_users, official_teams, active_starters, postpon
         for i, body_text in enumerate(batched_bodies):
             title = "MLB Lineup Alert" if len(batched_bodies) == 1 else f"MLB Lineup Alert ({i+1}/{len(batched_bodies)})"
             
+            # THE FIX: Send as a pure data payload so only the Service Worker triggers
             msg = messaging.Message(
-                notification=messaging.Notification(title=title, body=body_text),
-                token=push_token,
-                data={"url": "https://mlbstartingnine.com/"}
+                data={
+                    "title": title,
+                    "body": body_text,
+                    "url": "https://mlbstartingnine.com/"
+                },
+                token=push_token
             )
             messages_to_send.append(msg)
 
