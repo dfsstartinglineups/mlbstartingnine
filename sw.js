@@ -19,12 +19,13 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-  const notificationTitle = payload.notification.title || 'MLB9 Lineup Alert';
+  // 🚀 FIXED: Pull the title and body directly from the 'data' payload 
+  const notificationTitle = payload.data.title || 'MLB9 Lineup Alert';
   const notificationOptions = {
-    body: payload.notification.body,
+    body: payload.data.body,
     icon: '/apple-touch-icon.png', // The icon that appears in the push
     badge: '/favicon.ico',
-    data: payload.data // Pass URL data to click events
+    data: { url: payload.data.url } // Pass URL data to click events
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
