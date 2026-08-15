@@ -116,12 +116,16 @@ def process_notifications(active_users, official_teams, active_starters, postpon
         confirmed = []
         late_scratches = []
         late_adds = []
-        postponed_players = [] # New tracking list for rainouts
+        postponed_players = [] 
 
         for player_id, team_id in watchlist.items():
             team_id = str(team_id)
             current_state = notified_state.get(player_id)
-            player_name = master_data.get(player_id, {}).get('name', 'Your player')
+            
+            # THE FIX: Prepend 'ID' to the player_id for the lookup
+            lookup_key = f"ID{player_id}"
+            player_name = master_data.get(lookup_key, {}).get('name', 'Your player')
+            
             new_state = ""
 
             # Check for postponement first (this overrides everything else)
