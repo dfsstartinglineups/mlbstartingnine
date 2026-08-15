@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests beautifulsoup4 selenium webdriver-manager jinja2 pytz
+          pip install requests beautifulsoup4 selenium webdriver-manager jinja2 pytz firebase-admin
 
       - name: Run Matchup Fetcher
         run: python scripts/fetch_matchups.py
@@ -56,6 +56,12 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: firebase deploy --only hosting --token $FIREBASE_TOKEN
+
+      # 🚨 NEW STEP: Send DFS Push Notifications
+      - name: Run Firebase Push Notifications
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python scripts/send_notifications.py
 
       - name: Commit and Push Changes
         run: |
