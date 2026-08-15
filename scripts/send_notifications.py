@@ -80,7 +80,7 @@ def extract_official_lineups(daily_data):
             continue # Skip lineup parsing for postponed games
 
         # Process Away Team
-        if tracking.get('away', {}).get('status') == 'OFFICIAL':
+        if tracking.get('away', {}).get('status') in ['OFFICIAL','MODIFIED']:
             official_teams.add(away_team_id)
             
             # Add the 9 starting batters
@@ -93,7 +93,7 @@ def extract_official_lineups(daily_data):
                 active_starters.add(str(away_sp.get('id')))
 
         # Process Home Team
-        if tracking.get('home', {}).get('status') == 'OFFICIAL':
+        if tracking.get('home', {}).get('status') in ['OFFICIAL','MODIFIED']:
             official_teams.add(home_team_id)
             
             # Add the 9 starting batters
