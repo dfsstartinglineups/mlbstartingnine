@@ -187,7 +187,10 @@
     <div class="alert-card p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
             <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">My Monitored Players</h5>
-            <span class="badge bg-primary rounded-pill" id="player-count">0</span>
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-danger fw-bold py-0 px-2" id="clear-all-btn" style="font-size: 0.75rem; height: 22px; display: none;">Clear All</button>
+                <span class="badge bg-primary rounded-pill" id="player-count">0</span>
+            </div>
         </div>
         
         <div id="empty-state" class="text-center py-4 text-muted fst-italic" style="font-size: 0.9rem;">
@@ -304,6 +307,14 @@
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const armBtn = document.getElementById('arm-alerts-btn');
+    const clearAllBtn = document.getElementById('clear-all-btn');
+
+    clearAllBtn.addEventListener('click', () => {
+        if (confirm("Are you sure you want to remove all players from your watchlist?")) {
+            activeWatchlist.clear();
+            renderGrid();
+        }
+    });
 
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
@@ -358,8 +369,10 @@
         
         if (count === 0) {
             emptyState.style.display = 'block';
+            clearAllBtn.style.display = 'none';
         } else {
             emptyState.style.display = 'none';
+            clearAllBtn.style.display = 'inline-block';
             activeWatchlist.forEach((p, id) => {
                 const chip = document.createElement('div');
                 chip.className = 'player-chip';
