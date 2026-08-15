@@ -164,8 +164,7 @@
     </div>
 </div>
 
-<script>
-    // Configuration
+// Configuration
     const FIREBASE_DB_URL = "YOUR_FIREBASE_URL_HERE"; 
     
     // State Management
@@ -218,7 +217,7 @@
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
                 const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
                 
-                // Pull the team logo for the dropdown
+                // Pull the team logo for the dropdown badge
                 const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -3px; right: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; object-fit: contain;" alt="Team Logo">` : '';
                 
                 div.innerHTML = `
@@ -276,7 +275,7 @@
                 chip.className = 'player-chip';
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
                 
-                // Pull the official MLB SVG logo using the team_id
+                // Pull the official MLB SVG logo for the chip badge
                 const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; margin: 0 !important; object-fit: contain;" alt="Team Logo">` : '';
                 
                 chip.innerHTML = `
@@ -304,6 +303,20 @@
         if (e.target.files.length) processCSV(e.target.files[0]);
     });
 
+    // Mapping DFS Team Abbreviations to Master Data Team Names
+    const teamAbbrMap = {
+        "ARI": ["arizona", "diamondbacks"], "ATL": ["atlanta", "braves"], "BAL": ["baltimore", "orioles"],
+        "BOS": ["boston", "red sox"], "CHC": ["cubs"], "CHW": ["white sox"], "CWS": ["white sox"],
+        "CIN": ["cincinnati", "reds"], "CLE": ["cleveland", "guardians"], "COL": ["colorado", "rockies"],
+        "DET": ["detroit", "tigers"], "HOU": ["houston", "astros"], "KC":  ["kansas city", "royals"],
+        "LAA": ["angels"], "LAD": ["dodgers"], "MIA": ["miami", "marlins"], "MIL": ["milwaukee", "brewers"],
+        "MIN": ["minnesota", "twins"], "NYM": ["mets"], "NYY": ["yankees"], "OAK": ["athletics"],
+        "ATH": ["athletics"], "PHI": ["philadelphia", "phillies"], "PIT": ["pittsburgh", "pirates"],
+        "SD":  ["san diego", "padres"], "SF":  ["san francisco", "giants"], "SEA": ["seattle", "mariners"],
+        "STL": ["st. louis", "cardinals"], "TB":  ["tampa bay", "rays"], "TEX": ["texas", "rangers"],
+        "TOR": ["toronto", "blue jays"], "WSH": ["washington", "nationals"]
+    };
+
     function processCSV(file) {
         Papa.parse(file, {
             header: false,
@@ -313,21 +326,22 @@
                 if (data.length < 2) return;
 
                 let isFanDuel = false;
-                let fdIdToName = {};
+                let fdIdToPlayer = {}; // Store both Name and Team
 
-                // 1. Build FanDuel ID-to-Name map if applicable
+                // 1. Build FanDuel ID map
                 data.forEach(row => {
-                    if (row.length > 18) {
+                    if (row.length > 24) {
                         const id = row[15];
                         const name = row[18];
+                        const team = row[24];
                         if (id && id.includes('-') && name && name !== "Nickname") {
                             isFanDuel = true;
-                            fdIdToName[id] = name;
+                            fdIdToPlayer[id] = { name: name, team: team ? team.toUpperCase() : null };
                         }
                     }
                 });
 
-                // 2. Locate lineup columns (supporting P, SP, RP, etc.)
+                // 2. Locate lineup columns
                 let headerRowIndex = -1;
                 let lineupColStart = -1;
                 let lineupColEnd = -1;
@@ -375,15 +389,17 @@
 
                 uniquePlayerValues.forEach(val => {
                     let playerName = val;
+                    let playerTeam = null;
 
                     if (isFanDuel) {
-                        if (fdIdToName[val]) {
-                            playerName = fdIdToName[val];
+                        if (fdIdToPlayer[val]) {
+                            playerName = fdIdToPlayer[val].name;
+                            playerTeam = fdIdToPlayer[val].team;
                         } else if (val.includes(':')) {
                             playerName = val.split(':')[1].trim();
                         }
                     } else {
-                        // DraftKings: "Tarik Skubal (38291043)"
+                        // DraftKings Format
                         if (val.includes('(')) {
                             playerName = val.split('(')[0].trim();
                         }
@@ -391,10 +407,28 @@
 
                     const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                     
-                    const matchedPlayer = masterPlayerList.find(p => {
+                    const matchedPlayers = masterPlayerList.filter(p => {
                         const masterCleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                         return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
                     });
+
+                    let matchedPlayer = null;
+
+                    if (matchedPlayers.length === 1) {
+                        matchedPlayer = matchedPlayers[0];
+                    } else if (matchedPlayers.length > 1) {
+                        // Tiebreaker: Match via Team Abbreviation
+                        if (playerTeam) {
+                            matchedPlayer = matchedPlayers.find(p => {
+                                const masterTeam = (p.team_name || "").toLowerCase();
+                                const possibleNames = teamAbbrMap[playerTeam] || [];
+                                return possibleNames.some(t => masterTeam.includes(t)) || masterTeam.includes(playerTeam.toLowerCase());
+                            });
+                        }
+                        if (!matchedPlayer) {
+                            matchedPlayer = matchedPlayers[0]; // Fallback to first found
+                        }
+                    }
 
                     if (matchedPlayer) {
                         if (!activeWatchlist.has(matchedPlayer.player_id)) {
