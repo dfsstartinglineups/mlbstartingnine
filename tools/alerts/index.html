@@ -51,7 +51,6 @@
         
         /* Player Chips */
         .player-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .player-chip img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef; margin-right: 8px; }
         .player-chip .remove-btn { margin-left: 10px; color: #dc3545; cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; text-decoration: none; }
         .player-chip .remove-btn:hover { color: #a52834; }
     </style>
@@ -164,13 +163,31 @@
     </div>
 </div>
 
-// Configuration
+<script>
+    // Configuration
     const FIREBASE_DB_URL = "https://nbastartingfive-8b420-default-rtdb.firebaseio.com/"; 
     
     // State Management
     let masterPlayerList = [];
     let playerLookupByName = {};
     let activeWatchlist = new Map(); // Keyed by MLB player_id
+
+    // 1. Load Master Data (Includes Pitchers & Position Players)
+    fetch('../../data/player_master_data.json')
+        .then(res => res.json())
+        .then(data => {
+            // Keep all players including pitchers
+            masterPlayerList = Object.values(data);
+            
+            masterPlayerList.forEach(p => {
+                if(p.name) {
+                    // Normalize names for fuzzy mapping
+                    const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                    playerLookupByName[cleanName] = p;
+                }
+            });
+        })
+        .catch(err => console.error("Failed to load master player data:", err));
 
     // DOM Elements
     const searchInput = document.getElementById('player-search');
@@ -182,21 +199,6 @@
     const fileInput = document.getElementById('file-input');
     const armBtn = document.getElementById('arm-alerts-btn');
 
-    // 1. Load Master Data (Includes Pitchers & Position Players)
-    fetch('../../data/player_master_data.json')
-        .then(res => res.json())
-        .then(data => {
-            // Keep all players including pitchers
-            masterPlayerList = Object.values(data);
-            
-            masterPlayerList.forEach(p => {
-                // Normalize names for fuzzy mapping
-                const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                playerLookupByName[cleanName] = p;
-            });
-        })
-        .catch(err => console.error("Failed to load master player data:", err));
-
     // 2. Search Autocomplete
     searchInput.addEventListener('input', function() {
         const query = this.value.toLowerCase().trim();
@@ -207,7 +209,7 @@
             return;
         }
 
-        const matches = masterPlayerList.filter(p => p.name.toLowerCase().includes(query)).slice(0, 8);
+        const matches = masterPlayerList.filter(p => (p.name || "").toLowerCase().includes(query)).slice(0, 8);
         
         if (matches.length > 0) {
             searchResults.style.display = 'block';
@@ -222,7 +224,7 @@
                 
                 div.innerHTML = `
                     <div class="position-relative flex-shrink-0" style="width: 24px; height: 24px; margin-right: 10px;">
-                        <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                        <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
                         ${teamLogo}
                     </div>
                     <div class="d-flex flex-column justify-content-center">
@@ -326,7 +328,7 @@
                 if (data.length < 2) return;
 
                 let isFanDuel = false;
-                let fdIdToPlayer = {}; // Store both Name and Team
+                let fdIdToPlayer = {};
 
                 // 1. Build FanDuel ID map
                 data.forEach(row => {
@@ -405,10 +407,12 @@
                         }
                     }
 
+                    if(!playerName) return;
+
                     const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                     
                     const matchedPlayers = masterPlayerList.filter(p => {
-                        const masterCleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
+                        const masterCleanName = (p.name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                         return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
                     });
 
