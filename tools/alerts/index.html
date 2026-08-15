@@ -183,17 +183,20 @@
     const fileInput = document.getElementById('file-input');
     const armBtn = document.getElementById('arm-alerts-btn');
 
-    // 1. Load Master Data
+    // 1. Load Master Data (Includes Pitchers & Position Players)
     fetch('../../data/player_master_data.json')
         .then(res => res.json())
         .then(data => {
-            masterPlayerList = Object.values(data).filter(p => !p.is_pitcher); // Assuming DFS hitters are priority, remove filter if tracking SPs too
+            // Keep all players including pitchers
+            masterPlayerList = Object.values(data);
+            
             masterPlayerList.forEach(p => {
                 // Normalize names for fuzzy mapping
                 const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                 playerLookupByName[cleanName] = p;
             });
-        });
+        })
+        .catch(err => console.error("Failed to load master player data:", err));
 
     // 2. Search Autocomplete
     searchInput.addEventListener('input', function() {
@@ -213,11 +216,13 @@
                 const div = document.createElement('div');
                 div.className = 'search-item';
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
+                const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
+                
                 div.innerHTML = `
                     <img src="${headshot}" style="width:24px; height:24px; border-radius:50%; object-fit:cover; margin-right:10px;">
                     <div class="d-flex flex-column">
                         <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}</span>
-                        <span class="text-muted" style="font-size:0.65rem;">${p.team_name} • ${p.position}</span>
+                        <span class="text-muted" style="font-size:0.65rem;">${p.team_name} • ${displayPos}</span>
                     </div>
                 `;
                 div.onclick = () => {
@@ -264,9 +269,10 @@
                 const chip = document.createElement('div');
                 chip.className = 'player-chip';
                 const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
+                const teamAbbr = p.team_name ? p.team_name.split(' ').pop() : '';
                 chip.innerHTML = `
                     <img src="${headshot}">
-                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name} <span class="text-muted fw-normal">(${p.team_name.split(' ').pop()})</span></span>
+                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name} <span class="text-muted fw-normal">(${teamAbbr})</span></span>
                     <a href="javascript:void(0)" class="remove-btn" onclick="removePlayer('${id}')">&times;</a>
                 `;
                 playerGrid.appendChild(chip);
@@ -288,7 +294,7 @@
 
     function processCSV(file) {
         Papa.parse(file, {
-            header: false, // Read as array of arrays to handle the complex layout
+            header: false,
             skipEmptyLines: true,
             complete: function(results) {
                 const data = results.data;
@@ -297,14 +303,11 @@
                 let isFanDuel = false;
                 let fdIdToName = {};
 
-                // 1. Build the FanDuel ID-to-Name Dictionary
-                // FanDuel stores the player pool on the right side of the file.
-                // Column 15 is the ID (e.g. "133297-197981") and Column 18 is the Name.
+                // 1. Build FanDuel ID-to-Name map if applicable
                 data.forEach(row => {
                     if (row.length > 18) {
                         const id = row[15];
                         const name = row[18];
-                        // Validate it looks like a FanDuel ID
                         if (id && id.includes('-') && name && name !== "Nickname") {
                             isFanDuel = true;
                             fdIdToName[id] = name;
@@ -312,25 +315,23 @@
                     }
                 });
 
-                // 2. Identify the columns containing the actual lineups
+                // 2. Locate lineup columns (supporting P, SP, RP, etc.)
                 let headerRowIndex = -1;
                 let lineupColStart = -1;
                 let lineupColEnd = -1;
+                const positions = ["p", "sp", "rp", "pitcher", "c", "1b", "2b", "3b", "ss", "of", "c/1b", "util"];
 
                 for (let i = 0; i < Math.min(10, data.length); i++) {
-                    const firstCell = (data[i][0] || "").toLowerCase();
+                    const firstCell = (data[i][0] || "").toLowerCase().trim();
                     if (firstCell === "entry id" || firstCell === "entry_id") {
                         headerRowIndex = i;
-                        const positions = ["p", "c", "1b", "2b", "3b", "ss", "of", "c/1b", "util"];
-                        
-                        // Find where the positions start and end
                         for (let j = 0; j < data[i].length; j++) {
-                            const colName = (data[i][j] || "").toLowerCase();
+                            const colName = (data[i][j] || "").toLowerCase().trim();
                             if (positions.includes(colName)) {
                                 if (lineupColStart === -1) lineupColStart = j;
                                 lineupColEnd = j;
                             } else if (lineupColStart !== -1 && data[i][j] === "") {
-                                break; // Stop when hitting the blank spacer columns
+                                break;
                             }
                         }
                         break;
@@ -342,11 +343,10 @@
                     return;
                 }
 
-                // 3. Extract unique values from the user's entries
+                // 3. Extract unique player cells
                 const uniquePlayerValues = new Set();
                 for (let i = headerRowIndex + 1; i < data.length; i++) {
                     const row = data[i];
-                    // Skip if not a valid entry row
                     if (!row[0]) continue; 
                     
                     for (let col = lineupColStart; col <= lineupColEnd; col++) {
@@ -357,7 +357,7 @@
                     }
                 }
 
-                // 4. Map the DFS values to your Master MLB Player List
+                // 4. Map DFS values to Master MLB Player List
                 let addedCount = 0;
                 const unmatched = [];
 
@@ -365,24 +365,20 @@
                     let playerName = val;
 
                     if (isFanDuel) {
-                        // Look up the name from the FanDuel ID
                         if (fdIdToName[val]) {
                             playerName = fdIdToName[val];
                         } else if (val.includes(':')) {
-                            // Edge case: sometimes FD puts "ID:Name"
                             playerName = val.split(':')[1].trim();
                         }
                     } else {
-                        // DraftKings format: "Jacob Misiorowski (123456)"
+                        // DraftKings: "Tarik Skubal (38291043)"
                         if (val.includes('(')) {
                             playerName = val.split('(')[0].trim();
                         }
                     }
 
-                    // Clean the name (remove accents, suffixes) for a fuzzy match
                     const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                     
-                    // Match against your database
                     const matchedPlayer = masterPlayerList.find(p => {
                         const masterCleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
                         return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
@@ -398,7 +394,7 @@
                     }
                 });
 
-                // 5. Audit UI Update
+                // 5. Update UI
                 if (addedCount > 0) {
                     const alertDiv = document.getElementById('unmatched-alert');
                     if (unmatched.length > 0) {
@@ -439,16 +435,11 @@
         armBtn.disabled = true;
 
         try {
-            // Ask for Notification permission natively
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') {
                 throw new Error("Push permissions denied.");
             }
 
-            // In a full implementation, you would register your ServiceWorker here
-            // const registration = await navigator.serviceWorker.register('/sw.js');
-            // const subscription = await registration.pushManager.subscribe({ ... });
-            // const pushToken = JSON.stringify(subscription);
             const dummyPushToken = "example_browser_token_generated_by_service_worker"; 
 
             const payload = {
@@ -457,7 +448,6 @@
                 watchlist: playerIds
             };
 
-            // Write to Firebase
             const dbUrl = `${FIREBASE_DB_URL}/watchlist/${userId}.json`;
             const response = await fetch(dbUrl, {
                 method: "PUT",
