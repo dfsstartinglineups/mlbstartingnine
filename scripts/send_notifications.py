@@ -53,33 +53,44 @@ def load_daily_json(today_date):
         raise FileNotFoundError(f"Critical Error: {file_path} is missing. Halting execution.")
 
 def extract_official_lineups(daily_data):
-    """Parse the daily JSON to find teams with released lineups and active players."""
+    """Parse the daily JSON to find official lineups and postponed games."""
     official_teams = set()
     active_starters = set()
+    postponed_teams = set()
 
     for game in daily_data.get('games', []):
         game_raw = game.get('gameRaw', {})
         teams = game_raw.get('teams', {})
         lineups = game_raw.get('lineups', {})
         tracking = game.get('lineupTracking', {})
+        status = game_raw.get('status', {})
+
+        away_team_id = str(teams.get('away', {}).get('team', {}).get('id', ''))
+        home_team_id = str(teams.get('home', {}).get('team', {}).get('id', ''))
+
+        # Check if the game has been officially postponed
+        detailed_state = status.get('detailedState', '')
+        status_code = status.get('statusCode', '')
+        if 'Postponed' in detailed_state or status_code in ['PP', 'PR']:
+            postponed_teams.add(away_team_id)
+            postponed_teams.add(home_team_id)
+            continue # Skip lineup parsing for postponed games
 
         # Process Away Team
-        away_team_id = str(teams.get('away', {}).get('team', {}).get('id', ''))
         if tracking.get('away', {}).get('status') == 'OFFICIAL':
             official_teams.add(away_team_id)
             for player in lineups.get('awayPlayers', []):
                 active_starters.add(str(player.get('id')))
 
         # Process Home Team
-        home_team_id = str(teams.get('home', {}).get('team', {}).get('id', ''))
         if tracking.get('home', {}).get('status') == 'OFFICIAL':
             official_teams.add(home_team_id)
             for player in lineups.get('homePlayers', []):
                 active_starters.add(str(player.get('id')))
 
-    return official_teams, active_starters
+    return official_teams, active_starters, postponed_teams
 
-def process_notifications(active_users, official_teams, active_starters):
+def process_notifications(active_users, official_teams, active_starters, postponed_teams):
     """Evaluate watchlists, group alerts, and send push notifications in high-speed batches."""
     master_data_path = os.path.join(REPO_ROOT, 'data', 'player_master_data.json')
     try:
@@ -88,9 +99,7 @@ def process_notifications(active_users, official_teams, active_starters):
     except FileNotFoundError:
         master_data = {}
 
-    # This list will hold all built messages before sending them to Firebase
     messages_to_send = []
-    # This dictionary tracks database updates to fire off at the end
     database_updates = {}
 
     for uid, user_data in active_users.items():
@@ -107,17 +116,28 @@ def process_notifications(active_users, official_teams, active_starters):
         confirmed = []
         late_scratches = []
         late_adds = []
+        postponed_players = [] # New tracking list for rainouts
 
         for player_id, team_id in watchlist.items():
             team_id = str(team_id)
-            
+            current_state = notified_state.get(player_id)
+            player_name = master_data.get(player_id, {}).get('name', 'Your player')
+            new_state = ""
+
+            # Check for postponement first (this overrides everything else)
+            if team_id in postponed_teams:
+                if current_state != 'postponed':
+                    postponed_players.append(player_name)
+                    new_state = 'postponed'
+                if new_state and new_state != current_state:
+                    user_updates[player_id] = new_state
+                continue 
+
+            # Guardrail: Do nothing if the team's lineup hasn't dropped yet
             if team_id not in official_teams:
                 continue 
 
             is_starting = player_id in active_starters
-            current_state = notified_state.get(player_id)
-            player_name = master_data.get(player_id, {}).get('name', 'Your player')
-            new_state = ""
 
             if is_starting and current_state != 'confirmed':
                 if current_state == 'scratched':
@@ -139,7 +159,10 @@ def process_notifications(active_users, official_teams, active_starters):
         if not user_updates:
             continue
 
+        # Add the postponed players to the batching logic
         body_lines = []
+        if postponed_players:
+            body_lines.append("☔ POSTPONED: " + ", ".join(postponed_players))
         if late_scratches:
             body_lines.append("🚨 LATE SCRATCH: " + ", ".join(late_scratches))
         if scratches:
@@ -162,7 +185,6 @@ def process_notifications(active_users, official_teams, active_starters):
         if current_batch:
             batched_bodies.append(current_batch.strip())
 
-        # Instead of sending immediately, add to our master list
         for i, body_text in enumerate(batched_bodies):
             title = "MLB Lineup Alert" if len(batched_bodies) == 1 else f"MLB Lineup Alert ({i+1}/{len(batched_bodies)})"
             
@@ -173,13 +195,10 @@ def process_notifications(active_users, official_teams, active_starters):
             )
             messages_to_send.append(msg)
 
-        # Queue up the database receipts
         for pid, state in user_updates.items():
             database_updates[f'watchlist/{uid}/notified_state/{pid}'] = state
 
-    # --- HIGH SPEED BATCH SENDING ---
     if messages_to_send:
-        # Firebase has a strict limit of 500 messages per batch
         chunk_size = 500
         for i in range(0, len(messages_to_send), chunk_size):
             chunk = messages_to_send[i:i + chunk_size]
@@ -189,14 +208,13 @@ def process_notifications(active_users, official_teams, active_starters):
             except Exception as e:
                 print(f"Failed to send batch: {e}")
 
-    # Write all database receipts in one highly efficient call
     if database_updates:
         try:
             db.reference().update(database_updates)
             print(f"Successfully updated {len(database_updates)} database receipts.")
         except Exception as e:
             print(f"Failed to update database receipts: {e}")
-
+            
 if __name__ == "__main__":
     print("Starting MLB Lineup Notification Worker...")
     initialize_firebase()
@@ -208,11 +226,12 @@ if __name__ == "__main__":
     
     # 2. Parse the daily JSON
     daily_json = load_daily_json(today)
-    official_teams, active_starters = extract_official_lineups(daily_json)
+    official_teams, active_starters, postponed_teams = extract_official_lineups(daily_json)
     
     print(f"Teams with official lineups: {len(official_teams)}")
+    print(f"Postponed teams: {len(postponed_teams)}")
     print(f"Total active starters parsed: {len(active_starters)}")
     
     # 3. Process the state machine and send alerts
-    process_notifications(active_users, official_teams, active_starters)
+    process_notifications(active_users, official_teams, active_starters, postponed_teams)
     print("Worker complete.")
