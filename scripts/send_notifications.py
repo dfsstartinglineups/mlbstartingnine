@@ -80,13 +80,18 @@ def extract_official_lineups(daily_data):
     return official_teams, active_starters
 
 def process_notifications(active_users, official_teams, active_starters):
-    """Evaluate watchlists, group alerts to prevent spam, and send push notifications."""
+    """Evaluate watchlists, group alerts, and send push notifications in high-speed batches."""
     master_data_path = os.path.join(REPO_ROOT, 'data', 'player_master_data.json')
     try:
         with open(master_data_path, 'r') as f:
             master_data = json.load(f)
     except FileNotFoundError:
         master_data = {}
+
+    # This list will hold all built messages before sending them to Firebase
+    messages_to_send = []
+    # This dictionary tracks database updates to fire off at the end
+    database_updates = {}
 
     for uid, user_data in active_users.items():
         push_token = user_data.get('push_token')
@@ -97,7 +102,6 @@ def process_notifications(active_users, official_teams, active_starters):
         if not push_token or not watchlist:
             continue
 
-        # Temporary storage for this user's alerts during this pipeline run
         user_updates = {}
         scratches = []
         confirmed = []
@@ -107,43 +111,34 @@ def process_notifications(active_users, official_teams, active_starters):
         for player_id, team_id in watchlist.items():
             team_id = str(team_id)
             
-            # Guardrail: Do nothing if the team's lineup hasn't dropped yet
             if team_id not in official_teams:
                 continue 
 
             is_starting = player_id in active_starters
             current_state = notified_state.get(player_id)
             player_name = master_data.get(player_id, {}).get('name', 'Your player')
-
             new_state = ""
 
-            # Scenario 1: Player is IN the official lineup
             if is_starting and current_state != 'confirmed':
                 if current_state == 'scratched':
                     late_adds.append(player_name)
                 elif pref == 'full_coverage':
                     confirmed.append(player_name)
-                
                 new_state = 'confirmed'
 
-            # Scenario 2: Player is NOT in the official lineup (Scratched)
             elif not is_starting and current_state != 'scratched':
                 if current_state == 'confirmed':
                     late_scratches.append(player_name)
                 else:
                     scratches.append(player_name)
-                
                 new_state = 'scratched'
 
-            # Track the state change to update Firebase later
             if new_state and new_state != current_state:
                 user_updates[player_id] = new_state
 
-        # If nothing changed for this user, move to the next user
         if not user_updates:
             continue
 
-        # Build the grouped notification body strings
         body_lines = []
         if late_scratches:
             body_lines.append("🚨 LATE SCRATCH: " + ", ".join(late_scratches))
@@ -154,39 +149,53 @@ def process_notifications(active_users, official_teams, active_starters):
         if confirmed:
             body_lines.append("✅ IN: " + ", ".join(confirmed))
 
-        # Batch the lines so we don't exceed mobile lock screen limits (~200 chars)
-        batched_messages = []
+        batched_bodies = []
         current_batch = ""
 
         for line in body_lines:
             if len(current_batch) + len(line) > 200:
-                batched_messages.append(current_batch.strip())
+                batched_bodies.append(current_batch.strip())
                 current_batch = line + "\n"
             else:
                 current_batch += line + "\n"
         
         if current_batch:
-            batched_messages.append(current_batch.strip())
+            batched_bodies.append(current_batch.strip())
 
-        # Fire the grouped notifications
-        for i, body_text in enumerate(batched_messages):
-            # If multiple batches, number the titles (e.g., 1/2)
-            title = "MLB Lineup Alert" if len(batched_messages) == 1 else f"MLB Lineup Alert ({i+1}/{len(batched_messages)})"
+        # Instead of sending immediately, add to our master list
+        for i, body_text in enumerate(batched_bodies):
+            title = "MLB Lineup Alert" if len(batched_bodies) == 1 else f"MLB Lineup Alert ({i+1}/{len(batched_bodies)})"
             
-            message = messaging.Message(
+            msg = messaging.Message(
                 notification=messaging.Notification(title=title, body=body_text),
                 token=push_token,
                 data={"url": "https://mlbstartingnine.com/"}
             )
-            try:
-                messaging.send(message)
-                print(f"Sent batched alert {i+1} to {uid}")
-            except Exception as e:
-                print(f"Failed to send batched alert to {uid}: {e}")
+            messages_to_send.append(msg)
 
-        # Finally, update the database receipts for all processed players
+        # Queue up the database receipts
         for pid, state in user_updates.items():
-            db.reference(f'watchlist/{uid}/notified_state/{pid}').set(state)
+            database_updates[f'watchlist/{uid}/notified_state/{pid}'] = state
+
+    # --- HIGH SPEED BATCH SENDING ---
+    if messages_to_send:
+        # Firebase has a strict limit of 500 messages per batch
+        chunk_size = 500
+        for i in range(0, len(messages_to_send), chunk_size):
+            chunk = messages_to_send[i:i + chunk_size]
+            try:
+                response = messaging.send_each(chunk)
+                print(f"Batch sent: {response.success_count} successful, {response.failure_count} failed.")
+            except Exception as e:
+                print(f"Failed to send batch: {e}")
+
+    # Write all database receipts in one highly efficient call
+    if database_updates:
+        try:
+            db.reference().update(database_updates)
+            print(f"Successfully updated {len(database_updates)} database receipts.")
+        except Exception as e:
+            print(f"Failed to update database receipts: {e}")
 
 if __name__ == "__main__":
     print("Starting MLB Lineup Notification Worker...")
