@@ -19,7 +19,7 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-  // 🚀 FIXED: Pull the title and body directly from the 'data' payload 
+  // Pull the title and body directly from the 'data' payload 
   const notificationTitle = payload.data.title || 'MLB9 Lineup Alert';
   const notificationOptions = {
     body: payload.data.body,
