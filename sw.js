@@ -1,7 +1,38 @@
-// Import Firebase Service Worker libraries (using compat versions for background scripts)
+// 1. NATIVE PUSH LISTENER (Bypasses Firebase's foreground/background rules)
+self.addEventListener('push', function(event) {
+  // Parse the raw push event from the browser
+  const payload = event.data ? event.data.json() : {};
+  
+  // Only trigger if it contains our custom data payload
+  if (payload.data && payload.data.title) {
+    const notificationTitle = payload.data.title;
+    const notificationOptions = {
+      body: payload.data.body,
+      icon: '/apple-touch-icon.png', 
+      badge: '/favicon.ico',
+      data: { url: payload.data.url } 
+    };
+
+    // Force the browser to show the notification
+    event.waitUntil(
+      self.registration.showNotification(notificationTitle, notificationOptions)
+    );
+  }
+});
+
+// 2. Handle notification clicks (routes the user to the site)
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  if (event.notification.data && event.notification.data.url) {
+      event.waitUntil(clients.openWindow(event.notification.data.url));
+  }
+});
+
+// 3. Import Firebase Service Worker libraries
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging-compat.js');
 
+// 4. Initialize Firebase (Still required to generate the push tokens on the frontend)
 firebase.initializeApp({
   apiKey: "AIzaSyC1siO6niUMzrm_RXpcDxFDiLQ8xjSAAkw",
   authDomain: "nbastartingfive-8b420.firebaseapp.com",
@@ -13,28 +44,3 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
-
-// Handle background messages
-// This runs if the user's browser is closed or they are on a different tab
-messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-
-  // Pull the title and body directly from the 'data' payload 
-  const notificationTitle = payload.data.title || 'MLB9 Lineup Alert';
-  const notificationOptions = {
-    body: payload.data.body,
-    icon: '/apple-touch-icon.png', // The icon that appears in the push
-    badge: '/favicon.ico',
-    data: { url: payload.data.url } // Pass URL data to click events
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-// Handle notification clicks (e.g., routing the user to the game page)
-self.addEventListener('notificationclick', function(event) {
-  event.notification.close();
-  if (event.notification.data && event.notification.data.url) {
-      event.waitUntil(clients.openWindow(event.notification.data.url));
-  }
-});
