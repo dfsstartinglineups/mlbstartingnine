@@ -190,7 +190,7 @@ def process_notifications(active_users, official_teams, active_starters, postpon
             batched_bodies.append(current_batch.strip())
 
         for i, body_text in enumerate(batched_bodies):
-            title = "MLB Lineup Alert" if len(batched_bodies) == 1 else f"MLB Lineup Alert ({i+1}/{len(batched_bodies)})"
+            title = "MLB9 Lineup Alert" if len(batched_bodies) == 1 else f"MLB9 Lineup Alert ({i+1}/{len(batched_bodies)})"
             
             # THE FIX: Send as a pure data payload so only the Service Worker triggers
             msg = messaging.Message(
