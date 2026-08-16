@@ -274,17 +274,37 @@
                     if (savedData.season) {
                         savedData.season.forEach(id => seasonSubs.add(id));
                     }
-                    updateUIReflection();
-                    
-                    if (dailySubs.size > 0 || seasonSubs.size > 0) {
-                        const msgBox = document.getElementById('status-message');
-                        const armBtn = document.getElementById('arm-alerts-btn');
-                        msgBox.className = "mt-3 fw-bold text-success d-block";
-                        msgBox.innerText = "✅ Your lineup alerts are active.";
-                        armBtn.innerHTML = "Update Subscriptions 🛡️";
-                    }
                 }
-            }).catch(e => console.log("No previous subs found."));
+
+                // --- NEW: Intercept pending team from lineup page ---
+                const pendingTeamId = sessionStorage.getItem('pendingTeamAlertId');
+                if (pendingTeamId) {
+                    const tId = parseInt(pendingTeamId);
+                    dailySubs.add(tId);       // Default to Today
+                    seasonSubs.delete(tId);   // Ensure mutually exclusive
+                    sessionStorage.removeItem('pendingTeamAlertId'); // Clear memory
+                }
+
+                updateUIReflection();
+                
+                if (dailySubs.size > 0 || seasonSubs.size > 0) {
+                    const msgBox = document.getElementById('status-message');
+                    const armBtn = document.getElementById('arm-alerts-btn');
+                    msgBox.className = "mt-3 fw-bold text-success d-block";
+                    msgBox.innerText = "✅ Your lineup alerts are active.";
+                    armBtn.innerHTML = "Update Subscriptions 🛡️";
+                }
+            }).catch(e => {
+                // Catch errors but still process pending team from session storage if it exists
+                const pendingTeamId = sessionStorage.getItem('pendingTeamAlertId');
+                if (pendingTeamId) {
+                    const tId = parseInt(pendingTeamId);
+                    dailySubs.add(tId);
+                    sessionStorage.removeItem('pendingTeamAlertId');
+                    updateUIReflection();
+                }
+                console.log("No previous subs found.");
+            });
     }
 
     window.toggleSub = function(teamId, type) {
