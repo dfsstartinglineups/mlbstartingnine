@@ -236,7 +236,7 @@ def resolve_active_matchup(player_id, team_name, daily_data):
 # ==========================================
 # 3. HTML SUB-RENDERERS
 # ==========================================
-def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
+def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_data=None):
     game_raw = my_game.get("gameRaw") or {}
     teams = game_raw.get("teams") or {}
     my_team = teams.get(team_side) or {}
@@ -245,9 +245,15 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
     abstract_state = (game_raw.get("status") or {}).get("abstractGameState", "")
     detailed_state = (game_raw.get("status") or {}).get("detailedState", "")
     
+    # Check live_data first, then fallback to gameRaw status
+    game_pk = str(game_raw.get("gamePk", ""))
+    active_live = live_data.get(game_pk) if live_data else None
+    
+    is_game_active = (active_live is not None) or (abstract_state in ["Live", "In Progress", "Final", "Completed"]) or (detailed_state in ["In Progress", "Final", "Completed", "Game Over"])
+    
     is_postponed = "Postponed" in abstract_state or "Postponed" in detailed_state or (game_raw.get("status") or {}).get("statusCode") == "C"
     if is_postponed:
-        return '<div class="badge bg-danger p-2 w-100 shadow-sm text-uppercase fw-bold text-white">✕ GAME POSTPONED</div>'
+        return '<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">✕ GAME POSTPONED</div>'
         
     probable_pitcher = my_team.get("probablePitcher") or {}
     probable_id = str(probable_pitcher.get("id", ""))
@@ -256,22 +262,21 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
     proj_team = proj_lineups.get(team_side) or {}
     projected_id = str((proj_team.get("startingPitcher") or {}).get("id", ""))
 
-    # If MLB has announced a live probable pitcher, trust ONLY that. Otherwise fallback to projection.
     if probable_id:
         is_starting_pitcher = (probable_id == str(player_id))
     else:
         is_starting_pitcher = (projected_id == str(player_id))
                        
     if is_starting_pitcher:
-        badge_html = '<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Starting Pitcher</div>'
+        badge_html = '<div class="badge status-badge-confirmed py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">IN LINEUP: Starting Pitcher</div>'
     elif reliever_info:
         rel_status = reliever_info.get("status", "Available")
         if rel_status == "Available":
-            badge_html = '<div class="badge bg-success p-2 w-100 shadow-sm text-uppercase fw-bold text-white">BULLPEN: AVAILABLE</div>'
+            badge_html = '<div class="badge bg-success py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">BULLPEN: AVAILABLE</div>'
         elif rel_status == "Tired":
-            badge_html = '<div class="badge bg-warning text-dark p-2 w-100 shadow-sm text-uppercase fw-bold">BULLPEN: TIRED</div>'
+            badge_html = '<div class="badge bg-warning text-dark py-1 px-2 w-100 shadow-sm text-uppercase fw-bold" style="font-size: 0.7rem;">BULLPEN: TIRED</div>'
         else:
-            badge_html = '<div class="badge bg-danger p-2 w-100 shadow-sm text-uppercase fw-bold text-white">BULLPEN: UNAVAILABLE</div>'
+            badge_html = '<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">BULLPEN: UNAVAILABLE</div>'
     else:
         lineups = game_raw.get("lineups") or {}
         actual_lineup = lineups.get(f"{team_side}Players", [])
@@ -279,8 +284,6 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
         is_confirmed = tracking_node.get("status") in ["OFFICIAL", "UPDATED", "MODIFIED", "CONFIRMED"] or has_live_lineup
         
         slot_index = -1
-        
-        # STRICT HIERARCHY: Trust live lineup first. Do NOT fallback if a live lineup exists.
         if has_live_lineup:
             slot_index = next((i for i, p in enumerate(actual_lineup) if str(p.get("id")) == str(player_id)), -1)
         elif tracking_node.get("hash"):
@@ -292,33 +295,30 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
             slot_index = next((i for i, p in enumerate(proj_order) if str(p.get("id")) == str(player_id)), -1)
             
         if is_confirmed and slot_index != -1:
-            badge_html = f'<div class="badge status-badge-confirmed p-2 w-100 shadow-sm text-uppercase">IN LINEUP: Batting #{slot_index + 1}</div>'
+            badge_html = f'<div class="badge status-badge-confirmed py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">IN LINEUP: Batting #{slot_index + 1}</div>'
         elif is_confirmed and slot_index == -1:
-            badge_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT STARTING</div>'
+            badge_html = '<div class="badge status-badge-scratched py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">✕ NOT STARTING</div>'
         elif slot_index != -1:
-            badge_html = f'<div class="badge status-badge-projected p-2 w-100 shadow-sm text-uppercase text-dark">Projected #{slot_index + 1}</div>'
+            badge_html = f'<div class="badge status-badge-projected py-1 px-2 w-100 shadow-sm text-uppercase text-dark" style="font-size: 0.7rem;">Projected #{slot_index + 1}</div>'
         else:
-            badge_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NOT PROJECTED TO START</div>'
+            badge_html = '<div class="badge status-badge-scratched py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">✕ NOT PROJECTED TO START</div>'
             
     my_team_id = (my_team.get("team") or {}).get("id", 119)
     team_slug = get_slug_from_team_id(my_team_id)
     
-    # Check if the game is already official to toggle button text
     has_live_lineup = len((game_raw.get("lineups") or {}).get(f"{team_side}Players", [])) > 0
     is_official = tracking_node.get("status") in ["OFFICIAL", "CONFIRMED", "UPDATED", "MODIFIED"] or has_live_lineup
     
     lineup_link_text = "View Official Lineup" if is_official else "View Projected Lineup"
-    link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 mt-1 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
+    link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
     
-    # Dynamic Alert Button Logic
+    # Alert button only renders before first pitch
     alert_btn_html = ""
-    # Only show the button if they are a positional batter or starting pitcher, 
-    # AND the game has not yet gone live or finished.
-    if (is_starting_pitcher or not reliever_info) and abstract_state not in ["Live", "Final"]:
+    if (is_starting_pitcher or not reliever_info) and not is_game_active:
         alert_btn_text = "🚨 MONITOR LATE SCRATCH" if is_official else "🚨 SET LINEUP ALERT"
-        alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 mt-1 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
+        alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
     
-    return f'<div class="mb-3">{badge_html}{link_html}{alert_btn_html}</div>'
+    return f'<div class="d-flex flex-column gap-1 w-100">{badge_html}{link_html}{alert_btn_html}</div>'
 
 def build_custom_boxscore(profile, is_pitcher):
     """Builds a custom box score string directly from raw integer stats."""
@@ -1133,7 +1133,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
         fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
         
-        badge_matrix_html = render_badge_zone(player_id, team_side, my_game, reliever_info)
+        badge_matrix_html = render_badge_zone(player_id, team_side, my_game, reliever_info, live_data)
         
         game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher)
         
