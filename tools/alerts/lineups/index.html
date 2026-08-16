@@ -37,18 +37,22 @@
         
         .alert-card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        /* Team Grid Styling */
-        .team-card { border: 1px solid #dee2e6; border-radius: 8px; transition: all 0.2s; background: #fff; }
-        .team-card:hover { border-color: #adb5bd; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .team-logo { width: 45px; height: 45px; object-fit: contain; }
+        /* Compact Team Row Styling */
+        .team-list-item { transition: background 0.15s ease-in-out; border-bottom: 1px solid #e9ecef; }
+        .team-list-item:hover { background-color: #f8f9fa !important; }
+        .team-list-item:last-child { border-bottom: none; }
+        .team-logo-small { width: 32px; height: 32px; object-fit: contain; }
         
-        .btn-sub { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.2s; }
+        .btn-sub { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 4px 8px; transition: all 0.2s; }
         .btn-sub.active-daily { background-color: #0d6efd; color: white; border-color: #0d6efd; }
         .btn-sub.active-season { background-color: #198754; color: white; border-color: #198754; }
         
         /* Active Chips */
         .sub-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
         .sub-chip .remove-btn { margin-left: 10px; color: #dc3545; cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; text-decoration: none; }
+        
+        /* Sticky Column for Desktop */
+        .sticky-panel { position: sticky; top: 20px; z-index: 10; }
     </style>
 </head>
 <body>
@@ -87,7 +91,7 @@
 
                     <ol class="mb-0 ps-3">
                         <li class="mb-3">
-                            <strong>Choose Your Teams:</strong> Scroll through the grid below and select the MLB teams you want to monitor.
+                            <strong>Choose Your Teams:</strong> Scroll through the list below and select the MLB teams you want to monitor.
                         </li>
                         <li class="mb-4">
                             <strong>Select Your Duration:</strong> 
@@ -111,41 +115,64 @@
         </div>
     </div>
 
-    <!-- Active Watchlist -->
-    <div class="alert-card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-            <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">My Active Subscriptions</h5>
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-sm btn-outline-danger fw-bold py-0 px-2" id="clear-all-btn" style="font-size: 0.75rem; height: 22px; display: none;">Clear All</button>
+    <!-- Main Dashboard Grid -->
+    <div class="row g-4">
+        
+        <!-- LEFT SIDE: Team Selector (2 Columns) -->
+        <div class="col-lg-8">
+            <div class="alert-card p-3 p-md-4 h-100">
+                <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-size: 1.1rem;">⚾ Select Teams</h5>
+                <div class="row g-3">
+                    <!-- Column 1 (Teams 1-15) -->
+                    <div class="col-md-6">
+                        <div class="border rounded overflow-hidden bg-white shadow-sm" id="teams-col-1">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                    <!-- Column 2 (Teams 16-30) -->
+                    <div class="col-md-6">
+                        <div class="border rounded overflow-hidden bg-white shadow-sm" id="teams-col-2">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div id="empty-state" class="text-center py-3 text-muted fst-italic" style="font-size: 0.9rem;">
-            No teams selected yet. Tap the buttons below to subscribe!
-        </div>
-        
-        <div id="subs-grid" class="d-flex flex-wrap gap-2">
-            <!-- Chips injected here via JS -->
-        </div>
-    </div>
 
-    <!-- Teams Grid -->
-    <div class="alert-card p-4 mb-4 bg-light">
-        <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-size: 1rem;">⚾ Select Teams</h5>
-        <div class="row g-3" id="team-selector-grid">
-            <!-- Team cards injected here via JS -->
-        </div>
-    </div>
+        <!-- RIGHT SIDE: Monitored Subscriptions & Submit -->
+        <div class="col-lg-4">
+            <div class="sticky-panel">
+                
+                <!-- Active Watchlist -->
+                <div class="alert-card p-4 mb-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                        <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">Active Subs</h5>
+                        <button class="btn btn-sm btn-outline-danger fw-bold py-0 px-2" id="clear-all-btn" style="font-size: 0.75rem; height: 22px; display: none;">Clear All</button>
+                    </div>
+                    
+                    <div id="empty-state" class="text-center py-4 text-muted fst-italic" style="font-size: 0.85rem;">
+                        No teams selected yet. Tap the buttons on the left to build your board!
+                    </div>
+                    
+                    <div id="subs-grid" class="d-flex flex-wrap gap-2">
+                        <!-- Chips injected here via JS -->
+                    </div>
+                </div>
 
-    <!-- Toggles and Arming -->
-    <div class="alert-card p-4 text-center" style="background-color: #f8f9fa;">
-        <h5 class="fw-bold mb-3" style="font-size: 1rem;">Finalize Subscriptions</h5>
-        <div class="d-block">
-            <button id="arm-alerts-btn" class="btn btn-lg btn-primary fw-bold px-5 py-3 shadow w-100" style="max-width: 400px; border-radius: 30px;">
-                Confirm & Arm Alerts 🛡️
-            </button>
+                <!-- Toggles and Arming -->
+                <div class="alert-card p-4 text-center shadow-sm" style="background-color: #f8f9fa;">
+                    <h5 class="fw-bold mb-3" style="font-size: 1rem;">Finalize Selection</h5>
+                    <div class="d-block">
+                        <button id="arm-alerts-btn" class="btn btn-lg btn-primary fw-bold px-4 py-3 shadow w-100" style="border-radius: 30px; font-size: 0.95rem;">
+                            Confirm & Arm Alerts 🛡️
+                        </button>
+                    </div>
+                    <div id="status-message" class="mt-3 fw-bold d-none" style="font-size: 0.85rem; line-height: 1.4;"></div>
+                </div>
+
+            </div>
         </div>
-        <div id="status-message" class="mt-3 fw-bold d-none" style="font-size: 0.9rem;"></div>
+
     </div>
 </div>
 
@@ -167,62 +194,71 @@
     const messaging = getMessaging(app);
     const PUBLIC_VAPID_KEY = "BFeKk22n0ZPJtjfhu_rzyVT6fGDOLKL2pw3McTgQhelPNzfcFGfOjIYTD4QvZ7F1VIeF1XMDWDFikD19PeuGUG4";
 
-    const mlbTeams = [
-        { id: 109, city: "Arizona", name: "Diamondbacks", bg: "#A71930" },
-        { id: 144, city: "Atlanta", name: "Braves", bg: "#CE1141" },
-        { id: 110, city: "Baltimore", name: "Orioles", bg: "#DF4601" },
-        { id: 111, city: "Boston", name: "Red Sox", bg: "#BD3039" },
-        { id: 145, city: "Chicago", name: "White Sox", bg: "#27251F" },
-        { id: 112, city: "Chicago", name: "Cubs", bg: "#0E3386" },
-        { id: 113, city: "Cincinnati", name: "Reds", bg: "#C6011F" },
-        { id: 114, city: "Cleveland", name: "Guardians", bg: "#E31937" },
-        { id: 115, city: "Colorado", name: "Rockies", bg: "#33006F" },
-        { id: 116, city: "Detroit", name: "Tigers", bg: "#0C2340" },
-        { id: 117, city: "Houston", name: "Astros", bg: "#002D62" },
-        { id: 118, city: "Kansas City", name: "Royals", bg: "#004687" },
-        { id: 108, city: "Los Angeles", name: "Angels", bg: "#003263" },
-        { id: 119, city: "Los Angeles", name: "Dodgers", bg: "#005A9C" },
-        { id: 146, city: "Miami", name: "Marlins", bg: "#00A3E0" },
-        { id: 158, city: "Milwaukee", name: "Brewers", bg: "#FFC52F" },
-        { id: 142, city: "Minnesota", name: "Twins", bg: "#002B5C" },
-        { id: 121, city: "New York", name: "Mets", bg: "#FF5910" },
-        { id: 147, city: "New York", name: "Yankees", bg: "#003087" },
-        { id: 133, city: "Oakland", name: "Athletics", bg: "#003831" },
-        { id: 143, city: "Philadelphia", name: "Phillies", bg: "#E81828" },
-        { id: 134, city: "Pittsburgh", name: "Pirates", bg: "#FDB827" },
-        { id: 135, city: "San Diego", name: "Padres", bg: "#2F241D" },
-        { id: 137, city: "San Francisco", name: "Giants", bg: "#FD5A1E" },
-        { id: 136, city: "Seattle", name: "Mariners", bg: "#005C5C" },
-        { id: 138, city: "St. Louis", name: "Cardinals", bg: "#C41E3A" },
-        { id: 139, city: "Tampa Bay", name: "Rays", bg: "#092C5C" },
-        { id: 140, city: "Texas", name: "Rangers", bg: "#003278" },
-        { id: 141, city: "Toronto", name: "Blue Jays", bg: "#134A8E" },
-        { id: 120, city: "Washington", name: "Nationals", bg: "#AB0003" }
+    let mlbTeams = [
+        { id: 109, city: "Arizona", name: "Diamondbacks" },
+        { id: 144, city: "Atlanta", name: "Braves" },
+        { id: 110, city: "Baltimore", name: "Orioles" },
+        { id: 111, city: "Boston", name: "Red Sox" },
+        { id: 145, city: "Chicago", name: "White Sox" },
+        { id: 112, city: "Chicago", name: "Cubs" },
+        { id: 113, city: "Cincinnati", name: "Reds" },
+        { id: 114, city: "Cleveland", name: "Guardians" },
+        { id: 115, city: "Colorado", name: "Rockies" },
+        { id: 116, city: "Detroit", name: "Tigers" },
+        { id: 117, city: "Houston", name: "Astros" },
+        { id: 118, city: "Kansas City", name: "Royals" },
+        { id: 108, city: "Los Angeles", name: "Angels" },
+        { id: 119, city: "Los Angeles", name: "Dodgers" },
+        { id: 146, city: "Miami", name: "Marlins" },
+        { id: 158, city: "Milwaukee", name: "Brewers" },
+        { id: 142, city: "Minnesota", name: "Twins" },
+        { id: 121, city: "New York", name: "Mets" },
+        { id: 147, city: "New York", name: "Yankees" },
+        { id: 133, city: "Oakland", name: "Athletics" },
+        { id: 143, city: "Philadelphia", name: "Phillies" },
+        { id: 134, city: "Pittsburgh", name: "Pirates" },
+        { id: 135, city: "San Diego", name: "Padres" },
+        { id: 137, city: "San Francisco", name: "Giants" },
+        { id: 136, city: "Seattle", name: "Mariners" },
+        { id: 138, city: "St. Louis", name: "Cardinals" },
+        { id: 139, city: "Tampa Bay", name: "Rays" },
+        { id: 140, city: "Texas", name: "Rangers" },
+        { id: 141, city: "Toronto", name: "Blue Jays" },
+        { id: 120, city: "Washington", name: "Nationals" }
     ];
+
+    // Alphabetize teams dynamically
+    mlbTeams.sort((a, b) => a.city.localeCompare(b.city));
 
     let dailySubs = new Set();
     let seasonSubs = new Set();
     const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
 
     function initUI() {
-        const grid = document.getElementById('team-selector-grid');
-        mlbTeams.forEach(team => {
+        const col1 = document.getElementById('teams-col-1');
+        const col2 = document.getElementById('teams-col-2');
+        
+        mlbTeams.forEach((team, index) => {
             const logo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${team.id}.svg`;
-            const div = document.createElement('div');
-            div.className = 'col-12 col-md-6 col-lg-4';
-            div.innerHTML = `
-                <div class="team-card p-3 d-flex align-items-center h-100">
-                    <img src="${logo}" class="team-logo me-3" alt="${team.name}">
-                    <div class="flex-grow-1">
-                        <div class="fw-bold text-dark lh-1 mb-2" style="font-size: 0.95rem;">${team.city} <br><span class="text-secondary" style="font-size: 0.8rem;">${team.name}</span></div>
-                        <div class="d-flex gap-1">
-                            <button class="btn btn-outline-primary w-50 btn-sub" id="btn-daily-${team.id}" onclick="toggleSub(${team.id}, 'daily')">Today</button>
-                            <button class="btn btn-outline-success w-50 btn-sub" id="btn-season-${team.id}" onclick="toggleSub(${team.id}, 'season')">Season</button>
+            const rowHtml = `
+                <div class="team-list-item d-flex justify-content-between align-items-center p-2 bg-white">
+                    <div class="d-flex align-items-center overflow-hidden pe-2" style="min-width: 0;">
+                        <img src="${logo}" class="team-logo-small me-2 flex-shrink-0" alt="${team.name}">
+                        <div class="text-truncate">
+                            <span class="fw-bold text-dark d-block lh-1 mb-1" style="font-size: 0.85rem;">${team.city}</span>
+                            <span class="text-muted lh-1 d-block text-truncate" style="font-size: 0.7rem;">${team.name}</span>
                         </div>
+                    </div>
+                    <div class="btn-group flex-shrink-0 shadow-sm">
+                        <button class="btn btn-outline-primary btn-sub" id="btn-daily-${team.id}" onclick="toggleSub(${team.id}, 'daily')">Today</button>
+                        <button class="btn btn-outline-success btn-sub" id="btn-season-${team.id}" onclick="toggleSub(${team.id}, 'season')">Season</button>
                     </div>
                 </div>
             `;
-            grid.appendChild(div);
+            
+            // First 15 go left, remaining go right
+            if (index < 15) { col1.innerHTML += rowHtml; } 
+            else { col2.innerHTML += rowHtml; }
         });
 
         // Load existing subs from Firebase
@@ -243,7 +279,7 @@
                     if (dailySubs.size > 0 || seasonSubs.size > 0) {
                         const msgBox = document.getElementById('status-message');
                         const armBtn = document.getElementById('arm-alerts-btn');
-                        msgBox.className = "mt-3 fw-bold text-success";
+                        msgBox.className = "mt-3 fw-bold text-success d-block";
                         msgBox.innerText = "✅ Your lineup alerts are active.";
                         armBtn.innerHTML = "Update Subscriptions 🛡️";
                     }
@@ -320,8 +356,8 @@
                 <img src="${logo}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
             </div>
             <div class="d-flex flex-column pe-2">
-                <span class="fw-bold lh-1" style="font-size: 0.75rem;">${team.name}</span>
-                <span class="badge ${badgeColor} lh-1 mt-1" style="font-size: 0.5rem; padding: 2px 4px;">${badgeLabel}</span>
+                <span class="fw-bold lh-1 text-dark" style="font-size: 0.75rem;">${team.name}</span>
+                <span class="badge ${badgeColor} lh-1 mt-1" style="font-size: 0.5rem; padding: 3px 4px;">${badgeLabel}</span>
             </div>
             <a href="javascript:void(0)" class="remove-btn pe-2" onclick="removeSub(${team.id}, '${type}')">&times;</a>
         `;
@@ -343,7 +379,7 @@
         armBtn.disabled = true;
 
         try {
-            // 1. Feature Detection with Explicit iOS Instructions
+            // Feature Detection with Explicit iOS Instructions
             if (!('Notification' in window)) {
                 throw new Error("Apple requires you to add this app to your home screen to receive alerts. Tap the Share icon (bottom center in Safari, top right in Chrome), scroll down, and select 'Add to Home Screen'. Then open the new MLB9 icon from your home screen to arm your alerts! (Requires iOS 16.4+)");
             }
