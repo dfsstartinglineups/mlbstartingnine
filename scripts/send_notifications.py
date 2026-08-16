@@ -497,6 +497,7 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
                         },
                         token=push_token
                     )
+                    messages_to_send.append(msg)
 
         # Queue database receipts
         if user_updates:
