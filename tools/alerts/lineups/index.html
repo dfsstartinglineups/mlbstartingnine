@@ -343,11 +343,16 @@
         armBtn.disabled = true;
 
         try {
-            if (!('Notification' in window)) throw new Error("Apple requires you to add this app to your home screen to receive alerts.");
-            if (!('serviceWorker' in navigator)) throw new Error("Your browser does not support background alerts.");
+            // 1. Feature Detection with Explicit iOS Instructions
+            if (!('Notification' in window)) {
+                throw new Error("Apple requires you to add this app to your home screen to receive alerts. Tap the Share icon (bottom center in Safari, top right in Chrome), scroll down, and select 'Add to Home Screen'. Then open the new MLB9 icon from your home screen to arm your alerts! (Requires iOS 16.4+)");
+            }
+            if (!('serviceWorker' in navigator)) {
+                throw new Error("Your browser does not support background alerts. Please try Chrome, Firefox, or a supported browser.");
+            }
 
             const permission = await Notification.requestPermission();
-            if (permission !== 'granted') throw new Error("Push permissions denied by user.");
+            if (permission !== 'granted') { throw new Error("Push permissions denied by user."); }
 
             armBtn.innerHTML = "Generating Secure Token...";
 
