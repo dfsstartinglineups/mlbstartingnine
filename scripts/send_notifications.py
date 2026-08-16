@@ -449,7 +449,7 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
                 if "_G1" in off_team: game_tag = " (Game 1)"
                 elif "_G2" in off_team: game_tag = " (Game 2)"
                 
-                body_text = f"🚨 OFFICIAL: The {team_name} starting lineup{game_tag} is live!"
+                body_text = f"🚨 OFFICIAL: The {team_name} starting lineup{game_tag} is live! Tap to view the lineup."
                 
                 msg = messaging.Message(
                     data={
