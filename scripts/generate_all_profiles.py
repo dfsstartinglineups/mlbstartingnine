@@ -93,9 +93,17 @@ def update_sitemap(all_player_urls, updated_urls):
         except Exception:
             pass
 
-    home_url = f"{DOMAIN}/"
+    # Define your static, core website URLs here
+    core_urls = [
+        f"{DOMAIN}/",
+        f"{DOMAIN}/tools/alerts/players/"
+    ]
+    
     all_urls_set = set(all_player_urls)
-    all_urls_set.add(home_url)
+    
+    # Inject all core URLs into the master set
+    for curl in core_urls:
+        all_urls_set.add(curl)
     
     # Merge newly generated URLs with any pre-existing URLs (like /lineups/) that share this sitemap
     final_urls = sorted(list(all_urls_set.union(existing_data.keys())))
@@ -294,10 +302,22 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
             
     my_team_id = (my_team.get("team") or {}).get("id", 119)
     team_slug = get_slug_from_team_id(my_team_id)
-    lineup_link_text = "View Official Lineup" if (tracking_node.get("status") in ["OFFICIAL", "CONFIRMED"]) else "View Projected Lineup"
+    
+    # Check if the game is already official to toggle button text
+    has_live_lineup = len((game_raw.get("lineups") or {}).get(f"{team_side}Players", [])) > 0
+    is_official = tracking_node.get("status") in ["OFFICIAL", "CONFIRMED", "UPDATED", "MODIFIED"] or has_live_lineup
+    
+    lineup_link_text = "View Official Lineup" if is_official else "View Projected Lineup"
     link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
     
-    return f'<div class="mb-3">{badge_html}{link_html}</div>'
+    # Dynamic Alert Button Logic
+    alert_btn_html = ""
+    # Only show the button if they are a positional batter OR the designated starting pitcher
+    if is_starting_pitcher or not reliever_info:
+        alert_btn_text = "🚨 MONITOR LATE SCRATCH" if is_official else "🚨 SET LINEUP ALERT"
+        alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
+    
+    return f'<div class="mb-3">{badge_html}{link_html}{alert_btn_html}</div>'
 
 def build_custom_boxscore(profile, is_pitcher):
     """Builds a custom box score string directly from raw integer stats."""
