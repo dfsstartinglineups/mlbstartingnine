@@ -113,6 +113,7 @@ def extract_official_lineups(daily_data):
     official_teams = set()
     active_starters = set()
     postponed_teams = set()
+    modified_teams = set()
 
     games = daily_data.get('games', [])
 
@@ -171,12 +172,18 @@ def extract_official_lineups(daily_data):
             continue
 
         # Process Away Team
-        if tracking.get('away', {}).get('status') in ['OFFICIAL', 'MODIFIED']:
+        away_status = tracking.get('away', {}).get('status')
+        if away_status in ['OFFICIAL', 'MODIFIED']:
             if away_tag:
                 official_teams.add(f"{away_team_id}_{away_tag}")
+                if away_status == 'MODIFIED':
+                    modified_teams.add(f"{away_team_id}_{away_tag}")
             else:
                 official_teams.add(away_team_id)
                 official_teams.add(f"{away_team_id}_G1")
+                if away_status == 'MODIFIED':
+                    modified_teams.add(away_team_id)
+                    modified_teams.add(f"{away_team_id}_G1")
 
             for player in lineups.get('awayPlayers', []):
                 pid = str(player.get('id'))
@@ -196,12 +203,18 @@ def extract_official_lineups(daily_data):
                     active_starters.add(f"{sp_id}_G1")
 
         # Process Home Team
-        if tracking.get('home', {}).get('status') in ['OFFICIAL', 'MODIFIED']:
+        home_status = tracking.get('home', {}).get('status')
+        if home_status in ['OFFICIAL', 'MODIFIED']:
             if home_tag:
                 official_teams.add(f"{home_team_id}_{home_tag}")
+                if home_status == 'MODIFIED':
+                    modified_teams.add(f"{home_team_id}_{home_tag}")
             else:
                 official_teams.add(home_team_id)
                 official_teams.add(f"{home_team_id}_G1")
+                if home_status == 'MODIFIED':
+                    modified_teams.add(home_team_id)
+                    modified_teams.add(f"{home_team_id}_G1")
 
             for player in lineups.get('homePlayers', []):
                 pid = str(player.get('id'))
@@ -220,7 +233,7 @@ def extract_official_lineups(daily_data):
                     active_starters.add(sp_id)
                     active_starters.add(f"{sp_id}_G1")
 
-    return official_teams, active_starters, postponed_teams
+    return official_teams, active_starters, postponed_teams, modified_teams
 
 def process_dfs_notifications(active_users, official_teams, active_starters, postponed_teams):
     """Evaluate DFS watchlists, group alerts, and send push notifications in high-speed batches."""
@@ -381,8 +394,8 @@ def process_dfs_notifications(active_users, official_teams, active_starters, pos
         except Exception as e:
             print(f"Failed to update DFS database receipts: {e}")
 
-def process_team_notifications(active_team_users, official_teams, postponed_teams):
-    """Evaluate team-level subscriptions and send push notifications when lineups go official."""
+def process_team_notifications(active_team_users, official_teams, postponed_teams, modified_teams):
+    """Evaluate team-level subscriptions and send push notifications when lineups go official or are modified."""
     messages_to_send = []
     database_updates = {}
 
@@ -432,7 +445,7 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
                 messages_to_send.append(msg)
                 user_updates[ppd_key] = True
 
-        # 2. Evaluate Official Lineups
+        # 2. Evaluate Official & Modified Lineups
         for off_team in official_teams:
             base_team = off_team.split('_')[0]
             
@@ -440,27 +453,46 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
             if off_team.endswith('_G1') and base_team in official_teams:
                 continue
             
-            if base_team in subscribed_teams and off_team not in notified_states:
-                team_info = TEAM_MAP.get(int(base_team), {})
-                team_name = team_info.get("name", "Team")
-                team_slug = team_info.get("slug", "los-angeles-dodgers")
+            is_modified = off_team in modified_teams
+            
+            if base_team in subscribed_teams:
+                has_official_receipt = off_team in notified_states
+                has_modified_receipt = f"MOD_{off_team}" in notified_states
                 
-                game_tag = ""
-                if "_G1" in off_team: game_tag = " (Game 1)"
-                elif "_G2" in off_team: game_tag = " (Game 2)"
+                alert_type = None
                 
-                body_text = f"🚨 OFFICIAL: The {team_name} starting lineup{game_tag} is live! Tap to view the lineup."
+                if is_modified and not has_modified_receipt:
+                    alert_type = "MODIFIED"
+                elif not is_modified and not has_official_receipt:
+                    alert_type = "OFFICIAL"
+                    
+                if alert_type:
+                    team_info = TEAM_MAP.get(int(base_team), {})
+                    team_name = team_info.get("name", "Team")
+                    team_slug = team_info.get("slug", "los-angeles-dodgers")
+                    
+                    game_tag = ""
+                    if "_G1" in off_team: game_tag = " (Game 1)"
+                    elif "_G2" in off_team: game_tag = " (Game 2)"
+                    
+                    if alert_type == "MODIFIED":
+                        body_text = f"🚨 MODIFIED: The {team_name} starting lineup{game_tag} has been updated! Tap to view the lineup."
+                        # Mark both receipts so we don't backfire and send an official alert later
+                        user_updates[f"MOD_{off_team}"] = True
+                        user_updates[off_team] = True
+                    else:
+                        body_text = f"🚨 OFFICIAL: The {team_name} starting lineup{game_tag} is live! Tap to view the lineup."
+                        user_updates[off_team] = True
                 
-                msg = messaging.Message(
-                    data={
-                        "title": "Lineup Alert",
-                        "body": body_text,
-                        "url": f"https://mlbstartingnine.com/lineups/{team_slug}/"
-                    },
-                    token=push_token
-                )
-                messages_to_send.append(msg)
-                user_updates[off_team] = True
+                    msg = messaging.Message(
+                        data={
+                            "title": "Lineup Alert",
+                            "body": body_text,
+                            "url": f"https://mlbstartingnine.com/lineups/{team_slug}/"
+                        },
+                        token=push_token
+                    )
+                    messages_to_send.append(msg)
 
         # Queue database receipts
         if user_updates:
@@ -498,9 +530,10 @@ if __name__ == "__main__":
     
     # 2. Parse the daily JSON (Only happens once for maximum speed)
     daily_json = load_daily_json(today)
-    official_teams, active_starters, postponed_teams = extract_official_lineups(daily_json)
+    official_teams, active_starters, postponed_teams, modified_teams = extract_official_lineups(daily_json)
     
     print(f"Teams with official lineups: {len(official_teams)}")
+    print(f"Modified lineups: {len(modified_teams)}")
     print(f"Postponed teams: {len(postponed_teams)}")
     print(f"Total active starters parsed: {len(active_starters)}")
     
@@ -508,6 +541,6 @@ if __name__ == "__main__":
     process_dfs_notifications(active_dfs_users, official_teams, active_starters, postponed_teams)
     
     # 4. Process Team Level Notifications
-    process_team_notifications(active_team_users, official_teams, postponed_teams)
+    process_team_notifications(active_team_users, official_teams, postponed_teams, modified_teams)
     
     print("Unified Worker complete.")
