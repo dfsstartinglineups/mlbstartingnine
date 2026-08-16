@@ -267,41 +267,63 @@
         fetch(dbUrl)
             .then(res => res.json())
             .then(savedData => {
+                let dbHadSubs = false;
+                
                 if (savedData) {
-                    if (savedData.date === todayDate && savedData.daily) {
+                    if (savedData.date === todayDate && savedData.daily && savedData.daily.length > 0) {
                         savedData.daily.forEach(id => dailySubs.add(id));
+                        dbHadSubs = true;
                     }
-                    if (savedData.season) {
+                    if (savedData.season && savedData.season.length > 0) {
                         savedData.season.forEach(id => seasonSubs.add(id));
+                        dbHadSubs = true;
                     }
                 }
 
-                // --- NEW: Intercept pending team from lineup page ---
+                // --- Intercept pending team from lineup page ---
+                let addedFromSession = false;
                 const pendingTeamId = sessionStorage.getItem('pendingTeamAlertId');
                 if (pendingTeamId) {
                     const tId = parseInt(pendingTeamId);
                     dailySubs.add(tId);       // Default to Today
                     seasonSubs.delete(tId);   // Ensure mutually exclusive
                     sessionStorage.removeItem('pendingTeamAlertId'); // Clear memory
+                    addedFromSession = true;
                 }
 
                 updateUIReflection();
                 
-                if (dailySubs.size > 0 || seasonSubs.size > 0) {
-                    const msgBox = document.getElementById('status-message');
-                    const armBtn = document.getElementById('arm-alerts-btn');
+                const msgBox = document.getElementById('status-message');
+                const armBtn = document.getElementById('arm-alerts-btn');
+
+                if (addedFromSession) {
+                    // User came from the team page with a new, unsaved team
+                    msgBox.className = "mt-3 fw-bold text-primary d-block";
+                    msgBox.innerText = "👉 Click 'Confirm & Arm Alerts' to save your new selection.";
+                    armBtn.innerHTML = "Confirm & Arm Alerts 🛡️";
+                } else if (dbHadSubs) {
+                    // Normal load where user already had saved DB subscriptions
                     msgBox.className = "mt-3 fw-bold text-success d-block";
                     msgBox.innerText = "✅ Your lineup alerts are active.";
                     armBtn.innerHTML = "Update Subscriptions 🛡️";
                 }
             }).catch(e => {
-                // Catch errors but still process pending team from session storage if it exists
+                let addedFromSession = false;
                 const pendingTeamId = sessionStorage.getItem('pendingTeamAlertId');
                 if (pendingTeamId) {
                     const tId = parseInt(pendingTeamId);
                     dailySubs.add(tId);
                     sessionStorage.removeItem('pendingTeamAlertId');
+                    addedFromSession = true;
                     updateUIReflection();
+                }
+                
+                if (addedFromSession) {
+                    const msgBox = document.getElementById('status-message');
+                    const armBtn = document.getElementById('arm-alerts-btn');
+                    msgBox.className = "mt-3 fw-bold text-primary d-block";
+                    msgBox.innerText = "👉 Click 'Confirm & Arm Alerts' to save your new selection.";
+                    armBtn.innerHTML = "Confirm & Arm Alerts 🛡️";
                 }
                 console.log("No previous subs found.");
             });
