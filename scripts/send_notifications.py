@@ -10,6 +10,40 @@ from firebase_admin import credentials, db, messaging
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPT_DIR)
 
+# Team Map for Names and URL Slugs
+TEAM_MAP = {
+    108: {"name": "Los Angeles Angels", "slug": "los-angeles-angels"},
+    109: {"name": "Arizona Diamondbacks", "slug": "arizona-diamondbacks"},
+    110: {"name": "Baltimore Orioles", "slug": "baltimore-orioles"},
+    111: {"name": "Boston Red Sox", "slug": "boston-red-sox"},
+    112: {"name": "Chicago Cubs", "slug": "chicago-cubs"},
+    113: {"name": "Cincinnati Reds", "slug": "cincinnati-reds"},
+    114: {"name": "Cleveland Guardians", "slug": "cleveland-guardians"},
+    115: {"name": "Colorado Rockies", "slug": "colorado-rockies"},
+    116: {"name": "Detroit Tigers", "slug": "detroit-tigers"},
+    117: {"name": "Houston Astros", "slug": "houston-astros"},
+    118: {"name": "Kansas City Royals", "slug": "kansas-city-royals"},
+    119: {"name": "Los Angeles Dodgers", "slug": "los-angeles-dodgers"},
+    120: {"name": "Washington Nationals", "slug": "washington-nationals"},
+    121: {"name": "New York Mets", "slug": "new-york-mets"},
+    133: {"name": "Oakland Athletics", "slug": "athletics"},
+    134: {"name": "Pittsburgh Pirates", "slug": "pittsburgh-pirates"},
+    135: {"name": "San Diego Padres", "slug": "san-diego-padres"},
+    136: {"name": "Seattle Mariners", "slug": "seattle-mariners"},
+    137: {"name": "San Francisco Giants", "slug": "san-francisco-giants"},
+    138: {"name": "St. Louis Cardinals", "slug": "st-louis-cardinals"},
+    139: {"name": "Tampa Bay Rays", "slug": "tampa-bay-rays"},
+    140: {"name": "Texas Rangers", "slug": "texas-rangers"},
+    141: {"name": "Toronto Blue Jays", "slug": "toronto-blue-jays"},
+    142: {"name": "Minnesota Twins", "slug": "minnesota-twins"},
+    143: {"name": "Philadelphia Phillies", "slug": "philadelphia-phillies"},
+    144: {"name": "Atlanta Braves", "slug": "atlanta-braves"},
+    145: {"name": "Chicago White Sox", "slug": "chicago-white-sox"},
+    146: {"name": "Miami Marlins", "slug": "miami-marlins"},
+    147: {"name": "New York Yankees", "slug": "new-york-yankees"},
+    158: {"name": "Milwaukee Brewers", "slug": "milwaukee-brewers"}
+}
+
 def initialize_firebase():
     """Initialize the Firebase Admin SDK using GitHub Secrets."""
     secret_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT')
@@ -27,7 +61,7 @@ def get_today_date_string():
     return datetime.now(tz).strftime('%Y-%m-%d')
 
 def clean_old_watchlists(today_date):
-    """Delete watchlists from previous days to keep the database fast and clean."""
+    """Delete DFS watchlists from previous days to keep the database fast and clean."""
     ref = db.reference('watchlist')
     all_users = ref.get() or {}
     
@@ -38,8 +72,30 @@ def clean_old_watchlists(today_date):
             del all_users[uid]
             deleted_count += 1
             
-    print(f"Cleanup Complete: Removed {deleted_count} stale watchlists.")
+    print(f"Cleanup Complete: Removed {deleted_count} stale DFS watchlists.")
     return all_users
+
+def clean_old_team_watchlists(today_date):
+    """Clear daily team subs and notification receipts from previous days."""
+    ref = db.reference('team_watchlist')
+    all_team_users = ref.get() or {}
+    
+    cleaned_count = 0
+    for uid, data in list(all_team_users.items()):
+        if data.get('date') != today_date:
+            # Wipe today's daily subs and reset notification receipts
+            ref.child(uid).child('daily').delete()
+            ref.child(uid).child('notified').delete()
+            ref.child(uid).update({'date': today_date})
+            
+            # Update local state so current run uses clean data
+            all_team_users[uid]['daily'] = []
+            all_team_users[uid]['notified'] = {}
+            all_team_users[uid]['date'] = today_date
+            cleaned_count += 1
+            
+    print(f"Cleanup Complete: Reset {cleaned_count} stale Team Subscriptions.")
+    return all_team_users
 
 def load_daily_json(today_date):
     """Grab the daily JSON file strictly by its exact filename, using absolute paths."""
@@ -166,8 +222,8 @@ def extract_official_lineups(daily_data):
 
     return official_teams, active_starters, postponed_teams
 
-def process_notifications(active_users, official_teams, active_starters, postponed_teams):
-    """Evaluate watchlists, group alerts, and send push notifications in high-speed batches."""
+def process_dfs_notifications(active_users, official_teams, active_starters, postponed_teams):
+    """Evaluate DFS watchlists, group alerts, and send push notifications in high-speed batches."""
     master_data_path = os.path.join(REPO_ROOT, 'data', 'player_master_data.json')
     try:
         with open(master_data_path, 'r') as f:
@@ -295,7 +351,6 @@ def process_notifications(active_users, official_teams, active_starters, postpon
         for i, body_text in enumerate(batched_bodies):
             title = "Lineup Alert" if len(batched_bodies) == 1 else f"Lineup Alert ({i+1}/{len(batched_bodies)})"
             
-            # THE FIX: Send as a pure data payload so only the Service Worker triggers
             msg = messaging.Message(
                 data={
                     "title": title,
@@ -315,27 +370,124 @@ def process_notifications(active_users, official_teams, active_starters, postpon
             chunk = messages_to_send[i:i + chunk_size]
             try:
                 response = messaging.send_each(chunk)
-                print(f"Batch sent: {response.success_count} successful, {response.failure_count} failed.")
+                print(f"DFS Batch sent: {response.success_count} successful, {response.failure_count} failed.")
             except Exception as e:
-                print(f"Failed to send batch: {e}")
+                print(f"Failed to send DFS batch: {e}")
 
     if database_updates:
         try:
             db.reference().update(database_updates)
-            print(f"Successfully updated {len(database_updates)} database receipts.")
+            print(f"Successfully updated {len(database_updates)} DFS database receipts.")
         except Exception as e:
-            print(f"Failed to update database receipts: {e}")
+            print(f"Failed to update DFS database receipts: {e}")
+
+def process_team_notifications(active_team_users, official_teams, postponed_teams):
+    """Evaluate team-level subscriptions and send push notifications when lineups go official."""
+    messages_to_send = []
+    database_updates = {}
+
+    for uid, user_data in active_team_users.items():
+        push_token = user_data.get('push_token')
+        if not push_token:
+            continue
+
+        daily_subs = user_data.get('daily', [])
+        season_subs = user_data.get('season', [])
+        
+        # Combine subscribed team IDs into a set of strings for rapid checking
+        subscribed_teams = set()
+        if daily_subs: subscribed_teams.update(str(t) for t in daily_subs)
+        if season_subs: subscribed_teams.update(str(t) for t in season_subs)
+        
+        if not subscribed_teams:
+            continue
+
+        # Get existing notification receipts
+        notified_states = user_data.get('notified', {})
+        user_updates = {}
+
+        # 1. Evaluate Postponed Games
+        for ppd_team in postponed_teams: # e.g. '147' or '147_G1'
+            base_team = ppd_team.split('_')[0]
+            ppd_key = f"PPD_{ppd_team}"
             
+            if base_team in subscribed_teams and ppd_key not in notified_states:
+                team_info = TEAM_MAP.get(int(base_team), {})
+                team_name = team_info.get("name", "Team")
+                team_slug = team_info.get("slug", "los-angeles-dodgers")
+                
+                msg = messaging.Message(
+                    data={
+                        "title": "Game Postponed",
+                        "body": f"☔ The {team_name} game has been postponed.",
+                        "url": f"https://mlbstartingnine.com/lineups/{team_slug}/"
+                    },
+                    token=push_token
+                )
+                messages_to_send.append(msg)
+                user_updates[ppd_key] = True
+
+        # 2. Evaluate Official Lineups
+        for off_team in official_teams:
+            base_team = off_team.split('_')[0]
+            
+            if base_team in subscribed_teams and off_team not in notified_states:
+                team_info = TEAM_MAP.get(int(base_team), {})
+                team_name = team_info.get("name", "Team")
+                team_slug = team_info.get("slug", "los-angeles-dodgers")
+                
+                game_tag = ""
+                if "_G1" in off_team: game_tag = " (Game 1)"
+                elif "_G2" in off_team: game_tag = " (Game 2)"
+                
+                body_text = f"🚨 OFFICIAL: The {team_name} starting lineup{game_tag} is live!"
+                
+                msg = messaging.Message(
+                    data={
+                        "title": "Lineup Alert",
+                        "body": body_text,
+                        "url": f"https://mlbstartingnine.com/lineups/{team_slug}/"
+                    },
+                    token=push_token
+                )
+                messages_to_send.append(msg)
+                user_updates[off_team] = True
+
+        # Queue database receipts
+        if user_updates:
+            for key, val in user_updates.items():
+                database_updates[f'team_watchlist/{uid}/notified/{key}'] = val
+
+    # Send Notification Payload
+    if messages_to_send:
+        chunk_size = 500
+        for i in range(0, len(messages_to_send), chunk_size):
+            chunk = messages_to_send[i:i + chunk_size]
+            try:
+                response = messaging.send_each(chunk)
+                print(f"Team Alert Batch sent: {response.success_count} successful, {response.failure_count} failed.")
+            except Exception as e:
+                print(f"Failed to send Team Alert batch: {e}")
+
+    # Write DB Receipts
+    if database_updates:
+        try:
+            db.reference().update(database_updates)
+            print(f"Successfully updated {len(database_updates)} Team DB receipts.")
+        except Exception as e:
+            print(f"Failed to update Team database receipts: {e}")
+
 if __name__ == "__main__":
-    print("Starting MLB Lineup Notification Worker...")
+    print("Starting Unified MLB Notification Worker...")
     initialize_firebase()
     
     today = get_today_date_string()
     
-    # 1. Clean the database
-    active_users = clean_old_watchlists(today)
+    # 1. Clean both databases simultaneously
+    active_dfs_users = clean_old_watchlists(today)
+    active_team_users = clean_old_team_watchlists(today)
     
-    # 2. Parse the daily JSON
+    # 2. Parse the daily JSON (Only happens once for maximum speed)
     daily_json = load_daily_json(today)
     official_teams, active_starters, postponed_teams = extract_official_lineups(daily_json)
     
@@ -343,6 +495,10 @@ if __name__ == "__main__":
     print(f"Postponed teams: {len(postponed_teams)}")
     print(f"Total active starters parsed: {len(active_starters)}")
     
-    # 3. Process the state machine and send alerts
-    process_notifications(active_users, official_teams, active_starters, postponed_teams)
-    print("Worker complete.")
+    # 3. Process DFS Scratches & Notifications
+    process_dfs_notifications(active_dfs_users, official_teams, active_starters, postponed_teams)
+    
+    # 4. Process Team Level Notifications
+    process_team_notifications(active_team_users, official_teams, postponed_teams)
+    
+    print("Unified Worker complete.")
