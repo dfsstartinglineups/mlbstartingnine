@@ -555,7 +555,11 @@ def generate_team_html(team, player_db, daily_slates):
         elif status == "MODIFIED":
             badge_html = '<span style="background: #ff1744; color: #fff; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 0 8px rgba(255, 23, 68, 0.4);">🚨 MODIFIED / LATE SCRATCH</span>'
         else:
-            badge_html = '<span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block;">⏳ PROJECTED BATTING ORDER</span>'
+            # PROJECTED STATE: Shortened badge + Set Alert button with sessionStorage injection
+            badge_html = f"""<div style="display: inline-flex; align-items: center; gap: 6px;">
+                <span style="background: #ffb300; color: #000; font-weight: 800; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-block;">PROJECTED</span>
+                <a href="/tools/alerts/lineups/" onclick="sessionStorage.setItem('pendingTeamAlertId', '{team_id}');" style="background: #212529; color: #fff; text-decoration: none; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 10px; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 3px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: all 0.2s;">🔔 Set Alert</a>
+            </div>"""
             
         vs_symbol = f"@ {opp_anchor}" if target_side == 'away' else f"vs {opp_anchor}"
         
