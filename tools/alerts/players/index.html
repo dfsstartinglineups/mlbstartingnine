@@ -249,55 +249,81 @@
     let masterPlayerList = [];
     let playerLookupByName = {};
     let activeWatchlist = new Map();
+    let doubleHeaderTeamIds = new Set();
 
-    fetch('../../../data/player_master_data.json')
-        .then(res => res.json())
-        .then(data => {
-            masterPlayerList = Object.values(data);
-            masterPlayerList.forEach(p => {
-                if(p.name) {
-                    const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                    playerLookupByName[cleanName] = p;
+    const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+
+    // 1. Fetch Doubleheader Schedule & Master Player Data concurrently
+    Promise.all([
+        fetch('../../../data/player_master_data.json').then(res => res.json()),
+        fetch(`../../../data/daily_files/games_${todayDate}.json`).then(res => res.json()).catch(() => null)
+    ])
+    .then(([playerData, gamesData]) => {
+        masterPlayerList = Object.values(playerData);
+        masterPlayerList.forEach(p => {
+            if (p.name) {
+                const cleanName = p.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                playerLookupByName[cleanName] = p;
+            }
+        });
+
+        // Detect Double Header Teams from today's games file
+        if (gamesData && gamesData.games) {
+            const teamGameCounts = {};
+            gamesData.games.forEach(g => {
+                const awayId = g.gameRaw?.teams?.away?.team?.id;
+                const homeId = g.gameRaw?.teams?.home?.team?.id;
+                const isDH = g.gameRaw?.doubleHeader === "Y" || g.gameRaw?.gameNumber > 1;
+                
+                if (awayId) teamGameCounts[awayId] = (teamGameCounts[awayId] || 0) + 1;
+                if (homeId) teamGameCounts[homeId] = (teamGameCounts[homeId] || 0) + 1;
+                if (isDH) {
+                    if (awayId) doubleHeaderTeamIds.add(String(awayId));
+                    if (homeId) doubleHeaderTeamIds.add(String(homeId));
                 }
             });
 
-            // CHECK FIREBASE FOR TODAY'S SAVED PLAYERS
-            const userId = generateUserId();
-            const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
-            const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
+            Object.keys(teamGameCounts).forEach(teamId => {
+                if (teamGameCounts[teamId] > 1) {
+                    doubleHeaderTeamIds.add(String(teamId));
+                }
+            });
+        }
 
-            fetch(dbUrl)
-                .then(res => res.json())
-                .then(savedData => {
-                    // Only load the saved players if the payload is tagged with today's date
-                    if (savedData && savedData.watchlist && savedData.date === todayDate) {
-                        
-                        // savedData.watchlist is now an object: { "571970": "119" }
-                        Object.keys(savedData.watchlist).forEach(id => {
-                            const player = masterPlayerList.find(p => p.player_id == id);
-                            if (player) {
-                                activeWatchlist.set(player.player_id, player);
-                            }
-                        });
-                        
-                        if (savedData.preference) {
-                            const radio = document.querySelector(`input[name="alertPref"][value="${savedData.preference}"]`);
-                            if (radio) radio.checked = true;
-                        }
+        // CHECK FIREBASE FOR TODAY'S SAVED PLAYERS
+        const userId = generateUserId();
+        const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
 
-                        renderGrid();
-                        if (activeWatchlist.size > 0) {
-                            const msgBox = document.getElementById('status-message');
-                            const armBtn = document.getElementById('arm-alerts-btn');
-                            msgBox.className = "mt-3 fw-bold text-success";
-                            msgBox.innerText = "✅ Your alerts for today are active.";
-                            armBtn.innerHTML = "Update Alerts 🛡️";
+        fetch(dbUrl)
+            .then(res => res.json())
+            .then(savedData => {
+                if (savedData && savedData.watchlist && savedData.date === todayDate) {
+                    Object.keys(savedData.watchlist).forEach(watchKey => {
+                        const [baseId, gameSuffix] = watchKey.split('_');
+                        const player = masterPlayerList.find(p => p.player_id == baseId);
+                        if (player) {
+                            addPlayerToWatchlist(player, gameSuffix || null);
                         }
+                    });
+                    
+                    if (savedData.preference) {
+                        const radio = document.querySelector(`input[name="alertPref"][value="${savedData.preference}"]`);
+                        if (radio) radio.checked = true;
                     }
-                })
-                .catch(err => console.log("No saved watchlist found or error fetching.", err));
-        })
-        .catch(err => console.error("Failed to load master player data:", err));
+
+                    renderGrid();
+                    if (activeWatchlist.size > 0) {
+                        const msgBox = document.getElementById('status-message');
+                        const armBtn = document.getElementById('arm-alerts-btn');
+                        msgBox.className = "mt-3 fw-bold text-success";
+                        msgBox.innerText = "✅ Your alerts for today are active.";
+                        armBtn.innerHTML = "Update Alerts 🛡️";
+                    }
+                }
+            })
+            .catch(err => console.log("No saved watchlist found or error fetching.", err));
+    })
+    .catch(err => console.error("Failed to load initial data:", err));
 
     const searchInput = document.getElementById('player-search');
     const searchResults = document.getElementById('search-results');
@@ -327,24 +353,33 @@
         if (matches.length > 0) {
             searchResults.style.display = 'block';
             matches.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'search-item';
-                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
-                const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
-                const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -3px; right: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; object-fit: contain;" alt="Team Logo">` : '';
-                
-                div.innerHTML = `
-                    <div class="position-relative flex-shrink-0" style="width: 24px; height: 24px; margin-right: 10px;">
-                        <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
-                        ${teamLogo}
-                    </div>
-                    <div class="d-flex flex-column justify-content-center">
-                        <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}</span>
-                        <span class="text-muted mt-1" style="font-size:0.65rem;">${displayPos}</span>
-                    </div>
-                `;
-                div.onclick = () => { addPlayerToWatchlist(p); searchInput.value = ''; searchResults.style.display = 'none'; };
-                searchResults.appendChild(div);
+                const isDH = doubleHeaderTeamIds.has(String(p.team_id));
+                const options = isDH ? [{ tag: 'G1', label: ' (GM1)' }, { tag: 'G2', label: ' (GM2)' }] : [{ tag: null, label: '' }];
+
+                options.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'search-item';
+                    const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
+                    const displayPos = p.position || (p.is_pitcher ? 'P' : 'UTIL');
+                    const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -3px; right: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; object-fit: contain;" alt="Team Logo">` : '';
+                    
+                    div.innerHTML = `
+                        <div class="position-relative flex-shrink-0" style="width: 24px; height: 24px; margin-right: 10px;">
+                            <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
+                            ${teamLogo}
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                            <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}<span class="text-primary">${opt.label}</span></span>
+                            <span class="text-muted mt-1" style="font-size:0.65rem;">${displayPos}</span>
+                        </div>
+                    `;
+                    div.onclick = () => { 
+                        addPlayerToWatchlist(p, opt.tag); 
+                        searchInput.value = ''; 
+                        searchResults.style.display = 'none'; 
+                    };
+                    searchResults.appendChild(div);
+                });
             });
         } else { searchResults.style.display = 'none'; }
     });
@@ -353,13 +388,23 @@
         if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.style.display = 'none';
     });
 
-    window.removePlayer = function(playerId) {
-        activeWatchlist.delete(playerId);
+    window.removePlayer = function(watchKey) {
+        activeWatchlist.delete(watchKey);
         renderGrid();
     }
 
-    function addPlayerToWatchlist(player) {
-        if (!activeWatchlist.has(player.player_id)) { activeWatchlist.set(player.player_id, player); renderGrid(); }
+    function addPlayerToWatchlist(player, gameTag = null) {
+        const watchKey = gameTag ? `${player.player_id}_${gameTag}` : `${player.player_id}`;
+        const displayLabel = gameTag ? ` (${gameTag.replace('G', 'GM')})` : '';
+        
+        if (!activeWatchlist.has(watchKey)) {
+            activeWatchlist.set(watchKey, {
+                ...player,
+                watchKey: watchKey,
+                displayName: `${player.name}${displayLabel}`
+            });
+            renderGrid();
+        }
     }
 
     function renderGrid() {
@@ -373,10 +418,10 @@
         } else {
             emptyState.style.display = 'none';
             clearAllBtn.style.display = 'inline-block';
-            activeWatchlist.forEach((p, id) => {
+            activeWatchlist.forEach((p, watchKey) => {
                 const chip = document.createElement('div');
                 chip.className = 'player-chip';
-                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${id}/headshot/67/current`;
+                const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
                 const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; margin: 0 !important; object-fit: contain;" alt="Team Logo">` : '';
                 
                 chip.innerHTML = `
@@ -384,8 +429,8 @@
                         <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef; margin: 0 !important;">
                         ${teamLogo}
                     </div>
-                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name}</span>
-                    <a href="javascript:void(0)" class="remove-btn" onclick="removePlayer('${id}')">&times;</a>
+                    <span class="fw-bold" style="font-size: 0.8rem;">${p.displayName}</span>
+                    <a href="javascript:void(0)" class="remove-btn" onclick="removePlayer('${watchKey}')">&times;</a>
                 `;
                 playerGrid.appendChild(chip);
             });
@@ -487,7 +532,15 @@
                     }
 
                     if (matchedPlayer) {
-                        if (!activeWatchlist.has(matchedPlayer.player_id)) { addPlayerToWatchlist(matchedPlayer); addedCount++; }
+                        const isDH = doubleHeaderTeamIds.has(String(matchedPlayer.team_id));
+                        if (isDH) {
+                            addPlayerToWatchlist(matchedPlayer, 'G1');
+                            addPlayerToWatchlist(matchedPlayer, 'G2');
+                            addedCount += 2;
+                        } else {
+                            addPlayerToWatchlist(matchedPlayer);
+                            addedCount++;
+                        }
                     } else unmatched.push(playerName);
                 });
 
@@ -538,13 +591,11 @@
 
             if (!actualPushToken) throw new Error("Failed to retrieve push token.");
 
-            // Build the object mapping player_id to team_id
+            // Build the object mapping watchKey (e.g. "680777" or "680777_G1") to team_id
             const watchlistPayload = {};
-            activeWatchlist.forEach((player, id) => {
-                watchlistPayload[id] = player.team_id || "unknown";
+            activeWatchlist.forEach((player, watchKey) => {
+                watchlistPayload[watchKey] = player.team_id || "unknown";
             });
-
-            const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
 
             const payload = {
                 push_token: actualPushToken,
