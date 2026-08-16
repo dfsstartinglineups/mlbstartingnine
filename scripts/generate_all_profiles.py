@@ -308,14 +308,15 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None):
     is_official = tracking_node.get("status") in ["OFFICIAL", "CONFIRMED", "UPDATED", "MODIFIED"] or has_live_lineup
     
     lineup_link_text = "View Official Lineup" if is_official else "View Projected Lineup"
-    link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
+    link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 mt-1 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
     
     # Dynamic Alert Button Logic
     alert_btn_html = ""
-    # Only show the button if they are a positional batter OR the designated starting pitcher
-    if is_starting_pitcher or not reliever_info:
+    # Only show the button if they are a positional batter or starting pitcher, 
+    # AND the game has not yet gone live or finished.
+    if (is_starting_pitcher or not reliever_info) and abstract_state not in ["Live", "Final"]:
         alert_btn_text = "🚨 MONITOR LATE SCRATCH" if is_official else "🚨 SET LINEUP ALERT"
-        alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 mt-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
+        alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 mt-1 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
     
     return f'<div class="mb-3">{badge_html}{link_html}{alert_btn_html}</div>'
 
