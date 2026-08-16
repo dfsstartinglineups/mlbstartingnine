@@ -290,6 +290,23 @@
             });
         }
 
+        // CHECK SESSION STORAGE FOR INCOMING PLAYER FROM PROFILE PAGE
+        const pendingId = sessionStorage.getItem('pendingAlertId');
+        if (pendingId) {
+            const pendingPlayer = masterPlayerList.find(p => p.player_id == pendingId);
+            if (pendingPlayer) {
+                const isDH = doubleHeaderTeamIds.has(String(pendingPlayer.team_id));
+                if (isDH) {
+                    addPlayerToWatchlist(pendingPlayer, 'G1');
+                    addPlayerToWatchlist(pendingPlayer, 'G2');
+                } else {
+                    addPlayerToWatchlist(pendingPlayer);
+                }
+            }
+            // Always clean up the memory so it doesn't duplicate on page refresh
+            sessionStorage.removeItem('pendingAlertId'); 
+        }
+        
         // CHECK FIREBASE FOR TODAY'S SAVED PLAYERS
         const userId = generateUserId();
         const dbUrl = `${firebaseConfig.databaseURL}/watchlist/${userId}.json`;
