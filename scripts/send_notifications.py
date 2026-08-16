@@ -250,31 +250,47 @@ def process_notifications(active_users, official_teams, active_starters, postpon
         if not user_updates:
             continue
 
-        # Add the postponed players to the batching logic
-        body_lines = []
-        if postponed_players:
-            body_lines.append("☔ POSTPONED: " + ", ".join(postponed_players))
-        if late_scratches:
-            body_lines.append("🚨 LATE SCRATCH: " + ", ".join(late_scratches))
-        if scratches:
-            body_lines.append("🚨 OUT: " + ", ".join(scratches))
-        if late_adds:
-            body_lines.append("✅ LATE ADD: " + ", ".join(late_adds))
-        if confirmed:
-            body_lines.append("✅ IN: " + ", ".join(confirmed))
+        # 1. Chunk each alert category so player names never exceed lock screen width (~85 chars)
+        def chunk_category(prefix, player_list, max_len=85):
+            if not player_list:
+                return []
+            chunks = []
+            current = []
+            for player in player_list:
+                test_str = f"{prefix}: " + ", ".join(current + [player])
+                if len(test_str) > max_len and current:
+                    chunks.append(f"{prefix}: " + ", ".join(current))
+                    current = [player]
+                else:
+                    current.append(player)
+            if current:
+                chunks.append(f"{prefix}: " + ", ".join(current))
+            return chunks
 
+        category_lines = []
+        category_lines.extend(chunk_category("☔ POSTPONED", postponed_players))
+        category_lines.extend(chunk_category("🚨 LATE SCRATCH", late_scratches))
+        category_lines.extend(chunk_category("🚨 OUT", scratches))
+        category_lines.extend(chunk_category("✅ LATE ADD", late_adds))
+        category_lines.extend(chunk_category("✅ IN", confirmed))
+
+        # 2. Pack lines into notification batches (Strict limit: max 90 chars or max 2 lines per alert)
         batched_bodies = []
-        current_batch = ""
+        current_batch = []
+        current_len = 0
 
-        for line in body_lines:
-            if len(current_batch) + len(line) > 200:
-                batched_bodies.append(current_batch.strip())
-                current_batch = line + "\n"
+        for line in category_lines:
+            line_len = len(line)
+            if current_batch and (current_len + line_len + 1 > 90 or len(current_batch) >= 2):
+                batched_bodies.append("\n".join(current_batch))
+                current_batch = [line]
+                current_len = line_len
             else:
-                current_batch += line + "\n"
-        
+                current_batch.append(line)
+                current_len += line_len + 1
+
         if current_batch:
-            batched_bodies.append(current_batch.strip())
+            batched_bodies.append("\n".join(current_batch))
 
         for i, body_text in enumerate(batched_bodies):
             title = "Lineup Alert" if len(batched_bodies) == 1 else f"Lineup Alert ({i+1}/{len(batched_bodies)})"
