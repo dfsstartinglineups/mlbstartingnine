@@ -364,11 +364,14 @@ def process_dfs_notifications(active_users, official_teams, active_starters, pos
         for i, body_text in enumerate(batched_bodies):
             title = "Lineup Alert" if len(batched_bodies) == 1 else f"Lineup Alert ({i+1}/{len(batched_bodies)})"
             
+            # Generate a unique timestamp for the cache buster
+            cache_buster = int(datetime.now().timestamp())
+            
             msg = messaging.Message(
                 data={
                     "title": title,
                     "body": body_text,
-                    "url": "https://mlbstartingnine.com/"
+                    "url": f"https://mlbstartingnine.com/?cb={cache_buster}"
                 },
                 token=push_token
             )
@@ -434,11 +437,12 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
                 team_name = team_info.get("name", "Team")
                 team_slug = team_info.get("slug", "los-angeles-dodgers")
                 
+                cache_buster = int(datetime.now().timestamp())
                 msg = messaging.Message(
                     data={
                         "title": "Game Postponed",
                         "body": f"☔ The {team_name} game has been postponed.",
-                        "url": f"https://mlbstartingnine.com/lineups/{team_slug}/"
+                        "url": f"https://mlbstartingnine.com/lineups/{team_slug}/?cb={cache_buster}"
                     },
                     token=push_token
                 )
@@ -484,15 +488,15 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
                         body_text = f"🚨 OFFICIAL: The {team_name} starting lineup{game_tag} is live! Tap to view the lineup."
                         user_updates[off_team] = True
                 
+                    cache_buster = int(datetime.now().timestamp())
                     msg = messaging.Message(
                         data={
                             "title": "Lineup Alert",
                             "body": body_text,
-                            "url": f"https://mlbstartingnine.com/lineups/{team_slug}/"
+                            "url": f"https://mlbstartingnine.com/lineups/{team_slug}/?cb={cache_buster}"
                         },
                         token=push_token
                     )
-                    messages_to_send.append(msg)
 
         # Queue database receipts
         if user_updates:
