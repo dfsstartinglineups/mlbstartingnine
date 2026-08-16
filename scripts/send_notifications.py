@@ -409,6 +409,11 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
         # 1. Evaluate Postponed Games
         for ppd_team in postponed_teams: # e.g. '147' or '147_G1'
             base_team = ppd_team.split('_')[0]
+            
+            # FIX: Ignore artificial "_G1" duplicates on normal days
+            if ppd_team.endswith('_G1') and base_team in postponed_teams:
+                continue
+                
             ppd_key = f"PPD_{ppd_team}"
             
             if base_team in subscribed_teams and ppd_key not in notified_states:
@@ -430,6 +435,10 @@ def process_team_notifications(active_team_users, official_teams, postponed_team
         # 2. Evaluate Official Lineups
         for off_team in official_teams:
             base_team = off_team.split('_')[0]
+            
+            # FIX: Ignore artificial "_G1" duplicates on normal days
+            if off_team.endswith('_G1') and base_team in official_teams:
+                continue
             
             if base_team in subscribed_teams and off_team not in notified_states:
                 team_info = TEAM_MAP.get(int(base_team), {})
