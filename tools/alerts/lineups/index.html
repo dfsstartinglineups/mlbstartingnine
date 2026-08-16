@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="/manifest-alerts.json">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    
+    <title>MLB Team Lineup Alerts | Instant Starting 9 Push Notifications</title>
+    <meta name="description" content="Subscribe to your favorite MLB teams and get instant push notifications the exact second their official starting lineup is released.">
+    <meta name="keywords" content="MLB team lineup alerts, MLB starting lineups, DFS alerts, baseball push notifications, MLB DFS tools">
+    <link rel="canonical" href="https://mlbstartingnine.com/tools/alerts/lineups/">
+    
+    <meta property="og:site_name" content="MLB Starting Nine">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mlbstartingnine.com/tools/alerts/lineups/">
+    <meta property="og:title" content="MLB Team Lineup Alerts | Instant Starting Lineup Notifications">
+    <meta property="og:description" content="Subscribe to your favorite MLB teams and get instant push notifications the exact second their official starting lineup drops.">
+    <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body { background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .header-brand a { color: inherit; text-decoration: none; }
+        .header-brand span { background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-right: 2px; display: inline-block; }
+        
+        .alert-card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        /* Team Grid Styling */
+        .team-card { border: 1px solid #dee2e6; border-radius: 8px; transition: all 0.2s; background: #fff; }
+        .team-card:hover { border-color: #adb5bd; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .team-logo { width: 45px; height: 45px; object-fit: contain; }
+        
+        .btn-sub { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.2s; }
+        .btn-sub.active-daily { background-color: #0d6efd; color: white; border-color: #0d6efd; }
+        .btn-sub.active-season { background-color: #198754; color: white; border-color: #198754; }
+        
+        /* Active Chips */
+        .sub-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .sub-chip .remove-btn { margin-left: 10px; color: #dc3545; cursor: pointer; font-weight: bold; font-size: 1.1rem; line-height: 1; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="header-brand mb-2 mb-md-0">
+            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="/" class="btn btn-sm btn-outline-light fw-bold">◀ Back to Lineups</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="text-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-2">Team Lineup Alerts 🔔</h1>
+        <p class="text-muted">Get an instant push notification the exact second a team's starting lineup drops.</p>
+    </div>
+
+    <!-- How it works Accordion -->
+    <div class="accordion mb-4 shadow-sm" id="howItWorksAccordion">
+        <div class="accordion-item border-0 rounded alert-card overflow-hidden">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background-color: #fcfcfc;">
+                    How It Works (Click to Expand)
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#howItWorksAccordion">
+                <div class="accordion-body text-muted" style="font-size: 0.9rem;">
+                    <ol class="mb-0 ps-3">
+                        <li class="mb-2">
+                            <strong>Choose Your Teams:</strong> Scroll through the grid below and select the MLB teams you want to monitor.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Select Your Duration:</strong> 
+                            <ul class="mt-1 mb-0 ps-3">
+                                <li><strong>Today Only:</strong> We will ping you when today's lineup drops, then automatically clear your subscription tonight. Perfect for daily fantasy and props.</li>
+                                <li><strong>Full Season:</strong> Set it and forget it. We will ping you every single game day the second your favorite team releases their lineup.</li>
+                            </ul>
+                        </li>
+                        <li class="mb-1">
+                            <strong>Arm Your Alerts:</strong> You must grant browser push notification permissions. On iOS, you will need to "Add to Home Screen" first via the share button.
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Watchlist -->
+    <div class="alert-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+            <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">My Active Subscriptions</h5>
+            <div class="d-flex align-items-center gap-2">
+                <button class="btn btn-sm btn-outline-danger fw-bold py-0 px-2" id="clear-all-btn" style="font-size: 0.75rem; height: 22px; display: none;">Clear All</button>
+            </div>
+        </div>
+        
+        <div id="empty-state" class="text-center py-3 text-muted fst-italic" style="font-size: 0.9rem;">
+            No teams selected yet. Tap the buttons below to subscribe!
+        </div>
+        
+        <div id="subs-grid" class="d-flex flex-wrap gap-2">
+            <!-- Chips injected here via JS -->
+        </div>
+    </div>
+
+    <!-- Teams Grid -->
+    <div class="alert-card p-4 mb-4 bg-light">
+        <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-size: 1rem;">⚾ Select Teams</h5>
+        <div class="row g-3" id="team-selector-grid">
+            <!-- Team cards injected here via JS -->
+        </div>
+    </div>
+
+    <!-- Toggles and Arming -->
+    <div class="alert-card p-4 text-center" style="background-color: #f8f9fa;">
+        <h5 class="fw-bold mb-3" style="font-size: 1rem;">Finalize Subscriptions</h5>
+        <div class="d-block">
+            <button id="arm-alerts-btn" class="btn btn-lg btn-primary fw-bold px-5 py-3 shadow w-100" style="max-width: 400px; border-radius: 30px;">
+                Confirm & Arm Alerts 🛡️
+            </button>
+        </div>
+        <div id="status-message" class="mt-3 fw-bold d-none" style="font-size: 0.9rem;"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1siO6niUMzrm_RXpcDxFDiLQ8xjSAAkw",
+      authDomain: "nbastartingfive-8b420.firebaseapp.com",
+      databaseURL: "https://nbastartingfive-8b420-default-rtdb.firebaseio.com",
+      projectId: "nbastartingfive-8b420",
+      storageBucket: "nbastartingfive-8b420.firebasestorage.app",
+      messagingSenderId: "348101109842",
+      appId: "1:348101109842:web:8713e5ba9b0bc9691ed78b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+    const PUBLIC_VAPID_KEY = "BFeKk22n0ZPJtjfhu_rzyVT6fGDOLKL2pw3McTgQhelPNzfcFGfOjIYTD4QvZ7F1VIeF1XMDWDFikD19PeuGUG4";
+
+    const mlbTeams = [
+        { id: 109, city: "Arizona", name: "Diamondbacks", bg: "#A71930" },
+        { id: 144, city: "Atlanta", name: "Braves", bg: "#CE1141" },
+        { id: 110, city: "Baltimore", name: "Orioles", bg: "#DF4601" },
+        { id: 111, city: "Boston", name: "Red Sox", bg: "#BD3039" },
+        { id: 145, city: "Chicago", name: "White Sox", bg: "#27251F" },
+        { id: 112, city: "Chicago", name: "Cubs", bg: "#0E3386" },
+        { id: 113, city: "Cincinnati", name: "Reds", bg: "#C6011F" },
+        { id: 114, city: "Cleveland", name: "Guardians", bg: "#E31937" },
+        { id: 115, city: "Colorado", name: "Rockies", bg: "#33006F" },
+        { id: 116, city: "Detroit", name: "Tigers", bg: "#0C2340" },
+        { id: 117, city: "Houston", name: "Astros", bg: "#002D62" },
+        { id: 118, city: "Kansas City", name: "Royals", bg: "#004687" },
+        { id: 108, city: "Los Angeles", name: "Angels", bg: "#003263" },
+        { id: 119, city: "Los Angeles", name: "Dodgers", bg: "#005A9C" },
+        { id: 146, city: "Miami", name: "Marlins", bg: "#00A3E0" },
+        { id: 158, city: "Milwaukee", name: "Brewers", bg: "#FFC52F" },
+        { id: 142, city: "Minnesota", name: "Twins", bg: "#002B5C" },
+        { id: 121, city: "New York", name: "Mets", bg: "#FF5910" },
+        { id: 147, city: "New York", name: "Yankees", bg: "#003087" },
+        { id: 133, city: "Oakland", name: "Athletics", bg: "#003831" },
+        { id: 143, city: "Philadelphia", name: "Phillies", bg: "#E81828" },
+        { id: 134, city: "Pittsburgh", name: "Pirates", bg: "#FDB827" },
+        { id: 135, city: "San Diego", name: "Padres", bg: "#2F241D" },
+        { id: 137, city: "San Francisco", name: "Giants", bg: "#FD5A1E" },
+        { id: 136, city: "Seattle", name: "Mariners", bg: "#005C5C" },
+        { id: 138, city: "St. Louis", name: "Cardinals", bg: "#C41E3A" },
+        { id: 139, city: "Tampa Bay", name: "Rays", bg: "#092C5C" },
+        { id: 140, city: "Texas", name: "Rangers", bg: "#003278" },
+        { id: 141, city: "Toronto", name: "Blue Jays", bg: "#134A8E" },
+        { id: 120, city: "Washington", name: "Nationals", bg: "#AB0003" }
+    ];
+
+    let dailySubs = new Set();
+    let seasonSubs = new Set();
+    const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+
+    function initUI() {
+        const grid = document.getElementById('team-selector-grid');
+        mlbTeams.forEach(team => {
+            const logo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${team.id}.svg`;
+            const div = document.createElement('div');
+            div.className = 'col-12 col-md-6 col-lg-4';
+            div.innerHTML = `
+                <div class="team-card p-3 d-flex align-items-center h-100">
+                    <img src="${logo}" class="team-logo me-3" alt="${team.name}">
+                    <div class="flex-grow-1">
+                        <div class="fw-bold text-dark lh-1 mb-2" style="font-size: 0.95rem;">${team.city} <br><span class="text-secondary" style="font-size: 0.8rem;">${team.name}</span></div>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-outline-primary w-50 btn-sub" id="btn-daily-${team.id}" onclick="toggleSub(${team.id}, 'daily')">Today</button>
+                            <button class="btn btn-outline-success w-50 btn-sub" id="btn-season-${team.id}" onclick="toggleSub(${team.id}, 'season')">Season</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.appendChild(div);
+        });
+
+        // Load existing subs from Firebase
+        const userId = generateUserId();
+        const dbUrl = `${firebaseConfig.databaseURL}/team_watchlist/${userId}.json`;
+        fetch(dbUrl)
+            .then(res => res.json())
+            .then(savedData => {
+                if (savedData) {
+                    if (savedData.date === todayDate && savedData.daily) {
+                        savedData.daily.forEach(id => dailySubs.add(id));
+                    }
+                    if (savedData.season) {
+                        savedData.season.forEach(id => seasonSubs.add(id));
+                    }
+                    updateUIReflection();
+                    
+                    if (dailySubs.size > 0 || seasonSubs.size > 0) {
+                        const msgBox = document.getElementById('status-message');
+                        const armBtn = document.getElementById('arm-alerts-btn');
+                        msgBox.className = "mt-3 fw-bold text-success";
+                        msgBox.innerText = "✅ Your lineup alerts are active.";
+                        armBtn.innerHTML = "Update Subscriptions 🛡️";
+                    }
+                }
+            }).catch(e => console.log("No previous subs found."));
+    }
+
+    window.toggleSub = function(teamId, type) {
+        if (type === 'daily') {
+            if (dailySubs.has(teamId)) dailySubs.delete(teamId);
+            else { dailySubs.add(teamId); seasonSubs.delete(teamId); } // Mutually exclusive
+        } else {
+            if (seasonSubs.has(teamId)) seasonSubs.delete(teamId);
+            else { seasonSubs.add(teamId); dailySubs.delete(teamId); } // Mutually exclusive
+        }
+        updateUIReflection();
+    };
+
+    window.removeSub = function(teamId, type) {
+        if (type === 'daily') dailySubs.delete(teamId);
+        else seasonSubs.delete(teamId);
+        updateUIReflection();
+    };
+
+    document.getElementById('clear-all-btn').addEventListener('click', () => {
+        if (confirm("Are you sure you want to remove all subscriptions?")) {
+            dailySubs.clear();
+            seasonSubs.clear();
+            updateUIReflection();
+        }
+    });
+
+    function updateUIReflection() {
+        const subsGrid = document.getElementById('subs-grid');
+        const emptyState = document.getElementById('empty-state');
+        const clearBtn = document.getElementById('clear-all-btn');
+        subsGrid.innerHTML = '';
+        
+        mlbTeams.forEach(team => {
+            const btnDaily = document.getElementById(`btn-daily-${team.id}`);
+            const btnSeason = document.getElementById(`btn-season-${team.id}`);
+            
+            if (dailySubs.has(team.id)) {
+                btnDaily.classList.add('active-daily'); btnDaily.innerText = "✓ Today";
+                btnSeason.classList.remove('active-season'); btnSeason.innerText = "Season";
+                createChip(team, 'daily');
+            } else if (seasonSubs.has(team.id)) {
+                btnSeason.classList.add('active-season'); btnSeason.innerText = "✓ Season";
+                btnDaily.classList.remove('active-daily'); btnDaily.innerText = "Today";
+                createChip(team, 'season');
+            } else {
+                btnDaily.classList.remove('active-daily'); btnDaily.innerText = "Today";
+                btnSeason.classList.remove('active-season'); btnSeason.innerText = "Season";
+            }
+        });
+
+        if (dailySubs.size === 0 && seasonSubs.size === 0) {
+            emptyState.style.display = 'block'; clearBtn.style.display = 'none';
+        } else {
+            emptyState.style.display = 'none'; clearBtn.style.display = 'inline-block';
+        }
+    }
+
+    function createChip(team, type) {
+        const subsGrid = document.getElementById('subs-grid');
+        const chip = document.createElement('div');
+        chip.className = 'sub-chip';
+        const logo = `https://www.mlbstatic.com/team-logos/team-cap-on-light/${team.id}.svg`;
+        const badgeColor = type === 'daily' ? 'bg-primary' : 'bg-success';
+        const badgeLabel = type === 'daily' ? 'TODAY' : 'SEASON';
+        
+        chip.innerHTML = `
+            <div class="position-relative d-inline-block flex-shrink-0" style="width: 28px; height: 28px; margin-right: 8px;">
+                <img src="${logo}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
+            </div>
+            <div class="d-flex flex-column pe-2">
+                <span class="fw-bold lh-1" style="font-size: 0.75rem;">${team.name}</span>
+                <span class="badge ${badgeColor} lh-1 mt-1" style="font-size: 0.5rem; padding: 2px 4px;">${badgeLabel}</span>
+            </div>
+            <a href="javascript:void(0)" class="remove-btn pe-2" onclick="removeSub(${team.id}, '${type}')">&times;</a>
+        `;
+        subsGrid.appendChild(chip);
+    }
+
+    function generateUserId() {
+        let uid = localStorage.getItem('mlb9_alerts_uid');
+        if (!uid) { uid = 'anon_' + Math.random().toString(36).substr(2, 9); localStorage.setItem('mlb9_alerts_uid', uid); }
+        return uid;
+    }
+
+    document.getElementById('arm-alerts-btn').addEventListener('click', async () => {
+        const armBtn = document.getElementById('arm-alerts-btn');
+        const msgBox = document.getElementById('status-message');
+        const userId = generateUserId();
+
+        armBtn.innerHTML = "Requesting Permissions...";
+        armBtn.disabled = true;
+
+        try {
+            if (!('Notification' in window)) throw new Error("Apple requires you to add this app to your home screen to receive alerts.");
+            if (!('serviceWorker' in navigator)) throw new Error("Your browser does not support background alerts.");
+
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') throw new Error("Push permissions denied by user.");
+
+            armBtn.innerHTML = "Generating Secure Token...";
+
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            const actualPushToken = await getToken(messaging, {
+                vapidKey: PUBLIC_VAPID_KEY,
+                serviceWorkerRegistration: registration
+            });
+
+            if (!actualPushToken) throw new Error("Failed to retrieve push token.");
+
+            // Build payload
+            const payload = {
+                push_token: actualPushToken,
+                date: todayDate,
+                daily: Array.from(dailySubs),
+                season: Array.from(seasonSubs)
+            };
+
+            const dbUrl = `${firebaseConfig.databaseURL}/team_watchlist/${userId}.json`;
+            const response = await fetch(dbUrl, {
+                method: "PUT", // Use PUT to fully overwrite this specific user's team preferences
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                msgBox.className = "mt-3 fw-bold text-success d-block";
+                msgBox.innerText = "✅ Success! Your team alerts are armed.";
+                armBtn.innerHTML = "Alerts Armed 🛡️";
+                armBtn.disabled = false;
+            } else {
+                throw new Error("Failed to save to database.");
+            }
+
+        } catch (error) {
+            console.error(error);
+            msgBox.className = "mt-3 fw-bold text-danger d-block";
+            msgBox.innerText = "⚠️ Error: " + error.message;
+            armBtn.innerHTML = "Confirm & Arm Alerts 🛡️";
+            armBtn.disabled = false;
+        }
+    });
+
+    // Boot up
+    initUI();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>    
+</body>
+</html>
