@@ -287,7 +287,8 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
     has_live_lineup = len((game_raw.get("lineups") or {}).get(f"{team_side}Players", [])) > 0
     is_official = tracking_node.get("status") in ["OFFICIAL", "CONFIRMED", "UPDATED", "MODIFIED"] or has_live_lineup
     
-    lineup_link_text = f"View {dh_prefix.replace(': ', ' ')}Official Lineup" if is_official else f"View {dh_prefix.replace(': ', ' ')}Projected Lineup"
+    # Strip the doubleheader prefix from the button so it remains universal
+    lineup_link_text = "View Official Lineup" if is_official else "View Projected Lineup"
     link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
     
     alert_btn_html = ""
@@ -295,7 +296,8 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
         alert_btn_text = "🚨 MONITOR LATE SCRATCH" if is_official else "🚨 SET LINEUP ALERT"
         alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
     
-    return f'<div class="d-flex flex-column gap-1 w-100 mb-2">{badge_html}{link_html}{alert_btn_html}</div>'
+    # Return elements individually so the parent function can group them cleanly
+    return badge_html, link_html, alert_btn_html
 
 def build_custom_boxscore(profile, is_pitcher):
     """Builds a custom box score string directly from raw integer stats."""
@@ -1090,7 +1092,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         # ----------------------------------------------------
         # OFF-SLATE FALLBACK
         # ----------------------------------------------------
-        badge_matrix_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NO GAME SCHEDULED</div>'
+        badge_matrix_html = '<div class="d-flex flex-column gap-1 w-100 mb-2"><div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NO GAME SCHEDULED</div></div>'
         game_state_lbl = '<strong>Game Status:</strong> Not on Today\'s Active Slate'
         
         blurb_html, raw_text = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, None, None, {}, profile, master_data, live_data, reliever_info)
@@ -1107,6 +1109,10 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         # ----------------------------------------------------
         # ACTIVE SLATE / DOUBLEHEADER ITERATOR
         # ----------------------------------------------------
+        badges_list = []
+        final_link_html = ""
+        final_alert_html = ""
+
         for i, match in enumerate(active_matches):
             my_game = match["game"]
             team_side = match["teamSide"]
@@ -1132,8 +1138,22 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
             fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
             
-            b_html = render_badge_zone(player_id, team_side, my_game, reliever_info, live_data, dh_prefix)
-            badge_matrix_html += b_html
+            # Deconstruct the returned tuple
+            b_html, l_html, a_html = render_badge_zone(player_id, team_side, my_game, reliever_info, live_data, dh_prefix)
+            badges_list.append(b_html)
+
+            # Keep the link for the currently relevant game (Switches to Game 2 if Game 1 is final)
+            game_pk = str(my_game.get("gameRaw", {}).get("gamePk", ""))
+            active_live = live_data.get(game_pk) if live_data else None
+            abstract_state = my_game.get("gameRaw", {}).get("status", {}).get("abstractGameState", "")
+            is_game_final = (active_live is not None and active_live.get("status") in ["Final", "Completed"]) or abstract_state == "Final"
+            
+            if not final_link_html or not is_game_final:
+                final_link_html = l_html
+                
+            # Retain the alert button if any game allows it
+            if a_html:
+                final_alert_html = a_html
             
             state_lbl, console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher)
             game_state_lbls.append(f"<strong>{dh_prefix.strip(': ')}</strong> {state_lbl}" if is_dh else state_lbl)
@@ -1164,6 +1184,9 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             
             if is_dh and i == 0:
                 modules_html += '<hr class="my-4" style="border-top: 3px solid #dee2e6; opacity: 1;">'
+
+        # Wrap everything in one clean container
+        badge_matrix_html = f'<div class="d-flex flex-column gap-1 w-100 mb-2">{"".join(badges_list)}{final_link_html}{final_alert_html}</div>'
 
         game_state_lbl = " | ".join(game_state_lbls)
         opponents_str = " & ".join(opp_team_names)
