@@ -77,7 +77,6 @@ def update_sitemap(all_player_urls, updated_urls):
     """Updates the sitemap with accurate <lastmod> dates and removes deprecated tags."""
     existing_data = {}
     
-    # 1. Parse existing dates to prevent overwriting unchanged URLs
     if os.path.exists(SITEMAP_OUTPUT_PATH):
         try:
             ET.register_namespace('', "http://www.sitemaps.org/schemas/sitemap/0.9")
@@ -93,7 +92,6 @@ def update_sitemap(all_player_urls, updated_urls):
         except Exception:
             pass
 
-    # Define your static, core website URLs here
     core_urls = [
         f"{DOMAIN}/",
         f"{DOMAIN}/tools/alerts/players/"
@@ -101,14 +99,10 @@ def update_sitemap(all_player_urls, updated_urls):
     
     all_urls_set = set(all_player_urls)
     
-    # Inject all core URLs into the master set
     for curl in core_urls:
         all_urls_set.add(curl)
     
-    # Merge newly generated URLs with any pre-existing URLs (like /lineups/) that share this sitemap
     final_urls = sorted(list(all_urls_set.union(existing_data.keys())))
-    
-    # Update to use full ISO 8601 format with time (e.g., 2026-08-09T20:37:57+00:00)
     today_str = datetime.now(timezone.utc).isoformat(timespec='seconds')
 
     xml_root = ET.Element('urlset', xmlns="http://www.sitemaps.org/schemas/sitemap/0.9")
@@ -117,7 +111,6 @@ def update_sitemap(all_player_urls, updated_urls):
         url_node = ET.SubElement(xml_root, 'url')
         ET.SubElement(url_node, 'loc').text = url
         
-        # 2. Assign accurate lastmod date based on update status
         if url in updated_urls:
             lastmod = today_str
         else:
@@ -159,18 +152,16 @@ def queue_urls_for_indexnow(new_urls, queue_file="data/updates_queue.json"):
         json.dump(queue_data, f, indent=2)
 
 # ==========================================
-# 2. MATCHUP ENGINE
+# 2. MATCHUP ENGINE (UPDATED FOR DOUBLEHEADERS)
 # ==========================================
-def resolve_active_matchup(player_id, team_name, daily_data):
+def resolve_active_matchups(player_id, team_name, daily_data):
+    """Returns an array of unique games a player/team is involved in for the current slate."""
     p_id_str = str(player_id)
-    
-    official_id_matches = []
-    proj_id_team_matches = []
-    proj_id_matches = []
-    team_name_matches = []
+    matches_by_pk = {}
 
     for game in daily_data.get("games", []):
         game_raw = game.get("gameRaw", {})
+        game_pk = str(game_raw.get("gamePk", ""))
         teams = game_raw.get("teams", {})
         
         home_team_name = teams.get("home", {}).get("team", {}).get("name", "")
@@ -187,56 +178,44 @@ def resolve_active_matchup(player_id, team_name, daily_data):
         home_proj_players = [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])]
         away_proj_players = [str(p.get("id")) for p in game.get("projectedLineups", {}).get("away", {}).get("battingOrder", [])]
 
-        # ----------------------------------------------------
-        # TIER 1: OFFICIAL / LIVE LINEUP MATCH (Highest Priority)
-        # ----------------------------------------------------
+        team_side = None
+        tier = 4 # Lowest confidence
+
+        # Evaluate confidence tiers
         if p_id_str in home_official_players or (home_probable_p and home_probable_p == p_id_str):
-            official_id_matches.append({"game": game, "teamSide": "home"})
+            team_side, tier = "home", 1
         elif p_id_str in away_official_players or (away_probable_p and away_probable_p == p_id_str):
-            official_id_matches.append({"game": game, "teamSide": "away"})
-
-        # ----------------------------------------------------
-        # TIER 2: PROJECTED ID + TEAM NAME MATCH
-        # ----------------------------------------------------
+            team_side, tier = "away", 1
         elif p_id_str in home_proj_players and (home_team_name and home_team_name in team_name):
-            proj_id_team_matches.append({"game": game, "teamSide": "home"})
+            team_side, tier = "home", 2
         elif p_id_str in away_proj_players and (away_team_name and away_team_name in team_name):
-            proj_id_team_matches.append({"game": game, "teamSide": "away"})
-
-        # ----------------------------------------------------
-        # TIER 3: PROJECTED ID MATCH (Cross-team / Stale)
-        # ----------------------------------------------------
+            team_side, tier = "away", 2
         elif p_id_str in home_proj_players:
-            proj_id_matches.append({"game": game, "teamSide": "home"})
+            team_side, tier = "home", 3
         elif p_id_str in away_proj_players:
-            proj_id_matches.append({"game": game, "teamSide": "away"})
-
-        # ----------------------------------------------------
-        # TIER 4: LOOSE TEAM NAME FALLBACK
-        # ----------------------------------------------------
+            team_side, tier = "away", 3
         elif home_team_name and home_team_name in team_name:
-            team_name_matches.append({"game": game, "teamSide": "home"})
+            team_side, tier = "home", 4
         elif away_team_name and away_team_name in team_name:
-            team_name_matches.append({"game": game, "teamSide": "away"})
+            team_side, tier = "away", 4
 
-    # Always select the highest tier bucket that contains matches
-    matching_games = official_id_matches or proj_id_team_matches or proj_id_matches or team_name_matches
-    if not matching_games: 
-        return None, None
-        
-    if len(matching_games) > 1:
-        live_match = next((m for m in matching_games if m["game"].get("gameRaw", {}).get("status", {}).get("abstractGameState") in ["Live", "In Progress"]), None)
-        upcoming_match = next((m for m in matching_games if m["game"].get("gameRaw", {}).get("status", {}).get("abstractGameState") in ["Preview", "Scheduled"]), None)
-        if live_match: return live_match["game"], live_match["teamSide"]
-        elif upcoming_match: return upcoming_match["game"], upcoming_match["teamSide"]
-        else: return matching_games[-1]["game"], matching_games[-1]["teamSide"]
-            
-    return matching_games[0]["game"], matching_games[0]["teamSide"]
+        # Group matches uniquely by Game PK to prevent double-counting a single game
+        if team_side:
+            if game_pk in matches_by_pk:
+                if tier < matches_by_pk[game_pk]["tier"]:
+                    matches_by_pk[game_pk] = {"game": game, "teamSide": team_side, "tier": tier}
+            else:
+                matches_by_pk[game_pk] = {"game": game, "teamSide": team_side, "tier": tier}
+
+    # Sort matches chronologically
+    sorted_matches = sorted(list(matches_by_pk.values()), key=lambda x: x["game"].get("gameRaw", {}).get("gameNumber", 1))
+    
+    return sorted_matches[:2]
 
 # ==========================================
 # 3. HTML SUB-RENDERERS
 # ==========================================
-def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_data=None):
+def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_data=None, dh_prefix=""):
     game_raw = my_game.get("gameRaw") or {}
     teams = game_raw.get("teams") or {}
     my_team = teams.get(team_side) or {}
@@ -245,7 +224,6 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
     abstract_state = (game_raw.get("status") or {}).get("abstractGameState", "")
     detailed_state = (game_raw.get("status") or {}).get("detailedState", "")
     
-    # Check live_data first, then fallback to gameRaw status
     game_pk = str(game_raw.get("gamePk", ""))
     active_live = live_data.get(game_pk) if live_data else None
     
@@ -253,7 +231,7 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
     
     is_postponed = "Postponed" in abstract_state or "Postponed" in detailed_state or (game_raw.get("status") or {}).get("statusCode") == "C"
     if is_postponed:
-        return '<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">✕ GAME POSTPONED</div>'
+        return f'<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">{dh_prefix}✕ GAME POSTPONED</div>'
         
     probable_pitcher = my_team.get("probablePitcher") or {}
     probable_id = str(probable_pitcher.get("id", ""))
@@ -268,15 +246,15 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
         is_starting_pitcher = (projected_id == str(player_id))
                        
     if is_starting_pitcher:
-        badge_html = '<div class="badge status-badge-confirmed py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">IN LINEUP: Starting Pitcher</div>'
+        badge_html = f'<div class="badge status-badge-confirmed py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">{dh_prefix}IN LINEUP: Starting Pitcher</div>'
     elif reliever_info:
         rel_status = reliever_info.get("status", "Available")
         if rel_status == "Available":
-            badge_html = '<div class="badge bg-success py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">BULLPEN: AVAILABLE</div>'
+            badge_html = f'<div class="badge bg-success py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">{dh_prefix}BULLPEN: AVAILABLE</div>'
         elif rel_status == "Tired":
-            badge_html = '<div class="badge bg-warning text-dark py-1 px-2 w-100 shadow-sm text-uppercase fw-bold" style="font-size: 0.7rem;">BULLPEN: TIRED</div>'
+            badge_html = f'<div class="badge bg-warning text-dark py-1 px-2 w-100 shadow-sm text-uppercase fw-bold" style="font-size: 0.7rem;">{dh_prefix}BULLPEN: TIRED</div>'
         else:
-            badge_html = '<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">BULLPEN: UNAVAILABLE</div>'
+            badge_html = f'<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">{dh_prefix}BULLPEN: UNAVAILABLE</div>'
     else:
         lineups = game_raw.get("lineups") or {}
         actual_lineup = lineups.get(f"{team_side}Players", [])
@@ -295,13 +273,13 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
             slot_index = next((i for i, p in enumerate(proj_order) if str(p.get("id")) == str(player_id)), -1)
             
         if is_confirmed and slot_index != -1:
-            badge_html = f'<div class="badge status-badge-confirmed py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">IN LINEUP: Batting #{slot_index + 1}</div>'
+            badge_html = f'<div class="badge status-badge-confirmed py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">{dh_prefix}IN LINEUP: Batting #{slot_index + 1}</div>'
         elif is_confirmed and slot_index == -1:
-            badge_html = '<div class="badge status-badge-scratched py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">✕ NOT STARTING</div>'
+            badge_html = f'<div class="badge status-badge-scratched py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">{dh_prefix}✕ NOT STARTING</div>'
         elif slot_index != -1:
-            badge_html = f'<div class="badge status-badge-projected py-1 px-2 w-100 shadow-sm text-uppercase text-dark" style="font-size: 0.7rem;">Projected #{slot_index + 1}</div>'
+            badge_html = f'<div class="badge status-badge-projected py-1 px-2 w-100 shadow-sm text-uppercase text-dark" style="font-size: 0.7rem;">{dh_prefix}Projected #{slot_index + 1}</div>'
         else:
-            badge_html = '<div class="badge status-badge-scratched py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">✕ NOT PROJECTED TO START</div>'
+            badge_html = f'<div class="badge status-badge-scratched py-1 px-2 w-100 shadow-sm text-uppercase" style="font-size: 0.7rem;">{dh_prefix}✕ NOT PROJECTED TO START</div>'
             
     my_team_id = (my_team.get("team") or {}).get("id", 119)
     team_slug = get_slug_from_team_id(my_team_id)
@@ -309,16 +287,15 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
     has_live_lineup = len((game_raw.get("lineups") or {}).get(f"{team_side}Players", [])) > 0
     is_official = tracking_node.get("status") in ["OFFICIAL", "CONFIRMED", "UPDATED", "MODIFIED"] or has_live_lineup
     
-    lineup_link_text = "View Official Lineup" if is_official else "View Projected Lineup"
+    lineup_link_text = f"View {dh_prefix.replace(': ', ' ')}Official Lineup" if is_official else f"View {dh_prefix.replace(': ', ' ')}Projected Lineup"
     link_html = f'<a href="https://mlbstartingnine.com/lineups/{team_slug}/" class="btn btn-sm btn-outline-primary w-100 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">📊 {lineup_link_text}</a>'
     
-    # Alert button only renders before first pitch
     alert_btn_html = ""
     if (is_starting_pitcher or not reliever_info) and not is_game_active:
         alert_btn_text = "🚨 MONITOR LATE SCRATCH" if is_official else "🚨 SET LINEUP ALERT"
         alert_btn_html = f'<button type="button" onclick="sessionStorage.setItem(\'pendingAlertId\', \'{player_id}\'); window.location.href=\'/tools/alerts/players/\';" class="btn btn-sm btn-outline-danger w-100 py-1 px-2 fw-bold text-uppercase shadow-sm" style="font-size: 0.7rem; letter-spacing: 0.5px;">{alert_btn_text}</button>'
     
-    return f'<div class="d-flex flex-column gap-1 w-100">{badge_html}{link_html}{alert_btn_html}</div>'
+    return f'<div class="d-flex flex-column gap-1 w-100 mb-2">{badge_html}{link_html}{alert_btn_html}</div>'
 
 def build_custom_boxscore(profile, is_pitcher):
     """Builds a custom box score string directly from raw integer stats."""
@@ -374,7 +351,6 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
 
     active_live = live_data.get(game_pk)
     
-    # Pre-calculate routing URLs based on Live state and Position Type
     if active_live:
         dk_leaderboard_url = f"{DOMAIN}/dfs/draftkings/live-slate-leaderboard/"
         fd_leaderboard_url = f"{DOMAIN}/dfs/fanduel/live-slate-leaderboard/"
@@ -391,7 +367,6 @@ def render_live_console(player_id, team_side, my_game, live_data, dk_val, fd_val
         side_upper = team_side.upper()
         player_box = active_live.get("players", {}).get(side_upper, {}).get(f"ID{player_id}", {})
         
-        # Route to the correct custom formatter based on player position
         if is_pitcher and player_box.get("pitching"):
             summary = build_custom_boxscore(player_box.get("pitching"), is_pitcher=True)
         elif player_box.get("batting"):
@@ -670,14 +645,14 @@ def render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pit
 # ==========================================
 # DAILY OUTLOOK & MATCHUP BRIEFING GENERATOR
 # ==========================================
-def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text, card_title=None):
+def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text, card_title=None, dh_title=""):
     slate_dt = get_target_slate_datetime()
-    date_str = f"{slate_dt.strftime('%A')}({slate_dt.month}/{slate_dt.day}/{slate_dt.year})"
+    date_str = f"{slate_dt.strftime('%A')} ({slate_dt.month}/{slate_dt.day}/{slate_dt.year})"
 
     if card_title:
-        title_text = f"{card_title} for {date_str}"
+        title_text = f"{card_title.replace('📰 ', f'📰 {dh_title}')} for {date_str}"
     else:
-        title_text = f"📰 Daily Outlook for {date_str}"
+        title_text = f"📰 {dh_title}Daily Outlook for {date_str}"
 
     return f"""
     <div class="card shadow-sm border-0 mb-3" style="border-left: 4px solid {border_hex} !important;">
@@ -693,9 +668,7 @@ def render_blurb_card(badge_text, badge_bg, border_hex, blurb_text, card_title=N
     </div>"""
 
 def format_batter_narrative(batting_node):
-    """Converts box score batting dictionary into natural prose narrative."""
-    if not batting_node:
-        return ""
+    if not batting_node: return ""
 
     ab = safe_int(batting_node.get("atBats", 0))
     hits = safe_int(batting_node.get("hits", 0))
@@ -725,21 +698,15 @@ def format_batter_narrative(batting_node):
     if sbs > 0: details.append("a stolen base" if sbs == 1 else f"{sbs} stolen bases")
     if ks > 0: details.append("a strikeout" if ks == 1 else f"{ks} strikeouts")
 
-    if not details:
-        return base_phrase
+    if not details: return base_phrase
 
-    if len(details) == 1:
-        return f"{base_phrase} with {details[0]}"
-    elif len(details) == 2:
-        return f"{base_phrase} with {details[0]} and {details[1]}"
-    else:
-        return f"{base_phrase} with {', '.join(details[:-1])}, and {details[-1]}"
+    if len(details) == 1: return f"{base_phrase} with {details[0]}"
+    elif len(details) == 2: return f"{base_phrase} with {details[0]} and {details[1]}"
+    else: return f"{base_phrase} with {', '.join(details[:-1])}, and {details[-1]}"
 
 
 def format_pitcher_narrative(pitching_node):
-    """Converts box score pitching dictionary into natural prose narrative."""
-    if not pitching_node:
-        return ""
+    if not pitching_node: return ""
 
     ip = pitching_node.get("inningsPitched", "0.0")
     er = safe_int(pitching_node.get("earnedRuns", 0))
@@ -749,7 +716,6 @@ def format_pitcher_narrative(pitching_node):
     note = pitching_node.get("note", "")
     is_starter = pitching_node.get("gamesStarted", 0) == 1
 
-    # Format role and decision phrase naturally
     if is_starter:
         if "(W" in note: action_phrase = "started and earned the win, tossing"
         elif "(L" in note: action_phrase = "started and took the loss, tossing"
@@ -761,7 +727,6 @@ def format_pitcher_narrative(pitching_node):
         elif "(L" in note: action_phrase = "pitched in relief and took the loss, tossing"
         else: action_phrase = "pitched in relief, tossing"
 
-    # Singular / Plural formatting
     er_str = "0 earned runs" if er == 0 else ("1 earned run" if er == 1 else f"{er} earned runs")
     hits_str = "1 hit" if hits == 1 else f"{hits} hits"
     so_str = "1 strikeout" if so == 1 else f"{so} strikeouts"
@@ -769,10 +734,10 @@ def format_pitcher_narrative(pitching_node):
 
     return f"{action_phrase} <strong>{ip} innings</strong>, allowing <strong>{er_str}</strong> on {hits_str} with {so_str} and {bb_str}"
 
-def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data=None, reliever_info=None):
+def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data=None, reliever_info=None, dh_title=""):
     if not my_game or not team_side:
         blurb = f"<strong>{p_name}</strong> is not scheduled to pitch on today's active MLB slate." if is_pitcher else f"<strong>{p_name}</strong> is not on today's active MLB slate."
-        return render_blurb_card("Off-Slate", "bg-secondary", "#6c757d", blurb), blurb
+        return render_blurb_card("Off-Slate", "bg-secondary", "#6c757d", blurb, dh_title=dh_title), blurb
 
     game_raw = my_game.get("gameRaw") or {}
     teams = game_raw.get("teams") or {}
@@ -790,7 +755,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
     detailed_state = (game_raw.get("status") or {}).get("detailedState", "")
     if "Postponed" in abstract_state or "Postponed" in detailed_state or (game_raw.get("status") or {}).get("statusCode") == "C":
         blurb = f"Today's matchup between the <strong>{team_name}</strong> and <strong>{opp_team_name}</strong> has been <strong>postponed</strong>."
-        return render_blurb_card("Postponed", "bg-danger", "#dc3545", blurb), blurb
+        return render_blurb_card("Postponed", "bg-danger", "#dc3545", blurb, dh_title=dh_title), blurb
 
     # ----------------------------------------------------
     # 🏆 POST-GAME RECAP INTERCEPTION (GAMES ARE FINAL)
@@ -806,18 +771,15 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         my_score = away_score if team_side == "away" else home_score
         opp_score = home_score if team_side == "away" else away_score
         
-        # Always list the higher score first (American sports standard)
         high_score = max(my_score, opp_score)
         low_score = min(my_score, opp_score)
         score_str = f"{high_score}-{low_score}"
         
         outcome_word = "victory over" if my_score > opp_score else ("defeat against" if my_score < opp_score else "draw with")
 
-        # Locate player in live box score
         side_upper = team_side.upper()
         player_box = active_live.get("players", {}).get(side_upper, {}).get(f"ID{player_id}", {}) if active_live else {}
         if not player_box and active_live:
-            # Fallback search both teams
             all_players = {**active_live.get("players", {}).get("AWAY", {}), **active_live.get("players", {}).get("HOME", {})}
             player_box = all_players.get(f"ID{player_id}", {})
 
@@ -832,7 +794,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             else:
                 blurb = f"<strong>{p_name}</strong> did not pitch in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
 
-            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb, card_title="📰 Post-Game Recap"), blurb
+            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb, card_title="📰 Post-Game Recap", dh_title=dh_title), blurb
 
         # 2. Batter Post-Game Recap
         else:
@@ -840,14 +802,14 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
                 narrative_stat = format_batter_narrative(batting_node)
                 note = batting_node.get("note", "")
 
-                if note:  # Came off bench / Pinch hitter
+                if note:
                     blurb = f"<strong>{p_name}</strong> made an appearance off the bench in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}, going {narrative_stat}."
                 else:
                     blurb = f"<strong>{p_name}</strong> {narrative_stat} in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
             else:
                 blurb = f"<strong>{p_name}</strong> did not see the field in the {team_name}'s {score_str} {outcome_word} the {opp_team_name}."
 
-            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb, card_title="📰 Post-Game Recap"), blurb
+            return render_blurb_card("Final Recap", "bg-dark text-white", "#212529", blurb, card_title="📰 Post-Game Recap", dh_title=dh_title), blurb
     # ----------------------------------------------------
     # PITCHER NARRATIVE BRANCH (PRE-GAME)
     # ----------------------------------------------------
@@ -924,14 +886,14 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
                 )
 
                 if rel_status == "Available":
-                    return render_blurb_card("Bullpen: Available", "bg-success", "#198754", rel_blurb), rel_blurb
+                    return render_blurb_card("Bullpen: Available", "bg-success", "#198754", rel_blurb, dh_title=dh_title), rel_blurb
                 elif rel_status == "Tired":
-                    return render_blurb_card("Bullpen: Tired", "bg-warning text-dark", "#ffc107", rel_blurb), rel_blurb
+                    return render_blurb_card("Bullpen: Tired", "bg-warning text-dark", "#ffc107", rel_blurb, dh_title=dh_title), rel_blurb
                 else:
-                    return render_blurb_card("Bullpen: Unavailable", "bg-danger", "#dc3545", rel_blurb), rel_blurb
+                    return render_blurb_card("Bullpen: Unavailable", "bg-danger", "#dc3545", rel_blurb, dh_title=dh_title), rel_blurb
 
             blurb = f"<strong>{p_name}</strong> is not listed as the starting pitcher for the <strong>{team_name}</strong> in today's matchup against the <strong>{opp_team_name}</strong>. {season_summary}"
-            return render_blurb_card("Not Starting", "bg-secondary", "#6c757d", blurb), blurb
+            return render_blurb_card("Not Starting", "bg-secondary", "#6c757d", blurb, dh_title=dh_title), blurb
 
         tracking = (my_game.get("lineupTracking") or {}).get(opp_side) or {}
         order_list = tracking.get("hash", "").split('-') if tracking.get("hash") else []
@@ -976,7 +938,7 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         else: grade, badge_bg, border_hex = "Poor", "bg-danger", "#dc3545"
 
         blurb = f"<strong>{p_name}</strong> is scheduled to start today for the <strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>. {season_summary}{recent_summary}{bvp_note}"
-        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb), blurb
+        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb, dh_title=dh_title), blurb
 
     # ----------------------------------------------------
     # BATTER NARRATIVE BRANCH (PRE-GAME)
@@ -989,7 +951,6 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         
         slot_index = -1
         
-        # STRICT HIERARCHY: Trust live lineup first. Do NOT fallback if a live lineup exists.
         if has_live_lineup:
             slot_index = next((i for i, p in enumerate(actual_lineup) if str(p.get("id")) == str(player_id)), -1)
         elif tracking_node.get("hash"):
@@ -1006,16 +967,16 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         if slot_index == -1:
             if injury_indicator in ['IL', 'O', 'OUT']:
                 blurb = f"<strong>INJURY ALERT:</strong> <strong>{p_name}</strong> is <strong>out of today's starting lineup</strong> for the {team_name} against the {opp_team_name} due to an injury designation ({injury_indicator})."
-                return render_blurb_card("Lineup: Out (Injury)", "bg-danger", "#dc3545", blurb), blurb
+                return render_blurb_card("Lineup: Out (Injury)", "bg-danger", "#dc3545", blurb, dh_title=dh_title), blurb
             elif injury_indicator in ['DTD', 'DAY-TO-DAY']:
                 blurb = f"<strong>INJURY ALERT:</strong> <strong>{p_name}</strong> is <strong>out of today's starting lineup</strong> for the {team_name}. He is listed as day-to-day; monitor team reports prior to pitch."
-                return render_blurb_card("Lineup: Day-to-Day", "bg-warning text-dark", "#ffc107", blurb), blurb
+                return render_blurb_card("Lineup: Day-to-Day", "bg-warning text-dark", "#ffc107", blurb, dh_title=dh_title), blurb
             elif is_confirmed:
                 blurb = f"<strong>LINEUP ALERT:</strong> <strong>{p_name}</strong> is <strong>not in today's starting lineup</strong> for the {team_name} as they take on the {opp_team_name}. Lineups are confirmed; monitor team updates prior to first pitch."
-                return render_blurb_card("Lineup: Out Today", "bg-danger", "#dc3545", blurb), blurb
+                return render_blurb_card("Lineup: Out Today", "bg-danger", "#dc3545", blurb, dh_title=dh_title), blurb
             else:
                 blurb = f"<strong>{p_name}</strong> is <strong>not projected</strong> to be in the starting lineup for the {team_name} as they take on the {opp_team_name}."
-                return render_blurb_card("Not Projected", "bg-secondary", "#6c757d", blurb), blurb
+                return render_blurb_card("Not Projected", "bg-secondary", "#6c757d", blurb, dh_title=dh_title), blurb
 
         grade, badge_bg, border_hex = "Average", "bg-primary", "#0d6efd"
         lineup_prefix = "confirmed" if is_confirmed else "projected"
@@ -1023,21 +984,16 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
         spot_names = {1: "leadoff", 2: "2nd", 3: "3rd", 4: "cleanup", 5: "5th", 6: "6th", 7: "7th", 8: "8th", 9: "9th"}
         slot_str = f"batting {spot_names.get(slot_index + 1, f'{slot_index + 1}th')}" if slot_index != -1 else "in the starting lineup"
 
-        # Check if the opposing starting pitcher is TBD
         is_tbd_pitcher = not opp_pitcher_id or opp_pitcher_name.strip().upper() in ["TBD", "TO BE DETERMINED", ""]
 
-        # ----------------------------------------------------
-        # 🎯 TBD PITCHER BRANCH (Lineup Spot Only)
-        # ----------------------------------------------------
         if is_tbd_pitcher:
             blurb = (
                 f"<strong>{p_name}</strong> is {lineup_prefix} to be {slot_str} for the "
                 f"<strong>{team_name}</strong> vs the <strong>{opp_team_name}</strong>."
             )
             badge_title = f"Lineup: {'Confirmed' if is_confirmed else 'Projected'}"
-            return render_blurb_card(badge_title, "bg-primary", "#0d6efd", blurb), blurb
+            return render_blurb_card(badge_title, "bg-primary", "#0d6efd", blurb, dh_title=dh_title), blurb
 
-        # Standard Pitcher Branch (RHP / LHP / Splits / BvP)
         opp_hand = (my_game.get("lineupHandedness") or {}).get(opp_pitcher_id, "R")
         hand_label = "right-handed" if opp_hand == 'R' else "left-handed"
         hand_abbr = "RHP" if opp_hand == 'R' else "LHP"
@@ -1086,10 +1042,9 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
             f"He draws a matchup against {hand_label} starter <strong>{opp_pitcher_name}</strong>. "
             f"In his last {ab_split} ABs vs {hand_abbr}, he is hitting <strong>{avg_split}</strong> with a <strong>{ops_split} OPS</strong>.{bvp_text}"
         )
-        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb), blurb
+        return render_blurb_card(f"Matchup: {grade}", badge_bg, border_hex, blurb, dh_title=dh_title), blurb
 
-    # Universal fallback
-    return render_blurb_card("Data Unavailable", "bg-secondary", "#6c757d", f"Matchup data for {p_name} is currently unavailable."), ""
+    return render_blurb_card("Data Unavailable", "bg-secondary", "#6c757d", f"Matchup data for {p_name} is currently unavailable.", dh_title=dh_title), ""
 
 # ==========================================
 # 4. PRIMARY HTML LAYOUT BUILDER
@@ -1103,60 +1058,120 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
     team_name = profile.get("team_name", "Free Agent")
     position = profile.get("position", "Unknown Position")
     
-    my_game, team_side = resolve_active_matchup(player_id, team_name, daily_data)
-    
-    dk_proj_val, fd_proj_val = 'NA', 'NA'
-    badge_matrix_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NO GAME SCHEDULED</div>'
-    game_state_lbl = '<strong>Game Status:</strong> Not on Today\'s Active Slate'
-    live_console_html = '<div class="p-3 border-bottom" style="background-color: #edf4f8;"><span class="badge bg-secondary text-uppercase me-2" style="font-size:0.65rem;">Off Slate</span><span class="text-dark fw-semibold" style="font-size: 0.85rem;">No schedules match this player today.</span></div>'
-    hr_predictor_html = ""
-    bvp_cards_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
-    p_deep_stats = {}
     reliever_info = reliever_map.get(str(player_id)) if reliever_map else None
+
+    # Fetch array of all active matchups today for this player/team
+    active_matches = resolve_active_matchups(player_id, team_name, daily_data)
     
-    if my_game and team_side:
-        p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
-        p_proj_node = None
-        if my_game.get("projectedLineups", {}).get(team_side):
-            pl = my_game["projectedLineups"][team_side]
-            if str(pl.get("startingPitcher", {}).get("id")) == str(player_id):
-                p_proj_node = pl.get("startingPitcher")
-            else:
-                p_proj_node = next((p for p in pl.get("battingOrder", []) if str(p.get("id")) == str(player_id)), None)
-                
-        dk_raw = p_proj_node.get("dk_slates", {}).get(list(p_proj_node.get("dk_slates", {}).keys())[0], {}).get("proj") if (p_proj_node and p_proj_node.get("dk_slates")) else (p_proj_node.get("dk_proj") if p_proj_node else None)
-        fd_raw = p_proj_node.get("fd_slates", {}).get(list(p_proj_node.get("fd_slates", {}).keys())[0], {}).get("proj") if (p_proj_node and p_proj_node.get("fd_slates")) else (p_proj_node.get("proj") if p_proj_node else None)
+    # Filter for Starting Pitchers: They only play in the specific game they are assigned to start.
+    if is_pitcher and reliever_info is None:
+        started_matches = []
+        for m in active_matches:
+            gm = m["game"]
+            ts = m["teamSide"]
+            prob_id = str(gm.get("gameRaw", {}).get("teams", {}).get(ts, {}).get("probablePitcher", {}).get("id", ""))
+            proj_id = str(gm.get("projectedLineups", {}).get(ts, {}).get("startingPitcher", {}).get("id", ""))
+            if str(player_id) in [prob_id, proj_id]:
+                started_matches.append(m)
+        if started_matches:
+            active_matches = started_matches
+        elif active_matches:
+            active_matches = active_matches[:1] # Default fallback to game 1 if unscheduled
+
+    is_dh = len(active_matches) > 1
+
+    badge_matrix_html = ""
+    game_state_lbls = []
+    modules_html = ""
+    raw_blurb_texts = []
+    opp_team_names = []
+
+    if not active_matches:
+        # ----------------------------------------------------
+        # OFF-SLATE FALLBACK
+        # ----------------------------------------------------
+        badge_matrix_html = '<div class="badge status-badge-scratched p-2 w-100 shadow-sm text-uppercase">✕ NO GAME SCHEDULED</div>'
+        game_state_lbl = '<strong>Game Status:</strong> Not on Today\'s Active Slate'
         
-        dk_raw = dk_raw if dk_raw is not None else (p_deep_stats.get("dk_proj") or p_deep_stats.get("dk_points"))
-        fd_raw = fd_raw if fd_raw is not None else (p_deep_stats.get("fd_proj") or p_deep_stats.get("fd_points") or p_deep_stats.get("proj"))
+        blurb_html, raw_text = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, None, None, {}, profile, master_data, live_data, reliever_info)
+        console_html = '<div class="p-3 border rounded shadow-sm text-center" style="background-color: #edf4f8;"><span class="badge bg-secondary text-uppercase mb-2" style="font-size:0.65rem;">Off Slate</span><span class="text-dark d-block fw-semibold" style="font-size: 0.85rem;">No schedules match this player today.</span></div>'
+        bvp_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
         
-        dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
-        fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
+        raw_blurb_texts = [raw_text]
+        opponents_str = "Opponent"
         
-        badge_matrix_html = render_badge_zone(player_id, team_side, my_game, reliever_info, live_data)
-        
-        game_state_lbl, live_console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher)
-        
-        hr_predictor_html, bvp_cards_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
-        
-    # Generate blurb card and extract raw blurb text for schema (Pass live_data)
-    news_blurb_html, raw_blurb_text = generate_news_blurb(
-        player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data, reliever_info
-    )
+        modules_html = f'<div class="mb-3">{blurb_html}</div><div class="mb-3">{console_html}</div>{bvp_html}'
+        is_game_final = False
+
+    else:
+        # ----------------------------------------------------
+        # ACTIVE SLATE / DOUBLEHEADER ITERATOR
+        # ----------------------------------------------------
+        for i, match in enumerate(active_matches):
+            my_game = match["game"]
+            team_side = match["teamSide"]
+            game_num = i + 1
+            dh_prefix = f"GM{game_num}: " if is_dh else ""
+            dh_title = f"Game {game_num} " if is_dh else ""
+            
+            p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
+            p_proj_node = None
+            if my_game.get("projectedLineups", {}).get(team_side):
+                pl = my_game["projectedLineups"][team_side]
+                if str(pl.get("startingPitcher", {}).get("id")) == str(player_id):
+                    p_proj_node = pl.get("startingPitcher")
+                else:
+                    p_proj_node = next((p for p in pl.get("battingOrder", []) if str(p.get("id")) == str(player_id)), None)
+                    
+            dk_raw = p_proj_node.get("dk_slates", {}).get(list(p_proj_node.get("dk_slates", {}).keys())[0], {}).get("proj") if (p_proj_node and p_proj_node.get("dk_slates")) else (p_proj_node.get("dk_proj") if p_proj_node else None)
+            fd_raw = p_proj_node.get("fd_slates", {}).get(list(p_proj_node.get("fd_slates", {}).keys())[0], {}).get("proj") if (p_proj_node and p_proj_node.get("fd_slates")) else (p_proj_node.get("proj") if p_proj_node else None)
+            
+            dk_raw = dk_raw if dk_raw is not None else (p_deep_stats.get("dk_proj") or p_deep_stats.get("dk_points"))
+            fd_raw = fd_raw if fd_raw is not None else (p_deep_stats.get("fd_proj") or p_deep_stats.get("fd_points") or p_deep_stats.get("proj"))
+            
+            dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
+            fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
+            
+            b_html = render_badge_zone(player_id, team_side, my_game, reliever_info, live_data, dh_prefix)
+            badge_matrix_html += b_html
+            
+            state_lbl, console_html = render_live_console(player_id, team_side, my_game, live_data, dk_proj_val, fd_proj_val, master_data, is_pitcher)
+            game_state_lbls.append(f"<strong>{dh_prefix.strip(': ')}</strong> {state_lbl}" if is_dh else state_lbl)
+            
+            hr_html, bvp_html = render_advanced_matrices(player_id, team_side, my_game, p_deep_stats, is_pitcher, master_data)
+            
+            blurb_html, raw_text = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data, reliever_info, dh_title)
+            raw_blurb_texts.append(raw_text)
+
+            opp_side = "home" if team_side == "away" else "away"
+            opp_team_name = (my_game.get("gameRaw", {}).get("teams", {}).get(opp_side, {}).get("team") or {}).get("name", "Opponent")
+            if opp_team_name not in opp_team_names:
+                opp_team_names.append(opp_team_name)
+
+            module_header = ""
+            if is_dh:
+                module_header = f'<h5 class="fw-bold mb-3 mt-4 text-dark border-bottom pb-2" style="font-size: 1.1rem;">Game {game_num} Matchup</h5>'
+            
+            modules_html += f"""
+            <div class="matchup-module mb-4">
+                {module_header}
+                <div class="mb-3">{blurb_html}</div>
+                <div class="mb-3 border rounded overflow-hidden shadow-sm">{console_html}</div>
+                {hr_html}
+                {bvp_html}
+            </div>
+            """
+            
+            if is_dh and i == 0:
+                modules_html += '<hr class="my-4" style="border-top: 3px solid #dee2e6; opacity: 1;">'
+
+        game_state_lbl = " | ".join(game_state_lbls)
+        opponents_str = " & ".join(opp_team_names)
+        is_game_final = any((live_data.get(str(m["game"].get("gameRaw", {}).get("gamePk", ""))) or {}).get("status") in ["Final", "Completed"] for m in active_matches)
     
-    # Clean only the raw blurb text (strips HTML tags without capturing header/badge titles)
-    clean_blurb_desc = clean_text_for_json(raw_blurb_text)
+    clean_blurb_desc = clean_text_for_json(" ".join(raw_blurb_texts))
     player_url = f"{DOMAIN}/players/{slug}/"
     headshot_url = f"https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current"
-
-    # Derive Opponent Team Name for Meta Tags
-    opp_side = "home" if team_side == "away" else "away"
-    opp_team_name = (my_game.get("gameRaw", {}).get("teams", {}).get(opp_side, {}).get("team") or {}).get("name", "Opponent") if my_game else "Opponent"
-
-    # Check if game is Final to swap Meta Tags
-    game_pk = str((my_game.get("gameRaw") or {}).get("gamePk", "")) if my_game else ""
-    active_live = live_data.get(game_pk) if live_data else None
-    is_game_final = (active_live.get("status") in ["Final", "Completed"]) if active_live else False
 
     # ----------------------------------------------------
     # ATHLETE JSON-LD SCHEMA GENERATION
@@ -1186,15 +1201,15 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         
         if reliever_info:
             if is_game_final:
-                title = f"Is {p_name} available out of the bullpen today? Post-Game Recap vs {opp_team_name}"
-                desc = f"Is {p_name} available out of the bullpen today? Post-game stats and box score recap vs the {opp_team_name}. {clean_blurb_desc}"
+                title = f"Is {p_name} available out of the bullpen today? Post-Game Recap vs {opponents_str}"
+                desc = f"Is {p_name} available out of the bullpen today? Post-game stats and box score recap vs the {opponents_str}. {clean_blurb_desc}"
             else:
                 title = f"Is {p_name} available out of the bullpen today?"
                 desc = f"Is {p_name} available out of the bullpen today? View real-time fatigue status, pitch counts, split analytics, and matchup stats."
         else:
             if is_game_final:
-                title = f"Is {p_name} Pitching Today? Rotation Status & Latest Stats vs {opp_team_name}"
-                desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
+                title = f"Is {p_name} Pitching Today? Rotation Status & Latest Stats vs {opponents_str}"
+                desc = f"Post-game stats and box score recap for {p_name} vs the {opponents_str}. {clean_blurb_desc}"
             else:
                 title = f"Is {p_name} Pitching Today? Lineup Status & Matchup Stats"
                 desc = f"Find out if {p_name} is starting today. View real-time lineup validation, pitch split analytics, opponent HR safety factors, and daily fantasy projection scores."
@@ -1205,8 +1220,8 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         split_vol_label, split_hr_label = "ABs:", "Homeruns:"
         
         if is_game_final:
-            title = f"Is {p_name} Playing Today? Lineup Status & Latest Stats vs {opp_team_name}"
-            desc = f"Post-game stats and box score recap for {p_name} vs the {opp_team_name}. {clean_blurb_desc}"
+            title = f"Is {p_name} Playing Today? Lineup Status & Latest Stats vs {opponents_str}"
+            desc = f"Post-game stats and box score recap for {p_name} vs the {opponents_str}. {clean_blurb_desc}"
         else:
             title = f"Is {p_name} Playing Today? Lineup Status, BvP & Matchup Stats"
             desc = f"Find out if {p_name} is in today's starting lineup. View real-time lineup status, lifetime matchup analytics, daily HR probability scores, and live box scores."
@@ -1215,8 +1230,6 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
     historical_table_rows = "".join([f"<tr><td class='text-start ps-3 fw-bold'>{log.get('date','')}</td><td>{log.get('summary','')}</td><td class='dk-accent'>{log.get('dk_pts',0.0):.2f}</td><td class='fd-accent'>{log.get('fd_pts',0.0):.1f}</td></tr>" for log in profile.get("game_log", [])])
     if not historical_table_rows:
         historical_table_rows = '<tr><td colspan="4" class="text-center p-3 text-muted">No recent history logged.</td></tr>'
-
-    player_url = f"{DOMAIN}/players/{slug}/"
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -1266,7 +1279,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             <div class="profile-hero-card">
                 <div class="profile-hero-bg d-flex align-items-center flex-column flex-sm-row text-center text-sm-start gap-4">
                     <div class="player-headshot-frame flex-shrink-0">
-                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/{player_id}/headshot/67/current" class="player-headshot" alt="{p_name}">
+                        <img src="{headshot_url}" class="player-headshot" alt="{p_name}">
                         <img src="{team_logo_url}" class="player-team-badge" alt="Team Badge">
                     </div>
                     <div class="w-100 text-white">
@@ -1283,19 +1296,10 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
                     </div>
                 </div>
 
-                <div class="p-3 pb-0">
-                    {news_blurb_html}
-                </div>
-
-                <div id="live-consoles-container">{live_console_html}</div>
-
-                
-
-                <div class="card-body p-3">
-                    <h5 class="fw-bold mb-3 text-dark border-bottom pb-2" style="font-size: 1rem;">📈 Split Analytics & Matchup Matrix</h5>
-                    <div id="hr-predictor-container">{hr_predictor_html}</div>
-                    <div id="bvp-cards-container">{bvp_cards_html}</div>
-
+                <div class="card-body p-3 p-md-4">
+                    {modules_html}
+                    
+                    <h5 class="fw-bold mb-3 mt-4 text-dark border-bottom pb-2" style="font-size: 1rem;">📊 Season Splits</h5>
                     <div class="row g-2">
                         <div class="col-md-6">
                             <div class="border rounded p-2 bg-light">
@@ -1348,7 +1352,6 @@ def main():
     live_data = load_json_safe(f"data/LIVE/live_mlb_{target_date_str}.json")
     bullpen_data = load_json_safe(BULLPEN_DATA_PATH)
 
-    # Build a fast lookup map for relievers by player_id
     reliever_map = {}
     for team_slug, team_info in bullpen_data.items():
         for r in team_info.get("active_relievers", []):
@@ -1384,7 +1387,6 @@ def main():
             
             updated_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-    # 3. Pass both arrays into the newly configured update_sitemap module
     update_sitemap(all_player_urls, updated_urls)
 
     if updated_urls:
