@@ -352,6 +352,7 @@
         updateUIReflection();
     };
 
+    // --- NEW: Select All Function ---
     window.selectAll = function(type) {
         // Clear both sets to prevent duplicates/conflicts
         dailySubs.clear();
@@ -369,6 +370,16 @@
         // Visually update the UI instantly
         updateUIReflection();
     };
+
+    // --- RESTORED: Clear All Event Listener ---
+    document.getElementById('clear-all-btn').addEventListener('click', () => {
+        if (confirm("Are you sure you want to remove all subscriptions?")) {
+            dailySubs.clear();
+            seasonSubs.clear();
+            updateUIReflection();
+        }
+    });
+
     function updateUIReflection() {
         const subsGrid = document.getElementById('subs-grid');
         const emptyState = document.getElementById('empty-state');
