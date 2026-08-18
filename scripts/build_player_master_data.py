@@ -249,7 +249,8 @@ def main():
     print(f"🔄 Commencing deep-stat updates for {len(all_target_ids)} total players...")
     updated_players_count = 0
 
-    for player_id in all_target_ids:
+    # Sort IDs numerically so older veterans are processed first and claim base slugs
+    for player_id in sorted(all_target_ids, key=int):
         api_id_key = f"ID{player_id}"
         
         # Determine player meta context safely
