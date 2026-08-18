@@ -181,22 +181,28 @@ def resolve_active_matchups(player_id, team_name, daily_data):
         team_side = None
         tier = 4 # Lowest confidence
 
+        def matches_team(feed_name, profile_name):
+            if not feed_name or not profile_name:
+                return False
+            f, p = feed_name.lower(), profile_name.lower()
+            return (f in p) or (p in f)
+
         # Evaluate confidence tiers
         if p_id_str in home_official_players or (home_probable_p and home_probable_p == p_id_str):
             team_side, tier = "home", 1
         elif p_id_str in away_official_players or (away_probable_p and away_probable_p == p_id_str):
             team_side, tier = "away", 1
-        elif p_id_str in home_proj_players and (home_team_name and home_team_name in team_name):
+        elif p_id_str in home_proj_players and matches_team(home_team_name, team_name):
             team_side, tier = "home", 2
-        elif p_id_str in away_proj_players and (away_team_name and away_team_name in team_name):
+        elif p_id_str in away_proj_players and matches_team(away_team_name, team_name):
             team_side, tier = "away", 2
         elif p_id_str in home_proj_players:
             team_side, tier = "home", 3
         elif p_id_str in away_proj_players:
             team_side, tier = "away", 3
-        elif home_team_name and home_team_name in team_name:
+        elif matches_team(home_team_name, team_name):
             team_side, tier = "home", 4
-        elif away_team_name and away_team_name in team_name:
+        elif matches_team(away_team_name, team_name):
             team_side, tier = "away", 4
 
         # Group matches uniquely by Game PK to prevent double-counting a single game
@@ -1121,20 +1127,50 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             dh_title = f"Game {game_num} " if is_dh else ""
             
             p_deep_stats = my_game.get("deepStats", {}).get(str(player_id), {})
+            
+            # 1. Locate player node across both projected lineups and official lineups
             p_proj_node = None
-            if my_game.get("projectedLineups", {}).get(team_side):
-                pl = my_game["projectedLineups"][team_side]
-                if str(pl.get("startingPitcher", {}).get("id")) == str(player_id):
-                    p_proj_node = pl.get("startingPitcher")
-                else:
-                    p_proj_node = next((p for p in pl.get("battingOrder", []) if str(p.get("id")) == str(player_id)), None)
-                    
-            dk_raw = p_proj_node.get("dk_slates", {}).get(list(p_proj_node.get("dk_slates", {}).keys())[0], {}).get("proj") if (p_proj_node and p_proj_node.get("dk_slates")) else (p_proj_node.get("dk_proj") if p_proj_node else None)
-            fd_raw = p_proj_node.get("fd_slates", {}).get(list(p_proj_node.get("fd_slates", {}).keys())[0], {}).get("proj") if (p_proj_node and p_proj_node.get("fd_slates")) else (p_proj_node.get("proj") if p_proj_node else None)
             
-            dk_raw = dk_raw if dk_raw is not None else (p_deep_stats.get("dk_proj") or p_deep_stats.get("dk_points"))
-            fd_raw = fd_raw if fd_raw is not None else (p_deep_stats.get("fd_proj") or p_deep_stats.get("fd_points") or p_deep_stats.get("proj"))
-            
+            # Check Projected Lineups
+            pl = my_game.get("projectedLineups", {}).get(team_side, {})
+            if str(pl.get("startingPitcher", {}).get("id")) == str(player_id):
+                p_proj_node = pl.get("startingPitcher")
+            else:
+                p_proj_node = next((p for p in pl.get("battingOrder", []) if str(p.get("id")) == str(player_id)), None)
+
+            # Fallback: Check Official GameRaw Lineups if not found in projected
+            if not p_proj_node:
+                official_players = (my_game.get("gameRaw", {}).get("lineups", {}) or {}).get(f"{team_side}Players", [])
+                p_proj_node = next((p for p in official_players if str(p.get("id")) == str(player_id)), None)
+
+            # 2. Extract DraftKings projection
+            dk_raw = None
+            if p_proj_node:
+                # Prefer direct root projection, then slate-specific projection
+                dk_raw = p_proj_node.get("dk_proj")
+                if dk_raw is None and p_proj_node.get("dk_slates"):
+                    for s_data in p_proj_node.get("dk_slates", {}).values():
+                        if s_data.get("proj") is not None:
+                            dk_raw = s_data.get("proj")
+                            break
+
+            # 3. Extract FanDuel projection
+            fd_raw = None
+            if p_proj_node:
+                # Prefer direct root projection, then slate-specific projection
+                fd_raw = p_proj_node.get("proj") if p_proj_node.get("proj") is not None else p_proj_node.get("fd_proj")
+                if fd_raw is None and p_proj_node.get("fd_slates"):
+                    for s_data in p_proj_node.get("fd_slates", {}).values():
+                        if s_data.get("proj") is not None:
+                            fd_raw = s_data.get("proj")
+                            break
+
+            # 4. Final deepStats fallback
+            if dk_raw is None:
+                dk_raw = p_deep_stats.get("dk_proj") or p_deep_stats.get("dk_points")
+            if fd_raw is None:
+                fd_raw = p_deep_stats.get("fd_proj") or p_deep_stats.get("fd_points") or p_deep_stats.get("proj")
+
             dk_proj_val = f"{float(dk_raw):.1f}" if dk_raw is not None else 'NA'
             fd_proj_val = f"{float(fd_raw):.1f}" if fd_raw is not None else 'NA'
             
