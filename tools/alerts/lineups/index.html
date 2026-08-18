@@ -121,7 +121,13 @@
         <!-- LEFT SIDE: Team Selector (2 Columns) -->
         <div class="col-lg-8">
             <div class="alert-card p-3 p-md-4 h-100">
-                <h5 class="fw-bold mb-3 border-bottom pb-2" style="font-size: 1.1rem;">⚾ Select Teams</h5>
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+                    <h5 class="fw-bold mb-0" style="font-size: 1.1rem;">⚾ Select Teams</h5>
+                    <div class="btn-group shadow-sm">
+                        <button class="btn btn-sm btn-outline-primary fw-bold" onclick="selectAll('daily')" style="font-size: 0.7rem; letter-spacing: 0.5px;">ALL TODAY</button>
+                        <button class="btn btn-sm btn-outline-success fw-bold" onclick="selectAll('season')" style="font-size: 0.7rem; letter-spacing: 0.5px;">ALL SEASON</button>
+                    </div>
+                </div>
                 <div class="row g-3">
                     <!-- Column 1 (Teams 1-15) -->
                     <div class="col-md-6">
@@ -346,14 +352,23 @@
         updateUIReflection();
     };
 
-    document.getElementById('clear-all-btn').addEventListener('click', () => {
-        if (confirm("Are you sure you want to remove all subscriptions?")) {
-            dailySubs.clear();
-            seasonSubs.clear();
-            updateUIReflection();
-        }
-    });
-
+    window.selectAll = function(type) {
+        // Clear both sets to prevent duplicates/conflicts
+        dailySubs.clear();
+        seasonSubs.clear();
+        
+        // Flood the requested set with all 30 team IDs
+        mlbTeams.forEach(team => {
+            if (type === 'daily') {
+                dailySubs.add(team.id);
+            } else if (type === 'season') {
+                seasonSubs.add(team.id);
+            }
+        });
+        
+        // Visually update the UI instantly
+        updateUIReflection();
+    };
     function updateUIReflection() {
         const subsGrid = document.getElementById('subs-grid');
         const emptyState = document.getElementById('empty-state');
