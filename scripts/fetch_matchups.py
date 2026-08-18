@@ -104,7 +104,7 @@ def get_active_sport_ids():
         return "1,51"
     return "1"
 
-def build_waterfall_lineup(team_abbr, dff_projections, bbm_fallback, starting_pitcher, reverse_lookup):
+def build_waterfall_lineup(team_abbr, team_id, dff_projections, bbm_fallback, starting_pitcher, reverse_lookup):
     pitcher_obj = None
     if starting_pitcher:
         pitcher_obj = {
@@ -130,7 +130,8 @@ def build_waterfall_lineup(team_abbr, dff_projections, bbm_fallback, starting_pi
         
         for batter in dff_batters:
             b_clean = clean_player_name(batter.get('name', ''))
-            b_id = reverse_lookup.get(b_clean)
+            # Try team-specific ID first, then fallback to global name lookup
+            b_id = reverse_lookup.get(f"{team_id}_{b_clean}") or reverse_lookup.get(b_clean)
             
             if not b_id:
                 id_mapping_failed = True
@@ -590,8 +591,16 @@ def main():
     reverse_lookup = {}
     for key, player in master_data_raw.items():
         cleaned_name = clean_player_name(player.get("name", ""))
+        team_id = str(player.get("team_id", ""))
+        
         if cleaned_name and "player_id" in player:
-            reverse_lookup[cleaned_name] = int(player.get("player_id"))
+            # 1. Store team-specific key for exact match (e.g. "119_max muncy")
+            if team_id:
+                reverse_lookup[f"{team_id}_{cleaned_name}"] = int(player.get("player_id"))
+            
+            # 2. Keep generic name fallback (only sets if not already populated)
+            if cleaned_name not in reverse_lookup:
+                reverse_lookup[cleaned_name] = int(player.get("player_id"))
             
     API_CALL_TRACKER["odds"] += 1
     try: odds_data = requests.get("https://weathermlb.com/data/odds.json", timeout=10).json().get('odds', [])
@@ -995,8 +1004,8 @@ def main():
                 away_abbr = get_dff_team_abbr(away_team_name)
                 home_abbr = get_dff_team_abbr(home_team_name)
 
-                final_away = build_waterfall_lineup(away_abbr, dff_projections, bbm_away, away_starter, reverse_lookup) if has_valid_dfs else bbm_away
-                final_home = build_waterfall_lineup(home_abbr, dff_projections, bbm_home, home_starter, reverse_lookup) if has_valid_dfs else bbm_home
+                final_away = build_waterfall_lineup(away_abbr, away_team_id, dff_projections, bbm_away, away_starter, reverse_lookup) if has_valid_dfs else bbm_away
+                final_home = build_waterfall_lineup(home_abbr, home_team_id, dff_projections, bbm_home, home_starter, reverse_lookup) if has_valid_dfs else bbm_home
 
                 game_projected_lineups = {
                     "lastUpdated": current_est_time.timestamp(),
