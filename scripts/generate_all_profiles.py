@@ -159,6 +159,12 @@ def resolve_active_matchups(player_id, team_name, daily_data):
     p_id_str = str(player_id)
     matches_by_pk = {}
 
+    def matches_team(feed_name, profile_name):
+        if not feed_name or not profile_name:
+            return False
+        f, p = feed_name.lower(), profile_name.lower()
+        return (f in p) or (p in f)
+
     for game in daily_data.get("games", []):
         game_raw = game.get("gameRaw", {})
         game_pk = str(game_raw.get("gamePk", ""))
@@ -180,12 +186,6 @@ def resolve_active_matchups(player_id, team_name, daily_data):
 
         team_side = None
         tier = 4 # Lowest confidence
-
-        def matches_team(feed_name, profile_name):
-            if not feed_name or not profile_name:
-                return False
-            f, p = feed_name.lower(), profile_name.lower()
-            return (f in p) or (p in f)
 
         # Evaluate confidence tiers
         if p_id_str in home_official_players or (home_probable_p and home_probable_p == p_id_str):
@@ -212,6 +212,34 @@ def resolve_active_matchups(player_id, team_name, daily_data):
                     matches_by_pk[game_pk] = {"game": game, "teamSide": team_side, "tier": tier}
             else:
                 matches_by_pk[game_pk] = {"game": game, "teamSide": team_side, "tier": tier}
+
+    # --- MULTI-TEAM COLLISION SHIELD ---
+    # If the player matched multiple games, verify they all belong to the SAME team.
+    if len(matches_by_pk) > 1:
+        teams_involved = set()
+        for m in matches_by_pk.values():
+            gm = m["game"].get("gameRaw", {}).get("teams", {})
+            side = m["teamSide"]
+            t_name = gm.get(side, {}).get("team", {}).get("name", "")
+            teams_involved.add(t_name)
+            
+        if len(teams_involved) > 1:
+            # ID Collision! Player matched across multiple different teams.
+            # Force filter to only keep the game(s) matching their actual profile team.
+            filtered_matches = []
+            for m in matches_by_pk.values():
+                gm = m["game"].get("gameRaw", {}).get("teams", {})
+                side = m["teamSide"]
+                t_name = gm.get(side, {}).get("team", {}).get("name", "")
+                if matches_team(t_name, team_name):
+                    filtered_matches.append(m)
+            
+            # If the filter wiped everything, fallback to the highest confidence tier match overall.
+            if not filtered_matches:
+                best_match = min(matches_by_pk.values(), key=lambda x: x["tier"])
+                matches_by_pk = {best_match["game"].get("gameRaw", {}).get("gamePk", ""): best_match}
+            else:
+                matches_by_pk = {m["game"].get("gameRaw", {}).get("gamePk", ""): m for m in filtered_matches}
 
     # Sort matches chronologically
     sorted_matches = sorted(list(matches_by_pk.values()), key=lambda x: x["game"].get("gameRaw", {}).get("gameNumber", 1))
