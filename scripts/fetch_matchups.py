@@ -60,7 +60,16 @@ def clean_player_name(name):
     for suffix in [' jr', ' sr', ' ii', ' iii', ' iv']:
         if name.endswith(suffix):
             name = name[:-len(suffix)]
-    return name.strip()
+            
+    cleaned = name.strip()
+    
+    # --- KNOWN ALIAS MAPPING ---
+    # Normalizes common DFS nicknames to their official MLB names
+    aliases = {
+        "kike hernandez": "enrique hernandez"
+    }
+    
+    return aliases.get(cleaned, cleaned)
 
 def get_dff_team_abbr(team_name):
     map_ = {
