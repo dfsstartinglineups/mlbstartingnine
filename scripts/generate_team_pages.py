@@ -580,7 +580,22 @@ def generate_team_html(team, player_db, daily_slates):
                 <strong>The {team['name']} are off today.</strong> Their next matchup is on <strong>{nice_date}</strong> {vs_symbol_banner}. Below is the early projected lineup.
             </div>"""
 
-        card_html = future_banner_html + f"""
+        status_note_html = ""
+        if not is_postponed and not is_future:
+            if status in ["OFFICIAL", "MODIFIED"]:
+                status_note_html = f"""
+                <div style="max-width: 580px; width: 94%; margin: 15px auto 0; background: #1a1d24; border: 1px solid #2d323b; border-left: 4px solid #00e676; border-radius: 8px; padding: 12px 15px; font-family: 'Montserrat', sans-serif; font-size: 13px; color: #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center;">
+                    <span style="font-size: 18px; margin-right: 12px; line-height: 1;">✅</span> 
+                    <div style="line-height: 1.4;">This lineup is <strong>OFFICIAL</strong>, but to be notified for <strong>FREE</strong> of any possible late scratches <a href="/tools/alerts/lineups/" style="color: #7CD0FF; font-weight: 700; text-decoration: none; border-bottom: 1px dotted rgba(124,208,255,0.5); transition: opacity 0.2s;">click here</a>.</div>
+                </div>"""
+            else:
+                status_note_html = f"""
+                <div style="max-width: 580px; width: 94%; margin: 15px auto 0; background: #1a1d24; border: 1px solid #2d323b; border-left: 4px solid #ffb300; border-radius: 8px; padding: 12px 15px; font-family: 'Montserrat', sans-serif; font-size: 13px; color: #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center;">
+                    <span style="font-size: 18px; margin-right: 12px; line-height: 1;">⏱️</span> 
+                    <div style="line-height: 1.4;">This lineup is currently <strong>PROJECTED</strong>. To be notified for <strong>FREE</strong> when this lineup goes <strong>OFFICIAL</strong> <a href="/tools/alerts/lineups/" style="color: #7CD0FF; font-weight: 700; text-decoration: none; border-bottom: 1px dotted rgba(124,208,255,0.5); transition: opacity 0.2s;">click here</a>.</div>
+                </div>"""
+
+        card_html = future_banner_html + status_note_html + f"""
         <div style="max-width: 580px; width: 94%; margin: 15px auto; background: {theme['paperBg']}; border-radius: 10px; padding: 18px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.03); position: relative; overflow: hidden; border: 1px solid #bbb; color: {theme['markerInk']}; box-sizing: border-box; --paper-line: {theme['paperLine']}; --marker-ink: {theme['markerInk']};">
             <img src="https://www.mlbstatic.com/team-logos/{team_id}.svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 420px; height: 420px; object-fit: contain; opacity: 0.09; pointer-events: none; z-index: 0;">
             <div style="display: flex; align-items: center; gap: 14px; border-bottom: 2.5px solid var(--marker-ink); padding-bottom: 12px; margin-bottom: 10px; position: relative; z-index: 1;">
