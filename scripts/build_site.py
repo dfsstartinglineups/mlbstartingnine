@@ -898,17 +898,20 @@ def generate_games_html(date_str, player_db):
             if not has_p: return ''
             track = tracking.get(side, {})
             
+            # Fetch the team ID directly from the game object for the alert link
+            team_id = game.get('teams', {}).get(side, {}).get('team', {}).get('id', '')
+            
             # Generate the URL route (e.g., /lineups/boston-red-sox/)
             team_slug = slugify(team_full_name)
             link_url = f"/lineups/{team_slug}/"
             
-            # Build the anchor tags with 'd-block' and 'text-decoration-none' so they act exactly like the old divs
             if is_official:
                 if track.get('status') == 'MODIFIED':
                     return f'<a href="{link_url}" class="d-block text-center py-1 fw-bold text-white w-100 border-bottom text-decoration-none" style="background-color: #dc3545; font-size: 0.75rem;">⚠️ LATE SWAP <span style="font-size:0.65rem; font-weight:normal;">({track.get("modifiedAt","")})</span></a>'
                 return f'<a href="{link_url}" class="d-block text-center py-1 fw-bold text-white w-100 border-bottom text-decoration-none" style="background-color: #198754; font-size: 0.75rem;">OFFICIAL {"("+track.get("officialAt")+")" if track.get("officialAt") else ""}</a>'
             
-            return f'<a href="{link_url}" class="d-block text-center py-1 fw-bold text-dark w-100 border-bottom text-decoration-none" style="background-color: #ffecb5; font-size: 0.75rem;">⏳ PROJECTED</a>'
+            # Use a flex div to house two separate links cleanly
+            return f'<div class="d-flex justify-content-center align-items-center py-1 w-100 border-bottom" style="background-color: #ffecb5; font-size: 0.75rem;"><a href="{link_url}" class="fw-bold text-dark text-decoration-none">⏳ PROJECTED</a> <span class="fw-bold ms-1 text-dark">(<a href="/tools/alerts/lineups/" onclick="sessionStorage.setItem(\'pendingTeamAlertId\', \'{team_id}\');" class="text-decoration-none" style="color: #0d6efd; border-bottom: 1px dotted #0d6efd;">Set 🔔</a>)</span></div>'
 
         away_banner = get_banner('away', is_a_official, len(final_away)>0, away_name_full)
         home_banner = get_banner('home', is_h_official, len(final_home)>0, home_name_full)
