@@ -198,21 +198,29 @@ def get_bbm_projected_lineups(target_date):
             
             team_key = f"{mlb_team_id}_{game_num}"
             if team_key not in projections:
-                projections[team_key] = {"startingPitcher": None, "battingOrder": []}
+                # Use a dictionary temporarily to enforce strict 1-to-9 slot uniqueness
+                projections[team_key] = {"startingPitcher": None, "battingOrder": {}}
                 
             player_obj = {
                 "id": int(player_mlb_id) if player_mlb_id.isdigit() else player_mlb_id,
                 "name": player_name,
                 "verified": confirmed
             }
+            
             if batting_order.isdigit() and 1 <= int(batting_order) <= 9:
-                player_obj["order"] = int(batting_order)
-                projections[team_key]["battingOrder"].append(player_obj)
+                order_num = int(batting_order)
+                player_obj["order"] = order_num
+                
+                # Only add the player if that slot is empty, preventing duplicate appends
+                if order_num not in projections[team_key]["battingOrder"]:
+                    projections[team_key]["battingOrder"][order_num] = player_obj
             else:
                 projections[team_key]["startingPitcher"] = player_obj
                 
         for key in projections:
-            projections[key]["battingOrder"].sort(key=lambda x: x["order"])
+            # Convert the dictionary back into a cleanly sorted list of (up to) 9 batters
+            order_dict = projections[key]["battingOrder"]
+            projections[key]["battingOrder"] = [order_dict[k] for k in sorted(order_dict.keys())]
             
     return projections
 
