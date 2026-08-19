@@ -587,7 +587,7 @@
         armBtn.disabled = true;
 
         try {
-            // 1. Feature Detection
+            // Feature Detection with Explicit iOS Instructions
             if (!('Notification' in window)) {
                 throw new Error("Apple requires you to add this app to your home screen to receive alerts. Tap the Share icon (bottom center in Safari, top right in Chrome), scroll down, and select 'Add to Home Screen'. Then open the new MLB9 icon from your home screen to arm your alerts! (Requires iOS 16.4+)");
             }
@@ -596,7 +596,11 @@
             }
 
             const permission = await Notification.requestPermission();
-            if (permission !== 'granted') { throw new Error("Push permissions denied by user."); }
+            if (permission === 'denied') { 
+                throw new Error("BLOCKED"); 
+            } else if (permission !== 'granted') { 
+                throw new Error("Push permissions were dismissed or denied."); 
+            }
 
             armBtn.innerHTML = "Generating Secure Token...";
 
@@ -629,17 +633,39 @@
             });
 
             if (response.ok) {
-                msgBox.className = "mt-3 fw-bold text-success";
-                msgBox.innerText = "✅ Success! Your alerts are armed and monitoring.";
+                msgBox.className = "mt-3 fw-bold text-success d-block";
+                msgBox.innerHTML = "✅ Success! Your alerts are armed and monitoring.";
                 armBtn.innerHTML = "Alerts Armed 🛡️";
+                armBtn.disabled = false;
             } else {
                 throw new Error("Failed to save to database.");
             }
 
         } catch (error) {
             console.error(error);
-            msgBox.className = "mt-3 fw-bold text-danger";
-            msgBox.innerText = "⚠️ Error: " + error.message;
+            msgBox.className = "mt-3 d-block";
+            
+            // Render specific HTML instructional boxes based on the error type
+            if (error.message === "BLOCKED") {
+                msgBox.innerHTML = `
+                <div class="alert alert-warning text-dark text-start border shadow-sm mx-auto mb-0" style="font-size: 0.85rem; max-width: 400px; line-height: 1.5;">
+                    <strong>⚠️ Alerts Blocked by Browser</strong><br>
+                    To fix this:<br>
+                    1. Click the site info icon (🔒 or 🎛️) on the far left of your address bar.<br>
+                    2. Open <strong>Site Settings</strong> or <strong>Permissions</strong>.<br>
+                    3. Change <strong>Notifications</strong> to <strong>Allow</strong>.<br>
+                    4. Refresh this page and try again!
+                </div>`;
+            } else if (error.message.includes("Apple requires")) {
+                msgBox.innerHTML = `
+                <div class="alert alert-info text-dark text-start border shadow-sm mx-auto mb-0" style="font-size: 0.85rem; max-width: 400px; line-height: 1.5;">
+                    <strong>🍎 iPhone / iPad Users:</strong><br>
+                    ${error.message}
+                </div>`;
+            } else {
+                msgBox.innerHTML = `<span class="fw-bold text-danger">⚠️ Error: ${error.message}</span>`;
+            }
+            
             armBtn.innerHTML = "Confirm & Arm Alerts 🛡️";
             armBtn.disabled = false;
         }
