@@ -1,6 +1,7 @@
 // ========================================================
 // VERSION: 1.0.1 Added DH logic
 // VERSION: 1.0.2 Added ALL Today and ALL Season for lineups
+// VERSION: 1.0.3 unique tag for sychronous alerts
 // ========================================================
 
 
@@ -18,7 +19,8 @@ self.addEventListener('push', function(event) {
       icon: '/apple-touch-icon.png', 
       badge: '/favicon.ico',
       data: { url: payload.data.url },
-      requireInteraction: true // Forces the notification to stay on screen until clicked/closed
+      requireInteraction: true, // Forces the notification to stay on screen until clicked/closed
+      tag: payload.data.tag || 'alert-' + Date.now().toString() + '-' + Math.random().toString(36).substring(2, 7) // Forces iOS to treat every alert as unique
     };
 
     // Force the browser to show the notification
