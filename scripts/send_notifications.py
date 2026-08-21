@@ -157,7 +157,7 @@ def extract_official_lineups(daily_data):
         # Check for postponed games
         detailed_state = status.get('detailedState', '')
         status_code = status.get('statusCode', '')
-        if 'Postponed' in detailed_state or status_code in ['PP', 'PR']:
+        if 'Postponed' in detailed_state or status_code in ['PP']:
             if away_tag:
                 postponed_teams.add(f"{away_team_id}_{away_tag}")
             else:
