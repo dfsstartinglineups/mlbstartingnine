@@ -449,7 +449,7 @@
         try {
             // Feature Detection with Explicit iOS Instructions
             if (!('Notification' in window)) {
-                throw new Error("Apple requires you to add this app to your home screen to receive alerts. 1. Tap the Share icon[the box with an up arrow] (bottom center in Safari, top right in Chrome)\n 2. Tap View More and scroll down and select 'Add to Home Screen'.\n 3. Open the new MLB9 icon from your home screen to arm your alerts! \n It sounds complicated but it is quite simple and once it is done you are good. (Requires iOS 16.4+)");
+                throw new Error("Apple requires you to add this app to your home screen to receive alerts.\n 1. Tap the Share icon[the box with an up arrow] (bottom center in Safari, top right in Chrome)\n 2. Tap View More and scroll down and select 'Add to Home Screen'.\n 3. Open the new MLB9 icon from your home screen to arm your alerts! \n It sounds complicated but it is quite simple and once it is done you are good. (Requires iOS 16.4+)");
             }
             if (!('serviceWorker' in navigator)) {
                 throw new Error("Your browser does not support background alerts. Please try Chrome, Firefox, or a supported browser.");
