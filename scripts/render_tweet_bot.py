@@ -1603,24 +1603,26 @@ async def run_engines(memory):
 
     # --- 🛡️ X.COM POSTING WHITELIST (Protects against 403 / Spam Flags) ---
     X_SUMMARY_ALLOWED_LEAGUES = {
-        # Top Domestic
+        # --- 1. EUROPE (Morning & Afternoon ET) ---
         "english premier league", "spanish laliga", "italian serie a", 
-        "german bundesliga", "french ligue 1", "mls", "liga mx", 
-        "liga bbva mx", "nwsl",
-        
-        # Continental & Marquee
+        "german bundesliga", "french ligue 1", "english league championship",
         "uefa champions league", "uefa europa league", "uefa conference league", 
-        "conmebol libertadores", "concacaf champions cup", "leagues cup", 
-        "saudi pro league", "english league championship",
-        
-        # Domestic Cups
         "english fa cup", "english carabao cup", "spanish copa del rey", 
-        "coppa italia", "german cup",
-        
-        # Major International
+        "coppa italia", "german cup", "saudi pro league",
+
+        # --- 2. THE AMERICAS (Evening & Late Night ET) ---
+        "mls", "liga mx", "liga bbva mx", "nwsl", "canadian premier league",
+        "concacaf champions cup", "leagues cup", "costa rican primera division",
+        "brazilian serie a", "copa do brasil", "argentine liga profesional de fútbol", 
+        "colombian primera a", "conmebol libertadores", "conmebol sudamericana",
+
+        # --- 3. ASIA-PACIFIC (Overnight & Early Morning ET) ---
+        "australian a-league men", "japanese j.league", "afc champions league elite",
+
+        # --- 4. MAJOR INTERNATIONAL TOURNAMENTS ---
         "fifa world cup", "fifa women's world cup", "fifa club world cup", 
-        "copa américa", "copa america", "concacaf gold cup", "concacaf nations league", 
-        "africa cup of nations"
+        "copa américa", "copa america", "concacaf gold cup", 
+        "concacaf nations league", "africa cup of nations", "afc asian cup"
     }
 
     SUMMARY_PHRASES = {
