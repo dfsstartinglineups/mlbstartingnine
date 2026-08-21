@@ -1601,6 +1601,28 @@ async def run_engines(memory):
     MAX_SUMMARY_AGE_SECONDS = 3600  # Skip summaries older than 5 minutes
     current_time_epoch = time.time()
 
+    # --- 🛡️ X.COM POSTING WHITELIST (Protects against 403 / Spam Flags) ---
+    X_SUMMARY_ALLOWED_LEAGUES = {
+        # Top Domestic
+        "english premier league", "spanish laliga", "italian serie a", 
+        "german bundesliga", "french ligue 1", "mls", "liga mx", 
+        "liga bbva mx", "nwsl",
+        
+        # Continental & Marquee
+        "uefa champions league", "uefa europa league", "uefa conference league", 
+        "conmebol libertadores", "concacaf champions cup", "leagues cup", 
+        "saudi pro league", "english league championship",
+        
+        # Domestic Cups
+        "english fa cup", "english carabao cup", "spanish copa del rey", 
+        "coppa italia", "german cup",
+        
+        # Major International
+        "fifa world cup", "fifa women's world cup", "fifa club world cup", 
+        "copa américa", "copa america", "concacaf gold cup", "concacaf nations league", 
+        "africa cup of nations"
+    }
+
     SUMMARY_PHRASES = {
         "narrow_win": {
             "titles": [
@@ -1933,8 +1955,10 @@ async def run_engines(memory):
         if (ft_key in tweeted_recently or x_ft_key in tweeted_recently) and (ft_key in tweeted_recently or bsky_ft_key in tweeted_recently):
             continue
 
-        # --- Post to X (Max 2 per loop cycle, if cap not reached) ---
-        if futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
+        # --- Post to X (Whitelist Filtered & Max 1-2 per cycle) ---
+        is_league_allowed_for_x = str(league_name).lower().strip() in X_SUMMARY_ALLOWED_LEAGUES
+
+        if is_league_allowed_for_x and futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol FT Summary Tweet ({scenario}) on X")
                 log_today.append(x_ft_key)
