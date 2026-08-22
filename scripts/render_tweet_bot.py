@@ -887,7 +887,23 @@ async def run_engines(memory):
     x_futbol_posts_count = 0  # Cap X to max 2 tweets per loop cycle
     x_futbol_posts_max = 1   
     # Cooldown timestamp for Futbol X.com rate limit / 403 errors
-       
+
+    # --- 🛡️ X.COM POSTING WHITELIST (Protects against 403 / Spam Flags) ---
+    X_ALLOWED_LEAGUES = {
+        "english premier league", "spanish laliga", "italian serie a", 
+        "german bundesliga", "french ligue 1", "english league championship",
+        "uefa champions league", "uefa europa league", "uefa conference league", 
+        "english fa cup", "english carabao cup", "spanish copa del rey", 
+        "coppa italia", "german cup", "saudi pro league",
+        "mls", "liga mx", "liga bbva mx", "nwsl", "canadian premier league",
+        "concacaf champions cup", "leagues cup", "costa rican primera division",
+        "brazilian serie a", "copa do brasil", "argentine liga profesional de fútbol", 
+        "colombian primera a", "conmebol libertadores", "conmebol sudamericana",
+        "australian a-league men", "japanese j.league", "afc champions league elite",
+        "fifa world cup", "fifa women's world cup", "fifa club world cup", 
+        "copa américa", "copa america", "concacaf gold cup", 
+        "concacaf nations league", "africa cup of nations", "afc asian cup"
+    }
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
@@ -1019,8 +1035,10 @@ async def run_engines(memory):
         bsky_tb.link(lineup_url, lineup_url)
         bsky_tb.text(f"\n\n{players_block}{bsky_hashtags}")
 
-        # --- Post to X (Max 2 per loop cycle) ---
-        if futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and entry_key not in tweeted_recently and x_key not in tweeted_recently:
+        # --- Post to X (Whitelist Filtered & Max 1-2 per cycle) ---
+        is_league_allowed_for_x = any(allowed in str(league_name).lower() for allowed in X_ALLOWED_LEAGUES)
+
+        if is_league_allowed_for_x and futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and entry_key not in tweeted_recently and x_key not in tweeted_recently:
             if DRY_RUN:
                 print(f"\n[SHADOW] 🛑 Mocking Futbol Lineup Tweet for {team_name} on X")
                 log_today.append(x_key)
@@ -1601,30 +1619,6 @@ async def run_engines(memory):
     MAX_SUMMARY_AGE_SECONDS = 3600  # Skip summaries older than 5 minutes
     current_time_epoch = time.time()
 
-    # --- 🛡️ X.COM POSTING WHITELIST (Protects against 403 / Spam Flags) ---
-    X_SUMMARY_ALLOWED_LEAGUES = {
-        # --- 1. EUROPE (Morning & Afternoon ET) ---
-        "english premier league", "spanish laliga", "italian serie a", 
-        "german bundesliga", "french ligue 1", "english league championship",
-        "uefa champions league", "uefa europa league", "uefa conference league", 
-        "english fa cup", "english carabao cup", "spanish copa del rey", 
-        "coppa italia", "german cup", "saudi pro league",
-
-        # --- 2. THE AMERICAS (Evening & Late Night ET) ---
-        "mls", "liga mx", "liga bbva mx", "nwsl", "canadian premier league",
-        "concacaf champions cup", "leagues cup", "costa rican primera division",
-        "brazilian serie a", "copa do brasil", "argentine liga profesional de fútbol", 
-        "colombian primera a", "conmebol libertadores", "conmebol sudamericana",
-
-        # --- 3. ASIA-PACIFIC (Overnight & Early Morning ET) ---
-        "australian a-league men", "japanese j.league", "afc champions league elite",
-
-        # --- 4. MAJOR INTERNATIONAL TOURNAMENTS ---
-        "fifa world cup", "fifa women's world cup", "fifa club world cup", 
-        "copa américa", "copa america", "concacaf gold cup", 
-        "concacaf nations league", "africa cup of nations", "afc asian cup"
-    }
-
     SUMMARY_PHRASES = {
         "narrow_win": {
             "titles": [
@@ -1958,7 +1952,7 @@ async def run_engines(memory):
             continue
 
         # --- Post to X (Whitelist Filtered & Max 1-2 per cycle) ---
-        is_league_allowed_for_x = str(league_name).lower().strip() in X_SUMMARY_ALLOWED_LEAGUES
+        is_league_allowed_for_x = any(allowed in str(league_name).lower() for allowed in X_ALLOWED_LEAGUES)
 
         if is_league_allowed_for_x and futbol_client and time.time() > FUTBOL_X_COOLDOWN_UNTIL and x_futbol_posts_count < x_futbol_posts_max and ft_key not in tweeted_recently and x_ft_key not in tweeted_recently:
             if DRY_RUN:
