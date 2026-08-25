@@ -2767,7 +2767,7 @@
 </div>
 
 <!-- Restored DFS Controls Row (Global Expand/Collapse Button Removed) -->
-<div id="dfs-controls-row" class="container d-flex align-items-center mb-3 gap-2 px-2">
+<div id="dfs-controls-row" class="container d-flex align-items-center flex-wrap mb-3 gap-2 px-2">
     <div class="btn-group shadow-sm flex-shrink-0" role="group">
         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
         <label class="btn btn-outline-primary fw-bold px-3 py-1" for="btn-fd" style="font-size: 0.85rem;">FD</label>
@@ -2775,8 +2775,16 @@
         <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
         <label class="btn fw-bold px-3 py-1 dk-btn-label" for="btn-dk" style="font-size: 0.85rem;">DK</label>
     </div>
-    <select id="dfs-page-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 180px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
+    <select id="dfs-page-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 170px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
         <!-- Populated by JS -->
+    </select>
+    
+    <!-- New Tools Dropdown -->
+    <select class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 150px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
+        <option value="">Tools ⚙️</option>
+        <option value="/dfs/lineup-checker/">DFS Lineup Checker</option>
+        <option value="/tools/alerts/players/">Player Alerts</option>
+        <option value="/tools/alerts/lineups/">Lineup Alerts</option>
     </select>
 </div>
 
@@ -38778,17 +38786,17 @@ function populateDFSLinks() {
     selector.innerHTML = '<option value="">Top DFS Plays...</option>';
     
     const links = platform === 'dk' ? [
-        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" },
         { slug: "pitchers", label: "Pitchers" }, { slug: "catchers", label: "Catchers" },
         { slug: "first-base", label: "First Base" }, { slug: "second-base", label: "Second Base" },
         { slug: "third-base", label: "Third Base" }, { slug: "shortstops", label: "Shortstops" },
-        { slug: "outfielders", label: "Outfielders" }, { slug: "util", label: "Util (All Hitters)" }
+        { slug: "outfielders", label: "Outfielders" }, { slug: "util", label: "Util (All Hitters)" },
+        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" }
     ] : [
-        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" },
         { slug: "pitchers", label: "Pitchers" }, { slug: "catchers-first-base", label: "C / 1B" },
         { slug: "second-base", label: "Second Base" }, { slug: "third-base", label: "Third Base" },
         { slug: "shortstops", label: "Shortstops" }, { slug: "outfielders", label: "Outfielders" },
-        { slug: "util", label: "Utility" }
+        { slug: "util", label: "Utility" },
+        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" }
     ];
     
     const platSlug = platform === 'dk' ? 'draftkings' : 'fanduel';
