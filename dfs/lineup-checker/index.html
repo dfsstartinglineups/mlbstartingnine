@@ -36,7 +36,7 @@
         
         .alert-card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         
-        .drop-zone { border: 2px dashed #adb5bd; border-radius: 8px; padding: 40px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.2s; }
+        .drop-zone { border: 2px dashed #adb5bd; border-radius: 8px; padding: 20px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.2s; }
         .drop-zone:hover, .drop-zone.dragover { border-color: #0d6efd; background-color: #e9ecef; }
         
         .player-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -102,24 +102,32 @@
         </div>
     </div>
     
-    <div class="alert-card p-4 mb-4">
+    <div class="row g-3 mb-4">
         <!-- Manual Search -->
-        <div class="mb-4 pb-4 border-bottom">
-            <h5 class="fw-bold mb-3" style="font-size: 1rem;">🔍 Quick Player Check</h5>
-            <div class="search-container position-relative">
-                <input type="text" id="player-search" class="form-control form-control-lg" placeholder="Type a player name to check status..." autocomplete="off">
-                <div id="search-results" class="position-absolute w-100 bg-white border rounded shadow-sm mt-1 z-3" style="display: none; max-height: 250px; overflow-y: auto;"></div>
+        <div class="col-md-6">
+            <div class="alert-card p-4 h-100">
+                <h5 class="fw-bold mb-3" style="font-size: 1rem;">🔍 Quick Player Check</h5>
+                <div class="search-container position-relative">
+                    <input type="text" id="player-search" class="form-control form-control-lg" placeholder="Type a player name..." autocomplete="off">
+                    <div id="search-results" class="position-absolute w-100 bg-white border rounded shadow-sm mt-1 z-3" style="display: none; max-height: 250px; overflow-y: auto;"></div>
+                </div>
             </div>
         </div>
-
+        
         <!-- DFS Upload -->
-        <h5 class="fw-bold mb-3" style="font-size: 1rem;">📁 Full DFS Lineup Check</h5>
-        <div class="drop-zone" id="drop-zone">
-            <div class="mb-2" style="font-size: 3rem;">📥</div>
-            <div class="fw-bold text-dark fs-5">Drag & Drop Your CSV Here</div>
-            <div class="text-muted small mt-2">All processing happens instantly in your browser.</div>
-            <input type="file" id="file-input" class="d-none" accept=".csv">
-            <button class="btn btn-primary fw-bold mt-3 px-4" onclick="document.getElementById('file-input').click()">Browse Files</button>
+        <div class="col-md-6">
+            <div class="alert-card p-3 h-100 d-flex flex-column justify-content-center">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="fw-bold mb-0" style="font-size: 1rem;">📁 Full DFS Lineup Check</h5>
+                </div>
+                <div class="drop-zone" id="drop-zone">
+                    <div class="mb-1" style="font-size: 2rem;">📥</div>
+                    <div class="fw-bold text-dark" style="font-size: 0.95rem;">Drag & Drop Your CSV Here</div>
+                    <div class="text-muted small mt-1">Browser processing only</div>
+                    <input type="file" id="file-input" class="d-none" accept=".csv">
+                    <button class="btn btn-sm btn-primary fw-bold mt-2 px-3" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                </div>
+            </div>
         </div>
     </div>
 
