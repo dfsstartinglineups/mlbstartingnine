@@ -506,13 +506,13 @@
             
             const gridEl = document.getElementById(`grid-${id}`);
             
-            if (id === 'out' && arr.length === 0) {
-                gridEl.innerHTML = `
-                    <div class="w-100 p-3 bg-white border border-success rounded text-center shadow-sm">
-                        <span class="fs-4 mb-2 d-block">🎉</span>
-                        <span class="fw-bold text-success">All Clear!</span>
-                        <p class="text-muted small mb-0 mt-1">None of your players are officially scratched or postponed.</p>
-                    </div>`;
+            if (arr.length === 0) {
+                if (id === 'out') {
+                    gridEl.innerHTML = `<span class="text-success fw-bold" style="font-size: 0.85rem;">🎉 All clear! No scratches detected.</span>`;
+                } else {
+                    // Keep other empty boxes as tight as possible
+                    gridEl.innerHTML = ''; 
+                }
             } else {
                 gridEl.innerHTML = arr.map(item => isGhost ? createGhostChip(item) : createChip(item)).join('');
             }
