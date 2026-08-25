@@ -1000,6 +1000,21 @@ def main():
             else:
                 all_dfs_urls[page_url] = existing_dates.get(page_url, w3c_today)
 
+    # Handle the Static DFS Lineup Checker Tool
+    lineup_checker_url = f"{base_domain}/dfs/lineup-checker/"
+    lineup_checker_file = os.path.join(OUTPUT_BASE_DIR, "lineup-checker", "index.html")
+    
+    if os.path.exists(lineup_checker_file):
+        # Use actual file modification time so we don't spam IndexNow every day
+        mtime = os.path.getmtime(lineup_checker_file)
+        file_dt = datetime.fromtimestamp(mtime, tz=timezone.utc)
+        file_w3c = file_dt.isoformat(timespec='seconds')
+        
+        if lineup_checker_url not in existing_dates or existing_dates[lineup_checker_url] != file_w3c:
+            changed_urls.append(lineup_checker_url)
+            
+        all_dfs_urls[lineup_checker_url] = file_w3c
+    
     # Rebuild sitemap & queue IndexNow pings only if changes were detected
     if changed_urls:
         sitemap_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
