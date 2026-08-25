@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TW817924LJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-TW817924LJ');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    
+    <title>DFS Lineup Checker | DraftKings & FanDuel MLB Tool</title>
+    <meta name="description" content="Upload your DraftKings or FanDuel CSV and instantly check your daily fantasy baseball lineups against official MLB starting nines.">
+    <meta name="keywords" content="DFS lineup checker, DraftKings lineup tool, FanDuel lineup tool, MLB starting lineups, DFS scratches">
+    <link rel="canonical" href="https://mlbstartingnine.com/dfs/lineup-checker/">
+    
+    <meta property="og:site_name" content="MLB Starting Nine">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mlbstartingnine.com/dfs/lineup-checker/">
+    <meta property="og:title" content="DFS Lineup Checker | Instant Scratch & Starter Report">
+    <meta property="og:description" content="Drop your DFS CSV and instantly see who is IN, who is OUT, and who is PENDING.">
+    <meta property="og:image" content="https://mlbstartingnine.com/mlb-social-share.jpg">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        body { background-color: #f1f3f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .header-brand { font-weight: 900; letter-spacing: -1px; font-size: 2rem; color: #fff; font-style: italic; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .header-brand a { color: inherit; text-decoration: none; }
+        .header-brand span { background: linear-gradient(to bottom, #7CD0FF 0%, #1A8CFF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; padding-right: 2px; display: inline-block; }
+        
+        .alert-card { background: #fff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        .drop-zone { border: 2px dashed #adb5bd; border-radius: 8px; padding: 40px; text-align: center; background-color: #f8f9fa; cursor: pointer; transition: all 0.2s; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: #0d6efd; background-color: #e9ecef; }
+        
+        .player-chip { background: #fff; border: 1px solid #dee2e6; border-radius: 30px; padding: 4px 12px 4px 4px; display: inline-flex; align-items: center; margin: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .ghost-chip { background: #f8f9fa; border: 1px dashed #adb5bd; color: #6c757d; }
+        
+        .status-box { display: none; border-radius: 8px; border: 1px solid; padding: 15px; margin-bottom: 20px; }
+        .status-unmatched { border-color: #ffc107; background-color: #fffdf5; }
+        .status-out { border-color: #dc3545; background-color: #fff5f5; }
+        .status-pending { border-color: #6c757d; background-color: #f8f9fa; }
+        .status-in { border-color: #198754; background-color: #f1fcf5; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap">
+        <div class="header-brand mb-2 mb-md-0">
+            <a href="/" class="text-decoration-none">MLB Starting <span>Nine</span></a>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <a href="/" class="btn btn-sm btn-outline-light fw-bold">◀ Back to Lineups</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container pb-5">
+    <div class="text-center mb-4">
+        <h1 class="h3 fw-bold text-dark mb-2">DFS Lineup Checker ⚾</h1>
+        <p class="text-muted">Instantly cross-reference your DraftKings or FanDuel CSV against official MLB starting nines.</p>
+    </div>
+
+    <div class="accordion mb-4 shadow-sm" id="howItWorksAccordion">
+        <div class="accordion-item border-0 rounded alert-card overflow-hidden">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold text-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background-color: #fcfcfc;">
+                    How to Export Your DFS CSV
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#howItWorksAccordion">
+                <div class="accordion-body text-muted" style="font-size: 0.9rem;">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h6 class="fw-bold text-dark border-bottom pb-2">FanDuel</h6>
+                            <ol class="mb-0 ps-3">
+                                <li>Log into <strong>FanDuel.com</strong> on a desktop/laptop.</li>
+                                <li>Navigate to the <strong>Upcoming</strong> tab.</li>
+                                <li>Click <strong>CSV Edit</strong> on the right side.</li>
+                                <li>Select your slate and click <strong>Download CSV template</strong>.</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark border-bottom pb-2">DraftKings</h6>
+                            <ol class="mb-0 ps-3">
+                                <li>Log into <strong>DraftKings.com</strong> on a desktop/laptop.</li>
+                                <li>Click <strong>Lineups</strong> in the top menu.</li>
+                                <li>Click <strong>Edit Entries</strong> near the top right.</li>
+                                <li>Click <strong>Download</strong> to save your `.csv` file.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert-card p-4 mb-4">
+        <div class="drop-zone" id="drop-zone">
+            <div class="mb-2" style="font-size: 3rem;">📥</div>
+            <div class="fw-bold text-dark fs-5">Drag & Drop Your CSV Here</div>
+            <div class="text-muted small mt-2">All processing happens instantly in your browser.</div>
+            <input type="file" id="file-input" class="d-none" accept=".csv">
+            <button class="btn btn-primary fw-bold mt-3 px-4" onclick="document.getElementById('file-input').click()">Browse Files</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Results -->
+    <div id="dashboard-results" style="display: none;">
+        <h4 class="fw-bold border-bottom pb-2 mb-4">Lineup Status Report</h4>
+
+        <!-- Box 4: Unmatched -->
+        <div id="box-unmatched" class="status-box status-unmatched shadow-sm">
+            <h5 class="fw-bold text-warning-emphasis mb-3">
+                ⚠️ Action Required <span id="count-unmatched" class="badge bg-warning text-dark ms-2">0</span>
+            </h5>
+            <p class="small text-muted mb-2">We couldn't confidently map these names to our master database. Please check them manually on your DFS app.</p>
+            <div id="grid-unmatched" class="d-flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Box 1: OUT -->
+        <div id="box-out" class="status-box status-out shadow-sm">
+            <h5 class="fw-bold text-danger mb-3">
+                🚨 OUT / POSTPONED <span id="count-out" class="badge bg-danger ms-2">0</span>
+            </h5>
+            <p class="small text-muted mb-2">These players are officially benched or their game is postponed. Replace them immediately.</p>
+            <div id="grid-out" class="d-flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Box 2: PENDING -->
+        <div id="box-pending" class="status-box status-pending shadow-sm">
+            <h5 class="fw-bold text-secondary mb-3">
+                ⏳ PENDING <span id="count-pending" class="badge bg-secondary ms-2">0</span>
+            </h5>
+            <p class="small text-muted mb-2">Official lineups for these games have not been released yet.</p>
+            <div id="grid-pending" class="d-flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Box 3: IN -->
+        <div id="box-in" class="status-box status-in shadow-sm">
+            <h5 class="fw-bold text-success mb-3">
+                ✅ CONFIRMED IN <span id="count-in" class="badge bg-success ms-2">0</span>
+            </h5>
+            <p class="small text-muted mb-2">These players are officially locked into the starting nine.</p>
+            <div id="grid-in" class="d-flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="alert-card p-4 mt-4 text-center" style="background: linear-gradient(to right, #212529, #343a40); color: white;">
+            <h5 class="fw-bold mb-2">Don't want to refresh this page all night?</h5>
+            <p class="text-light" style="font-size: 0.95rem;">Lock in your players on our alerts page and we will push a notification to your screen the second a lineup changes.</p>
+            <a href="/tools/alerts/players/" class="btn btn-light text-dark fw-bold px-4 py-2 mt-2" style="border-radius: 30px;">
+                🔔 Set Up Player Alerts
+            </a>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    let masterPlayerList = [];
+    let officialTeams = new Set();
+    let activeStarters = new Set();
+    let postponedTeams = new Set();
+    let doubleHeaderTeamIds = new Set();
+
+    const todayDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
+
+    // Fetch Master Data and Today's Live JSON Data concurrently
+    Promise.all([
+        fetch('/data/player_master_data.json').then(res => res.json()),
+        fetch(`/data/daily_files/games_${todayDate}.json`).then(res => res.json()).catch(() => null)
+    ])
+    .then(([playerData, gamesData]) => {
+        masterPlayerList = Object.values(playerData);
+        if (gamesData) buildLiveDataSets(gamesData);
+    })
+    .catch(err => console.error("Failed to load backend data:", err));
+
+    function buildLiveDataSets(daily_data) {
+        const games = daily_data.games || [];
+        const teamGameCounts = {};
+
+        // Identify Doubleheaders
+        games.forEach(g => {
+            const awayId = String(g.gameRaw?.teams?.away?.team?.id || '');
+            const homeId = String(g.gameRaw?.teams?.home?.team?.id || '');
+            const isDH = g.gameRaw?.doubleHeader === 'Y' || g.gameRaw?.gameNumber > 1;
+
+            if (awayId) { teamGameCounts[awayId] = (teamGameCounts[awayId] || 0) + 1; if (isDH) doubleHeaderTeamIds.add(awayId); }
+            if (homeId) { teamGameCounts[homeId] = (teamGameCounts[homeId] || 0) + 1; if (isDH) doubleHeaderTeamIds.add(homeId); }
+        });
+        Object.keys(teamGameCounts).forEach(tid => { if (teamGameCounts[tid] > 1) doubleHeaderTeamIds.add(tid); });
+
+        // Extract Lineups & Postponements
+        games.forEach(g => {
+            const gameRaw = g.gameRaw || {};
+            const awayId = String(gameRaw.teams?.away?.team?.id || '');
+            const homeId = String(gameRaw.teams?.home?.team?.id || '');
+            const gameNum = gameRaw.gameNumber || 1;
+
+            const awayTag = doubleHeaderTeamIds.has(awayId) ? `G${gameNum}` : null;
+            const homeTag = doubleHeaderTeamIds.has(homeId) ? `G${gameNum}` : null;
+
+            const status = gameRaw.status || {};
+            const detailedState = status.detailedState || '';
+            const statusCode = status.statusCode || '';
+
+            // Postponements
+            if (detailedState.includes('Postponed') || statusCode === 'PP') {
+                if (awayTag) postponedTeams.add(`${awayId}_${awayTag}`);
+                else { postponedTeams.add(awayId); postponedTeams.add(`${awayId}_G1`); }
+
+                if (homeTag) postponedTeams.add(`${homeId}_${homeTag}`);
+                else { postponedTeams.add(homeId); postponedTeams.add(`${homeId}_G1`); }
+                return;
+            }
+
+            const tracking = g.lineupTracking || {};
+            const lineups = gameRaw.lineups || {};
+            const projected = g.projectedLineups || {};
+
+            // Away Team Check
+            if (['OFFICIAL', 'MODIFIED'].includes(tracking.away?.status)) {
+                if (awayTag) officialTeams.add(`${awayId}_${awayTag}`);
+                else { officialTeams.add(awayId); officialTeams.add(`${awayId}_G1`); }
+
+                (lineups.awayPlayers || []).forEach(p => {
+                    if (awayTag) activeStarters.add(`${p.id}_${awayTag}`);
+                    else { activeStarters.add(String(p.id)); activeStarters.add(`${p.id}_G1`); }
+                });
+                
+                const spId = projected.away?.startingPitcher?.id;
+                if (spId) {
+                    if (awayTag) activeStarters.add(`${spId}_${awayTag}`);
+                    else { activeStarters.add(String(spId)); activeStarters.add(`${spId}_G1`); }
+                }
+            }
+
+            // Home Team Check
+            if (['OFFICIAL', 'MODIFIED'].includes(tracking.home?.status)) {
+                if (homeTag) officialTeams.add(`${homeId}_${homeTag}`);
+                else { officialTeams.add(homeId); officialTeams.add(`${homeId}_G1`); }
+
+                (lineups.homePlayers || []).forEach(p => {
+                    if (homeTag) activeStarters.add(`${p.id}_${homeTag}`);
+                    else { activeStarters.add(String(p.id)); activeStarters.add(`${p.id}_G1`); }
+                });
+                
+                const spId = projected.home?.startingPitcher?.id;
+                if (spId) {
+                    if (homeTag) activeStarters.add(`${spId}_${homeTag}`);
+                    else { activeStarters.add(String(spId)); activeStarters.add(`${spId}_G1`); }
+                }
+            }
+        });
+    }
+
+    const teamAbbrMap = {
+        "ARI": ["arizona", "diamondbacks"], "ATL": ["atlanta", "braves"], "BAL": ["baltimore", "orioles"], "BOS": ["boston", "red sox"], "CHC": ["cubs"], "CHW": ["white sox"], "CWS": ["white sox"], "CIN": ["cincinnati", "reds"], "CLE": ["cleveland", "guardians"], "COL": ["colorado", "rockies"], "DET": ["detroit", "tigers"], "HOU": ["houston", "astros"], "KC":  ["kansas city", "royals"], "LAA": ["angels"], "LAD": ["dodgers"], "MIA": ["miami", "marlins"], "MIL": ["milwaukee", "brewers"], "MIN": ["minnesota", "twins"], "NYM": ["mets"], "NYY": ["yankees"], "OAK": ["athletics"], "ATH": ["athletics"], "PHI": ["philadelphia", "phillies"], "PIT": ["pittsburgh", "pirates"], "SD":  ["san diego", "padres"], "SF":  ["san francisco", "giants"], "SEA": ["seattle", "mariners"], "STL": ["st. louis", "cardinals"], "TB":  ["tampa bay", "rays"], "TEX": ["texas", "rangers"], "TOR": ["toronto", "blue jays"], "WSH": ["washington", "nationals"]
+    };
+
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) processCSV(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', (e) => { if (e.target.files.length) processCSV(e.target.files[0]); });
+
+    function processCSV(file) {
+        Papa.parse(file, {
+            header: false,
+            skipEmptyLines: true,
+            complete: function(results) {
+                const data = results.data;
+                if (data.length < 2) return;
+
+                let isFanDuel = false;
+                let fdIdToPlayer = {};
+
+                data.forEach(row => {
+                    if (row.length > 24) {
+                        const id = row[15], name = row[18], team = row[24];
+                        if (id && id.includes('-') && name && name !== "Nickname") {
+                            isFanDuel = true;
+                            fdIdToPlayer[id] = { name: name, team: team ? team.toUpperCase() : null };
+                        }
+                    }
+                });
+
+                let headerRowIndex = -1, lineupColStart = -1, lineupColEnd = -1;
+                const positions = ["p", "sp", "rp", "pitcher", "c", "1b", "2b", "3b", "ss", "of", "c/1b", "util"];
+
+                for (let i = 0; i < Math.min(10, data.length); i++) {
+                    const firstCell = (data[i][0] || "").toLowerCase().trim();
+                    if (firstCell === "entry id" || firstCell === "entry_id") {
+                        headerRowIndex = i;
+                        for (let j = 0; j < data[i].length; j++) {
+                            const colName = (data[i][j] || "").toLowerCase().trim();
+                            if (positions.includes(colName)) {
+                                if (lineupColStart === -1) lineupColStart = j;
+                                lineupColEnd = j;
+                            } else if (lineupColStart !== -1 && data[i][j] === "") break;
+                        }
+                        break;
+                    }
+                }
+
+                if (headerRowIndex === -1 || lineupColStart === -1) { alert("Could not detect lineup columns. Ensure this is a DraftKings or FanDuel file."); return; }
+
+                const uniquePlayerValues = new Set();
+                for (let i = headerRowIndex + 1; i < data.length; i++) {
+                    const row = data[i];
+                    if (!row[0]) continue; 
+                    for (let col = lineupColStart; col <= lineupColEnd; col++) {
+                        const cellVal = row[col];
+                        if (cellVal && cellVal.trim() !== "") uniquePlayerValues.add(cellVal.trim());
+                    }
+                }
+
+                evaluateLineups(uniquePlayerValues, isFanDuel, fdIdToPlayer);
+            }
+        });
+    }
+
+    function evaluateLineups(uniquePlayerValues, isFanDuel, fdIdToPlayer) {
+        document.getElementById('dashboard-results').style.display = 'block';
+        const grids = { unmatched: [], out: [], pending: [], in: [] };
+
+        uniquePlayerValues.forEach(val => {
+            let playerName = val, playerTeam = null;
+
+            if (isFanDuel) {
+                if (fdIdToPlayer[val]) { playerName = fdIdToPlayer[val].name; playerTeam = fdIdToPlayer[val].team; }
+                else if (val.includes(':')) playerName = val.split(':')[1].trim();
+            } else {
+                if (val.includes('(')) playerName = val.split('(')[0].trim();
+            }
+
+            if(!playerName) return;
+
+            const cleanName = playerName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
+            const matchedPlayers = masterPlayerList.filter(p => {
+                const masterCleanName = (p.name || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z\s]/g, "");
+                return masterCleanName === cleanName || masterCleanName.includes(cleanName) || cleanName.includes(masterCleanName);
+            });
+
+            let matchedPlayer = null;
+            if (matchedPlayers.length === 1) matchedPlayer = matchedPlayers[0];
+            else if (matchedPlayers.length > 1) {
+                if (playerTeam) {
+                    matchedPlayer = matchedPlayers.find(p => {
+                        const masterTeam = (p.team_name || "").toLowerCase();
+                        const possibleNames = teamAbbrMap[playerTeam] || [];
+                        return possibleNames.some(t => masterTeam.includes(t)) || masterTeam.includes(playerTeam.toLowerCase());
+                    });
+                }
+                if (!matchedPlayer) matchedPlayer = matchedPlayers[0];
+            }
+
+            if (matchedPlayer) {
+                const isDH = doubleHeaderTeamIds.has(String(matchedPlayer.team_id));
+                if (isDH) {
+                    assignBucket(matchedPlayer, 'G1', grids);
+                    assignBucket(matchedPlayer, 'G2', grids);
+                } else {
+                    assignBucket(matchedPlayer, null, grids);
+                }
+            } else {
+                grids.unmatched.push(playerName);
+            }
+        });
+
+        renderGrids(grids);
+    }
+
+    function assignBucket(player, gameTag, grids) {
+        const teamId = String(player.team_id);
+        const playerId = String(player.player_id);
+        const teamCheckKey = gameTag ? `${teamId}_${gameTag}` : teamId;
+        const playerCheckKey = gameTag ? `${playerId}_${gameTag}` : playerId;
+
+        const pObj = { ...player, gameTag: gameTag };
+
+        if (postponedTeams.has(teamCheckKey) || postponedTeams.has(teamId)) {
+            grids.out.push(pObj);
+        } else if (!officialTeams.has(teamCheckKey)) {
+            grids.pending.push(pObj);
+        } else if (activeStarters.has(playerCheckKey)) {
+            grids.in.push(pObj);
+        } else {
+            grids.out.push(pObj);
+        }
+    }
+
+    function renderGrids(grids) {
+        const createChip = (p) => {
+            const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
+            const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; margin: 0 !important; object-fit: contain;" alt="Logo">` : '';
+            const displayLabel = p.gameTag ? ` (${p.gameTag.replace('G', 'GM')})` : '';
+            return `
+                <div class="player-chip pe-3">
+                    <div class="position-relative d-inline-block flex-shrink-0" style="width: 28px; height: 28px; margin-right: 8px;">
+                        <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef; margin: 0 !important;">
+                        ${teamLogo}
+                    </div>
+                    <span class="fw-bold" style="font-size: 0.8rem;">${p.name}${displayLabel}</span>
+                </div>`;
+        };
+
+        const createGhostChip = (name) => `
+            <div class="player-chip ghost-chip pe-3 ps-3">
+                <span class="fw-bold" style="font-size: 0.8rem;">❓ ${name}</span>
+            </div>`;
+
+        const renderBox = (id, arr, isGhost = false) => {
+            document.getElementById(`count-${id}`).innerText = arr.length;
+            document.getElementById(`box-${id}`).style.display = (id === 'unmatched' && arr.length === 0) ? 'none' : 'block';
+            document.getElementById(`grid-${id}`).innerHTML = arr.map(item => isGhost ? createGhostChip(item) : createChip(item)).join('');
+        };
+
+        renderBox('unmatched', grids.unmatched, true);
+        renderBox('out', grids.out);
+        renderBox('pending', grids.pending);
+        renderBox('in', grids.in);
+        
+        document.getElementById('dashboard-results').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>    
+</body>
+</html>
