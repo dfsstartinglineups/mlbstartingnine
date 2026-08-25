@@ -101,8 +101,19 @@
             </div>
         </div>
     </div>
-
+    
     <div class="alert-card p-4 mb-4">
+        <!-- Manual Search -->
+        <div class="mb-4 pb-4 border-bottom">
+            <h5 class="fw-bold mb-3" style="font-size: 1rem;">🔍 Quick Player Check</h5>
+            <div class="search-container position-relative">
+                <input type="text" id="player-search" class="form-control form-control-lg" placeholder="Type a player name to check status..." autocomplete="off">
+                <div id="search-results" class="position-absolute w-100 bg-white border rounded shadow-sm mt-1 z-3" style="display: none; max-height: 250px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- DFS Upload -->
+        <h5 class="fw-bold mb-3" style="font-size: 1rem;">📁 Full DFS Lineup Check</h5>
         <div class="drop-zone" id="drop-zone">
             <div class="mb-2" style="font-size: 3rem;">📥</div>
             <div class="fw-bold text-dark fs-5">Drag & Drop Your CSV Here</div>
@@ -274,6 +285,67 @@
     dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length) processCSV(e.dataTransfer.files[0]); });
     fileInput.addEventListener('change', (e) => { if (e.target.files.length) processCSV(e.target.files[0]); });
 
+    // --- MANUAL SEARCH LOGIC ---
+    const searchInput = document.getElementById('player-search');
+    const searchResults = document.getElementById('search-results');
+
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        searchResults.innerHTML = '';
+        
+        if (query.length < 2) { searchResults.style.display = 'none'; return; }
+
+        const matches = masterPlayerList.filter(p => (p.name || "").toLowerCase().includes(query)).slice(0, 8);
+        
+        if (matches.length > 0) {
+            searchResults.style.display = 'block';
+            matches.forEach(p => {
+                const isDH = doubleHeaderTeamIds.has(String(p.team_id));
+                const options = isDH ? [{ tag: 'G1', label: ' (GM1)' }, { tag: 'G2', label: ' (GM2)' }] : [{ tag: null, label: '' }];
+
+                options.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'p-2 border-bottom d-flex align-items-center bg-light';
+                    div.style.cursor = 'pointer';
+                    
+                    const headshot = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/${p.player_id}/headshot/67/current`;
+                    const teamLogo = p.team_id ? `<img src="https://www.mlbstatic.com/team-logos/${p.team_id}.svg" style="position: absolute; bottom: -3px; right: -3px; width: 12px; height: 12px; background: #fff; border-radius: 50%; border: 1px solid #dee2e6; padding: 1px; object-fit: contain;" alt="Logo">` : '';
+                    
+                    div.innerHTML = `
+                        <div class="position-relative flex-shrink-0" style="width: 24px; height: 24px; margin-right: 10px;">
+                            <img src="${headshot}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 1px solid #e9ecef;">
+                            ${teamLogo}
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                            <span class="fw-bold" style="font-size:0.85rem; line-height:1;">${p.name}<span class="text-primary">${opt.label}</span></span>
+                        </div>
+                    `;
+                    
+                    div.onmouseover = () => div.classList.add('bg-white');
+                    div.onmouseout = () => div.classList.remove('bg-white');
+                    
+                    div.onclick = () => {
+                        // Pass the single selected player into the existing dashboard logic
+                        document.getElementById('dashboard-results').style.display = 'block';
+                        const grids = { unmatched: [], out: [], pending: [], in: [] };
+                        assignBucket(p, opt.tag, grids);
+                        renderGrids(grids);
+                        
+                        searchInput.value = ''; 
+                        searchResults.style.display = 'none'; 
+                    };
+                    searchResults.appendChild(div);
+                });
+            });
+        } else { 
+            searchResults.style.display = 'none'; 
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) searchResults.style.display = 'none';
+    });
+    
     function processCSV(file) {
         Papa.parse(file, {
             header: false,
@@ -423,7 +495,19 @@
         const renderBox = (id, arr, isGhost = false) => {
             document.getElementById(`count-${id}`).innerText = arr.length;
             document.getElementById(`box-${id}`).style.display = (id === 'unmatched' && arr.length === 0) ? 'none' : 'block';
-            document.getElementById(`grid-${id}`).innerHTML = arr.map(item => isGhost ? createGhostChip(item) : createChip(item)).join('');
+            
+            const gridEl = document.getElementById(`grid-${id}`);
+            
+            if (id === 'out' && arr.length === 0) {
+                gridEl.innerHTML = `
+                    <div class="w-100 p-3 bg-white border border-success rounded text-center shadow-sm">
+                        <span class="fs-4 mb-2 d-block">🎉</span>
+                        <span class="fw-bold text-success">All Clear!</span>
+                        <p class="text-muted small mb-0 mt-1">None of your players are officially scratched or postponed.</p>
+                    </div>`;
+            } else {
+                gridEl.innerHTML = arr.map(item => isGhost ? createGhostChip(item) : createChip(item)).join('');
+            }
         };
 
         renderBox('unmatched', grids.unmatched, true);
