@@ -38,13 +38,13 @@
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "Los Angeles Dodgers Lineups",
-      "item": "https://mlbstartingnine.com/lineups/los-angeles-dodgers/"
+      "name": "League Bullpens",
+      "item": "https://mlbstartingnine.com/reports/bullpens/"
     },
     {
       "@type": "ListItem",
       "position": 3,
-      "name": "Bullpen Report",
+      "name": "Los Angeles Dodgers Bullpen",
       "item": "https://mlbstartingnine.com/teams/los-angeles-dodgers/bullpen/"
     }
   ]
@@ -61,7 +61,10 @@
 <nav class="navbar shadow-sm py-3 mb-4" style="background-color: #212529;">
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
         <div class="header-brand mb-0"><a href="/">MLB Starting <span>Nine</span></a></div>
-        <div><a href="/lineups/los-angeles-dodgers/" class="btn btn-sm btn-outline-light font-weight-bold">← Team Lineups</a></div>
+        <div>
+            <a href="/reports/bullpens/" class="btn btn-sm btn-outline-light font-weight-bold me-2">📊 League Hub</a>
+            <a href="/lineups/los-angeles-dodgers/" class="btn btn-sm btn-outline-light font-weight-bold">← Team Lineups</a>
+        </div>
     </div>
 </nav>
 
@@ -81,9 +84,9 @@
                 <div class="card-body p-3 bg-white rounded-end d-flex justify-content-between align-items-center">
                     <div>
                         <span class="fw-bold text-dark d-block" style="font-size: 1.1rem;">Bullpen Status</span>
-                        <span class="text-muted" style="font-size: 0.85rem;">8 of 8 active arms are fully rested today.</span>
+                        <span class="text-muted" style="font-size: 0.85rem;">7 of 7 active arms are fully rested today.</span>
                     </div>
-                    <span class="badge bg-primary fs-5 px-3 py-2 shadow-sm">8 / 8</span>
+                    <span class="badge bg-primary fs-5 px-3 py-2 shadow-sm">7 / 7</span>
                 </div>
             </div>
 
@@ -95,8 +98,8 @@
             <div class="border rounded p-2 text-center bg-white shadow-sm h-100">
                 <div class="text-muted fw-bold" style="font-size: 0.65rem;">ERA</div>
                 <div class="d-flex justify-content-center align-items-end gap-1">
-                    <span class="fs-5 fw-bold text-dark">3.98</span>
-                    <span class="text-muted fw-bold mb-1" style="font-size: 0.7rem;">(13)</span>
+                    <span class="fs-5 fw-bold text-dark">3.97</span>
+                    <span class="text-muted fw-bold mb-1" style="font-size: 0.7rem;">(12)</span>
                 </div>
             </div>
         </div>
@@ -116,7 +119,7 @@
                 <div class="text-muted fw-bold" style="font-size: 0.65rem;">BAA</div>
                 <div class="d-flex justify-content-center align-items-end gap-1">
                     <span class="fs-5 fw-bold text-dark">.220</span>
-                    <span class="text-success fw-bold mb-1" style="font-size: 0.7rem;">(2)</span>
+                    <span class="text-success fw-bold mb-1" style="font-size: 0.7rem;">(1)</span>
                 </div>
             </div>
         </div>
@@ -125,7 +128,7 @@
             <div class="border rounded p-2 text-center bg-white shadow-sm h-100">
                 <div class="text-muted fw-bold" style="font-size: 0.65rem;">K/9</div>
                 <div class="d-flex justify-content-center align-items-end gap-1">
-                    <span class="fs-5 fw-bold text-dark">9.84</span>
+                    <span class="fs-5 fw-bold text-dark">9.79</span>
                     <span class="text-success fw-bold mb-1" style="font-size: 0.7rem;">(4)</span>
                 </div>
             </div>
@@ -135,7 +138,7 @@
             <div class="border rounded p-2 text-center bg-white shadow-sm h-100">
                 <div class="text-muted fw-bold" style="font-size: 0.65rem;">BB/9</div>
                 <div class="d-flex justify-content-center align-items-end gap-1">
-                    <span class="fs-5 fw-bold text-dark">4.13</span>
+                    <span class="fs-5 fw-bold text-dark">4.12</span>
                     <span class="text-muted fw-bold mb-1" style="font-size: 0.7rem;">(23)</span>
                 </div>
             </div>
@@ -145,7 +148,7 @@
             <div class="border rounded p-2 text-center bg-white shadow-sm h-100">
                 <div class="text-muted fw-bold" style="font-size: 0.65rem;">HR/9</div>
                 <div class="d-flex justify-content-center align-items-end gap-1">
-                    <span class="fs-5 fw-bold text-dark">1.01</span>
+                    <span class="fs-5 fw-bold text-dark">1.00</span>
                     <span class="text-muted fw-bold mb-1" style="font-size: 0.7rem;">(12)</span>
                 </div>
             </div>
@@ -188,11 +191,11 @@
                     <table class="table table-bordered text-center align-middle mb-0" style="font-size:0.8rem; min-width: 750px;">
                         <thead class="table-dark text-white fw-bold">
                             <tr>
-                                <th class="text-start ps-3">Pitcher</th>
+                                <th class="text-start ps-3 border-end">Pitcher</th>
                                 <th>ERA</th>
-                                <th>WHIP</th>
-                                <th style="min-width: 100px;">Status</th>
-                                <th style="font-size:0.7rem;">Appearances<br>(Last 5)</th>
+                                <th class="border-end">WHIP</th>
+                                <th style="min-width: 100px;" class="border-end">Status</th>
+                                <th style="font-size:0.7rem;" class="border-end">Appearances<br>(Last 5)</th>
                                 <th>Yest</th>
                                 <th>2 Days</th>
                                 <th>3 Days</th>
@@ -202,136 +205,119 @@
                         </thead>
                         <tbody>
                             
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/681911/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/681911/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/alex-vesia/" class="text-dark fw-bold text-decoration-none">Alex Vesia</a>
                 </div>
             </td>
-            <td class="align-middle fw-bold text-dark">3.18</td>
-            <td class="align-middle fw-bold text-dark">1.24</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">1</td>
+            <td class="align-middle fw-bold text-dark">3.11</td>
+            <td class="align-middle fw-bold text-dark border-end">1.21</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">1</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold" style="background-color: #f8d7da; color: #842029;">25</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
         </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/592779/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/592779/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/brock-stewart/" class="text-dark fw-bold text-decoration-none">Brock Stewart</a>
                 </div>
             </td>
             <td class="align-middle fw-bold text-dark">2.08</td>
-            <td class="align-middle fw-bold text-dark">0.63</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">2</td>
+            <td class="align-middle fw-bold text-dark border-end">0.63</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">2</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">6</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">8</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
         </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/683618/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/683618/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/edgardo-henriquez/" class="text-dark fw-bold text-decoration-none">Edgardo Henriquez</a>
                 </div>
             </td>
             <td class="align-middle fw-bold text-dark">2.91</td>
-            <td class="align-middle fw-bold text-dark">1.01</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">2</td>
+            <td class="align-middle fw-bold text-dark border-end">1.01</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">2</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">12</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold" style="background-color: #f8d7da; color: #842029;">23</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
         </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/623465/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/623465/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/evan-phillips/" class="text-dark fw-bold text-decoration-none">Evan Phillips</a>
                 </div>
             </td>
-            <td class="align-middle fw-bold text-dark">4.70</td>
-            <td class="align-middle fw-bold text-dark">1.43</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">2</td>
+            <td class="align-middle fw-bold text-dark">4.60</td>
+            <td class="align-middle fw-bold text-dark border-end">1.40</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">2</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">18</td>
             <td class="fw-bold">18</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
         </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/676263/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/676263/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/jack-dreyer/" class="text-dark fw-bold text-decoration-none">Jack Dreyer</a>
                 </div>
             </td>
-            <td class="align-middle fw-bold text-dark">2.91</td>
-            <td class="align-middle fw-bold text-dark">1.01</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">1</td>
+            <td class="align-middle fw-bold text-dark">2.87</td>
+            <td class="align-middle fw-bold text-dark border-end">1.03</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">1</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">5</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
         </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/669165/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/669165/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/kyle-hurt/" class="text-dark fw-bold text-decoration-none">Kyle Hurt</a>
                 </div>
             </td>
             <td class="align-middle fw-bold text-dark">4.61</td>
-            <td class="align-middle fw-bold text-dark">1.41</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">1</td>
+            <td class="align-middle fw-bold text-dark border-end">1.41</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">1</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">19</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
         </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
+        <tr class="bg-white">
+            <td class="text-start align-middle ps-3 border-end">
                 <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/801434/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
-                    <a href="/players/paul-gervase/" class="text-dark fw-bold text-decoration-none">Paul Gervase</a>
-                </div>
-            </td>
-            <td class="align-middle fw-bold text-dark">2.35</td>
-            <td class="align-middle fw-bold text-dark">1.57</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">0</td>
-            <td class="text-muted" style="background-color: #f8f9fa;">-</td>
-            <td class="text-muted" style="background-color: #f8f9fa;">-</td>
-            <td class="text-muted" style="background-color: #f8f9fa;">-</td>
-            <td class="text-muted" style="background-color: #f8f9fa;">-</td>
-            <td class="text-muted" style="background-color: #f8f9fa;">-</td>
-        </tr>
-        <tr>
-            <td class="text-start align-middle ps-3">
-                <div class="d-flex align-items-center">
-                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/656945/headshot/67/current" style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
+                    <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:brooks:default/w_180,q_auto:best/v1/people/656945/headshot/67/current" style="width: 28px; height: 28px; border-radius: 50%; border: 1px solid #dee2e6; object-fit: cover; background: #fff; margin-right: 8px;">
                     <a href="/players/tanner-scott/" class="text-dark fw-bold text-decoration-none">Tanner Scott</a>
                 </div>
             </td>
-            <td class="align-middle fw-bold text-dark">2.24</td>
-            <td class="align-middle fw-bold text-dark">0.90</td>
-            <td class="align-middle"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
-            <td class="align-middle fw-bold text-muted">1</td>
+            <td class="align-middle fw-bold text-dark">2.36</td>
+            <td class="align-middle fw-bold text-dark border-end">0.92</td>
+            <td class="align-middle border-end" style="width: 110px;"><span class="badge bg-success shadow-sm w-100 py-1" style="font-size: 0.65rem;">AVAILABLE</span></td>
+            <td class="align-middle fw-bold text-muted border-end">1</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="text-muted" style="background-color: #f8f9fa;">-</td>
             <td class="fw-bold">11</td>
@@ -342,7 +328,6 @@
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
