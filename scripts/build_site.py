@@ -134,20 +134,38 @@ BASE_TEMPLATE = """<!DOCTYPE html>
     <p class="text-muted mb-2" style="font-size: 0.85rem;">Live BvP matchups, pitcher splits, umpire tendencies, daily fantasy projections, and park factors.</p>
 </div>
 
-<!-- Restored DFS Controls Row (Global Expand/Collapse Button Removed) -->
-<div id="dfs-controls-row" class="container d-flex align-items-center flex-wrap mb-3 gap-2 px-2">
-    <div class="btn-group shadow-sm flex-shrink-0" role="group">
-        <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-fd" value="fd" checked>
-        <label class="btn btn-outline-primary fw-bold px-3 py-1" for="btn-fd" style="font-size: 0.85rem;">FD</label>
+<!-- Main Controls Row -->
+<div id="controls-row" class="container d-flex align-items-center flex-wrap mb-3 gap-2 px-2">
+    <!-- Reports Dropdown -->
+    <select class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 220px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) { window.location.href = this.value.includes('/dfs/') ? this.value + '?day=' + currentActiveDay : this.value; }">
+        <option value="">Reports 📊</option>
+        <option value="/reports/bullpens/">🔥MLB Bullpen Report</option>
         
-        <input type="radio" class="btn-check dfs-toggle" name="dfsPlatform" id="btn-dk" value="dk">
-        <label class="btn fw-bold px-3 py-1 dk-btn-label" for="btn-dk" style="font-size: 0.85rem;">DK</label>
-    </div>
-    <select id="dfs-page-selector" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 170px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
-        <!-- Populated by JS -->
+        <optgroup label="FanDuel">
+            <option value="/dfs/fanduel/top-pitchers/">Pitchers</option>
+            <option value="/dfs/fanduel/top-catchers-first-base/">C / 1B</option>
+            <option value="/dfs/fanduel/top-second-base/">Second Base</option>
+            <option value="/dfs/fanduel/top-third-base/">Third Base</option>
+            <option value="/dfs/fanduel/top-shortstops/">Shortstops</option>
+            <option value="/dfs/fanduel/top-outfielders/">Outfielders</option>
+            <option value="/dfs/fanduel/top-util/">Util</option>
+            <option value="/dfs/fanduel/live-slate-leaderboard/">🔴Live Leaderboard</option>
+        </optgroup>
+        
+        <optgroup label="DraftKings">            
+            <option value="/dfs/draftkings/top-pitchers/">Pitchers</option>
+            <option value="/dfs/draftkings/top-catchers/">Catchers</option>
+            <option value="/dfs/draftkings/top-first-base/">First Base</option>
+            <option value="/dfs/draftkings/top-second-base/">Second Base</option>
+            <option value="/dfs/draftkings/top-third-base/">Third Base</option>
+            <option value="/dfs/draftkings/top-shortstops/">Shortstops</option>
+            <option value="/dfs/draftkings/top-outfielders/">Outfielders</option>
+            <option value="/dfs/draftkings/top-util/">Util</option>
+            <option value="/dfs/draftkings/live-slate-leaderboard/">🔴Live Leaderboard</option>
+        </optgroup>
     </select>
     
-    <!-- New Tools Dropdown -->
+    <!-- Tools Dropdown -->
     <select class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; min-width: 150px; cursor: pointer; font-size: 0.85rem; border-color: #ced4da; color: #212529;" onchange="if(this.value) window.location.href=this.value;">
         <option value="">Tools ⚙️</option>
         <option value="/dfs/lineup-checker/">DFS Lineup Checker</option>
@@ -229,8 +247,7 @@ function switchDay(targetDay) {
     filterTeams();
     adjustOverflowingNames(); // Fix names when unhiding containers
 
-    // 🎯 NEW: Re-populate DFS links whenever the day is switched
-    populateDFSLinks();
+    
 }
 
 window.switchGameTab = function(gamePk, tabName, btnEl) {
@@ -275,50 +292,7 @@ function filterTeams() {
 }
 document.getElementById('team-search').addEventListener('input', filterTeams);
 
-// ========================================================
-// 2. DFS CONTROLS & DROPDOWN LOGIC
-// ========================================================
-function populateDFSLinks() {
-    const platformNode = document.querySelector('input[name="dfsPlatform"]:checked');
-    const platform = platformNode ? platformNode.value : 'fd';
-    
-    const selector = document.getElementById('dfs-page-selector');
-    if (!selector) return;
-    
-    selector.innerHTML = '<option value="">Top DFS Plays...</option>';
-    
-    const links = platform === 'dk' ? [
-        { slug: "pitchers", label: "Pitchers" }, { slug: "catchers", label: "Catchers" },
-        { slug: "first-base", label: "First Base" }, { slug: "second-base", label: "Second Base" },
-        { slug: "third-base", label: "Third Base" }, { slug: "shortstops", label: "Shortstops" },
-        { slug: "outfielders", label: "Outfielders" }, { slug: "util", label: "Util (All Hitters)" },
-        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" }
-    ] : [
-        { slug: "pitchers", label: "Pitchers" }, { slug: "catchers-first-base", label: "C / 1B" },
-        { slug: "second-base", label: "Second Base" }, { slug: "third-base", label: "Third Base" },
-        { slug: "shortstops", label: "Shortstops" }, { slug: "outfielders", label: "Outfielders" },
-        { slug: "util", label: "Utility" },
-        { slug: "live-slate-leaderboard", label: "🔴 Live Leaderboard" }
-    ];
-    
-    const platSlug = platform === 'dk' ? 'draftkings' : 'fanduel';
-    
-    links.forEach(link => {
-        const opt = document.createElement('option');
-        
-        let basePath = (link.slug === "live-slate-leaderboard") 
-            ? `/dfs/${platSlug}/${link.slug}/` 
-            : `/dfs/${platSlug}/top-${link.slug}/`;
-        
-        // 🎯 NEW: Attach the active day query parameter
-        opt.value = `${basePath}?day=${currentActiveDay}`;
-        
-        opt.textContent = link.label;
-        selector.appendChild(opt);
-    });
-}
-document.querySelectorAll('.dfs-toggle').forEach(radio => radio.addEventListener('change', populateDFSLinks));
-document.addEventListener('DOMContentLoaded', populateDFSLinks);
+
 
 // ========================================================
 // 3. UI POLISH (TEXT OVERFLOW & EXPAND/COLLAPSE)
