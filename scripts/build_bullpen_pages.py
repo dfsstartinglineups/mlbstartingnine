@@ -458,7 +458,7 @@ def generate_team_bullpen_html(team_slug, data, player_db):
     <div class="container d-flex justify-content-between align-items-center flex-wrap">
         <div class="header-brand mb-0"><a href="/">MLB Starting <span>Nine</span></a></div>
         <div>
-            <a href="/reports/bullpens/" class="btn btn-sm btn-outline-light font-weight-bold me-2">📊 League Hub</a>
+            <a href="/reports/bullpens/" class="btn btn-sm btn-outline-light font-weight-bold me-2">📊 MLB Bullpen Report</a>
             <a href="/lineups/{team_slug}/" class="btn btn-sm btn-outline-light font-weight-bold">← Team Lineups</a>
         </div>
     </div>
