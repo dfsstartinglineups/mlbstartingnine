@@ -1160,7 +1160,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             p_proj_node = None
             
             # Check Projected Lineups
-            pl = my_game.get("projectedLineups", {}).get(team_side, {})
+            pl = (my_game.get("projectedLineups") or {}).get(team_side) or {}
             if str(pl.get("startingPitcher", {}).get("id")) == str(player_id):
                 p_proj_node = pl.get("startingPitcher")
             else:
