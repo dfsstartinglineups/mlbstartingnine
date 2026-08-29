@@ -177,8 +177,8 @@ def resolve_active_matchups(player_id, team_name, daily_data):
         home_official_players = [str(p.get("id")) for p in game_raw.get("lineups", {}).get("homePlayers", [])]
         away_official_players = [str(p.get("id")) for p in game_raw.get("lineups", {}).get("awayPlayers", [])]
         
-        home_probable_p = str(teams.get("home", {}).get("probablePitcher", {}).get("id", ""))
-        away_probable_p = str(teams.get("away", {}).get("probablePitcher", {}).get("id", ""))
+        home_probable_p = str(((teams.get("home") or {}).get("probablePitcher") or {}).get("id", ""))
+        away_probable_p = str(((teams.get("away") or {}).get("probablePitcher") or {}).get("id", ""))
 
         # Extract IDs from Projected Lineups
         home_proj_players = [str(p.get("id")) for p in game.get("projectedLineups", {}).get("home", {}).get("battingOrder", [])]
@@ -1105,8 +1105,10 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         for m in active_matches:
             gm = m["game"]
             ts = m["teamSide"]
-            prob_id = str(gm.get("gameRaw", {}).get("teams", {}).get(ts, {}).get("probablePitcher", {}).get("id", ""))
-            proj_id = str(gm.get("projectedLineups", {}).get(ts, {}).get("startingPitcher", {}).get("id", ""))
+            teams_node = (gm.get("gameRaw") or {}).get("teams") or {}
+            prob_id = str(((teams_node.get(ts) or {}).get("probablePitcher") or {}).get("id", ""))
+            ts_node = (gm.get("projectedLineups") or {}).get(ts) or {}
+            proj_id = str((ts_node.get("startingPitcher") or {}).get("id", ""))
             if str(player_id) in [prob_id, proj_id]:
                 started_matches.append(m)
         if started_matches:
@@ -1161,7 +1163,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             
             # Check Projected Lineups
             pl = (my_game.get("projectedLineups") or {}).get(team_side) or {}
-            if str(pl.get("startingPitcher", {}).get("id")) == str(player_id):
+            if str((pl.get("startingPitcher") or {}).get("id")) == str(player_id):
                 p_proj_node = pl.get("startingPitcher")
             else:
                 p_proj_node = next((p for p in pl.get("battingOrder", []) if str(p.get("id")) == str(player_id)), None)
