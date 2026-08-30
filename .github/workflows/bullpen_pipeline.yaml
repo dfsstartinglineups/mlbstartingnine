@@ -1,9 +1,9 @@
 name: Bullpen Data & Pages Pipeline
 
 on:
-  schedule:
-    - cron: '0 8 * * *'
   workflow_dispatch:
+  repository_dispatch: 
+    types: [bullpen-update] # Enables external webhook triggering from cron-job.org
 
 permissions:
   contents: write
