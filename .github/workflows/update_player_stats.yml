@@ -1,10 +1,9 @@
 name: Nightly Player Data Update
 
 on:
-  schedule:
-    # 9:00 AM UTC is exactly 5:00 AM Eastern Time in the summer (EDT)
-    - cron: '0 9 * * *'
   workflow_dispatch: # Keeps the manual button in GitHub UI just in case you need to force a run
+  repository_dispatch: 
+    types: [update-player-data] # Enables external webhook triggering from cron-job.org
 
 permissions:
   contents: write
