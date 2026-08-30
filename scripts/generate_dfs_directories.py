@@ -303,14 +303,17 @@ def process_day_data(date_str):
 
         p_data = game.get("projectedLineups", {})
         for side in ["away", "home"]:
-            batters = p_data.get(side, {}).get("battingOrder", [])
-            pitcher = p_data.get(side, {}).get("startingPitcher", {})
-            if any(b.get("dk_salary", 0) > 0 for b in batters) or pitcher.get("dk_salary", 0) > 0: has_dk_data = True
-            if any(b.get("salary", 0) > 0 for b in batters) or pitcher.get("salary", 0) > 0: has_fd_data = True
-
-    dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
-    fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
-    dk_live_pool, fd_live_pool = [], []
+            # Using 'or []' and 'or {}' forces a fallback if the parsed value is None
+            batters = p_data.get(side, {}).get("battingOrder") or []
+            pitcher = p_data.get(side, {}).get("startingPitcher") or {}
+            
+            # We also add '(b or {})' inside the list comprehension just in case a list item is null
+            if any((b or {}).get("dk_salary", 0) > 0 for b in batters) or pitcher.get("dk_salary", 0) > 0: has_dk_data = True
+            if any((b or {}).get("salary", 0) > 0 for b in batters) or pitcher.get("salary", 0) > 0: has_fd_data = True
+        
+            dk_pools = {"pitchers": [], "catchers": [], "first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
+            fd_pools = {"pitchers": [], "catchers-first-base": [], "second-base": [], "third-base": [], "shortstops": [], "outfielders": [], "util": []}
+            dk_live_pool, fd_live_pool = [], []
 
     for game in games_list:
         game_raw = game.get("gameRaw", {})
