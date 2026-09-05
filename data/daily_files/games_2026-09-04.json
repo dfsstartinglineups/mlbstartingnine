@@ -1,5 +1,5 @@
 {
-    "last_updated": "Sep 05, 01:00 AM ET",
+    "last_updated": "Sep 05, 01:02 AM ET",
     "slates": {
         "fanduel": [
             {
@@ -40769,9 +40769,9 @@
                 "officialDate": "2026-09-04",
                 "status": {
                     "abstractGameState": "Final",
-                    "codedGameState": "O",
-                    "detailedState": "Game Over",
-                    "statusCode": "O",
+                    "codedGameState": "F",
+                    "detailedState": "Final",
+                    "statusCode": "F",
                     "startTimeTBD": false,
                     "abstractGameCode": "F"
                 },
@@ -41366,6 +41366,7 @@
                             "isPlayer": true,
                             "isVerified": true,
                             "draftYear": 2021,
+                            "mlbDebutDate": "2026-09-04",
                             "batSide": {
                                 "code": "R",
                                 "description": "Right"
@@ -43952,12 +43953,12 @@
                 "gameDate": "2026-09-05T02:10:00Z",
                 "officialDate": "2026-09-04",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -43967,12 +43968,13 @@
                             "link": "/api/v1/teams/133"
                         },
                         "leagueRecord": {
-                            "wins": 55,
+                            "wins": 56,
                             "losses": 86,
                             "ties": 0,
-                            "pct": ".390"
+                            "pct": ".394"
                         },
                         "score": 7,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 695034,
                             "fullName": "Kade Morris",
@@ -44033,11 +44035,12 @@
                         },
                         "leagueRecord": {
                             "wins": 66,
-                            "losses": 75,
+                            "losses": 76,
                             "ties": 0,
-                            "pct": ".468"
+                            "pct": ".465"
                         },
                         "score": 6,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 669302,
                             "fullName": "Logan Gilbert",
@@ -44231,9 +44234,10 @@
                             "num": 9,
                             "ordinalNum": "9th",
                             "home": {
+                                "runs": 0,
                                 "hits": 0,
                                 "errors": 0,
-                                "leftOnBase": 0
+                                "leftOnBase": 1
                             },
                             "away": {
                                 "runs": 0,
@@ -44248,7 +44252,7 @@
                             "runs": 6,
                             "hits": 10,
                             "errors": 1,
-                            "leftOnBase": 5
+                            "leftOnBase": 6
                         },
                         "away": {
                             "runs": 7,
@@ -44371,55 +44375,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 686527,
-                            "fullName": "Dominic Canzone",
-                            "link": "/api/v1/people/686527",
-                            "firstName": "Dominic",
-                            "lastName": "Canzone",
-                            "primaryNumber": "8",
-                            "birthDate": "1997-08-16",
-                            "currentAge": 29,
-                            "birthCity": "Cleveland",
-                            "birthStateProvince": "OH",
-                            "birthCountry": "USA",
-                            "height": "6' 0\"",
-                            "weight": 190,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "10",
-                                "name": "Designated Hitter",
-                                "type": "Hitter",
-                                "abbreviation": "DH"
-                            },
-                            "useName": "Dominic",
-                            "useLastName": "Canzone",
-                            "middleName": "Gene",
-                            "boxscoreName": "Canzone",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2019,
-                            "mlbDebutDate": "2023-07-08",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Dominic Canzone",
-                            "nameSlug": "dominic-canzone-686527",
-                            "firstLastName": "Dominic Canzone",
-                            "lastFirstName": "Canzone, Dominic",
-                            "lastInitName": "Canzone, D",
-                            "initLastName": "D Canzone",
-                            "fullFMLName": "Dominic Gene Canzone",
-                            "fullLFMName": "Canzone, Dominic Gene",
-                            "strikeZoneTop": 3.209,
-                            "strikeZoneBottom": 1.619
-                        },
-                        "onDeck": {
                             "id": 677594,
                             "fullName": "Julio Rodr\u00edguez",
                             "link": "/api/v1/people/677594",
@@ -44467,7 +44422,7 @@
                             "strikeZoneTop": 3.378,
                             "strikeZoneBottom": 1.705
                         },
-                        "inHole": {
+                        "onDeck": {
                             "id": 663728,
                             "fullName": "Cal Raleigh",
                             "link": "/api/v1/people/663728",
@@ -44517,53 +44472,55 @@
                             "strikeZoneTop": 3.282,
                             "strikeZoneBottom": 1.656
                         },
-                        "second": {
-                            "id": 668227,
-                            "fullName": "Randy Arozarena",
-                            "link": "/api/v1/people/668227",
-                            "firstName": "Randy",
-                            "lastName": "Arozarena",
-                            "primaryNumber": "56",
-                            "birthDate": "1995-02-28",
-                            "currentAge": 31,
-                            "birthCity": "Havana",
-                            "birthCountry": "Cuba",
+                        "inHole": {
+                            "id": 647304,
+                            "fullName": "Josh Naylor",
+                            "link": "/api/v1/people/647304",
+                            "firstName": "Joshua-Douglas",
+                            "lastName": "Naylor",
+                            "primaryNumber": "12",
+                            "birthDate": "1997-06-22",
+                            "currentAge": 29,
+                            "birthCity": "Mississauga",
+                            "birthStateProvince": "ON",
+                            "birthCountry": "Canada",
                             "height": "5' 10\"",
-                            "weight": 185,
+                            "weight": 235,
                             "active": true,
                             "primaryPosition": {
-                                "code": "7",
-                                "name": "Outfielder",
-                                "type": "Outfielder",
-                                "abbreviation": "LF"
+                                "code": "3",
+                                "name": "First Base",
+                                "type": "Infielder",
+                                "abbreviation": "1B"
                             },
-                            "useName": "Randy",
-                            "useLastName": "Arozarena",
-                            "boxscoreName": "Arozarena",
+                            "useName": "Josh",
+                            "useLastName": "Naylor",
+                            "middleName": "James",
+                            "boxscoreName": "Naylor, J",
+                            "nickName": "Naylz",
                             "gender": "M",
-                            "nameMatrilineal": "Gonzalez",
                             "isPlayer": true,
                             "isVerified": true,
-                            "pronunciation": "ah-row-sah-RAY-nah",
-                            "mlbDebutDate": "2019-08-14",
+                            "draftYear": 2015,
+                            "mlbDebutDate": "2019-05-24",
                             "batSide": {
-                                "code": "R",
-                                "description": "Right"
+                                "code": "L",
+                                "description": "Left"
                             },
                             "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
+                                "code": "L",
+                                "description": "Left"
                             },
-                            "nameFirstLast": "Randy Arozarena",
-                            "nameSlug": "randy-arozarena-668227",
-                            "firstLastName": "Randy Arozarena",
-                            "lastFirstName": "Arozarena, Randy",
-                            "lastInitName": "Arozarena, R",
-                            "initLastName": "R Arozarena",
-                            "fullFMLName": "Randy Arozarena",
-                            "fullLFMName": "Arozarena, Randy",
-                            "strikeZoneTop": 3.128,
-                            "strikeZoneBottom": 1.579
+                            "nameFirstLast": "Josh Naylor",
+                            "nameSlug": "josh-naylor-647304",
+                            "firstLastName": "Josh Naylor",
+                            "lastFirstName": "Naylor, Josh",
+                            "lastInitName": "Naylor, J",
+                            "initLastName": "J Naylor",
+                            "fullFMLName": "Joshua-Douglas James Naylor",
+                            "fullLFMName": "Naylor, Joshua-Douglas James",
+                            "strikeZoneTop": 3.11,
+                            "strikeZoneBottom": 1.57
                         },
                         "pitcher": {
                             "id": 662253,
@@ -44616,16 +44573,16 @@
                             "strikeZoneTop": 3.299,
                             "strikeZoneBottom": 1.665
                         },
-                        "battingOrder": 2,
+                        "battingOrder": 3,
                         "team": {
                             "id": 136,
                             "name": "Seattle Mariners",
                             "link": "/api/v1/teams/136"
                         }
                     },
-                    "balls": 0,
-                    "strikes": 2,
-                    "outs": 2
+                    "balls": 1,
+                    "strikes": 0,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 680,
@@ -44635,6 +44592,7 @@
                 "content": {
                     "link": "/api/v1/game/823093/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
