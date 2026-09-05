@@ -888,6 +888,12 @@ async def run_engines(memory):
     x_futbol_posts_max = 1   
     # Cooldown timestamp for Futbol X.com rate limit / 403 errors
 
+    # --- ADD THIS: Custom Headers to bypass Cloudflare ---
+    CF_BYPASS_HEADERS = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
+        'X-Futbol-Bot-Auth': 'super-secret-bot-key-2026'
+    }
+
     # --- 🛡️ X.COM POSTING WHITELIST (Protects against 403 / Spam Flags) ---
     X_ALLOWED_LEAGUES = {
         "english premier league", "spanish laliga", "italian serie a", 
@@ -907,7 +913,7 @@ async def run_engines(memory):
 
     try:
         daily_lineups_url = f"https://futbolstartingeleven.com/data/daily_lineups.json?v={today_est.timestamp()}"
-        daily_lineups = requests.get(daily_lineups_url, timeout=10).json()
+        daily_lineups = requests.get(daily_lineups_url, headers=CF_BYPASS_HEADERS, timeout=10).json()
     except Exception as e:
         print(f"⚠️ Could not fetch daily_lineups.json: {e}")
         daily_lineups = {}
@@ -1096,7 +1102,7 @@ async def run_engines(memory):
     # ==========================================
     try:
         daily_goals_url = f"https://futbolstartingeleven.com/data/daily_goals.json?v={today_est.timestamp()}"
-        daily_goals = requests.get(daily_goals_url, timeout=10).json()
+        daily_goals = requests.get(daily_goals_url, headers=CF_BYPASS_HEADERS, timeout=10).json()
     except Exception as e:
         print(f"⚠️ Could not fetch daily_goals.json: {e}")
         daily_goals = {}
@@ -1611,7 +1617,7 @@ async def run_engines(memory):
     # ==========================================
     try:
         summary_url = f"https://futbolstartingeleven.com/data/game_summary.json?v={today_est.timestamp()}"
-        game_summaries_data = requests.get(summary_url, timeout=10).json()
+        game_summaries_data = requests.get(summary_url, headers=CF_BYPASS_HEADERS, timeout=10).json()
     except Exception as e:
         print(f"⚠️ Could not fetch game_summary.json: {e}")
         game_summaries_data = {}
