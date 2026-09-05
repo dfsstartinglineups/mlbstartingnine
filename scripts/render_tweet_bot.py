@@ -891,7 +891,7 @@ async def run_engines(memory):
     # --- ADD THIS: Custom Headers to bypass Cloudflare ---
     CF_BYPASS_HEADERS = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
-        'X-Futbol-Bot-Auth': 'super-secret-bot-key-2026'
+        'x-futbol-bot-auth': 'super-secret-bot-key-2026'
     }
 
     # --- 🛡️ X.COM POSTING WHITELIST (Protects against 403 / Spam Flags) ---
