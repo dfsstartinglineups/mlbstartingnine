@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import requests
 import unicodedata
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
@@ -1085,7 +1086,8 @@ def generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team
 # ==========================================
 # 4. PRIMARY HTML LAYOUT BUILDER
 # ==========================================
-def generate_player_html(profile, slug, daily_data, live_data, master_data, reliever_map=None):
+def generate_player_html(profile, slug, daily_data, live_data, master_data, reliever_map=None, news_data=None):
+    if news_data is None: news_data = {}
     player_id = profile.get("player_id", "")
     team_id = profile.get("team_id", "")
     team_logo_url = f"https://www.mlbstatic.com/team-logos/team-cap-on-light/{team_id}.svg" if team_id else "https://www.mlbstatic.com/team-logos/team-cap-on-light/blank.svg"
@@ -1132,13 +1134,15 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
         game_state_lbl = '<strong>Game Status:</strong> Not on Today\'s Active Slate'
         
         blurb_html, raw_text = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, None, None, {}, profile, master_data, live_data, reliever_info)
+        news_html = render_news_module(player_id, news_data)
+        
         console_html = '<div class="p-3 border rounded shadow-sm text-center" style="background-color: #edf4f8;"><span class="badge bg-secondary text-uppercase mb-2" style="font-size:0.65rem;">Off Slate</span><span class="text-dark d-block fw-semibold" style="font-size: 0.85rem;">No schedules match this player today.</span></div>'
         bvp_html = '<div class="border rounded p-3 text-center text-muted fst-italic bg-white shadow-sm" style="font-size: 0.8rem;">🚫 No active matchup setup for today\'s slate.</div>'
         
         raw_blurb_texts = [raw_text]
         opponents_str = "Opponent"
         
-        modules_html = f'<div class="mb-3">{blurb_html}</div><div class="mb-3">{console_html}</div>{bvp_html}'
+        modules_html = f'<div class="mb-3">{blurb_html}</div>{news_html}<div class="mb-3">{console_html}</div>{bvp_html}'
         is_game_final = False
 
     else:
@@ -1228,6 +1232,8 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             
             blurb_html, raw_text = generate_news_blurb(player_id, p_name, team_name, position, is_pitcher, team_side, my_game, p_deep_stats, profile, master_data, live_data, reliever_info, dh_title)
             raw_blurb_texts.append(raw_text)
+            
+            news_html = render_news_module(player_id, news_data)
 
             opp_side = "home" if team_side == "away" else "away"
             opp_team_name = (my_game.get("gameRaw", {}).get("teams", {}).get(opp_side, {}).get("team") or {}).get("name", "Opponent")
@@ -1242,6 +1248,7 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
             <div class="matchup-module mb-4">
                 {module_header}
                 <div class="mb-3">{blurb_html}</div>
+                {news_html}
                 <div class="mb-3 border rounded overflow-hidden shadow-sm">{console_html}</div>
                 {hr_html}
                 {bvp_html}
@@ -1430,6 +1437,131 @@ def generate_player_html(profile, slug, daily_data, live_data, master_data, reli
 </body>
 </html>"""
 
+# ==========================================
+# 5. FANTASYPROS NEWS INJECTION (WITH CACHING)
+# ==========================================
+def fetch_fp_news():
+    FP_API_KEY = os.environ.get('FANTASYPROS_API_KEY', '')
+    if not FP_API_KEY:
+        return {}
+
+    news_cache_path = "data/fp_news_cache.json"
+    map_cache_path = "data/fp_mlbam_map.json"
+    headers = {"x-api-key": FP_API_KEY}
+    
+    # 1. Check and build the ID Mapping (Run once or if missing)
+    if not os.path.exists(map_cache_path):
+        try:
+            print("Fetching FP to MLBAM ID mapping...")
+            players_url = "https://api.fantasypros.com/public/v2/json/mlb/players?external_ids=mlbam"
+            res = requests.get(players_url, headers=headers, timeout=10)
+            if res.status_code == 200:
+                id_map = {}
+                for p in res.json().get('players', []):
+                    fp_id = str(p.get('player_id', ''))
+                    ext = p.get('external_ids', {})
+                    # Catch the mlbam ID whether it's nested or flat in their JSON
+                    mlbam_id = str(ext.get('mlbam') or p.get('mlbam_id') or p.get('mlbam') or '')
+                    if fp_id and mlbam_id and mlbam_id not in ['None', '']:
+                        id_map[fp_id] = mlbam_id
+                
+                os.makedirs(os.path.dirname(map_cache_path), exist_ok=True)
+                with open(map_cache_path, "w") as f:
+                    json.dump(id_map, f)
+        except Exception as e:
+            print(f"Mapping error: {e}")
+
+    fp_to_mlbam = load_json_safe(map_cache_path)
+
+    # 2. Check 15-Minute News Cache
+    now_utc = datetime.now(timezone.utc)
+    if os.path.exists(news_cache_path):
+        try:
+            with open(news_cache_path, "r") as f:
+                cache_data = json.load(f)
+            last_updated = datetime.fromisoformat(cache_data.get("last_updated", "2000-01-01T00:00:00+00:00"))
+            if (now_utc - last_updated).total_seconds() < 900: # 15 minutes = 900 seconds
+                return cache_data.get("mapped_news", {})
+        except Exception:
+            pass
+
+    # 3. Fetch Fresh News (15-min TTL Expired)
+    try:
+        print("Fetching fresh FantasyPros news...")
+        news_url = "https://api.fantasypros.com/public/v2/json/mlb/news"
+        res = requests.get(news_url, headers=headers, params={"limit": 100}, timeout=10)
+        
+        mapped_news = {}
+        if res.status_code == 200:
+            for item in res.json().get('items', []):
+                fp_id = str(item.get('player_id', ''))
+                mlbam_id = fp_to_mlbam.get(fp_id)
+                if mlbam_id:
+                    if mlbam_id not in mapped_news:
+                        mapped_news[mlbam_id] = []
+                    mapped_news[mlbam_id].append(item)
+                    
+            with open(news_cache_path, "w") as f:
+                json.dump({"last_updated": now_utc.isoformat(), "mapped_news": mapped_news}, f)
+            return mapped_news
+    except Exception as e:
+        print(f"News fetch error: {e}")
+        
+    return load_json_safe(news_cache_path).get("mapped_news", {})
+
+def render_news_module(mlbam_id, news_dict):
+    news_items = news_dict.get(str(mlbam_id), [])
+    if not news_items:
+        return ""
+        
+    def get_badge(cats_str):
+        if "INJURY" in cats_str: return "bg-danger"
+        elif "TRANSACTION" in cats_str: return "bg-warning text-dark"
+        return "bg-primary"
+
+    hero = news_items[0]
+    cats = ", ".join(hero.get("categories", [])).upper()
+    
+    html = f"""
+    <div class="card shadow-sm border-0 mb-3" style="border-left: 4px solid #343a40 !important;">
+        <div class="card-body p-3 bg-white rounded-end">
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <span class="fw-bold text-dark" style="font-size: 0.85rem;">📰 Breaking News: {hero.get('title', 'Update')}</span>
+                <span class="badge {get_badge(cats)} shadow-sm" style="font-size: 0.65rem;">{cats if cats else 'NEWS'}</span>
+            </div>
+            <div class="mb-1 text-muted fw-bold" style="font-size: 0.7rem;">🕒 {hero.get('created_formated', '')}</div>
+            <p class="mb-2 text-dark" style="font-size: 0.85rem; line-height: 1.5;">{hero.get('desc', '')}</p>
+            {f"<div class='p-2 bg-light border rounded' style='font-size: 0.8rem; border-left: 3px solid #0d6efd !important;'><strong class='text-dark'>💡 Fantasy Impact:</strong> <span class='text-muted'>{hero.get('impact', '')}</span></div>" if hero.get('impact') else ""}
+        </div>
+    </div>
+    """
+    
+    if len(news_items) > 1:
+        acc_id = f"newsAccordion_{mlbam_id}"
+        html += f'<div class="accordion accordion-flush border rounded shadow-sm mb-3 bg-white" id="{acc_id}">'
+        
+        for idx, item in enumerate(news_items[1:], start=1):
+            cats = ", ".join(item.get("categories", [])).upper()
+            html += f"""
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading_{mlbam_id}_{idx}">
+                    <button class="accordion-button collapsed py-2 px-3 text-dark bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_{mlbam_id}_{idx}" style="font-size: 0.8rem; font-weight: 700;">
+                        🕒 {item.get('created_formated', '')} - {item.get('title', 'Update')}
+                    </button>
+                </h2>
+                <div id="collapse_{mlbam_id}_{idx}" class="accordion-collapse collapse" data-bs-parent="#{acc_id}">
+                    <div class="accordion-body p-3" style="font-size: 0.85rem;">
+                        <div class="mb-2"><span class="badge {get_badge(cats)}">{cats if cats else 'NEWS'}</span></div>
+                        <p class="mb-2 text-dark">{item.get('desc', '')}</p>
+                        {f"<div class='p-2 bg-light border rounded text-muted' style='font-size: 0.8rem;'><strong>Impact:</strong> {item.get('impact', '')}</div>" if item.get('impact') else ""}
+                    </div>
+                </div>
+            </div>
+            """
+        html += '</div>'
+        
+    return html
+
 def main():
     if not os.path.exists(MASTER_DATA_PATH):
         return
@@ -1440,6 +1572,9 @@ def main():
     daily_data = load_json_safe(f"data/daily_files/games_{target_date_str}.json")
     live_data = load_json_safe(f"data/LIVE/live_mlb_{target_date_str}.json")
     bullpen_data = load_json_safe(BULLPEN_DATA_PATH)
+    
+    # Trigger 15-Min TTL Check & Load News Memory Cache
+    news_data = fetch_fp_news()
 
     reliever_map = {}
     for team_slug, team_info in bullpen_data.items():
@@ -1462,7 +1597,7 @@ def main():
         
         all_player_urls.append(f"{DOMAIN}/players/{player_slug}/")
 
-        new_html_content = generate_player_html(profile, player_slug, daily_data, live_data, master_data, reliever_map)
+        new_html_content = generate_player_html(profile, player_slug, daily_data, live_data, master_data, reliever_map, news_data)
         
         existing_html = ""
         if os.path.exists(index_file_path):
