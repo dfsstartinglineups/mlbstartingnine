@@ -36,7 +36,7 @@ jobs:
       - name: Generate Static Lineup Pages
         run: python scripts/generate_team_pages.py
 
-      - - name: Generate Player Profiles
+      - name: Generate Player Profiles
         env:
           FANTASYPROS_API_KEY: ${{ secrets.FANTASYPROS_API_KEY }}
         run: python scripts/generate_all_profiles.py
