@@ -1448,6 +1448,8 @@ def fetch_fp_news():
     news_cache_path = "data/fp_news_cache.json"
     map_cache_path = "data/fp_mlbam_map.json"
     headers = {"x-api-key": FP_API_KEY}
+    now_utc = datetime.now(timezone.utc)
+    cutoff_48h = now_utc - timedelta(hours=48)
     
     # 1. Check and build the ID Mapping (Run once or if missing)
     if not os.path.exists(map_cache_path):
@@ -1460,7 +1462,6 @@ def fetch_fp_news():
                 for p in res.json().get('players', []):
                     fp_id = str(p.get('player_id', ''))
                     ext = p.get('external_ids', {})
-                    # Catch the mlbam ID whether it's nested or flat in their JSON
                     mlbam_id = str(ext.get('mlbam') or p.get('mlbam_id') or p.get('mlbam') or '')
                     if fp_id and mlbam_id and mlbam_id not in ['None', '']:
                         id_map[fp_id] = mlbam_id
@@ -1473,41 +1474,81 @@ def fetch_fp_news():
 
     fp_to_mlbam = load_json_safe(map_cache_path)
 
-    # 2. Check 15-Minute News Cache
-    now_utc = datetime.now(timezone.utc)
-    if os.path.exists(news_cache_path):
-        try:
-            with open(news_cache_path, "r") as f:
-                cache_data = json.load(f)
-            last_updated = datetime.fromisoformat(cache_data.get("last_updated", "2000-01-01T00:00:00+00:00"))
-            if (now_utc - last_updated).total_seconds() < 900: # 15 minutes = 900 seconds
-                return cache_data.get("mapped_news", {})
-        except Exception:
-            pass
+    # 2. Load existing cache from disk
+    cached_file_data = load_json_safe(news_cache_path)
+    existing_mapped_news = cached_file_data.get("mapped_news", {})
+    last_updated_str = cached_file_data.get("last_updated", "2000-01-01T00:00:00+00:00")
+    
+    try:
+        last_updated = datetime.fromisoformat(last_updated_str)
+    except Exception:
+        last_updated = datetime(2000, 1, 1, tzinfo=timezone.utc)
 
-    # 3. Fetch Fresh News (15-min TTL Expired)
+    # If within the 15-minute TTL, serve existing cache directly
+    if (now_utc - last_updated).total_seconds() < 900 and existing_mapped_news:
+        return existing_mapped_news
+
+    # 3. Fetch fresh news & merge into a 48-hour rolling window
     try:
         print("Fetching fresh FantasyPros news...")
         news_url = "https://api.fantasypros.com/public/v2/json/mlb/news"
         res = requests.get(news_url, headers=headers, params={"limit": 100}, timeout=10)
         
-        mapped_news = {}
         if res.status_code == 200:
-            for item in res.json().get('items', []):
+            incoming_items = res.json().get('items', [])
+            
+            # Group all items (existing + new) by MLBAM ID
+            all_player_news = {}
+            
+            # Re-seed with existing cached items
+            for mlbam_id, items in existing_mapped_news.items():
+                all_player_news[mlbam_id] = {str(item.get('id')): item for item in items if item.get('id')}
+            
+            # Merge incoming items
+            for item in incoming_items:
                 fp_id = str(item.get('player_id', ''))
                 mlbam_id = fp_to_mlbam.get(fp_id)
-                if mlbam_id:
-                    if mlbam_id not in mapped_news:
-                        mapped_news[mlbam_id] = []
-                    mapped_news[mlbam_id].append(item)
+                item_id = str(item.get('id', ''))
+                
+                if mlbam_id and item_id:
+                    if mlbam_id not in all_player_news:
+                        all_player_news[mlbam_id] = {}
+                    all_player_news[mlbam_id][item_id] = item
+
+            # 4. Purge items older than 48 hours & sort descending by date
+            cleaned_mapped_news = {}
+            for mlbam_id, items_dict in all_player_news.items():
+                valid_items = []
+                for item in items_dict.values():
+                    created_raw = item.get("created", "")
+                    try:
+                        # FP timestamps: "YYYY-MM-DD HH:MM:SS" (UTC)
+                        item_dt = datetime.strptime(created_raw, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+                    except Exception:
+                        item_dt = now_utc  # Keep if parsing fails
                     
+                    if item_dt >= cutoff_48h:
+                        valid_items.append((item_dt, item))
+
+                if valid_items:
+                    # Sort newest-to-oldest so item[0] is always the hero blurb
+                    valid_items.sort(key=lambda x: x[0], reverse=True)
+                    cleaned_mapped_news[mlbam_id] = [x[1] for x in valid_items]
+
+            # Save merged rolling cache
+            os.makedirs(os.path.dirname(news_cache_path), exist_ok=True)
             with open(news_cache_path, "w") as f:
-                json.dump({"last_updated": now_utc.isoformat(), "mapped_news": mapped_news}, f)
-            return mapped_news
+                json.dump({
+                    "last_updated": now_utc.isoformat(),
+                    "mapped_news": cleaned_mapped_news
+                }, f, indent=2)
+                
+            return cleaned_mapped_news
+            
     except Exception as e:
-        print(f"News fetch error: {e}")
-        
-    return load_json_safe(news_cache_path).get("mapped_news", {})
+        print(f"News fetch/merge error: {e}")
+
+    return existing_mapped_news
 
 def render_news_module(mlbam_id, news_dict):
     news_items = news_dict.get(str(mlbam_id), [])
