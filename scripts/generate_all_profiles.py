@@ -1562,6 +1562,7 @@ def render_news_module(mlbam_id, news_dict):
 
     hero = news_items[0]
     cats = ", ".join(hero.get("categories", [])).upper()
+    hero_link = hero.get("link", "https://www.fantasypros.com/mlb/news/")
     
     html = f"""
     <div class="card shadow-sm border-0 mb-3" style="border-left: 4px solid #343a40 !important;">
@@ -1570,7 +1571,13 @@ def render_news_module(mlbam_id, news_dict):
                 <span class="fw-bold text-dark" style="font-size: 0.85rem;">📰 Breaking News: {hero.get('title', 'Update')}</span>
                 <span class="badge {get_badge(cats)} shadow-sm" style="font-size: 0.65rem;">{cats if cats else 'NEWS'}</span>
             </div>
-            <div class="mb-1 text-muted fw-bold" style="font-size: 0.7rem;">🕒 {hero.get('created_formated', '')}</div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="text-muted fw-bold" style="font-size: 0.7rem;">🕒 {hero.get('created_formated', '')}</div>
+                <!-- 🚨 FANTASYPROS ATTRIBUTION BADGE -->
+                <a href="{hero_link}" target="_blank" class="badge bg-light text-secondary border text-decoration-none" style="font-size: 0.6rem;">
+                    Powered by FantasyPros
+                </a>
+            </div>
             <p class="mb-2 text-dark" style="font-size: 0.85rem; line-height: 1.5;">{hero.get('desc', '')}</p>
             {f"<div class='p-2 bg-light border rounded' style='font-size: 0.8rem; border-left: 3px solid #0d6efd !important;'><strong class='text-dark'>💡 Fantasy Impact:</strong> <span class='text-muted'>{hero.get('impact', '')}</span></div>" if hero.get('impact') else ""}
         </div>
@@ -1583,6 +1590,8 @@ def render_news_module(mlbam_id, news_dict):
         
         for idx, item in enumerate(news_items[1:], start=1):
             cats = ", ".join(item.get("categories", [])).upper()
+            item_link = item.get("link", "https://www.fantasypros.com/mlb/news/")
+            
             html += f"""
             <div class="accordion-item">
                 <h2 class="accordion-header" id="heading_{mlbam_id}_{idx}">
@@ -1592,7 +1601,10 @@ def render_news_module(mlbam_id, news_dict):
                 </h2>
                 <div id="collapse_{mlbam_id}_{idx}" class="accordion-collapse collapse" data-bs-parent="#{acc_id}">
                     <div class="accordion-body p-3" style="font-size: 0.85rem;">
-                        <div class="mb-2"><span class="badge {get_badge(cats)}">{cats if cats else 'NEWS'}</span></div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="badge {get_badge(cats)}">{cats if cats else 'NEWS'}</span>
+                            <a href="{item_link}" target="_blank" class="badge bg-light text-secondary border text-decoration-none" style="font-size: 0.6rem;">Read on FantasyPros</a>
+                        </div>
                         <p class="mb-2 text-dark">{item.get('desc', '')}</p>
                         {f"<div class='p-2 bg-light border rounded text-muted' style='font-size: 0.8rem;'><strong>Impact:</strong> {item.get('impact', '')}</div>" if item.get('impact') else ""}
                     </div>
