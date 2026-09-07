@@ -37,8 +37,6 @@ jobs:
         run: python scripts/generate_team_pages.py
 
       - name: Generate Player Profiles
-        env:
-          FANTASYPROS_API_KEY: ${{ secrets.FANTASYPROS_API_KEY }}
         run: python scripts/generate_all_profiles.py
 
       # 🚀 Build the main 3-Day Index Landing Page
@@ -83,8 +81,6 @@ jobs:
           git add lineups/
           git add players/
           git add reports/
-          git add data/fp_mlbam_map.json || true
-          git add data/fp_news_cache.json || true
           git add sitemap.xml
           git add sitemap-bullpen.xml
           git add sitemap-dfs.xml
