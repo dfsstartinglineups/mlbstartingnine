@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected DraftKings Outfielders</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-20 02:55 AM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-20 03:05 AM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
@@ -119,21 +119,12 @@
     <div id="games-yesterday" class="dfs-partition d-none">
         
         
-        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
-            No DFS data available for this partition.
-        </div>
-        
-    </div>
-    
-    <div id="games-today" class="dfs-partition ">
-        
-        
         
         <!-- Day-Specific Slate Selector -->
         
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'yesterday')">
                 <option value="all">All Games</option>
                 
                 <option value="25889">3 Games  · Early SAT 4:05PM ET</option>
@@ -4325,7 +4316,7 @@
         
     </div>
     
-    <div id="games-tomorrow" class="dfs-partition d-none">
+    <div id="games-today" class="dfs-partition ">
         
         
         
@@ -4333,7 +4324,7 @@
         
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'tomorrow')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
                 <option value="all">All Games</option>
                 
                 <option value="25898">10 Games SUN 1:10PM ET</option>
@@ -8800,6 +8791,15 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        
+    </div>
+    
+    <div id="games-tomorrow" class="dfs-partition d-none">
+        
+        
+        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
+            No DFS data available for this partition.
         </div>
         
     </div>

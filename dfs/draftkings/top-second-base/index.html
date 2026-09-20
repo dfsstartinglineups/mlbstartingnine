@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected DraftKings Second Base</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-20 02:55 AM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-20 03:05 AM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
@@ -122,87 +122,9 @@
         
         <!-- Day-Specific Slate Selector -->
         
-        
-        <div class="table-card shadow-sm mb-4 position-relative">
-            <div class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3 scroll-indicator" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
-                &larr; Swipe
-            </div>
-
-            <div class="table-responsive table-scroll-container">
-                <table class="table table-hover mb-0 leaderboard-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
-                            <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
-                            
-                            
-                            <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
-                            <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
-                            <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
-                            <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
-                            <th class="text-end" onclick="sortTable(this, 6)">Proj &#x21D5;</th>
-                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                        <tr data-slates="25815,2580F" 
-                            data-slate-stats='{"25815": {"salary": "$2,700", "proj": "6.50", "value": "2.41x"}, "2580F": {"salary": "$2,700", "proj": "6.50", "value": "2.41x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="6.5" 
-                            data-default-value="2.41x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">1</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/minnesota-twins/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-danger me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Not Starting">NS</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668952/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/142.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/ryan-kreidler/" class="player-link text-nowrap">Ryan Kreidler</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.41x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Twins
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/108.svg" alt="Angels Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Angels
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">6.5</td>
-                            
-                        </tr>
-                        
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-    </div>
-    
-    <div id="games-today" class="dfs-partition ">
-        
-        
-        
-        <!-- Day-Specific Slate Selector -->
-        
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'yesterday')">
                 <option value="all">All Games</option>
                 
                 <option value="25889">3 Games  · Early SAT 4:05PM ET</option>
@@ -1893,7 +1815,7 @@
         
     </div>
     
-    <div id="games-tomorrow" class="dfs-partition d-none">
+    <div id="games-today" class="dfs-partition ">
         
         
         
@@ -1901,7 +1823,7 @@
         
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'tomorrow')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
                 <option value="all">All Games</option>
                 
                 <option value="25898">10 Games SUN 1:10PM ET</option>
@@ -3621,6 +3543,15 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        
+    </div>
+    
+    <div id="games-tomorrow" class="dfs-partition d-none">
+        
+        
+        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
+            No DFS data available for this partition.
         </div>
         
     </div>
