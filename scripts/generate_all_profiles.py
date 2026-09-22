@@ -265,7 +265,8 @@ def render_badge_zone(player_id, team_side, my_game, reliever_info=None, live_da
     
     is_postponed = "Postponed" in abstract_state or "Postponed" in detailed_state or (game_raw.get("status") or {}).get("statusCode") == "C"
     if is_postponed:
-        return f'<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">{dh_prefix}✕ GAME POSTPONED</div>'
+        postponed_badge = f'<div class="badge bg-danger py-1 px-2 w-100 shadow-sm text-uppercase fw-bold text-white" style="font-size: 0.7rem;">{dh_prefix}✕ GAME POSTPONED</div>'
+        return postponed_badge, "", ""
         
     probable_pitcher = my_team.get("probablePitcher") or {}
     probable_id = str(probable_pitcher.get("id", ""))
