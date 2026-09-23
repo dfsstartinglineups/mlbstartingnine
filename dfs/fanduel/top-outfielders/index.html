@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected FanDuel Outfielders</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-22 11:43 PM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-22 11:46 PM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
@@ -950,6 +950,30 @@
         
         <!-- Day-Specific Slate Selector -->
         
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
+                <option value="all">All Games</option>
+                
+                <option value="20D89">15 Games  · All Day TUE 1:05PM ET</option>
+                
+                <option value="20D91">5 Games  · Early Only TUE 6:35PM ET</option>
+                
+                <option value="20D8E">9 Games  · Main TUE 7:15PM ET</option>
+                
+                <option value="20D92">3 Games  · Express TUE 7:40PM ET</option>
+                
+                <option value="20D94">4 Games  · After Hours TUE 9:40PM ET</option>
+                
+                <option value="20D90">TB @ NYY TUE 1:05PM ET</option>
+                
+                <option value="20D93">ARI @ COL TUE 8:40PM ET</option>
+                
+                <option value="20D95">SD @ LAD TUE 10:10PM ET</option>
+                
+            </select>
+        </div>
+        
         
         <div class="table-card shadow-sm mb-4 position-relative">
             <div class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3 scroll-indicator" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
@@ -974,8 +998,8 @@
                     </thead>
                     <tbody>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,500", "proj": "10.97", "value": "4.39x"}, "20D8E": {"salary": "$2,500", "proj": "10.97", "value": "4.39x"}, "20D89": {"salary": "$2,500", "proj": "10.97", "value": "4.39x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,500", "proj": "10.97", "value": "4.39x"}, "20D94": {"salary": "$2,500", "proj": "10.97", "value": "4.39x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="10.97" 
                             data-default-value="4.39x">
@@ -1015,8 +1039,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D8E" 
-                            data-slate-stats='{"20D89": {"salary": "$2,700", "proj": "11.60", "value": "4.30x"}, "20D8E": {"salary": "$2,700", "proj": "11.60", "value": "4.30x"}}' 
+                        <tr data-slates="20D8E" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,700", "proj": "11.60", "value": "4.30x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="11.6" 
                             data-default-value="4.3x">
@@ -1056,8 +1080,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D8E" 
-                            data-slate-stats='{"20D89": {"salary": "$3,700", "proj": "15.66", "value": "4.23x"}, "20D8E": {"salary": "$3,700", "proj": "15.66", "value": "4.23x"}}' 
+                        <tr data-slates="20D8E" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,700", "proj": "15.66", "value": "4.23x"}}' 
                             data-default-salary="$3,700" 
                             data-default-proj="15.66" 
                             data-default-value="4.23x">
@@ -1097,8 +1121,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D8E" 
-                            data-slate-stats='{"20D89": {"salary": "$2,100", "proj": "8.84", "value": "4.21x"}, "20D8E": {"salary": "$2,100", "proj": "8.84", "value": "4.21x"}}' 
+                        <tr data-slates="20D8E" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,100", "proj": "8.84", "value": "4.21x"}}' 
                             data-default-salary="$2,100" 
                             data-default-proj="8.84" 
                             data-default-value="4.21x">
@@ -1138,8 +1162,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,500", "proj": "10.37", "value": "4.15x"}, "20D89": {"salary": "$2,500", "proj": "10.37", "value": "4.15x"}, "20D8E": {"salary": "$2,500", "proj": "10.37", "value": "4.15x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,500", "proj": "10.37", "value": "4.15x"}, "20D92": {"salary": "$2,500", "proj": "10.37", "value": "4.15x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="10.37" 
                             data-default-value="4.15x">
@@ -1179,8 +1203,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,100", "proj": "8.59", "value": "4.09x"}, "20D8E": {"salary": "$2,100", "proj": "8.59", "value": "4.09x"}, "20D89": {"salary": "$2,100", "proj": "8.59", "value": "4.09x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,100", "proj": "8.59", "value": "4.09x"}, "20D94": {"salary": "$2,100", "proj": "8.59", "value": "4.09x"}}' 
                             data-default-salary="$2,100" 
                             data-default-proj="8.59" 
                             data-default-value="4.09x">
@@ -1220,8 +1244,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$13,400", "proj": "15.91", "value": "1.19x"}, "20D89": {"salary": "$3,900", "proj": "15.91", "value": "4.08x"}, "20D8E": {"salary": "$3,900", "proj": "15.91", "value": "4.08x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$13,400", "proj": "15.91", "value": "1.19x"}, "20D8E": {"salary": "$3,900", "proj": "15.91", "value": "4.08x"}}' 
                             data-default-salary="$3,900" 
                             data-default-proj="15.91" 
                             data-default-value="4.08x">
@@ -1261,8 +1285,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,300", "proj": "9.18", "value": "3.99x"}, "20D89": {"salary": "$2,300", "proj": "9.18", "value": "3.99x"}, "20D8E": {"salary": "$2,300", "proj": "9.18", "value": "3.99x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,300", "proj": "9.18", "value": "3.99x"}, "20D92": {"salary": "$2,300", "proj": "9.18", "value": "3.99x"}}' 
                             data-default-salary="$2,300" 
                             data-default-proj="9.18" 
                             data-default-value="3.99x">
@@ -1302,8 +1326,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,100", "proj": "8.38", "value": "3.99x"}, "20D8E": {"salary": "$2,100", "proj": "8.38", "value": "3.99x"}, "20D89": {"salary": "$2,100", "proj": "8.38", "value": "3.99x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,100", "proj": "8.38", "value": "3.99x"}, "20D94": {"salary": "$2,100", "proj": "8.38", "value": "3.99x"}}' 
                             data-default-salary="$2,100" 
                             data-default-proj="8.38" 
                             data-default-value="3.99x">
@@ -1343,8 +1367,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,200", "proj": "12.71", "value": "3.97x"}, "20D8E": {"salary": "$3,200", "proj": "12.71", "value": "3.97x"}, "20D89": {"salary": "$3,200", "proj": "12.71", "value": "3.97x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,200", "proj": "12.71", "value": "3.97x"}, "20D94": {"salary": "$3,200", "proj": "12.71", "value": "3.97x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="12.71" 
                             data-default-value="3.97x">
@@ -1384,8 +1408,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,300", "proj": "9.11", "value": "3.96x"}, "20D8E": {"salary": "$2,300", "proj": "9.11", "value": "3.96x"}, "20D89": {"salary": "$2,300", "proj": "9.11", "value": "3.96x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,300", "proj": "9.11", "value": "3.96x"}, "20D94": {"salary": "$2,300", "proj": "9.11", "value": "3.96x"}}' 
                             data-default-salary="$2,300" 
                             data-default-proj="9.11" 
                             data-default-value="3.96x">
@@ -1425,8 +1449,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,300", "proj": "13.04", "value": "3.95x"}, "20D8E": {"salary": "$3,300", "proj": "13.04", "value": "3.95x"}, "20D89": {"salary": "$3,300", "proj": "13.04", "value": "3.95x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,300", "proj": "13.04", "value": "3.95x"}, "20D94": {"salary": "$3,300", "proj": "13.04", "value": "3.95x"}}' 
                             data-default-salary="$3,300" 
                             data-default-proj="13.04" 
                             data-default-value="3.95x">
@@ -1466,8 +1490,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$8,600", "proj": "12.99", "value": "1.51x"}, "20D89": {"salary": "$3,400", "proj": "12.99", "value": "3.82x"}, "20D8E": {"salary": "$3,400", "proj": "12.99", "value": "3.82x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$8,600", "proj": "12.99", "value": "1.51x"}, "20D8E": {"salary": "$3,400", "proj": "12.99", "value": "3.82x"}}' 
                             data-default-salary="$3,400" 
                             data-default-proj="12.99" 
                             data-default-value="3.82x">
@@ -1507,8 +1531,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$8,600", "proj": "12.99", "value": "1.51x"}, "20D89": {"salary": "$3,400", "proj": "12.99", "value": "3.82x"}, "20D8E": {"salary": "$3,400", "proj": "12.99", "value": "3.82x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$8,600", "proj": "12.99", "value": "1.51x"}, "20D8E": {"salary": "$3,400", "proj": "12.99", "value": "3.82x"}}' 
                             data-default-salary="$3,400" 
                             data-default-proj="12.99" 
                             data-default-value="3.82x">
@@ -1548,8 +1572,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$9,400", "proj": "13.67", "value": "1.45x"}, "20D89": {"salary": "$3,600", "proj": "13.67", "value": "3.80x"}, "20D8E": {"salary": "$3,600", "proj": "13.67", "value": "3.80x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$9,400", "proj": "13.67", "value": "1.45x"}, "20D8E": {"salary": "$3,600", "proj": "13.67", "value": "3.80x"}}' 
                             data-default-salary="$3,600" 
                             data-default-proj="13.67" 
                             data-default-value="3.8x">
@@ -1589,8 +1613,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,400", "proj": "9.08", "value": "3.78x"}, "20D91": {"salary": "$2,400", "proj": "9.08", "value": "3.78x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,400", "proj": "9.08", "value": "3.78x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="9.08" 
                             data-default-value="3.78x">
@@ -1630,8 +1654,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,700", "proj": "10.19", "value": "3.77x"}, "20D8E": {"salary": "$2,700", "proj": "10.19", "value": "3.77x"}, "20D95": {"salary": "$4,600", "proj": "10.19", "value": "2.22x"}, "20D89": {"salary": "$2,700", "proj": "10.19", "value": "3.77x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$4,600", "proj": "10.19", "value": "2.22x"}, "20D8E": {"salary": "$2,700", "proj": "10.19", "value": "3.77x"}, "20D94": {"salary": "$2,700", "proj": "10.19", "value": "3.77x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="10.19" 
                             data-default-value="3.77x">
@@ -1671,8 +1695,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D8E" 
-                            data-slate-stats='{"20D89": {"salary": "$3,200", "proj": "12.02", "value": "3.76x"}, "20D8E": {"salary": "$3,200", "proj": "12.02", "value": "3.76x"}}' 
+                        <tr data-slates="20D8E" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,200", "proj": "12.02", "value": "3.76x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="12.02" 
                             data-default-value="3.76x">
@@ -1712,8 +1736,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}, "20D8E": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}, "20D89": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}, "20D94": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}}' 
                             data-default-salary="$2,600" 
                             data-default-proj="9.7" 
                             data-default-value="3.73x">
@@ -1753,8 +1777,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}, "20D8E": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}, "20D89": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}, "20D94": {"salary": "$2,600", "proj": "9.70", "value": "3.73x"}}' 
                             data-default-salary="$2,600" 
                             data-default-proj="9.7" 
                             data-default-value="3.73x">
@@ -1794,8 +1818,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,400", "proj": "8.92", "value": "3.72x"}, "20D8E": {"salary": "$2,400", "proj": "8.92", "value": "3.72x"}, "20D89": {"salary": "$2,400", "proj": "8.92", "value": "3.72x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,400", "proj": "8.92", "value": "3.72x"}, "20D94": {"salary": "$2,400", "proj": "8.92", "value": "3.72x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="8.92" 
                             data-default-value="3.72x">
@@ -1835,8 +1859,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,800", "proj": "10.39", "value": "3.71x"}, "20D8E": {"salary": "$2,800", "proj": "10.39", "value": "3.71x"}, "20D89": {"salary": "$2,800", "proj": "10.39", "value": "3.71x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,800", "proj": "10.39", "value": "3.71x"}, "20D94": {"salary": "$2,800", "proj": "10.39", "value": "3.71x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="10.39" 
                             data-default-value="3.71x">
@@ -1876,8 +1900,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,800", "proj": "13.83", "value": "3.64x"}, "20D8E": {"salary": "$3,800", "proj": "13.83", "value": "3.64x"}, "20D95": {"salary": "$13,000", "proj": "13.83", "value": "1.06x"}, "20D89": {"salary": "$3,800", "proj": "13.83", "value": "3.64x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$13,000", "proj": "13.83", "value": "1.06x"}, "20D8E": {"salary": "$3,800", "proj": "13.83", "value": "3.64x"}, "20D94": {"salary": "$3,800", "proj": "13.83", "value": "3.64x"}}' 
                             data-default-salary="$3,800" 
                             data-default-proj="13.83" 
                             data-default-value="3.64x">
@@ -1917,8 +1941,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,500", "proj": "9.05", "value": "3.62x"}, "20D89": {"salary": "$2,500", "proj": "9.05", "value": "3.62x"}, "20D8E": {"salary": "$2,500", "proj": "9.05", "value": "3.62x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,500", "proj": "9.05", "value": "3.62x"}, "20D92": {"salary": "$2,500", "proj": "9.05", "value": "3.62x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="9.05" 
                             data-default-value="3.62x">
@@ -1958,8 +1982,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,100", "proj": "11.22", "value": "3.62x"}, "20D8E": {"salary": "$3,100", "proj": "11.22", "value": "3.62x"}, "20D95": {"salary": "$7,400", "proj": "11.22", "value": "1.52x"}, "20D89": {"salary": "$3,100", "proj": "11.22", "value": "3.62x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$7,400", "proj": "11.22", "value": "1.52x"}, "20D8E": {"salary": "$3,100", "proj": "11.22", "value": "3.62x"}, "20D94": {"salary": "$3,100", "proj": "11.22", "value": "3.62x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="11.22" 
                             data-default-value="3.62x">
@@ -1999,8 +2023,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,200", "proj": "7.86", "value": "3.57x"}, "20D8E": {"salary": "$2,200", "proj": "7.86", "value": "3.57x"}, "20D89": {"salary": "$2,200", "proj": "7.86", "value": "3.57x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,200", "proj": "7.86", "value": "3.57x"}, "20D94": {"salary": "$2,200", "proj": "7.86", "value": "3.57x"}}' 
                             data-default-salary="$2,200" 
                             data-default-proj="7.86" 
                             data-default-value="3.57x">
@@ -2040,8 +2064,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}, "20D91": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="11.02" 
                             data-default-value="3.55x">
@@ -2081,8 +2105,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}, "20D89": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}, "20D8E": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}, "20D92": {"salary": "$3,100", "proj": "11.02", "value": "3.55x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="11.02" 
                             data-default-value="3.55x">
@@ -2122,8 +2146,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,000", "proj": "10.66", "value": "3.55x"}, "20D8E": {"salary": "$3,000", "proj": "10.66", "value": "3.55x"}, "20D89": {"salary": "$3,000", "proj": "10.66", "value": "3.55x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,000", "proj": "10.66", "value": "3.55x"}, "20D94": {"salary": "$3,000", "proj": "10.66", "value": "3.55x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="10.66" 
                             data-default-value="3.55x">
@@ -2163,8 +2187,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,600", "proj": "12.53", "value": "3.48x"}, "20D89": {"salary": "$3,600", "proj": "12.53", "value": "3.48x"}, "20D8E": {"salary": "$3,600", "proj": "12.53", "value": "3.48x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,600", "proj": "12.53", "value": "3.48x"}, "20D92": {"salary": "$3,600", "proj": "12.53", "value": "3.48x"}}' 
                             data-default-salary="$3,600" 
                             data-default-proj="12.53" 
                             data-default-value="3.48x">
@@ -2204,8 +2228,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$7,200", "proj": "11.45", "value": "1.59x"}, "20D89": {"salary": "$3,300", "proj": "11.45", "value": "3.47x"}, "20D8E": {"salary": "$3,300", "proj": "11.45", "value": "3.47x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$7,200", "proj": "11.45", "value": "1.59x"}, "20D8E": {"salary": "$3,300", "proj": "11.45", "value": "3.47x"}}' 
                             data-default-salary="$3,300" 
                             data-default-proj="11.45" 
                             data-default-value="3.47x">
@@ -2245,8 +2269,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,300", "proj": "7.93", "value": "3.45x"}, "20D91": {"salary": "$2,300", "proj": "7.93", "value": "3.45x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,300", "proj": "7.93", "value": "3.45x"}}' 
                             data-default-salary="$2,300" 
                             data-default-proj="7.93" 
                             data-default-value="3.45x">
@@ -2286,8 +2310,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,500", "proj": "8.63", "value": "3.45x"}, "20D89": {"salary": "$2,500", "proj": "8.63", "value": "3.45x"}, "20D8E": {"salary": "$2,500", "proj": "8.63", "value": "3.45x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,500", "proj": "8.63", "value": "3.45x"}, "20D92": {"salary": "$2,500", "proj": "8.63", "value": "3.45x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="8.63" 
                             data-default-value="3.45x">
@@ -2327,8 +2351,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$12,200", "proj": "12.77", "value": "1.05x"}, "20D89": {"salary": "$3,700", "proj": "12.77", "value": "3.45x"}, "20D8E": {"salary": "$3,700", "proj": "12.77", "value": "3.45x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$12,200", "proj": "12.77", "value": "1.05x"}, "20D8E": {"salary": "$3,700", "proj": "12.77", "value": "3.45x"}}' 
                             data-default-salary="$3,700" 
                             data-default-proj="12.77" 
                             data-default-value="3.45x">
@@ -2368,8 +2392,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,700", "proj": "9.31", "value": "3.45x"}, "20D8E": {"salary": "$2,700", "proj": "9.31", "value": "3.45x"}, "20D89": {"salary": "$2,700", "proj": "9.31", "value": "3.45x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,700", "proj": "9.31", "value": "3.45x"}, "20D94": {"salary": "$2,700", "proj": "9.31", "value": "3.45x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="9.31" 
                             data-default-value="3.45x">
@@ -2409,8 +2433,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D8E" 
-                            data-slate-stats='{"20D89": {"salary": "$2,500", "proj": "8.61", "value": "3.44x"}, "20D8E": {"salary": "$2,500", "proj": "8.61", "value": "3.44x"}}' 
+                        <tr data-slates="20D8E" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,500", "proj": "8.61", "value": "3.44x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="8.61" 
                             data-default-value="3.44x">
@@ -2450,8 +2474,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,000", "proj": "10.30", "value": "3.43x"}, "20D89": {"salary": "$3,000", "proj": "10.30", "value": "3.43x"}, "20D8E": {"salary": "$3,000", "proj": "10.30", "value": "3.43x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,000", "proj": "10.30", "value": "3.43x"}, "20D92": {"salary": "$3,000", "proj": "10.30", "value": "3.43x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="10.3" 
                             data-default-value="3.43x">
@@ -2491,8 +2515,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,900", "proj": "9.88", "value": "3.41x"}, "20D91": {"salary": "$2,900", "proj": "9.88", "value": "3.41x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,900", "proj": "9.88", "value": "3.41x"}}' 
                             data-default-salary="$2,900" 
                             data-default-proj="9.88" 
                             data-default-value="3.41x">
@@ -2532,8 +2556,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,400", "proj": "11.58", "value": "3.41x"}, "20D91": {"salary": "$3,400", "proj": "11.58", "value": "3.41x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,400", "proj": "11.58", "value": "3.41x"}}' 
                             data-default-salary="$3,400" 
                             data-default-proj="11.58" 
                             data-default-value="3.41x">
@@ -2573,8 +2597,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,200", "proj": "10.81", "value": "3.38x"}, "20D8E": {"salary": "$3,200", "proj": "10.81", "value": "3.38x"}, "20D95": {"salary": "$9,800", "proj": "10.81", "value": "1.10x"}, "20D89": {"salary": "$3,200", "proj": "10.81", "value": "3.38x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$9,800", "proj": "10.81", "value": "1.10x"}, "20D8E": {"salary": "$3,200", "proj": "10.81", "value": "3.38x"}, "20D94": {"salary": "$3,200", "proj": "10.81", "value": "3.38x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="10.81" 
                             data-default-value="3.38x">
@@ -2614,8 +2638,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,700", "proj": "9.06", "value": "3.36x"}, "20D91": {"salary": "$2,700", "proj": "9.06", "value": "3.36x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,700", "proj": "9.06", "value": "3.36x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="9.06" 
                             data-default-value="3.36x">
@@ -2655,8 +2679,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,900", "proj": "13.10", "value": "3.36x"}, "20D89": {"salary": "$3,900", "proj": "13.10", "value": "3.36x"}, "20D8E": {"salary": "$3,900", "proj": "13.10", "value": "3.36x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,900", "proj": "13.10", "value": "3.36x"}, "20D92": {"salary": "$3,900", "proj": "13.10", "value": "3.36x"}}' 
                             data-default-salary="$3,900" 
                             data-default-proj="13.1" 
                             data-default-value="3.36x">
@@ -2696,8 +2720,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,900", "proj": "9.72", "value": "3.35x"}, "20D89": {"salary": "$2,900", "proj": "9.72", "value": "3.35x"}, "20D8E": {"salary": "$2,900", "proj": "9.72", "value": "3.35x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,900", "proj": "9.72", "value": "3.35x"}, "20D92": {"salary": "$2,900", "proj": "9.72", "value": "3.35x"}}' 
                             data-default-salary="$2,900" 
                             data-default-proj="9.72" 
                             data-default-value="3.35x">
@@ -2737,8 +2761,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,200", "proj": "10.72", "value": "3.35x"}, "20D8E": {"salary": "$3,200", "proj": "10.72", "value": "3.35x"}, "20D89": {"salary": "$3,200", "proj": "10.72", "value": "3.35x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,200", "proj": "10.72", "value": "3.35x"}, "20D94": {"salary": "$3,200", "proj": "10.72", "value": "3.35x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="10.72" 
                             data-default-value="3.35x">
@@ -2778,8 +2802,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,500", "proj": "11.58", "value": "3.31x"}, "20D89": {"salary": "$3,500", "proj": "11.58", "value": "3.31x"}, "20D8E": {"salary": "$3,500", "proj": "11.58", "value": "3.31x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,500", "proj": "11.58", "value": "3.31x"}, "20D92": {"salary": "$3,500", "proj": "11.58", "value": "3.31x"}}' 
                             data-default-salary="$3,500" 
                             data-default-proj="11.58" 
                             data-default-value="3.31x">
@@ -2819,8 +2843,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,700", "proj": "8.84", "value": "3.27x"}, "20D8E": {"salary": "$2,700", "proj": "8.84", "value": "3.27x"}, "20D89": {"salary": "$2,700", "proj": "8.84", "value": "3.27x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,700", "proj": "8.84", "value": "3.27x"}, "20D94": {"salary": "$2,700", "proj": "8.84", "value": "3.27x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="8.84" 
                             data-default-value="3.27x">
@@ -2860,8 +2884,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,000", "proj": "9.70", "value": "3.23x"}, "20D91": {"salary": "$3,000", "proj": "9.70", "value": "3.23x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,000", "proj": "9.70", "value": "3.23x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="9.7" 
                             data-default-value="3.23x">
@@ -2901,8 +2925,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,900", "proj": "9.38", "value": "3.23x"}, "20D89": {"salary": "$2,900", "proj": "9.38", "value": "3.23x"}, "20D8E": {"salary": "$2,900", "proj": "9.38", "value": "3.23x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,900", "proj": "9.38", "value": "3.23x"}, "20D92": {"salary": "$2,900", "proj": "9.38", "value": "3.23x"}}' 
                             data-default-salary="$2,900" 
                             data-default-proj="9.38" 
                             data-default-value="3.23x">
@@ -2942,8 +2966,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,800", "proj": "9.01", "value": "3.22x"}, "20D91": {"salary": "$2,800", "proj": "9.01", "value": "3.22x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,800", "proj": "9.01", "value": "3.22x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="9.01" 
                             data-default-value="3.22x">
@@ -2983,8 +3007,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,800", "proj": "9.02", "value": "3.22x"}, "20D89": {"salary": "$2,800", "proj": "9.02", "value": "3.22x"}, "20D8E": {"salary": "$2,800", "proj": "9.02", "value": "3.22x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,800", "proj": "9.02", "value": "3.22x"}, "20D92": {"salary": "$2,800", "proj": "9.02", "value": "3.22x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="9.02" 
                             data-default-value="3.22x">
@@ -3024,8 +3048,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,700", "proj": "11.90", "value": "3.22x"}, "20D8E": {"salary": "$3,700", "proj": "11.90", "value": "3.22x"}, "20D89": {"salary": "$3,700", "proj": "11.90", "value": "3.22x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,700", "proj": "11.90", "value": "3.22x"}, "20D94": {"salary": "$3,700", "proj": "11.90", "value": "3.22x"}}' 
                             data-default-salary="$3,700" 
                             data-default-proj="11.9" 
                             data-default-value="3.22x">
@@ -3065,8 +3089,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,900", "proj": "9.31", "value": "3.21x"}, "20D91": {"salary": "$2,900", "proj": "9.31", "value": "3.21x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,900", "proj": "9.31", "value": "3.21x"}}' 
                             data-default-salary="$2,900" 
                             data-default-proj="9.31" 
                             data-default-value="3.21x">
@@ -3106,8 +3130,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,800", "proj": "8.99", "value": "3.21x"}, "20D91": {"salary": "$2,800", "proj": "8.99", "value": "3.21x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,800", "proj": "8.99", "value": "3.21x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="8.99" 
                             data-default-value="3.21x">
@@ -3147,95 +3171,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$5,600", "proj": "8.63", "value": "1.54x"}, "20D89": {"salary": "$2,700", "proj": "8.63", "value": "3.20x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="8.63" 
-                            data-default-value="3.2x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">54</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/802415/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/chandler-simpson/" class="player-link text-nowrap">Chandler Simpson</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">3.2x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Rays
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">8.63</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$5,600", "proj": "8.63", "value": "1.54x"}, "20D89": {"salary": "$2,700", "proj": "8.63", "value": "3.20x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="8.63" 
-                            data-default-value="3.2x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">55</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/802415/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/chandler-simpson/" class="player-link text-nowrap">Chandler Simpson</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">3.2x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Rays
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">8.63</td>
-                            
-                        </tr>
-                        
                         <tr data-slates="20D89,20D94,20D8E" 
                             data-slate-stats='{"20D89": {"salary": "$2,500", "proj": "8.00", "value": "3.20x"}, "20D94": {"salary": "$2,500", "proj": "8.00", "value": "3.20x"}, "20D8E": {"salary": "$2,500", "proj": "8.00", "value": "3.20x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="8.0" 
                             data-default-value="3.2x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">56</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">54</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -3270,13 +3212,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,600", "proj": "8.28", "value": "3.18x"}, "20D8E": {"salary": "$2,600", "proj": "8.28", "value": "3.18x"}, "20D89": {"salary": "$2,600", "proj": "8.28", "value": "3.18x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,600", "proj": "8.28", "value": "3.18x"}, "20D94": {"salary": "$2,600", "proj": "8.28", "value": "3.18x"}}' 
                             data-default-salary="$2,600" 
                             data-default-proj="8.28" 
                             data-default-value="3.18x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">57</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">55</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/san-francisco-giants/" class="text-decoration-none">
@@ -3311,13 +3253,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,900", "proj": "9.17", "value": "3.16x"}, "20D91": {"salary": "$2,900", "proj": "9.17", "value": "3.16x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,900", "proj": "9.17", "value": "3.16x"}}' 
                             data-default-salary="$2,900" 
                             data-default-proj="9.17" 
                             data-default-value="3.16x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">58</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">56</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/boston-red-sox/" class="text-decoration-none">
@@ -3352,13 +3294,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,800", "proj": "8.81", "value": "3.15x"}, "20D8E": {"salary": "$2,800", "proj": "8.81", "value": "3.15x"}, "20D89": {"salary": "$2,800", "proj": "8.81", "value": "3.15x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,800", "proj": "8.81", "value": "3.15x"}, "20D94": {"salary": "$2,800", "proj": "8.81", "value": "3.15x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="8.81" 
                             data-default-value="3.15x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">59</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">57</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/san-francisco-giants/" class="text-decoration-none">
@@ -3393,13 +3335,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,000", "proj": "9.21", "value": "3.07x"}, "20D89": {"salary": "$3,000", "proj": "9.21", "value": "3.07x"}, "20D8E": {"salary": "$3,000", "proj": "9.21", "value": "3.07x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,000", "proj": "9.21", "value": "3.07x"}, "20D92": {"salary": "$3,000", "proj": "9.21", "value": "3.07x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="9.21" 
                             data-default-value="3.07x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">60</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">58</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/miami-marlins/" class="text-decoration-none">
@@ -3434,13 +3376,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,400", "proj": "7.30", "value": "3.04x"}, "20D91": {"salary": "$2,400", "proj": "7.30", "value": "3.04x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,400", "proj": "7.30", "value": "3.04x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="7.3" 
                             data-default-value="3.04x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">61</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">59</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/boston-red-sox/" class="text-decoration-none">
@@ -3475,95 +3417,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$9,600", "proj": "9.31", "value": "0.97x"}, "20D89": {"salary": "$3,100", "proj": "9.31", "value": "3.00x"}}' 
-                            data-default-salary="$3,100" 
-                            data-default-proj="9.31" 
-                            data-default-value="3.0x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">62</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">2</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641355/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/cody-bellinger/" class="player-link text-nowrap">Cody Bellinger</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">3.0x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Yankees
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$3,100</td>
-                            <td class="text-end fw-bold col-proj">9.31</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$9,600", "proj": "9.31", "value": "0.97x"}, "20D89": {"salary": "$3,100", "proj": "9.31", "value": "3.00x"}}' 
-                            data-default-salary="$3,100" 
-                            data-default-proj="9.31" 
-                            data-default-value="3.0x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">63</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">2</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641355/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/cody-bellinger/" class="player-link text-nowrap">Cody Bellinger</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">3.0x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Yankees
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$3,100</td>
-                            <td class="text-end fw-bold col-proj">9.31</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,000", "proj": "9.01", "value": "3.00x"}, "20D89": {"salary": "$3,000", "proj": "9.01", "value": "3.00x"}, "20D8E": {"salary": "$3,000", "proj": "9.01", "value": "3.00x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,000", "proj": "9.01", "value": "3.00x"}, "20D92": {"salary": "$3,000", "proj": "9.01", "value": "3.00x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="9.01" 
                             data-default-value="3.0x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">64</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">60</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/miami-marlins/" class="text-decoration-none">
@@ -3598,13 +3458,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,100", "proj": "9.30", "value": "3.00x"}, "20D8E": {"salary": "$3,100", "proj": "9.30", "value": "3.00x"}, "20D95": {"salary": "$7,000", "proj": "9.30", "value": "1.33x"}, "20D89": {"salary": "$3,100", "proj": "9.30", "value": "3.00x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$7,000", "proj": "9.30", "value": "1.33x"}, "20D8E": {"salary": "$3,100", "proj": "9.30", "value": "3.00x"}, "20D94": {"salary": "$3,100", "proj": "9.30", "value": "3.00x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="9.3" 
                             data-default-value="3.0x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">65</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">61</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -3639,54 +3499,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$3,800", "proj": "7.47", "value": "1.97x"}, "20D89": {"salary": "$2,500", "proj": "7.47", "value": "2.99x"}}' 
-                            data-default-salary="$2,500" 
-                            data-default-proj="7.47" 
-                            data-default-value="2.99x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">66</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">4</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668723/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/ryan-vilade/" class="player-link text-nowrap">Ryan Vilade</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.99x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Rays
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,500</td>
-                            <td class="text-end fw-bold col-proj">7.47</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,200", "proj": "9.50", "value": "2.97x"}, "20D91": {"salary": "$3,200", "proj": "9.50", "value": "2.97x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,200", "proj": "9.50", "value": "2.97x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="9.5" 
                             data-default-value="2.97x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">67</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">62</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/st-louis-cardinals/" class="text-decoration-none">
@@ -3721,13 +3540,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$4,200", "proj": "8.90", "value": "2.12x"}, "20D89": {"salary": "$3,000", "proj": "8.90", "value": "2.97x"}, "20D8E": {"salary": "$3,000", "proj": "8.90", "value": "2.97x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$4,200", "proj": "8.90", "value": "2.12x"}, "20D8E": {"salary": "$3,000", "proj": "8.90", "value": "2.97x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="8.9" 
                             data-default-value="2.97x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">68</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">63</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/colorado-rockies/" class="text-decoration-none">
@@ -3762,13 +3581,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D93,20D89,20D8E" 
-                            data-slate-stats='{"20D93": {"salary": "$3,800", "proj": "8.59", "value": "2.26x"}, "20D89": {"salary": "$2,900", "proj": "8.59", "value": "2.96x"}, "20D8E": {"salary": "$2,900", "proj": "8.59", "value": "2.96x"}}' 
+                        <tr data-slates="20D93,20D8E" 
+                            data-slate-stats='{"20D93": {"salary": "$3,800", "proj": "8.59", "value": "2.26x"}, "20D8E": {"salary": "$2,900", "proj": "8.59", "value": "2.96x"}}' 
                             data-default-salary="$2,900" 
                             data-default-proj="8.59" 
                             data-default-value="2.96x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">69</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">64</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/colorado-rockies/" class="text-decoration-none">
@@ -3803,13 +3622,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,800", "proj": "11.15", "value": "2.93x"}, "20D91": {"salary": "$3,800", "proj": "11.15", "value": "2.93x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,800", "proj": "11.15", "value": "2.93x"}}' 
                             data-default-salary="$3,800" 
                             data-default-proj="11.15" 
                             data-default-value="2.93x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">70</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">65</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/pittsburgh-pirates/" class="text-decoration-none">
@@ -3844,13 +3663,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,100", "proj": "9.01", "value": "2.91x"}, "20D91": {"salary": "$3,100", "proj": "9.01", "value": "2.91x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,100", "proj": "9.01", "value": "2.91x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="9.01" 
                             data-default-value="2.91x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">71</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">66</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/pittsburgh-pirates/" class="text-decoration-none">
@@ -3885,13 +3704,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,400", "proj": "6.93", "value": "2.89x"}, "20D91": {"salary": "$2,400", "proj": "6.93", "value": "2.89x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,400", "proj": "6.93", "value": "2.89x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="6.93" 
                             data-default-value="2.89x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">72</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">67</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/pittsburgh-pirates/" class="text-decoration-none">
@@ -3926,13 +3745,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,800", "proj": "8.10", "value": "2.89x"}, "20D8E": {"salary": "$2,800", "proj": "8.10", "value": "2.89x"}, "20D95": {"salary": "$5,800", "proj": "8.10", "value": "1.40x"}, "20D89": {"salary": "$2,800", "proj": "8.10", "value": "2.89x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$5,800", "proj": "8.10", "value": "1.40x"}, "20D8E": {"salary": "$2,800", "proj": "8.10", "value": "2.89x"}, "20D94": {"salary": "$2,800", "proj": "8.10", "value": "2.89x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="8.1" 
                             data-default-value="2.89x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">73</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">68</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -3967,13 +3786,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$4,400", "proj": "12.57", "value": "2.86x"}, "20D89": {"salary": "$4,400", "proj": "12.57", "value": "2.86x"}, "20D8E": {"salary": "$4,400", "proj": "12.57", "value": "2.86x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$4,400", "proj": "12.57", "value": "2.86x"}, "20D92": {"salary": "$4,400", "proj": "12.57", "value": "2.86x"}}' 
                             data-default-salary="$4,400" 
                             data-default-proj="12.57" 
                             data-default-value="2.86x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">74</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">69</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/chicago-cubs/" class="text-decoration-none">
@@ -4008,13 +3827,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$4,200", "proj": "11.96", "value": "2.85x"}, "20D91": {"salary": "$4,200", "proj": "11.96", "value": "2.85x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$4,200", "proj": "11.96", "value": "2.85x"}}' 
                             data-default-salary="$4,200" 
                             data-default-proj="11.96" 
                             data-default-value="2.85x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">75</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">70</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/washington-nationals/" class="text-decoration-none">
@@ -4049,13 +3868,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,400", "proj": "6.84", "value": "2.85x"}, "20D89": {"salary": "$2,400", "proj": "6.84", "value": "2.85x"}, "20D8E": {"salary": "$2,400", "proj": "6.84", "value": "2.85x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,400", "proj": "6.84", "value": "2.85x"}, "20D92": {"salary": "$2,400", "proj": "6.84", "value": "2.85x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="6.84" 
                             data-default-value="2.85x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">76</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">71</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/miami-marlins/" class="text-decoration-none">
@@ -4090,13 +3909,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D8E" 
-                            data-slate-stats='{"20D89": {"salary": "$2,800", "proj": "7.96", "value": "2.84x"}, "20D8E": {"salary": "$2,800", "proj": "7.96", "value": "2.84x"}}' 
+                        <tr data-slates="20D8E" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,800", "proj": "7.96", "value": "2.84x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="7.96" 
                             data-default-value="2.84x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">77</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">72</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/cincinnati-reds/" class="text-decoration-none">
@@ -4131,13 +3950,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,700", "proj": "7.68", "value": "2.84x"}, "20D89": {"salary": "$2,700", "proj": "7.68", "value": "2.84x"}, "20D8E": {"salary": "$2,700", "proj": "7.68", "value": "2.84x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,700", "proj": "7.68", "value": "2.84x"}, "20D92": {"salary": "$2,700", "proj": "7.68", "value": "2.84x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="7.68" 
                             data-default-value="2.84x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">78</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">73</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/chicago-white-sox/" class="text-decoration-none">
@@ -4172,13 +3991,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,700", "proj": "7.60", "value": "2.81x"}, "20D91": {"salary": "$2,700", "proj": "7.60", "value": "2.81x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,700", "proj": "7.60", "value": "2.81x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="7.6" 
                             data-default-value="2.81x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">79</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">74</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/philadelphia-phillies/" class="text-decoration-none">
@@ -4213,13 +4032,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,400", "proj": "6.72", "value": "2.80x"}, "20D91": {"salary": "$2,400", "proj": "6.72", "value": "2.80x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,400", "proj": "6.72", "value": "2.80x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="6.72" 
                             data-default-value="2.8x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">80</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">75</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/philadelphia-phillies/" class="text-decoration-none">
@@ -4254,13 +4073,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,300", "proj": "9.21", "value": "2.79x"}, "20D91": {"salary": "$3,300", "proj": "9.21", "value": "2.79x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,300", "proj": "9.21", "value": "2.79x"}}' 
                             data-default-salary="$3,300" 
                             data-default-proj="9.21" 
                             data-default-value="2.79x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">81</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">76</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
@@ -4295,95 +4114,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$4,600", "proj": "7.50", "value": "1.63x"}, "20D89": {"salary": "$2,700", "proj": "7.50", "value": "2.78x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="7.5" 
-                            data-default-value="2.78x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">82</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676356/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/jonny-deluca/" class="player-link text-nowrap">Jonny Deluca</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.78x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Rays
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">7.5</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$4,600", "proj": "7.50", "value": "1.63x"}, "20D89": {"salary": "$2,700", "proj": "7.50", "value": "2.78x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="7.5" 
-                            data-default-value="2.78x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">83</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676356/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/jonny-deluca/" class="player-link text-nowrap">Jonny Deluca</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.78x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Rays
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">7.5</td>
-                            
-                        </tr>
-                        
                         <tr data-slates="20D89,20D94,20D95,20D8E" 
                             data-slate-stats='{"20D89": {"salary": "$2,700", "proj": "7.47", "value": "2.77x"}, "20D94": {"salary": "$2,700", "proj": "7.47", "value": "2.77x"}, "20D95": {"salary": "$4,800", "proj": "7.47", "value": "1.56x"}, "20D8E": {"salary": "$2,700", "proj": "7.47", "value": "2.77x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="7.47" 
                             data-default-value="2.77x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">84</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">77</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/san-diego-padres/" class="text-decoration-none">
@@ -4418,13 +4155,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,300", "proj": "6.30", "value": "2.74x"}, "20D89": {"salary": "$2,300", "proj": "6.30", "value": "2.74x"}, "20D8E": {"salary": "$2,300", "proj": "6.30", "value": "2.74x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,300", "proj": "6.30", "value": "2.74x"}, "20D92": {"salary": "$2,300", "proj": "6.30", "value": "2.74x"}}' 
                             data-default-salary="$2,300" 
                             data-default-proj="6.3" 
                             data-default-value="2.74x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">85</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">78</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -4459,13 +4196,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,000", "proj": "8.20", "value": "2.73x"}, "20D91": {"salary": "$3,000", "proj": "8.20", "value": "2.73x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,000", "proj": "8.20", "value": "2.73x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="8.2" 
                             data-default-value="2.73x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">86</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">79</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/detroit-tigers/" class="text-decoration-none">
@@ -4500,13 +4237,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,700", "proj": "7.38", "value": "2.73x"}, "20D89": {"salary": "$2,700", "proj": "7.38", "value": "2.73x"}, "20D8E": {"salary": "$2,700", "proj": "7.38", "value": "2.73x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,700", "proj": "7.38", "value": "2.73x"}, "20D92": {"salary": "$2,700", "proj": "7.38", "value": "2.73x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="7.38" 
                             data-default-value="2.73x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">87</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">80</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/kansas-city-royals/" class="text-decoration-none">
@@ -4541,13 +4278,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$4,300", "proj": "11.71", "value": "2.72x"}, "20D8E": {"salary": "$4,300", "proj": "11.71", "value": "2.72x"}, "20D89": {"salary": "$4,300", "proj": "11.71", "value": "2.72x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$4,300", "proj": "11.71", "value": "2.72x"}, "20D94": {"salary": "$4,300", "proj": "11.71", "value": "2.72x"}}' 
                             data-default-salary="$4,300" 
                             data-default-proj="11.71" 
                             data-default-value="2.72x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">88</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">81</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -4582,13 +4319,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,800", "proj": "7.61", "value": "2.72x"}, "20D8E": {"salary": "$2,800", "proj": "7.61", "value": "2.72x"}, "20D89": {"salary": "$2,800", "proj": "7.61", "value": "2.72x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,800", "proj": "7.61", "value": "2.72x"}, "20D94": {"salary": "$2,800", "proj": "7.61", "value": "2.72x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="7.61" 
                             data-default-value="2.72x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">89</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">82</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -4623,13 +4360,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D95,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$3,200", "proj": "8.63", "value": "2.70x"}, "20D8E": {"salary": "$3,200", "proj": "8.63", "value": "2.70x"}, "20D95": {"salary": "$10,600", "proj": "8.63", "value": "0.81x"}, "20D89": {"salary": "$3,200", "proj": "8.63", "value": "2.70x"}}' 
+                        <tr data-slates="20D95,20D8E,20D94" 
+                            data-slate-stats='{"20D95": {"salary": "$10,600", "proj": "8.63", "value": "0.81x"}, "20D8E": {"salary": "$3,200", "proj": "8.63", "value": "2.70x"}, "20D94": {"salary": "$3,200", "proj": "8.63", "value": "2.70x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="8.63" 
                             data-default-value="2.7x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">90</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">83</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/los-angeles-dodgers/" class="text-decoration-none">
@@ -4664,95 +4401,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$5,800", "proj": "7.23", "value": "1.25x"}, "20D89": {"salary": "$2,700", "proj": "7.23", "value": "2.68x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="7.23" 
-                            data-default-value="2.68x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">91</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">3</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/671218/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/heliot-ramos/" class="player-link text-nowrap">Heliot Ramos</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.68x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Yankees
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">7.23</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$5,800", "proj": "7.23", "value": "1.25x"}, "20D89": {"salary": "$2,700", "proj": "7.23", "value": "2.68x"}}' 
-                            data-default-salary="$2,700" 
-                            data-default-proj="7.23" 
-                            data-default-value="2.68x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">92</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">3</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/671218/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/heliot-ramos/" class="player-link text-nowrap">Heliot Ramos</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.68x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Yankees
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,700</td>
-                            <td class="text-end fw-bold col-proj">7.23</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$4,000", "proj": "10.69", "value": "2.67x"}, "20D91": {"salary": "$4,000", "proj": "10.69", "value": "2.67x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$4,000", "proj": "10.69", "value": "2.67x"}}' 
                             data-default-salary="$4,000" 
                             data-default-proj="10.69" 
                             data-default-value="2.67x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">93</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">84</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/philadelphia-phillies/" class="text-decoration-none">
@@ -4787,13 +4442,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,000", "proj": "7.98", "value": "2.66x"}, "20D91": {"salary": "$3,000", "proj": "7.98", "value": "2.66x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,000", "proj": "7.98", "value": "2.66x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="7.98" 
                             data-default-value="2.66x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">94</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">85</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/pittsburgh-pirates/" class="text-decoration-none">
@@ -4828,13 +4483,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,200", "proj": "8.45", "value": "2.64x"}, "20D91": {"salary": "$3,200", "proj": "8.45", "value": "2.64x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,200", "proj": "8.45", "value": "2.64x"}}' 
                             data-default-salary="$3,200" 
                             data-default-proj="8.45" 
                             data-default-value="2.64x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">95</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">86</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
@@ -4869,13 +4524,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$2,300", "proj": "6.06", "value": "2.63x"}, "20D89": {"salary": "$2,300", "proj": "6.06", "value": "2.63x"}, "20D8E": {"salary": "$2,300", "proj": "6.06", "value": "2.63x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,300", "proj": "6.06", "value": "2.63x"}, "20D92": {"salary": "$2,300", "proj": "6.06", "value": "2.63x"}}' 
                             data-default-salary="$2,300" 
                             data-default-proj="6.06" 
                             data-default-value="2.63x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">96</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">87</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/kansas-city-royals/" class="text-decoration-none">
@@ -4910,13 +4565,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,400", "proj": "6.32", "value": "2.63x"}, "20D8E": {"salary": "$2,400", "proj": "6.32", "value": "2.63x"}, "20D89": {"salary": "$2,400", "proj": "6.32", "value": "2.63x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,400", "proj": "6.32", "value": "2.63x"}, "20D94": {"salary": "$2,400", "proj": "6.32", "value": "2.63x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="6.32" 
                             data-default-value="2.63x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">97</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">88</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -4951,13 +4606,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,100", "proj": "8.08", "value": "2.61x"}, "20D91": {"salary": "$3,100", "proj": "8.08", "value": "2.61x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,100", "proj": "8.08", "value": "2.61x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="8.08" 
                             data-default-value="2.61x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">98</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">89</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/boston-red-sox/" class="text-decoration-none">
@@ -4992,13 +4647,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,000", "proj": "7.79", "value": "2.60x"}, "20D89": {"salary": "$3,000", "proj": "7.79", "value": "2.60x"}, "20D8E": {"salary": "$3,000", "proj": "7.79", "value": "2.60x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,000", "proj": "7.79", "value": "2.60x"}, "20D92": {"salary": "$3,000", "proj": "7.79", "value": "2.60x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="7.79" 
                             data-default-value="2.6x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">99</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">90</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/miami-marlins/" class="text-decoration-none">
@@ -5033,13 +4688,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D92,20D89,20D8E" 
-                            data-slate-stats='{"20D92": {"salary": "$3,100", "proj": "8.05", "value": "2.60x"}, "20D89": {"salary": "$3,100", "proj": "8.05", "value": "2.60x"}, "20D8E": {"salary": "$3,100", "proj": "8.05", "value": "2.60x"}}' 
+                        <tr data-slates="20D8E,20D92" 
+                            data-slate-stats='{"20D8E": {"salary": "$3,100", "proj": "8.05", "value": "2.60x"}, "20D92": {"salary": "$3,100", "proj": "8.05", "value": "2.60x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="8.05" 
                             data-default-value="2.6x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">100</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">91</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/new-york-mets/" class="text-decoration-none">
@@ -5074,13 +4729,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,600", "proj": "9.31", "value": "2.59x"}, "20D91": {"salary": "$3,600", "proj": "9.31", "value": "2.59x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,600", "proj": "9.31", "value": "2.59x"}}' 
                             data-default-salary="$3,600" 
                             data-default-proj="9.31" 
                             data-default-value="2.59x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">101</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">92</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
@@ -5115,13 +4770,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,500", "proj": "6.44", "value": "2.58x"}, "20D91": {"salary": "$2,500", "proj": "6.44", "value": "2.58x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,500", "proj": "6.44", "value": "2.58x"}}' 
                             data-default-salary="$2,500" 
                             data-default-proj="6.44" 
                             data-default-value="2.58x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">102</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">93</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/st-louis-cardinals/" class="text-decoration-none">
@@ -5156,13 +4811,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$2,700", "proj": "6.93", "value": "2.57x"}, "20D91": {"salary": "$2,700", "proj": "6.93", "value": "2.57x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$2,700", "proj": "6.93", "value": "2.57x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="6.93" 
                             data-default-value="2.57x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">103</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">94</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
@@ -5197,13 +4852,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,700", "proj": "6.85", "value": "2.54x"}, "20D8E": {"salary": "$2,700", "proj": "6.85", "value": "2.54x"}, "20D89": {"salary": "$2,700", "proj": "6.85", "value": "2.54x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,700", "proj": "6.85", "value": "2.54x"}, "20D94": {"salary": "$2,700", "proj": "6.85", "value": "2.54x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="6.85" 
                             data-default-value="2.54x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">104</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">95</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/seattle-mariners/" class="text-decoration-none">
@@ -5238,95 +4893,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$6,800", "proj": "6.98", "value": "1.03x"}, "20D89": {"salary": "$2,800", "proj": "6.98", "value": "2.49x"}}' 
-                            data-default-salary="$2,800" 
-                            data-default-proj="6.98" 
-                            data-default-value="2.49x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">105</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682987/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/spencer-jones/" class="player-link text-nowrap">Spencer Jones</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.49x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Yankees
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,800</td>
-                            <td class="text-end fw-bold col-proj">6.98</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D90,20D89" 
-                            data-slate-stats='{"20D90": {"salary": "$6,800", "proj": "6.84", "value": "1.01x"}, "20D89": {"salary": "$2,800", "proj": "6.84", "value": "2.44x"}}' 
-                            data-default-salary="$2,800" 
-                            data-default-proj="6.84" 
-                            data-default-value="2.44x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">106</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682987/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/spencer-jones/" class="player-link text-nowrap">Spencer Jones</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold text-success col-value">2.44x</td>
-                            <td>
-                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Yankees
-                                </span>
-                            </td>
-                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
-                                <div class="d-flex align-items-center text-nowrap">
-                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
-                                </div>
-                            </td>
-                            <td class="text-end fw-semibold col-salary">$2,800</td>
-                            <td class="text-end fw-bold col-proj">6.84</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="20D94,20D8E,20D89" 
-                            data-slate-stats='{"20D94": {"salary": "$2,600", "proj": "6.05", "value": "2.33x"}, "20D8E": {"salary": "$2,600", "proj": "6.05", "value": "2.33x"}, "20D89": {"salary": "$2,600", "proj": "6.05", "value": "2.33x"}}' 
+                        <tr data-slates="20D8E,20D94" 
+                            data-slate-stats='{"20D8E": {"salary": "$2,600", "proj": "6.05", "value": "2.33x"}, "20D94": {"salary": "$2,600", "proj": "6.05", "value": "2.33x"}}' 
                             data-default-salary="$2,600" 
                             data-default-proj="6.05" 
                             data-default-value="2.33x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">107</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">96</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/houston-astros/" class="text-decoration-none">
@@ -5361,13 +4934,13 @@
                             
                         </tr>
                         
-                        <tr data-slates="20D89,20D91" 
-                            data-slate-stats='{"20D89": {"salary": "$3,500", "proj": "7.86", "value": "2.25x"}, "20D91": {"salary": "$3,500", "proj": "7.86", "value": "2.25x"}}' 
+                        <tr data-slates="20D91" 
+                            data-slate-stats='{"20D91": {"salary": "$3,500", "proj": "7.86", "value": "2.25x"}}' 
                             data-default-salary="$3,500" 
                             data-default-proj="7.86" 
                             data-default-value="2.25x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">108</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">97</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/st-louis-cardinals/" class="text-decoration-none">
@@ -5399,6 +4972,457 @@
                             </td>
                             <td class="text-end fw-semibold col-salary">$3,500</td>
                             <td class="text-end fw-bold col-proj">7.86</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$3,800", "proj": "7.47", "value": "1.97x"}}' 
+                            data-default-salary="$3,800" 
+                            data-default-proj="7.47" 
+                            data-default-value="1.97x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">98</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">4</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668723/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/ryan-vilade/" class="player-link text-nowrap">Ryan Vilade</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.97x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Rays
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$3,800</td>
+                            <td class="text-end fw-bold col-proj">7.47</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$4,600", "proj": "7.50", "value": "1.63x"}}' 
+                            data-default-salary="$4,600" 
+                            data-default-proj="7.5" 
+                            data-default-value="1.63x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">99</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676356/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/jonny-deluca/" class="player-link text-nowrap">Jonny Deluca</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.63x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Rays
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$4,600</td>
+                            <td class="text-end fw-bold col-proj">7.5</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$4,600", "proj": "7.50", "value": "1.63x"}}' 
+                            data-default-salary="$4,600" 
+                            data-default-proj="7.5" 
+                            data-default-value="1.63x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">100</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/676356/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/jonny-deluca/" class="player-link text-nowrap">Jonny Deluca</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.63x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Rays
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$4,600</td>
+                            <td class="text-end fw-bold col-proj">7.5</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$5,600", "proj": "8.63", "value": "1.54x"}}' 
+                            data-default-salary="$5,600" 
+                            data-default-proj="8.63" 
+                            data-default-value="1.54x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">101</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/802415/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/chandler-simpson/" class="player-link text-nowrap">Chandler Simpson</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.54x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Rays
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$5,600</td>
+                            <td class="text-end fw-bold col-proj">8.63</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$5,600", "proj": "8.63", "value": "1.54x"}}' 
+                            data-default-salary="$5,600" 
+                            data-default-proj="8.63" 
+                            data-default-value="1.54x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">102</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/802415/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/chandler-simpson/" class="player-link text-nowrap">Chandler Simpson</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.54x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Rays
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Yankees Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Yankees
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$5,600</td>
+                            <td class="text-end fw-bold col-proj">8.63</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$5,800", "proj": "7.23", "value": "1.25x"}}' 
+                            data-default-salary="$5,800" 
+                            data-default-proj="7.23" 
+                            data-default-value="1.25x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">103</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">3</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/671218/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/heliot-ramos/" class="player-link text-nowrap">Heliot Ramos</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.25x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Yankees
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$5,800</td>
+                            <td class="text-end fw-bold col-proj">7.23</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$5,800", "proj": "7.23", "value": "1.25x"}}' 
+                            data-default-salary="$5,800" 
+                            data-default-proj="7.23" 
+                            data-default-value="1.25x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">104</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">3</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/671218/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/heliot-ramos/" class="player-link text-nowrap">Heliot Ramos</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.25x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Yankees
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$5,800</td>
+                            <td class="text-end fw-bold col-proj">7.23</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$6,800", "proj": "6.98", "value": "1.03x"}}' 
+                            data-default-salary="$6,800" 
+                            data-default-proj="6.98" 
+                            data-default-value="1.03x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">105</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682987/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/spencer-jones/" class="player-link text-nowrap">Spencer Jones</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.03x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Yankees
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$6,800</td>
+                            <td class="text-end fw-bold col-proj">6.98</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$6,800", "proj": "6.84", "value": "1.01x"}}' 
+                            data-default-salary="$6,800" 
+                            data-default-proj="6.84" 
+                            data-default-value="1.01x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">106</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/682987/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/spencer-jones/" class="player-link text-nowrap">Spencer Jones</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">1.01x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Yankees
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$6,800</td>
+                            <td class="text-end fw-bold col-proj">6.84</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$9,600", "proj": "9.31", "value": "0.97x"}}' 
+                            data-default-salary="$9,600" 
+                            data-default-proj="9.31" 
+                            data-default-value="0.97x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">107</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">2</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641355/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/cody-bellinger/" class="player-link text-nowrap">Cody Bellinger</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">0.97x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Yankees
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$9,600</td>
+                            <td class="text-end fw-bold col-proj">9.31</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20D90" 
+                            data-slate-stats='{"20D90": {"salary": "$9,600", "proj": "9.31", "value": "0.97x"}}' 
+                            data-default-salary="$9,600" 
+                            data-default-proj="9.31" 
+                            data-default-value="0.97x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">108</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/new-york-yankees/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">2</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641355/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/147.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/cody-bellinger/" class="player-link text-nowrap">Cody Bellinger</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">0.97x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Yankees
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$9,600</td>
+                            <td class="text-end fw-bold col-proj">9.31</td>
                             
                         </tr>
                         
