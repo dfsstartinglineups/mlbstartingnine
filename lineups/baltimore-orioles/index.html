@@ -110,11 +110,11 @@
                         <div style="width: 36px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); font-family: 'Permanent Marker', cursive; font-size: 16px; color: var(--marker-ink); background: rgba(0,0,0,0.04); flex-shrink: 0;">SP</div>
                         <div style="width: 48px; height: 100%; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--paper-line); flex-shrink: 0;">
                             <div style="width: 36px; height: 36px; border-radius: 50%; background: #e0dcd3; overflow: hidden; border: 1.5px solid var(--marker-ink); border-radius: 255px 15px 225px 15px/15px 225px 15px 255px; display: flex; justify-content: center; align-items: center;">
-                                <img src="https://www.mlbstatic.com/team-logos/100.svg" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
+                                <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/669432/headshot/67/current" style="width: 100%; height: 100%; object-fit: cover; object-position: center;">
                             </div>
                         </div>
                         <div style="flex-grow: 1; height: 100%; display: flex; align-items: center; padding-left: 10px; font-family: 'Permanent Marker', cursive; font-size: clamp(16px, 4vw, 18px); text-transform: uppercase; letter-spacing: 0.5px; color: #1a1e24; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                            <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;"></span><a href="/players/tbd-bullpen-game/" style="color: inherit; text-decoration: none;">TBD / Bullpen Game</a>
+                            <span style="font-family: 'Caveat', cursive; font-size: clamp(16px, 4vw, 18px); color: #4a4f58; opacity: 0.85; font-weight: 700; text-transform: none;">(L) </span><a href="/players/trevor-rogers/" style="color: inherit; text-decoration: none;">Trevor Rogers</a>
                         </div>
                         <div style="width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #4a4f58; flex-shrink: 0;">SP</div>
                     </div>
@@ -123,6 +123,63 @@
         </div>
         <div id="public-analytics-section">
             
+    <style>
+        .stat-container { max-width: 580px; width: 94%; margin: 10px auto 40px auto; font-family: 'Montserrat', sans-serif; }
+        .stat-card { background: #1a1d24; border: 1px solid #2d323b; border-radius: 10px; margin-bottom: 25px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .stat-header { background: #22262e; padding: 12px 15px; border-bottom: 2px solid var(--marker-ink, #444); color: #fff; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: space-between; }
+        .stat-table { width: 100%; border-collapse: collapse; color: #ddd; font-size: 12px; }
+        .stat-table th { background: #15171c; padding: 10px; text-align: center; color: #8892a3; font-weight: 600; text-transform: uppercase; font-size: 10px; border-bottom: 1px solid #2d323b; }
+        .stat-table th:first-child, .stat-table td:first-child { text-align: left; padding-left: 15px; font-weight: 600; color: #fff; }
+        .stat-table td { padding: 10px; text-align: center; border-bottom: 1px solid #252933; }
+        .stat-table tr:last-child td { border-bottom: none; }
+        .stat-table tr:hover { background: rgba(255,255,255,0.03); }
+        .highlight-text { color: #00e676; font-weight: 700; }
+        .env-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
+        .env-box { background: #15171c; border-radius: 8px; padding: 12px; border: 1px solid #252933; }
+        .env-title { font-size: 10px; color: #8892a3; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #2d323b; padding-bottom: 4px; }
+        .env-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; color: #ddd; }
+    </style>
+    
+    <div class="stat-container">
+        <div class="stat-card">
+            <div class="stat-header">DFS Projections & Pricing</div>
+            <table class="stat-table">
+                <thead><tr><th>Batter</th><th>Pos</th><th>FD $</th><th>FD Proj</th><th>DK $</th><th>DK Proj</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-header">Opposing Pitcher: TBD / Bullpen Game</div>
+            <div style="padding: 20px; text-align: center; color: #8892a3; font-size: 13px;">Advanced split stats will populate once an official starting pitcher is announced.</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">Batter Splits & BvP</div>
+            <table class="stat-table">
+                <thead><tr><th>Batter</th><th>vs RHP (OPS)</th><th>BvP AB</th><th>BvP AVG</th><th>BvP HR</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        
+    <div class="stat-card">
+        <div class="stat-header">Game Environment</div>
+        <div class="env-grid">
+            <div class="env-box">
+                <div class="env-title">Park Factors (100 = Avg)</div>
+                <div class="env-row"><span>Runs:</span> <span class="">99</span></div>
+                <div class="env-row"><span>HR (LHB):</span> <span>116</span></div>
+                <div class="env-row"><span>HR (RHB):</span> <span>103</span></div>
+            </div>
+            <div class="env-box">
+                <div class="env-title">Umpire: TBD</div>
+                <div class="env-row"><span>K Rate:</span> <span>-</span></div>
+                <div class="env-row"><span>BB Rate:</span> <span>-</span></div>
+                <div class="env-row"><span>Runs/Game:</span> <span>-</span></div>
+            </div>
+        </div>
+    </div>
+    </div>
+    
         </div>
         <footer style="background: #0a0a0a; border-top: 1px solid #1a1a1a; padding: 25px 15px; text-align: center; margin-top: 40px; font-family: 'Montserrat', sans-serif;">
             <p style="color: #666; font-size: 11px; margin: 0 0 8px 0;">&copy; 2026 MLB Starting 9. All rights reserved.</p>
