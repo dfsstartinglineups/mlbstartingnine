@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected FanDuel Third Base</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-30 02:59 AM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-09-30 03:02 AM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
@@ -117,21 +117,12 @@
     <div id="games-yesterday" class="dfs-partition d-none">
         
         
-        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
-            No DFS data available for this partition.
-        </div>
-        
-    </div>
-    
-    <div id="games-today" class="dfs-partition ">
-        
-        
         
         <!-- Day-Specific Slate Selector -->
         
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'yesterday')">
                 <option value="all">All Games</option>
                 
                 <option value="20E72">4 Games  · Main TUE 2:00PM ET</option>
@@ -223,7 +214,7 @@
         
     </div>
     
-    <div id="games-tomorrow" class="dfs-partition d-none">
+    <div id="games-today" class="dfs-partition ">
         
         
         
@@ -231,7 +222,7 @@
         
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'tomorrow')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
                 <option value="all">All Games</option>
                 
                 <option value="20EA9">4 Games  · Main WED 2:00PM ET</option>
@@ -269,8 +260,8 @@
                     </thead>
                     <tbody>
                         
-                        <tr data-slates="20EB0,20EA9" 
-                            data-slate-stats='{"20EB0": {"salary": "$9,800", "proj": "11.23", "value": "1.15x"}, "20EA9": {"salary": "$3,100", "proj": "11.23", "value": "3.62x"}}' 
+                        <tr data-slates="20EA9,20EB0" 
+                            data-slate-stats='{"20EA9": {"salary": "$3,100", "proj": "11.23", "value": "3.62x"}, "20EB0": {"salary": "$9,800", "proj": "11.23", "value": "1.15x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="11.23" 
                             data-default-value="3.62x">
@@ -310,8 +301,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB1,20EA9" 
-                            data-slate-stats='{"20EB1": {"salary": "$3,400", "proj": "7.47", "value": "2.20x"}, "20EA9": {"salary": "$2,200", "proj": "7.47", "value": "3.40x"}}' 
+                        <tr data-slates="20EA9,20EB1" 
+                            data-slate-stats='{"20EA9": {"salary": "$2,200", "proj": "7.47", "value": "3.40x"}, "20EB1": {"salary": "$3,400", "proj": "7.47", "value": "2.20x"}}' 
                             data-default-salary="$2,200" 
                             data-default-proj="7.47" 
                             data-default-value="3.4x">
@@ -351,8 +342,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB1,20EA9" 
-                            data-slate-stats='{"20EB1": {"salary": "$9,400", "proj": "10.50", "value": "1.12x"}, "20EA9": {"salary": "$3,100", "proj": "10.50", "value": "3.39x"}}' 
+                        <tr data-slates="20EA9,20EB1" 
+                            data-slate-stats='{"20EA9": {"salary": "$3,100", "proj": "10.50", "value": "3.39x"}, "20EB1": {"salary": "$9,400", "proj": "10.50", "value": "1.12x"}}' 
                             data-default-salary="$3,100" 
                             data-default-proj="10.5" 
                             data-default-value="3.39x">
@@ -392,8 +383,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB2,20EA9" 
-                            data-slate-stats='{"20EB2": {"salary": "$8,800", "proj": "10.10", "value": "1.15x"}, "20EA9": {"salary": "$3,000", "proj": "10.10", "value": "3.37x"}}' 
+                        <tr data-slates="20EA9,20EB2" 
+                            data-slate-stats='{"20EA9": {"salary": "$3,000", "proj": "10.10", "value": "3.37x"}, "20EB2": {"salary": "$8,800", "proj": "10.10", "value": "1.15x"}}' 
                             data-default-salary="$3,000" 
                             data-default-proj="10.1" 
                             data-default-value="3.37x">
@@ -433,8 +424,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB2,20EA9" 
-                            data-slate-stats='{"20EB2": {"salary": "$5,600", "proj": "8.99", "value": "1.61x"}, "20EA9": {"salary": "$2,700", "proj": "8.99", "value": "3.33x"}}' 
+                        <tr data-slates="20EA9,20EB2" 
+                            data-slate-stats='{"20EA9": {"salary": "$2,700", "proj": "8.99", "value": "3.33x"}, "20EB2": {"salary": "$5,600", "proj": "8.99", "value": "1.61x"}}' 
                             data-default-salary="$2,700" 
                             data-default-proj="8.99" 
                             data-default-value="3.33x">
@@ -556,8 +547,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB0,20EA9" 
-                            data-slate-stats='{"20EB0": {"salary": "$12,200", "proj": "10.40", "value": "0.85x"}, "20EA9": {"salary": "$3,400", "proj": "10.40", "value": "3.06x"}}' 
+                        <tr data-slates="20EA9,20EB0" 
+                            data-slate-stats='{"20EA9": {"salary": "$3,400", "proj": "10.40", "value": "3.06x"}, "20EB0": {"salary": "$12,200", "proj": "10.40", "value": "0.85x"}}' 
                             data-default-salary="$3,400" 
                             data-default-proj="10.4" 
                             data-default-value="3.06x">
@@ -638,8 +629,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB2,20EA9" 
-                            data-slate-stats='{"20EB2": {"salary": "$10,400", "proj": "9.60", "value": "0.92x"}, "20EA9": {"salary": "$3,300", "proj": "9.60", "value": "2.91x"}}' 
+                        <tr data-slates="20EA9,20EB2" 
+                            data-slate-stats='{"20EA9": {"salary": "$3,300", "proj": "9.60", "value": "2.91x"}, "20EB2": {"salary": "$10,400", "proj": "9.60", "value": "0.92x"}}' 
                             data-default-salary="$3,300" 
                             data-default-proj="9.6" 
                             data-default-value="2.91x">
@@ -720,8 +711,8 @@
                             
                         </tr>
                         
-                        <tr data-slates="20EB1,20EA9" 
-                            data-slate-stats='{"20EB1": {"salary": "$6,800", "proj": "6.79", "value": "1.00x"}, "20EA9": {"salary": "$2,800", "proj": "6.79", "value": "2.43x"}}' 
+                        <tr data-slates="20EA9,20EB1" 
+                            data-slate-stats='{"20EA9": {"salary": "$2,800", "proj": "6.79", "value": "2.43x"}, "20EB1": {"salary": "$6,800", "proj": "6.79", "value": "1.00x"}}' 
                             data-default-salary="$2,800" 
                             data-default-proj="6.79" 
                             data-default-value="2.43x">
@@ -764,6 +755,15 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+        
+    </div>
+    
+    <div id="games-tomorrow" class="dfs-partition d-none">
+        
+        
+        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
+            No DFS data available for this partition.
         </div>
         
     </div>
