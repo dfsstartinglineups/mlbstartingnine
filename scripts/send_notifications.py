@@ -101,12 +101,19 @@ def load_daily_json(today_date):
     """Grab the daily JSON file strictly by its exact filename, using absolute paths."""
     file_path = os.path.join(REPO_ROOT, 'data', 'daily_files', f'games_{today_date}.json')
     
+    if not os.path.exists(file_path):
+        print(f"No games file found for today ({today_date}). Halting execution gracefully.")
+        import sys
+        sys.exit(0)  # Exits cleanly with code 0 instead of throwing a stack trace
+        
     try:
         print(f"Reading official lineups from: {file_path}")
         with open(file_path, 'r') as f:
             return json.load(f)
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Critical Error: {file_path} is missing. Halting execution.")
+    except Exception as e:
+        print(f"Critical Error parsing {file_path}: {e}")
+        import sys
+        sys.exit(1)
 
 def extract_official_lineups(daily_data):
     """Parse the daily JSON to find official lineups, pitchers, and postponed games with doubleheader awareness."""
