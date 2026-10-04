@@ -1,5 +1,5 @@
 {
-    "last_updated": "Oct 04, 12:04 AM ET",
+    "last_updated": "Oct 04, 12:08 AM ET",
     "slates": {
         "fanduel": [
             {
@@ -372,15 +372,13 @@
                             "runs": 0,
                             "hits": 3,
                             "errors": 0,
-                            "leftOnBase": 7,
-                            "isWinner": false
+                            "leftOnBase": 7
                         },
                         "away": {
                             "runs": 3,
                             "hits": 6,
                             "errors": 0,
-                            "leftOnBase": 4,
-                            "isWinner": true
+                            "leftOnBase": 4
                         }
                     },
                     "defense": {
@@ -5898,12 +5896,12 @@
                 "gameDate": "2026-10-04T00:30:00Z",
                 "officialDate": "2026-10-03",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -5914,11 +5912,12 @@
                         },
                         "leagueRecord": {
                             "wins": 0,
-                            "losses": 0,
+                            "losses": 1,
                             "ties": 0,
                             "pct": ".000"
                         },
                         "score": 2,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 592662,
                             "fullName": "Robbie Ray",
@@ -5979,12 +5978,13 @@
                             "link": "/api/v1/teams/158"
                         },
                         "leagueRecord": {
-                            "wins": 0,
+                            "wins": 1,
                             "losses": 0,
                             "ties": 0,
-                            "pct": ".000"
+                            "pct": "1.000"
                         },
                         "score": 3,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 694819,
                             "fullName": "Jacob Misiorowski",
@@ -6184,9 +6184,10 @@
                                 "leftOnBase": 0
                             },
                             "away": {
+                                "runs": 0,
                                 "hits": 1,
                                 "errors": 0,
-                                "leftOnBase": 0
+                                "leftOnBase": 1
                             }
                         }
                     ],
@@ -6201,7 +6202,7 @@
                             "runs": 2,
                             "hits": 9,
                             "errors": 1,
-                            "leftOnBase": 11
+                            "leftOnBase": 12
                         }
                     },
                     "defense": {
@@ -6467,55 +6468,6 @@
                             "strikeZoneTop": 3.038,
                             "strikeZoneBottom": 1.533
                         },
-                        "first": {
-                            "id": 687957,
-                            "fullName": "Dustin Harris",
-                            "link": "/api/v1/people/687957",
-                            "firstName": "Dustin",
-                            "lastName": "Harris",
-                            "primaryNumber": "29",
-                            "birthDate": "1999-07-08",
-                            "currentAge": 27,
-                            "birthCity": "Tampa",
-                            "birthStateProvince": "FL",
-                            "birthCountry": "USA",
-                            "height": "6' 2\"",
-                            "weight": 185,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "7",
-                                "name": "Outfielder",
-                                "type": "Outfielder",
-                                "abbreviation": "LF"
-                            },
-                            "useName": "Dustin",
-                            "useLastName": "Harris",
-                            "middleName": "Alexander",
-                            "boxscoreName": "Harris, D",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2019,
-                            "mlbDebutDate": "2024-09-28",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Dustin Harris",
-                            "nameSlug": "dustin-harris-687957",
-                            "firstLastName": "Dustin Harris",
-                            "lastFirstName": "Harris, Dustin",
-                            "lastInitName": "Harris, D",
-                            "initLastName": "D Harris",
-                            "fullFMLName": "Dustin Alexander Harris",
-                            "fullLFMName": "Harris, Dustin Alexander",
-                            "strikeZoneTop": 3.32,
-                            "strikeZoneBottom": 1.67
-                        },
                         "pitcher": {
                             "id": 670970,
                             "fullName": "Adrian Morejon",
@@ -6573,8 +6525,8 @@
                         }
                     },
                     "balls": 0,
-                    "strikes": 0,
-                    "outs": 2
+                    "strikes": 1,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 32,
@@ -6584,6 +6536,7 @@
                 "content": {
                     "link": "/api/v1/game/849830/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
