@@ -1,5 +1,5 @@
 {
-    "last_updated": "Oct 05, 08:10 PM ET",
+    "last_updated": "Oct 05, 08:12 PM ET",
     "slates": {
         "fanduel": [
             {
@@ -41,12 +41,12 @@
                 "gameDate": "2026-10-05T21:00:00Z",
                 "officialDate": "2026-10-05",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -56,12 +56,13 @@
                             "link": "/api/v1/teams/145"
                         },
                         "leagueRecord": {
-                            "wins": 1,
+                            "wins": 2,
                             "losses": 0,
                             "ties": 0,
                             "pct": "1.000"
                         },
                         "score": 4,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 641743,
                             "fullName": "Anthony Kay",
@@ -122,11 +123,12 @@
                         },
                         "leagueRecord": {
                             "wins": 0,
-                            "losses": 1,
+                            "losses": 2,
                             "ties": 0,
                             "pct": ".000"
                         },
                         "score": 3,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 668909,
                             "fullName": "Gavin Williams",
@@ -320,6 +322,7 @@
                             "num": 9,
                             "ordinalNum": "9th",
                             "home": {
+                                "runs": 0,
                                 "hits": 0,
                                 "errors": 0,
                                 "leftOnBase": 0
@@ -663,8 +666,8 @@
                         }
                     },
                     "balls": 0,
-                    "strikes": 0,
-                    "outs": 2
+                    "strikes": 1,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 5,
@@ -674,6 +677,7 @@
                 "content": {
                     "link": "/api/v1/game/849834/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
@@ -3615,55 +3619,6 @@
                     },
                     "offense": {
                         "batter": {
-                            "id": 700250,
-                            "fullName": "Ben Rice",
-                            "link": "/api/v1/people/700250",
-                            "firstName": "Benjamin",
-                            "lastName": "Rice",
-                            "primaryNumber": "22",
-                            "birthDate": "1999-02-22",
-                            "currentAge": 27,
-                            "birthCity": "Cohasset",
-                            "birthStateProvince": "MA",
-                            "birthCountry": "USA",
-                            "height": "6' 2\"",
-                            "weight": 228,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "10",
-                                "name": "Designated Hitter",
-                                "type": "Hitter",
-                                "abbreviation": "DH"
-                            },
-                            "useName": "Ben",
-                            "useLastName": "Rice",
-                            "middleName": "Kimball",
-                            "boxscoreName": "Rice",
-                            "gender": "M",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "draftYear": 2021,
-                            "mlbDebutDate": "2024-06-18",
-                            "batSide": {
-                                "code": "L",
-                                "description": "Left"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Ben Rice",
-                            "nameSlug": "ben-rice-700250",
-                            "firstLastName": "Ben Rice",
-                            "lastFirstName": "Rice, Ben",
-                            "lastInitName": "Rice, B",
-                            "initLastName": "B Rice",
-                            "fullFMLName": "Benjamin Kimball Rice",
-                            "fullLFMName": "Rice, Benjamin Kimball",
-                            "strikeZoneTop": 3.281,
-                            "strikeZoneBottom": 1.656
-                        },
-                        "onDeck": {
                             "id": 641355,
                             "fullName": "Cody Bellinger",
                             "link": "/api/v1/people/641355",
@@ -3713,7 +3668,7 @@
                             "strikeZoneTop": 3.345,
                             "strikeZoneBottom": 1.688
                         },
-                        "inHole": {
+                        "onDeck": {
                             "id": 671277,
                             "fullName": "Luis Garc\u00eda Jr.",
                             "link": "/api/v1/people/671277",
@@ -3761,6 +3716,55 @@
                             "fullLFMName": "Garc\u00eda Jr., Luis Victoriano",
                             "strikeZoneTop": 3.248,
                             "strikeZoneBottom": 1.639
+                        },
+                        "inHole": {
+                            "id": 682987,
+                            "fullName": "Spencer Jones",
+                            "link": "/api/v1/people/682987",
+                            "firstName": "Spencer",
+                            "lastName": "Jones",
+                            "primaryNumber": "78",
+                            "birthDate": "2001-05-14",
+                            "currentAge": 25,
+                            "birthCity": "Encinitas",
+                            "birthStateProvince": "CA",
+                            "birthCountry": "USA",
+                            "height": "6' 7\"",
+                            "weight": 240,
+                            "active": true,
+                            "primaryPosition": {
+                                "code": "8",
+                                "name": "Outfielder",
+                                "type": "Outfielder",
+                                "abbreviation": "CF"
+                            },
+                            "useName": "Spencer",
+                            "useLastName": "Jones",
+                            "middleName": "George",
+                            "boxscoreName": "Jones, S",
+                            "gender": "M",
+                            "isPlayer": true,
+                            "isVerified": true,
+                            "draftYear": 2022,
+                            "mlbDebutDate": "2026-05-08",
+                            "batSide": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "pitchHand": {
+                                "code": "L",
+                                "description": "Left"
+                            },
+                            "nameFirstLast": "Spencer Jones",
+                            "nameSlug": "spencer-jones-682987",
+                            "firstLastName": "Spencer Jones",
+                            "lastFirstName": "Jones, Spencer",
+                            "lastInitName": "Jones, S",
+                            "initLastName": "S Jones",
+                            "fullFMLName": "Spencer George Jones",
+                            "fullLFMName": "Jones, Spencer George",
+                            "strikeZoneTop": 3.5,
+                            "strikeZoneBottom": 1.77
                         },
                         "pitcher": {
                             "id": 693645,
@@ -3811,7 +3815,7 @@
                             "strikeZoneTop": 3.478,
                             "strikeZoneBottom": 1.755
                         },
-                        "battingOrder": 1,
+                        "battingOrder": 2,
                         "team": {
                             "id": 147,
                             "name": "New York Yankees",
@@ -3819,8 +3823,8 @@
                         }
                     },
                     "balls": 0,
-                    "strikes": 0,
-                    "outs": 0
+                    "strikes": 2,
+                    "outs": 1
                 },
                 "venue": {
                     "id": 12,
