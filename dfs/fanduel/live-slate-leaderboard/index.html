@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Live FanDuel Slate Leaderboard</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-07 11:32 PM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-07 11:35 PM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
@@ -447,6 +447,28 @@
         
         <!-- Day-Specific Slate Selector -->
         
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
+                <option value="all">All Games</option>
+                
+                <option value="20FCB">4 Games  · Main WED 4:00PM ET</option>
+                
+                <option value="20FD3">3 Games  · Late WED 6:00PM ET</option>
+                
+                <option value="20FD4">2 Games  · After Hours WED 8:00PM ET</option>
+                
+                <option value="20FCF">CLE @ CWS WED 4:00PM ET</option>
+                
+                <option value="20FD0">LAD @ ATL WED 6:00PM ET</option>
+                
+                <option value="20FD1">TB @ NYY WED 8:00PM ET</option>
+                
+                <option value="20FD2">MIL @ SD WED 10:00PM ET</option>
+                
+            </select>
+        </div>
+        
         
         <div class="table-card shadow-sm mb-4 position-relative">
             <div class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3 scroll-indicator" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
@@ -468,13 +490,253 @@
                     </thead>
                     <tbody>
                         
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$6,400", "proj": "18.40", "value": "2.87x"}, "20FD4": {"salary": "$2,700", "proj": "18.40", "value": "6.81x"}, "20FD3": {"salary": "$2,700", "proj": "18.40", "value": "6.81x"}}' 
+                            data-default-salary="$2,700" 
+                            data-default-proj="18.4" 
+                            data-default-value="6.81x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">1</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">5</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/669003/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/garrett-mitchell/" class="player-link text-nowrap">Garrett Mitchell</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">18.4</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">2-2 | 3B, RBI, R</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD4,20FD3" 
+                            data-slate-stats='{"20FD4": {"salary": "$8,000", "proj": "18.00", "value": "2.25x"}, "20FD3": {"salary": "$8,000", "proj": "18.00", "value": "2.25x"}}' 
+                            data-default-salary="$8,000" 
+                            data-default-proj="18.0" 
+                            data-default-value="2.25x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">2</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">P</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/688107/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/robert-gasser/" class="player-link text-nowrap">Robert Gasser</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">18.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">4.0 IP, ER, 3 K, BB</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$12,800", "proj": "9.20", "value": "0.72x"}, "20FD4": {"salary": "$4,000", "proj": "9.20", "value": "2.30x"}, "20FD3": {"salary": "$4,000", "proj": "9.20", "value": "2.30x"}}' 
+                            data-default-salary="$4,000" 
+                            data-default-proj="9.2" 
+                            data-default-value="2.3x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">3</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">1</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/694192/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/jackson-chourio/" class="player-link text-nowrap">Jackson Chourio</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">9.2</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">1-2 | BB, RBI</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$10,200", "proj": "6.00", "value": "0.59x"}, "20FD4": {"salary": "$3,300", "proj": "6.00", "value": "1.82x"}, "20FD3": {"salary": "$3,300", "proj": "6.00", "value": "1.82x"}}' 
+                            data-default-salary="$3,300" 
+                            data-default-proj="6.0" 
+                            data-default-value="1.82x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">4</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">3</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/641343/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/jake-bauers/" class="player-link text-nowrap">Jake Bauers</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">6.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-0 | 2 BB</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$8,400", "proj": "3.00", "value": "0.36x"}, "20FD4": {"salary": "$3,000", "proj": "3.00", "value": "1.00x"}, "20FD3": {"salary": "$3,000", "proj": "3.00", "value": "1.00x"}}' 
+                            data-default-salary="$3,000" 
+                            data-default-proj="3.0" 
+                            data-default-value="1.0x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">5</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">4</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/661388/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/william-contreras/" class="player-link text-nowrap">William Contreras</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">3.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">1-3</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$8,000", "proj": "3.00", "value": "0.38x"}, "20FD4": {"salary": "$2,900", "proj": "3.00", "value": "1.03x"}, "20FD3": {"salary": "$2,900", "proj": "3.00", "value": "1.03x"}}' 
+                            data-default-salary="$2,900" 
+                            data-default-proj="3.0" 
+                            data-default-value="1.03x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">6</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/592885/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/christian-yelich/" class="player-link text-nowrap">Christian Yelich</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">3.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">1-3</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$11,400", "proj": "0.00", "value": "0.00x"}, "20FD4": {"salary": "$3,800", "proj": "0.00", "value": "0.00x"}, "20FD3": {"salary": "$3,800", "proj": "0.00", "value": "0.00x"}}' 
+                            data-default-salary="$3,800" 
+                            data-default-proj="0.0" 
+                            data-default-value="0.0x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">7</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">2</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668930/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/brice-turang/" class="player-link text-nowrap">Brice Turang</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">0.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-2</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$5,600", "proj": "0.00", "value": "0.00x"}, "20FD4": {"salary": "$2,700", "proj": "0.00", "value": "0.00x"}, "20FD3": {"salary": "$2,700", "proj": "0.00", "value": "0.00x"}}' 
+                            data-default-salary="$2,700" 
+                            data-default-proj="0.0" 
+                            data-default-value="0.0x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">8</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">7</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/806198/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/cooper-pratt/" class="player-link text-nowrap">Cooper Pratt</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">0.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-2</td>
+                            
+                        </tr>
+                        
                         <tr data-slates="20FD2,20FD4,20FD3,20FCB" 
                             data-slate-stats='{"20FD2": {"salary": "$3,800", "proj": "0.00", "value": "0.00x"}, "20FD4": {"salary": "$2,400", "proj": "0.00", "value": "0.00x"}, "20FD3": {"salary": "$2,400", "proj": "0.00", "value": "0.00x"}, "20FCB": {"salary": "$2,400", "proj": "0.00", "value": "0.00x"}}' 
                             data-default-salary="$2,400" 
                             data-default-proj="0.0" 
                             data-default-value="0.0x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">1</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">9</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
@@ -495,6 +757,36 @@
                             
                             <td class="text-end fw-bold col-proj fs-6">0.0</td>
                             <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">Pre-game</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="20FD2,20FD4,20FD3" 
+                            data-slate-stats='{"20FD2": {"salary": "$4,200", "proj": "0.00", "value": "0.00x"}, "20FD4": {"salary": "$2,400", "proj": "0.00", "value": "0.00x"}, "20FD3": {"salary": "$2,400", "proj": "0.00", "value": "0.00x"}}' 
+                            data-default-salary="$2,400" 
+                            data-default-proj="0.0" 
+                            data-default-value="0.0x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">10</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">9</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/687401/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/joey-ortiz/" class="player-link text-nowrap">Joey Ortiz</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">0.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-2</td>
                             
                         </tr>
                         
