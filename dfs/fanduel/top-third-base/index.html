@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected FanDuel Third Base</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-09 03:00 AM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-10 12:00 AM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
@@ -255,8 +255,130 @@
     <div id="games-tomorrow" class="dfs-partition d-none">
         
         
-        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
-            No DFS data available for this partition.
+        
+        <!-- Day-Specific Slate Selector -->
+        
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'tomorrow')">
+                <option value="all">All Games</option>
+                
+                <option value="21047">2 Games  · Sat-Sun Main SAT 8:00PM ET</option>
+                
+                <option value="21034">CWS @ CLE SAT 8:00PM ET</option>
+                
+            </select>
+        </div>
+        
+        
+        <div class="table-card shadow-sm mb-4 position-relative">
+            <div class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3 scroll-indicator" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
+                &larr; Swipe
+            </div>
+
+            <div class="table-responsive table-scroll-container">
+                <table class="table table-hover mb-0 leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 1%;" class="text-center px-2" onclick="sortTable(this, 0)"># &#x21D5;</th>
+                            <th onclick="sortTable(this, 1)">Player &#x21D5;</th>
+                            
+                            
+                            <th class="text-end text-primary" onclick="sortTable(this, 2)">Value &#x21D5;</th>
+                            <th onclick="sortTable(this, 3)">Team &#x21D5;</th>
+                            <th onclick="sortTable(this, 4)">Matchup &#x21D5;</th>
+                            <th class="text-end" onclick="sortTable(this, 5)">Salary &#x21D5;</th>
+                            <th class="text-end" onclick="sortTable(this, 6)">Proj &#x21D5;</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr data-slates="21034,21047" 
+                            data-slate-stats='{"21034": {"salary": "$12,200", "proj": "14.06", "value": "1.15x"}, "21047": {"salary": "$3,500", "proj": "14.06", "value": "4.02x"}}' 
+                            data-default-salary="$3,500" 
+                            data-default-proj="14.06" 
+                            data-default-value="4.02x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">1</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">2</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/608070/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/jose-ramirez/" class="player-link text-nowrap">Jose Ramirez</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">4.02x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Guardians
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="White Sox Icon" style="width: 18px; height: 18px; margin: 0 4px;"> White Sox
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$3,500</td>
+                            <td class="text-end fw-bold col-proj">14.06</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="21034,21047" 
+                            data-slate-stats='{"21034": {"salary": "$13,000", "proj": "10.30", "value": "0.79x"}, "21047": {"salary": "$3,900", "proj": "10.30", "value": "2.64x"}}' 
+                            data-default-salary="$3,900" 
+                            data-default-proj="10.3" 
+                            data-default-value="2.64x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">2</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/chicago-white-sox/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">3</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/678246/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/145.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/miguel-vargas/" class="player-link text-nowrap">Miguel Vargas</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">2.64x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    White Sox
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Guardians Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Guardians
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$3,900</td>
+                            <td class="text-end fw-bold col-proj">10.3</td>
+                            
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
         </div>
         
     </div>
