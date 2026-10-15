@@ -1,5 +1,5 @@
 {
-    "last_updated": "Oct 14, 11:10 PM ET",
+    "last_updated": "Oct 14, 11:12 PM ET",
     "slates": {
         "fanduel": [
             {
@@ -29,12 +29,12 @@
                 "gameDate": "2026-10-15T00:00:00Z",
                 "officialDate": "2026-10-14",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -44,12 +44,13 @@
                             "link": "/api/v1/teams/158"
                         },
                         "leagueRecord": {
-                            "wins": 2,
+                            "wins": 3,
                             "losses": 0,
                             "ties": 0,
                             "pct": "1.000"
                         },
                         "score": 6,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 688107,
                             "fullName": "Robert Gasser",
@@ -110,11 +111,12 @@
                         },
                         "leagueRecord": {
                             "wins": 0,
-                            "losses": 2,
+                            "losses": 3,
                             "ties": 0,
                             "pct": ".000"
                         },
                         "score": 2,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 605483,
                             "fullName": "Blake Snell",
@@ -309,6 +311,7 @@
                             "num": 9,
                             "ordinalNum": "9th",
                             "home": {
+                                "runs": 0,
                                 "hits": 0,
                                 "errors": 0,
                                 "leftOnBase": 0
@@ -656,8 +659,8 @@
                         }
                     },
                     "balls": 3,
-                    "strikes": 1,
-                    "outs": 2
+                    "strikes": 3,
+                    "outs": 3
                 },
                 "venue": {
                     "id": 22,
@@ -667,6 +670,7 @@
                 "content": {
                     "link": "/api/v1/game/849811/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
