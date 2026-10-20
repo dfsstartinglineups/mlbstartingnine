@@ -458,10 +458,6 @@ async def run_engines(memory):
                 
                 # Link-Free X (Twitter) Text
                 tweet_text = f"🏀 {game_date_short} {team_name} Starting Lineup vs {opp_name}\nProvided by nbastartingfive (check link in bio)\n\n"
-                if odds_str: tweet_text += f"📊 Live Line:{odds_str}\n\n"
-                tweet_text += f"#{team_hash} #{team_hash}Lineup #NBA"
-                if odds_str: tweet_text += f"📊 Live Line:{odds_str}\n\n"
-                link_url = f"https://nbastartingfive.com/#game-{url_game_id}"
                 if random.randint(1, 100) <= 100: tweet_text += f"Full matchups, stats, & odds:\n{link_url}\n\n"
                 tweet_text += f"#{team_hash} #{team_hash}Lineup #NBA"
                 
