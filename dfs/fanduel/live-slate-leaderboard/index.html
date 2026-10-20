@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Live FanDuel Slate Leaderboard</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-19 09:40 PM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-19 09:42 PM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">FanDuel</span>
     </div>
@@ -683,6 +683,16 @@
         
         <!-- Day-Specific Slate Selector -->
         
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'today')">
+                <option value="all">All Games</option>
+                
+                <option value="21179">CLE @ TB MON 8:08PM ET</option>
+                
+            </select>
+        </div>
+        
         
         <div class="table-card shadow-sm mb-4 position-relative">
             <div class="d-md-none position-absolute top-50 end-0 translate-middle-y pe-2 pe-none shadow-sm rounded-start bg-dark text-white px-2 py-1 z-3 scroll-indicator" style="opacity: 0.85; transition: opacity 0.3s; font-size: 0.70rem; letter-spacing: 0.5px;">
@@ -765,12 +775,42 @@
                         </tr>
                         
                         <tr data-slates="21179" 
+                            data-slate-stats='{"21179": {"salary": "$6,600", "proj": "6.00", "value": "0.91x"}}' 
+                            data-default-salary="$6,600" 
+                            data-default-proj="6.0" 
+                            data-default-value="0.91x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">3</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">1</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/680757/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/steven-kwan/" class="player-link text-nowrap">Steven Kwan</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold col-proj fs-6">6.0</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">1-2 | BB</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="21179" 
                             data-slate-stats='{"21179": {"salary": "$8,800", "proj": "6.00", "value": "0.68x"}}' 
                             data-default-salary="$8,800" 
                             data-default-proj="6.0" 
                             data-default-value="0.68x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">3</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">4</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
@@ -800,7 +840,7 @@
                             data-default-proj="6.0" 
                             data-default-value="1.5x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">4</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">5</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
@@ -830,7 +870,7 @@
                             data-default-proj="3.2" 
                             data-default-value="0.57x">
                             
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">5</td>
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">6</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
@@ -851,36 +891,6 @@
                             
                             <td class="text-end fw-bold col-proj fs-6">3.2</td>
                             <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-1 | RBI</td>
-                            
-                        </tr>
-                        
-                        <tr data-slates="21179" 
-                            data-slate-stats='{"21179": {"salary": "$6,600", "proj": "3.00", "value": "0.45x"}}' 
-                            data-default-salary="$6,600" 
-                            data-default-proj="3.0" 
-                            data-default-value="0.45x">
-                            
-                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">6</td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
-                                        
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">1</span>
-                                        
-                                    </a>
-                                    
-                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/680757/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
-                                    </div>
-                                    
-                                    <a href="/players/steven-kwan/" class="player-link text-nowrap">Steven Kwan</a>
-                                </div>
-                            </td>
-                            
-                            
-                            <td class="text-end fw-bold col-proj fs-6">3.0</td>
-                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">1-2</td>
                             
                         </tr>
                         
@@ -910,7 +920,7 @@
                             
                             
                             <td class="text-end fw-bold col-proj fs-6">3.0</td>
-                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-1 | BB</td>
+                            <td class="fw-semibold text-secondary" style="font-size: 0.85rem;">0-2 | BB</td>
                             
                         </tr>
                         
