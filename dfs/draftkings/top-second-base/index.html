@@ -75,7 +75,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
         <div>
             <h1 class="h3 fw-bold text-dark mb-1">Top Projected DraftKings Second Base</h1>
-            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-20 03:00 AM ET</p>
+            <p id="last-updated-text" class="text-muted small mb-0">Updated: 2026-10-23 01:18 AM ET</p>
         </div>
         <span class="badge bg-dark px-3 py-2 fs-6 shadow-sm">DraftKings</span>
     </div>
@@ -119,15 +119,33 @@
     <div id="games-yesterday" class="dfs-partition d-none">
         
         
+        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
+            No DFS data available for this partition.
+        </div>
+        
+    </div>
+    
+    <div id="games-today" class="dfs-partition ">
+        
+        
+        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
+            No DFS data available for this partition.
+        </div>
+        
+    </div>
+    
+    <div id="games-tomorrow" class="dfs-partition d-none">
+        
+        
         
         <!-- Day-Specific Slate Selector -->
         
         <div class="d-flex align-items-center gap-2 mb-2">
             <span class="fw-bold text-secondary small text-uppercase">Slates:</span>
-            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'yesterday')">
+            <select class="form-select form-select-sm w-auto fw-bold slate-selector" onchange="filterSlate(this.value, 'tomorrow')">
                 <option value="all">All Games</option>
                 
-                <option value="25E9E">CLE @ TB MON 8:08PM ET</option>
+                <option value="25F42">TB @ MIL FRI 8:00PM ET</option>
                 
             </select>
         </div>
@@ -156,68 +174,91 @@
                     </thead>
                     <tbody>
                         
-                        <tr data-slates="25E9E" 
-                            data-slate-stats='{"25E9E": {"salary": "$7,000", "proj": "5.89", "value": "0.84x"}}' 
-                            data-default-salary="$7,000" 
-                            data-default-proj="5.89" 
-                            data-default-value="0.84x">
+                        <tr data-slates="25F42" 
+                            data-slate-stats='{"25F42": {"salary": "$8,000", "proj": "8.41", "value": "1.05x"}}' 
+                            data-default-salary="$8,000" 
+                            data-default-proj="8.41" 
+                            data-default-value="1.05x">
                             
                             <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">1</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <a href="/lineups/cleveland-guardians/" class="text-decoration-none">
+                                    <a href="/lineups/milwaukee-brewers/" class="text-decoration-none">
                                         
-                                            <span class="badge bg-success me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Official Lineup Position">6</span>
+                                            <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">2</span>
                                         
                                     </a>
                                     
                                     <div class="position-relative d-inline-block me-2 flex-shrink-0">
-                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/683953/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
-                                        <img src="https://www.mlbstatic.com/team-logos/114.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/668930/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
                                     </div>
                                     
-                                    <a href="/players/travis-bazzana/" class="player-link text-nowrap">Travis Bazzana</a>
+                                    <a href="/players/brice-turang/" class="player-link text-nowrap">Brice Turang</a>
                                 </div>
                             </td>
                             
                             
-                            <td class="text-end fw-bold text-success col-value">0.84x</td>
+                            <td class="text-end fw-bold text-success col-value">1.05x</td>
                             <td>
                                 <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
-                                    Guardians
+                                    Brewers
                                 </span>
                             </td>
                             <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
                                 <div class="d-flex align-items-center text-nowrap">
-                                    @ <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
+                                    vs. <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Rays Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Rays
                                 </div>
                             </td>
-                            <td class="text-end fw-semibold col-salary">$7,000</td>
-                            <td class="text-end fw-bold col-proj">5.89</td>
+                            <td class="text-end fw-semibold col-salary">$8,000</td>
+                            <td class="text-end fw-bold col-proj">8.41</td>
+                            
+                        </tr>
+                        
+                        <tr data-slates="25F42" 
+                            data-slate-stats='{"25F42": {"salary": "$5,000", "proj": "4.88", "value": "0.98x"}}' 
+                            data-default-salary="$5,000" 
+                            data-default-proj="4.88" 
+                            data-default-value="0.98x">
+                            
+                            <td class="fw-bold text-muted col-rank text-center px-2" style="width: 1%;">2</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <a href="/lineups/tampa-bay-rays/" class="text-decoration-none">
+                                        
+                                            <span class="badge bg-warning text-dark me-2 shadow-sm d-inline-block text-center" style="font-size: 0.60rem; width: 26px;" title="Projected Lineup Position">8</span>
+                                        
+                                    </a>
+                                    
+                                    <div class="position-relative d-inline-block me-2 flex-shrink-0">
+                                        <img src="https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_64,q_auto:best/v1/people/680700/headshot/67/current" alt="headshot" class="rounded-circle" style="width: 34px; height: 34px; object-fit: cover; border: 1px solid #ced4da; background-color: #fff;">
+                                        <img src="https://www.mlbstatic.com/team-logos/139.svg" alt="Team Badge" class="position-absolute bg-white rounded-circle shadow-sm" style="width: 16px; height: 16px; bottom: -2px; right: -4px; padding: 1px; border: 1px solid #ced4da;">
+                                    </div>
+                                    
+                                    <a href="/players/richie-palacios/" class="player-link text-nowrap">Richie Palacios</a>
+                                </div>
+                            </td>
+                            
+                            
+                            <td class="text-end fw-bold text-success col-value">0.98x</td>
+                            <td>
+                                <span class="badge bg-light text-dark border d-flex align-items-center" style="width: fit-content; font-size: 0.80rem;">
+                                    Rays
+                                </span>
+                            </td>
+                            <td class="text-muted font-monospace fw-semibold" style="font-size: 0.80rem;">
+                                <div class="d-flex align-items-center text-nowrap">
+                                    @ <img src="https://www.mlbstatic.com/team-logos/158.svg" alt="Brewers Icon" style="width: 18px; height: 18px; margin: 0 4px;"> Brewers
+                                </div>
+                            </td>
+                            <td class="text-end fw-semibold col-salary">$5,000</td>
+                            <td class="text-end fw-bold col-proj">4.88</td>
                             
                         </tr>
                         
                     </tbody>
                 </table>
             </div>
-        </div>
-        
-    </div>
-    
-    <div id="games-today" class="dfs-partition ">
-        
-        
-        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
-            No DFS data available for this partition.
-        </div>
-        
-    </div>
-    
-    <div id="games-tomorrow" class="dfs-partition d-none">
-        
-        
-        <div class="table-card shadow-sm mb-4 text-center py-5 text-muted fw-bold">
-            No DFS data available for this partition.
         </div>
         
     </div>
