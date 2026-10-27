@@ -1,5 +1,5 @@
 {
-    "last_updated": "Oct 26, 11:10 PM ET",
+    "last_updated": "Oct 26, 11:12 PM ET",
     "slates": {
         "fanduel": [],
         "draftkings": []
@@ -15,12 +15,12 @@
                 "gameDate": "2026-10-27T00:00:00Z",
                 "officialDate": "2026-10-26",
                 "status": {
-                    "abstractGameState": "Live",
-                    "codedGameState": "I",
-                    "detailedState": "In Progress",
-                    "statusCode": "I",
+                    "abstractGameState": "Final",
+                    "codedGameState": "O",
+                    "detailedState": "Game Over",
+                    "statusCode": "O",
                     "startTimeTBD": false,
-                    "abstractGameCode": "L"
+                    "abstractGameCode": "F"
                 },
                 "teams": {
                     "away": {
@@ -30,12 +30,13 @@
                             "link": "/api/v1/teams/158"
                         },
                         "leagueRecord": {
-                            "wins": 2,
+                            "wins": 3,
                             "losses": 0,
                             "ties": 0,
                             "pct": "1.000"
                         },
                         "score": 10,
+                        "isWinner": true,
                         "probablePitcher": {
                             "id": 688107,
                             "fullName": "Robert Gasser",
@@ -96,11 +97,12 @@
                         },
                         "leagueRecord": {
                             "wins": 0,
-                            "losses": 2,
+                            "losses": 3,
                             "ties": 0,
                             "pct": ".000"
                         },
                         "score": 1,
+                        "isWinner": false,
                         "probablePitcher": {
                             "id": 642547,
                             "fullName": "Freddy Peralta",
@@ -296,7 +298,7 @@
                                 "runs": 1,
                                 "hits": 2,
                                 "errors": 0,
-                                "leftOnBase": 0
+                                "leftOnBase": 1
                             },
                             "away": {
                                 "runs": 0,
@@ -311,7 +313,7 @@
                             "runs": 1,
                             "hits": 3,
                             "errors": 1,
-                            "leftOnBase": 0
+                            "leftOnBase": 1
                         },
                         "away": {
                             "runs": 10,
@@ -582,55 +584,6 @@
                             "strikeZoneTop": 3.244,
                             "strikeZoneBottom": 1.637
                         },
-                        "second": {
-                            "id": 650490,
-                            "fullName": "Yandy D\u00edaz",
-                            "link": "/api/v1/people/650490",
-                            "firstName": "Yandy",
-                            "lastName": "D\u00edaz",
-                            "primaryNumber": "2",
-                            "birthDate": "1991-08-08",
-                            "currentAge": 35,
-                            "birthCity": "Sagua la Grande",
-                            "birthCountry": "Cuba",
-                            "height": "6' 0\"",
-                            "weight": 235,
-                            "active": true,
-                            "primaryPosition": {
-                                "code": "10",
-                                "name": "Designated Hitter",
-                                "type": "Hitter",
-                                "abbreviation": "DH"
-                            },
-                            "useName": "Yandy",
-                            "useLastName": "D\u00edaz",
-                            "boxscoreName": "D\u00edaz, Y",
-                            "nickName": "Aranita Diaz",
-                            "gender": "M",
-                            "nameMatrilineal": "Fernandez",
-                            "isPlayer": true,
-                            "isVerified": true,
-                            "pronunciation": "YAHN-dee",
-                            "mlbDebutDate": "2017-04-03",
-                            "batSide": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "pitchHand": {
-                                "code": "R",
-                                "description": "Right"
-                            },
-                            "nameFirstLast": "Yandy D\u00edaz",
-                            "nameSlug": "yandy-diaz-650490",
-                            "firstLastName": "Yandy D\u00edaz",
-                            "lastFirstName": "D\u00edaz, Yandy",
-                            "lastInitName": "D\u00edaz, Y",
-                            "initLastName": "Y D\u00edaz",
-                            "fullFMLName": "Yandy D\u00edaz",
-                            "fullLFMName": "D\u00edaz, Yandy",
-                            "strikeZoneTop": 3.228,
-                            "strikeZoneBottom": 1.629
-                        },
                         "pitcher": {
                             "id": 571927,
                             "fullName": "Steven Matz",
@@ -691,7 +644,7 @@
                     },
                     "balls": 0,
                     "strikes": 0,
-                    "outs": 2
+                    "outs": 3
                 },
                 "venue": {
                     "id": 12,
@@ -701,6 +654,7 @@
                 "content": {
                     "link": "/api/v1/game/849804/content"
                 },
+                "isTie": false,
                 "gameNumber": 1,
                 "publicFacing": true,
                 "doubleHeader": "N",
